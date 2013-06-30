@@ -301,3 +301,18 @@ void Panic::FileStream_Status(Panic::ERROR & error, fstream & stream, int log_le
         // Exit function.
         return;
 }
+
+const char * Panic::Get_Library_Version()
+{
+        return PANIC_HANDLER_VERSION;
+}
+
+const char * Panic::Get_Library_Compile_Date()
+{
+        return PANIC_HANDLER_COMPILEDATE;
+}
+
+const char * Panic::Get_Library_Compile_Time()
+{
+        return PANIC_HANDLER_COMPILETIME;
+}

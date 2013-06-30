@@ -24,6 +24,19 @@
 
 #include "BaseHeader.h"
 
+// Define version and compile date time.
+#ifndef PANIC_HANDLER_VERSION
+#define PANIC_HANDLER_VERSION "0.0.1 Alpha\0"
+#endif
+
+#ifndef PANIC_HANDLER_COMPILEDATE
+#define PANIC_HANDLER_COMPILEDATE   __DATE__
+#endif
+
+#ifndef PANIC_HANDLER_COMPILETIME
+#define PANIC_HANDLER_COMPILETIME   __TIME__
+#endif
+
 // Module ERROR IDs
 #define CORE_ID 1
 #define COMMON_ID 2
@@ -165,6 +178,27 @@ namespace Panic{
             Gets the status for a given file stream, and outputs that status to the given error handler with the given log_level.
     */
     void FileStream_Status(Panic::ERROR & error, fstream & stream, int log_level);
+    
+    /*!
+            const char * Panic::Get_Library_Version()
+
+            Returns a const char pointer to the library version.
+    */
+    const char * Get_Library_Version();
+
+    /*!
+            const char * Panic::Get_Library_Compile_Date()
+
+            Returns a const char pointer to the library compile date.
+    */
+    const char * Get_Library_Compile_Date();
+
+    /*!
+            const char * Panic::Get_Library_Compile_Time()
+
+            Returns a const char pointer to the library compile time.
+    */
+    const char * Get_Library_Compile_Time();
 }
 
 #endif
