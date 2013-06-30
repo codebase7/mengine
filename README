@@ -27,3 +27,15 @@ make
 Note: You can build in the source root directory, however it is advised against because it makes cleaning up
 the source tree harder later on. (Where as using a build directory allows you to just delete the build directory
 to clean it up.)
+
+Project Dependancies:
+
+The project requires some external libraries.
+
+They are:
+
+pthreads
+
+
+
+
