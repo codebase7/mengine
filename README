@@ -1,0 +1,29 @@
+Multiverse Engine Project 
+
+Written by Patrick Hibbs, released under the GNU GPL Version 2 on June 30 2013.
+
+Note from author:
+This project is / was a way for me to spend some time playing around with C++, and made for a good hobby.
+The release of this project (under the GPL, see the LICENSE.txt file.) is to allow others to use it if they find
+the project useful.
+As of the project's release it only supports POSIX systems. (With some not really useful support for Windows systems.)
+However I intend to add support for other systems later on.
+
+To build the project:
+
+Make a build directory and change into it.
+
+mkdir build
+cd build
+
+Then run cmake.
+
+cmake ../
+
+Finally run make.
+
+make
+
+Note: You can build in the source root directory, however it is advised against because it makes cleaning up
+the source tree harder later on. (Where as using a build directory allows you to just delete the build directory
+to clean it up.)

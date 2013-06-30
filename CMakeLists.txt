@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.6)
+project(Multiverse_Engine_Project)
+set(LIBRARY_OUTPUT_DIRECTORY ./build/lib CACHE PATH "object file output directory")
+set(ARCHIVE_OUTPUT_DIRECTORY ./build/obj CACHE PATH "library output directory")
+set(RUNTIME_OUTPUT_DIRECTORY ./build/bin CACHE PATH "executable output directory")
+add_subdirectory(src)

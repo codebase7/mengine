@@ -1,0 +1,2 @@
+add_executable(Thread_Test Thread_Utils_test.cpp)
+target_link_libraries(Thread_Test Common_Multiverse_Engine)
