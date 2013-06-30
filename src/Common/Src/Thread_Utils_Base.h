@@ -25,39 +25,19 @@ namespace Common
 {
         namespace Thread_Utils
         {
-                /*!
-                        enum supportedThreadLibs
-
-                        Contains a list of supported threadding libraries.
-
-                        The actual list used by the engine is generated at compile time.
-
-                        Below is the entire list of supported libraries that could be avaiable.
-
-                        Note: That some of the libraries below may not be avaiable to the engine
-                        at run-time due to external reasons.
-                        (Ex. The library is not supported on the given platform, was disabled at compile
-                         time due to user override, etc.)
-
-                        Note: If you add support for a library, you must define a unique id number for it.
-                        (This is to prevent the enum'd list from generating errors due to an id mismatch.)
-                        Also you must add a string for it in Get_Library_Name(). See below for description.
-                */
-                enum supportedThreadLibs {
-#ifdef TW_PTHREADS_SUPPORT
-                        pthreads = 1,
-#endif
-                        none = 0
+                // Below is a instance of the Library_Support_Status struct for the none / unsupported library.
+                const Library_Support_Status LibSupport_none =
+                {
+                        &Common::Thread_Utils::supportedThreadLibs[0],           // idNum                                (ID of the thread library that this struct is for.)
+                        false,          // bThreadsSupport                      (Do we support creating threads with this library.)
+                        false,          // bJoinThreadSupport                   (Do we support joining threads with this library.)
+                        false,          // bDetachThreadSupport                 (Do we support detaching threads with this library.)
+                        false,          // bLibraryRequiresSpecificFunctionSig  (Do we require that the user use a specific function signature when creating threads?)
+                        false,          // bMutexesSupport                      (Do we support creating mutexes with this library. Also basic lock and unlock support.)
+                        false,          // bTryLockSupport                      (Do we support trying to lock mutexes with this library.)
+                        false,          // bConditionVariableSupport            (Do we support condition variables with this library.)
+                        false           // bConditionWaitTimeoutSupport         (Do we support a timeout limit when waiting on a condition variable with this library.)
                 };
-
-                /*!
-                    const char * Get_Library_Name(const supportedThreadLibs & lib)
-
-                    Returns a human readable string to identify a given supported library.
-
-                    If no supported library is given it returns "none / unsupported".
-                */
-                const char * Get_Library_Name(const supportedThreadLibs & lib);
 
                 /*!
                         class Common::Thread_Utils::Thread
@@ -69,28 +49,28 @@ namespace Common
                         private:
 
                         protected:
-                            supportedThreadLibs thread_lib; // Thread library used to create thread.
+                            LibraryID thread_lib;           // Thread library used to create thread.
                             int rc_from_prevOP;             // Return code from the actual thread library function.
 
                         public:
                             Thread()
                             {
-                                    thread_lib = none;
-                                    rc_from_prevOP = 0;
+                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    rc_from_prevOP = -3;
                             }
                             virtual ~Thread()
                             {
 
                             }
 
-                            supportedThreadLibs Get_Thread_Library() const;
+                            const LibraryID & Get_Thread_Library() const;
                             int Get_Return_Code() const;
 
                             virtual short Create_Thread(void *(*real_funct_ptr)(void*), void * function_args = NULL, unsigned long int * thread_id = NULL);
 
                             virtual short Detach_Thread();
 
-                            virtual short Join_Thread(void * ret_from_thread = NULL);
+                            virtual short Join_Thread(void ** ret_from_thread = NULL);
                 };
 
                 /*!
@@ -104,32 +84,89 @@ namespace Common
                 class Mutex
                 {
                         private:
-
+                        /*
+                            LibraryID thread_lib;           // Thread library used to create mutex.
+                            int rc_from_prevOP;             // Return code from the actual thread library function.
+                            NOTE: The above is only here to show intent. A derived class should put the above in it's
+                            private feild. (To allow other classes to deive from it.)
+                        */
 
                         protected:
-                            supportedThreadLibs thread_lib; // Thread library used to create mutex.
-                            int rc_from_prevOP;             // Return code from the actual thread library function.
 
                         public:
+                            /*
+                            A basic constructor to show how the drived object should work. (I.e what vars to set at initilization.)
                             Mutex()
                             {
-                                    thread_lib = none;
-                                    rc_from_prevOP = 0;
+                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    rc_from_prevOP = -3;
                             }
+                            */
+
                             virtual ~Mutex()
                             {
-                                    thread_lib = none;
+
                             }
 
                             // Accessor function for the thread_lib.
-                            supportedThreadLibs Get_Thread_Library() const;
-                            int Get_Return_Code() const;
+                            virtual const LibraryID & Get_Thread_Library() const = 0;   // Used to return the external LibraryID for this object.
+                            virtual int Get_Return_Code() const = 0;        // Used to get return code from the external library. (NOT Thread_Utils!)
 
-                            virtual short Init_Mutex();
-                            virtual short Destroy_Mutex();
-                            virtual short Lock_Mutex();
-                            virtual short Try_Lock_Mutex();
-                            virtual short Unlock_Mutex();
+                            virtual short Init_Mutex() = 0;
+                            virtual short Destroy_Mutex() = 0;
+                            virtual short Lock_Mutex() = 0;
+                            virtual short Try_Lock_Mutex() = 0;
+                            virtual short Unlock_Mutex() = 0;
+                };
+
+                /*!
+                        class Common::Thread_Utils::Condition
+
+                        This class is a generic wrapper for condition variables.
+
+                        This class is also incomplete. (Ie. Virtual.) It must be derived to be used.
+                        It is to be used as a base class for pointer dereferening.
+                        (This is due to the condition class needing an internal mutex class to be usable.)
+
+                        Note: That this class does not contain the REAL condition variable.
+                        The condition variable is defined in the wrapper, by deriving the actual class from this one.
+                */
+                class Condition
+                {
+                        private:
+                        /*
+                            LibraryID thread_lib;           // Thread library used to create mutex.
+                            int rc_from_prevOP;             // Return code from the actual thread library function.
+                            NOTE: The above is only here to show intent. A derived class should put the above in it's
+                            private feild. (To allow other classes to deive from it.)
+                        */
+
+                        protected:
+
+                        public:
+                            /*
+                            A basic constructor to show how the drived object should work. (I.e what vars to set at initilization.)
+                            Condition()
+                            {
+                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    rc_from_prevOP = -3;
+                            }
+                            */
+
+                            virtual ~Condition()
+                            {
+
+                            }
+
+                            // Accessor function for the thread_lib.
+                            virtual const LibraryID & Get_Thread_Library() const = 0;   // Used to return the external LibraryID for this object.
+                            virtual int Get_Return_Code() const = 0;        // Used to get return code from the external library. (NOT Thread_Utils!)
+
+                            virtual short Init_Condition() = 0;
+                            virtual short Destroy_Condition() = 0;
+                            virtual short Wait() = 0;
+                            virtual short Timed_Wait(const unsigned long & seconds_to_wait) = 0;
+                            virtual short Signal() = 0;
                 };
         };
 };
