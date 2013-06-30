@@ -74,7 +74,7 @@ std::string Panic::ERROR::PanicHandler(std::string message, int moduleID, int lo
                             LastError = "Port Audio Subsystem: ";
                             break;
                         case ERROR_ID:
-                            LastError = "Panic_Hanlder: ";
+                            LastError = "Panic_Handler: ";
                             break;
                         default:
                             LastError = "UNKNOWN: ";
