@@ -10,5 +10,14 @@ if (Threads_FOUND)
 	  message(FATAL_ERROR "No pthreads library found. We need the Posix Thread Library, not a win32, sparc, hp, etc. version. Aborting.")
     endif(NOT CMAKE_USE_PTHREADS_INIT)
 endif(Threads_FOUND)
+
+# Look for the gcrypt library.
+
+
+# Add encryption library.
+add_library(Encryption_Utils_Multiverse_Engine SHARED Encryption_Utils_Base.cpp Encryption_Utils_Functions.cpp Encryption_Utils_gcrypt.cpp)
+target_link_libraries(Encryption_Utils_Multiverse_Engine Core_Multiverse_Engine Panic_Handler_Multiverse_Engine)
+
+# Add common library.
 add_library(Common_Multiverse_Engine SHARED FileUtills.cpp Thread_Utils_Base.cpp Thread_Utils_Functions.cpp Thread_Utils_pthread.cpp)
 target_link_libraries(Common_Multiverse_Engine Core_Multiverse_Engine Panic_Handler_Multiverse_Engine ${CMAKE_THREAD_LIBS_INIT})
