@@ -36,6 +36,12 @@
 #include <sys/statfs.h>
 #include <dirent.h>
 #include <string.h>
+#include <stddef.h>     // For errno.
+#include <time.h>       // For timespec and clock_gettime().
+
+// Internal includes.
+#include "../../Core/Src/DataProcess.h"
+#include "../../Core/Src/Panic.h"
 
 #endif
 #endif
