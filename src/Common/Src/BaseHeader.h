@@ -25,3 +25,11 @@
 #include <stdexcept>
 
 using namespace std;
+
+// OS / Arch specfific includes.
+
+#ifdef linux
+#include "Posix_common.h"
+#endif
+
+// End of BaseHeader.h 
