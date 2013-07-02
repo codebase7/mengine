@@ -20,7 +20,7 @@
 
 #include "Thread_Utils.h"
 
-const Common::Thread_Utils::LibraryID & Common::Thread_Utils::Thread::Get_Thread_Library() const
+const Common::LibraryID & Common::Thread_Utils::Thread::Get_Thread_Library() const
 {
         // Return thread library ID.
         return this->thread_lib;

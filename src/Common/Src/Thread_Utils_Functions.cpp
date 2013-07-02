@@ -20,12 +20,6 @@
 
 #include "Thread_Utils.h"
 
-const char * Common::Thread_Utils::Get_Library_Name(const Common::Thread_Utils::LibraryID & lib)
-{
-        // Return the string.
-        return lib.Name;
-}
-
 short Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries()
 {
         /*
@@ -38,7 +32,7 @@ short Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries()
         return ret;
 }
 
-Common::Thread_Utils::Thread * Common::Thread_Utils::Create_Thread(const Common::Thread_Utils::LibraryID & lib)
+Common::Thread_Utils::Thread * Common::Thread_Utils::Create_Thread(const Common::LibraryID & lib)
 {
         // Init return var.
         Common::Thread_Utils::Thread * ret = NULL;
@@ -71,7 +65,7 @@ Common::Thread_Utils::Thread * Common::Thread_Utils::Create_Thread(const Common:
         return ret;
 }
 
-Common::Thread_Utils::Mutex * Common::Thread_Utils::Create_Mutex(const Common::Thread_Utils::LibraryID & lib)
+Common::Thread_Utils::Mutex * Common::Thread_Utils::Create_Mutex(const Common::LibraryID & lib)
 {
         // Init return var.
         Common::Thread_Utils::Mutex * ret = NULL;
@@ -104,7 +98,7 @@ Common::Thread_Utils::Mutex * Common::Thread_Utils::Create_Mutex(const Common::T
         return ret;
 }
 
-Common::Thread_Utils::Condition * Common::Thread_Utils::Create_Condition(const Common::Thread_Utils::LibraryID & lib)
+Common::Thread_Utils::Condition * Common::Thread_Utils::Create_Condition(const Common::LibraryID & lib)
 {
         // Init return var.
         Common::Thread_Utils::Condition * ret = NULL;
@@ -157,7 +151,7 @@ void Common::Thread_Utils::Init_Library_Support_Status(Common::Thread_Utils::Lib
         return;
 }
 
-const Common::Thread_Utils::Library_Support_Status * Common::Thread_Utils::Get_Library_Stats(const Common::Thread_Utils::LibraryID & lib)
+const Common::Thread_Utils::Library_Support_Status * Common::Thread_Utils::Get_Library_Stats(const Common::LibraryID & lib)
 {
         // Init return var.
         const Common::Thread_Utils::Library_Support_Status * ret = &Common::Thread_Utils::LibSupport_none;
@@ -177,10 +171,10 @@ const Common::Thread_Utils::Library_Support_Status * Common::Thread_Utils::Get_L
         return ret;
 }
 
-const Common::Thread_Utils::LibraryID & Common::Thread_Utils::Select_Library(const Common::Thread_Utils::Library_Support_Status & required_stats, const Common::Thread_Utils::LibraryID & skip_past_this_lib)
+const Common::LibraryID & Common::Thread_Utils::Select_Library(const Common::Thread_Utils::Library_Support_Status & required_stats, const Common::LibraryID & skip_past_this_lib)
 {
         // Init result.
-        const Common::Thread_Utils::LibraryID * ret = &Common::Thread_Utils::supportedThreadLibs[0];        // None / Unsupported.
+        const Common::LibraryID * ret = &Common::Thread_Utils::supportedThreadLibs[0];        // None / Unsupported.
 
         // Init other vars.
         bool checkedPerferredlib = false;   // Used to tell if we have checked the perferred library.

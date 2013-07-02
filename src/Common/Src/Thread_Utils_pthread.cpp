@@ -23,7 +23,7 @@
 // Only define things if pthread support is enabled.
 #ifdef TW_PTHREADS_SUPPORT
 
-const Common::Thread_Utils::LibraryID & Common::Thread_Utils::Mutex_pthread::Get_Thread_Library() const
+const Common::LibraryID & Common::Thread_Utils::Mutex_pthread::Get_Thread_Library() const
 {
         // Return thread library ID.
         return this->thread_lib;
@@ -528,7 +528,7 @@ short Common::Thread_Utils::Thread_pthread::Set_Attribs(pthread_attr_t * attr)
         return 0;
 }
 
-const Common::Thread_Utils::LibraryID & Common::Thread_Utils::Condition_pthread::Get_Thread_Library() const
+const Common::LibraryID & Common::Thread_Utils::Condition_pthread::Get_Thread_Library() const
 {
         // Return thread library ID.
         return this->thread_lib;

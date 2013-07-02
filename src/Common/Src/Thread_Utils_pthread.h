@@ -144,7 +144,7 @@ namespace Common
                 class Mutex_pthread : public Mutex
                 {
                         private:
-                            LibraryID thread_lib;           // Thread library used to create mutex.
+                            Common::LibraryID thread_lib;   // Thread library used to create mutex.
                             int rc_from_prevOP;             // Return code from the actual thread library function.
 
                         protected:
@@ -169,7 +169,7 @@ namespace Common
                             }
 
                             // Accessor function for the thread_lib.
-                            virtual const LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
+                            virtual const Common::LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
                             virtual int Get_Return_Code() const;        // Used to get return code from the external library. (NOT Thread_Utils!)
 
                             /*!
@@ -267,7 +267,7 @@ namespace Common
                 class Condition_pthread : public Condition, public Mutex_pthread
                 {
                         private:
-                            LibraryID thread_lib;           // Thread library used to create mutex.
+                            Common::LibraryID thread_lib;   // Thread library used to create mutex.
                             int rc_from_prevOP;             // Return code from the actual thread library function.
                             bool condition_init;            // Used to tell if the condition object has been inited by the user.
                             bool cattrib_init;              // Used to tell if the condition attribs object has been inited by the user.
@@ -296,7 +296,7 @@ namespace Common
                             }
 
                             // Accessor function for the thread_lib.
-                            virtual const LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
+                            virtual const Common::LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
                             virtual int Get_Return_Code() const;        // Used to get return code from the external library. (NOT Thread_Utils!)
 
                             /*!

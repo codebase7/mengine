@@ -26,15 +26,6 @@ namespace Common
         namespace Thread_Utils
         {
                 /*!
-                    const char * Get_Library_Name(const LibraryID & lib)
-
-                    Returns a human readable string to identify a given supported library.
-
-                    If no supported library is given it returns "none / unsupported".
-                */
-                const char * Get_Library_Name(const LibraryID & lib);
-
-                /*!
                         short Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries()
 
                         This function is used internaly to get the total number of supported threading libraries at runtime.
@@ -42,7 +33,7 @@ namespace Common
                 short Get_Number_of_Supported_Thread_Libraries();
 
                 /*!
-                        Common::Thread_Utils::Thread * Common::Thread_Utils::Create_Thread(const Common::Thread_Utils::LibraryID & lib)
+                        Common::Thread_Utils::Thread * Common::Thread_Utils::Create_Thread(const Common::LibraryID & lib)
 
                         This function creates a thread class object for use with the given thread library.
                         Note: This function uses new to allocate the new object.
@@ -51,10 +42,10 @@ namespace Common
                         Returns a pointer to the created thread class object if successfull.
                         Otherwise returns NULL.
                 */
-                Thread * Create_Thread(const LibraryID & lib);
+                Thread * Create_Thread(const Common::LibraryID & lib);
 
                 /*!
-                        Common::Thread_Utils::Mutex * Common::Thread_Utils::Create_Mutex(const Common::Thread_Utils::LibraryID & lib)
+                        Common::Thread_Utils::Mutex * Common::Thread_Utils::Create_Mutex(const Common::LibraryID & lib)
 
                         This function creates a mutex class object for use with the given thread library.
                         Note: This function uses new to allocate the new object.
@@ -63,10 +54,10 @@ namespace Common
                         Returns a pointer to the created mutex class object if successfull.
                         Otherwise returns NULL.
                 */
-                Mutex * Create_Mutex(const LibraryID & lib);
+                Mutex * Create_Mutex(const Common::LibraryID & lib);
 
                 /*!
-                        Common::Thread_Utils::Condition * Common::Thread_Utils::Create_Condition(const Common::Thread_Utils::LibraryID & lib)
+                        Common::Thread_Utils::Condition * Common::Thread_Utils::Create_Condition(const Common::LibraryID & lib)
 
                         This function creates a condition class object for use with the given thread library.
                         Note: This function uses new to allocate the new object.
@@ -75,7 +66,7 @@ namespace Common
                         Returns a pointer to the created condition class object if successfull.
                         Otherwise returns NULL.
                 */
-                Condition * Create_Condition(const LibraryID & lib);
+                Condition * Create_Condition(const Common::LibraryID & lib);
 
                 /*!
                         void Common::Thread_Utils::Init_Library_Support_Status(Common::Thread_Utils::Library_Support_Status * str)
@@ -92,16 +83,16 @@ namespace Common
                 void Init_Library_Support_Status(Library_Support_Status * str);
 
                 /*!
-                        const Common::Thread_Utils::Library_Support_Status * Common::Thread_Utils::Get_Library_Stats(const Common::Thread_Utils::LibraryID & lib)
+                        const Common::Thread_Utils::Library_Support_Status * Common::Thread_Utils::Get_Library_Stats(const Common::LibraryID & lib)
 
                         This function returns the support status of a given library.
                         (I.e What functions are supported by Thread_Utils.)
                 */
-                const Library_Support_Status * Get_Library_Stats(const LibraryID & lib);
+                const Library_Support_Status * Get_Library_Stats(const Common::LibraryID & lib);
 
                 /*!
                         const Common::Thread_Utils::LibraryID & Common::Thread_Utils::Select_Library(const Common::Thread_Utils::Library_Support_Status & required_stats,
-                                                                                                     const Common::Thread_Utils::LibraryID & skip_past_this_lib)
+                                                                                                     const Common::LibraryID & skip_past_this_lib)
 
                         This function accepts a library support status structure created by the user, plus an optional library ID to skip past (see below),
                         and returns the ID for a supported library that best matches that structure.
@@ -131,7 +122,7 @@ namespace Common
 
                         Otherwise the first library (after any skipped libraries) that supports all of the requested requirements is returned.
                 */
-                const LibraryID & Select_Library(const Library_Support_Status & required_stats, const LibraryID & skip_past_this_lib = Common::Thread_Utils::supportedThreadLibs[0]); // supportedThreadLibs[0] = {0, "None / Unsupported"}
+                const Common::LibraryID & Select_Library(const Library_Support_Status & required_stats, const Common::LibraryID & skip_past_this_lib = Common::Thread_Utils::supportedThreadLibs[0]); // supportedThreadLibs[0] = {0, "None / Unsupported"}
         };
 };
 

@@ -207,7 +207,7 @@ Common::Thread_Utils::Thread * Create_NONE_UNSUPPORTED_Thread_Class()
 {
         // Init vars.
         Common::Thread_Utils::Thread * th = NULL;
-        Common::Thread_Utils::LibraryID Library_ID_Test = Common::Thread_Utils::supportedThreadLibs[0];
+        Common::LibraryID Library_ID_Test = Common::Thread_Utils::supportedThreadLibs[0];
 
         // Tell user we are attempting to create a thread with the given library.
         std::cout << "Attempting to create thread using LibraryID (Should fail): ";
@@ -329,7 +329,7 @@ void Basic_Thread_Test()
         }
 
         // Output the chosen thread.
-        std::cout << "The threading library chosen was: " << Common::Thread_Utils::Get_Library_Name(th->Get_Thread_Library()) << ".\n\n";
+        std::cout << "The threading library chosen was: " << (th->Get_Thread_Library()).Name << ".\n\n";
 
         // Tell user we are initing the thread.
         std::cout << "Initing thread.\n";
@@ -341,7 +341,7 @@ void Basic_Thread_Test()
         if (ret != 0)
         {
                 // Output error code.
-                std::cout << "Error occured while initing the thread, thread library was: " << Common::Thread_Utils::Get_Library_Name(th->Get_Thread_Library()) << ".\n";
+                std::cout << "Error occured while initing the thread, thread library was: " << (th->Get_Thread_Library()).Name << ".\n";
                 std::cout << "Return code from Thread_Utils function was: " << ret << ".\n";
                 std::cout << "Return code from library was: " << th->Get_Return_Code() << ".\n";
                 std::cout << "Aborting.\n";
@@ -393,8 +393,8 @@ void Basic_Thread_Test()
 void Test_Select_Library_Perferred_Library_Setting()
 {
         // Init vars.
-        Common::Thread_Utils::LibraryID Library_ID_Test;
-        const Common::Thread_Utils::LibraryID Library_ID_Fake = {99, "Non-existant Library"};
+        Common::LibraryID Library_ID_Test;
+        const Common::LibraryID Library_ID_Fake = {99, "Non-existant Library"};
 
         // Init Library_Support_Status Structure.
         Common::Thread_Utils::Library_Support_Status our_requirements;
@@ -405,7 +405,7 @@ void Test_Select_Library_Perferred_Library_Setting()
 
         // Tell user that we are testing the perferred library options.
         std::cout << "Testing perferred library support in Thread_Utils::Select_Library():\n";
-        std::cout << "Attempting to get library: " << Common::Thread_Utils::Get_Library_Name(Common::Thread_Utils::supportedThreadLibs[0]) << " via perferred library setting: ";
+        std::cout << "Attempting to get library: " << Common::Thread_Utils::supportedThreadLibs[0].Name << " via perferred library setting: ";
 
         // Set perferred library.
         our_requirements.lib = &Common::Thread_Utils::supportedThreadLibs[0];
@@ -521,7 +521,7 @@ bool Test_Thread_Support(Common::Thread_Utils::Library_Support_Status & our_requ
         short ret = 0;
         unsigned long int pid = 0;
         void * ret_from_thread = NULL;
-        Common::Thread_Utils::LibraryID Library_ID_Test;
+        Common::LibraryID Library_ID_Test;
 
         // Init thread object.
         Common::Thread_Utils::Thread * th = NULL;
@@ -845,7 +845,7 @@ bool Test_Mutex_Support(Common::Thread_Utils::Library_Support_Status & our_requi
         short ret = 0;
         short hack_delay_count = 0;                 // Used to tell how long we have waited.
         unsigned long int pid = 0;
-        Common::Thread_Utils::LibraryID Library_ID_Test;
+        Common::LibraryID Library_ID_Test;
         return_me rm;
         rm.cont = false;
         rm.object = NULL;
@@ -1290,7 +1290,7 @@ bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Statu
         short hack_delay_count = 0;
         unsigned long int pid = 0;
         void * ret_from_thread = NULL;
-        Common::Thread_Utils::LibraryID Library_ID_Test;
+        Common::LibraryID Library_ID_Test;
         return_me rm;
         rm.cont = false;
         rm.object = NULL;
@@ -1465,7 +1465,7 @@ bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Statu
                                                                                 ret = th->Join_Thread(&ret_from_thread);
                                                                                 if (!ret)
                                                                                 {
-                                                                                        // Check return. (It will point to the condition variable's memory address if successfull.)
+                                                                                        // Check return.
                                                                                         if (rm.rc == 1)
                                                                                         {
                                                                                                 std::cout << "PASS\n";
@@ -1641,7 +1641,7 @@ bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Statu
         return true;
 }
 
-void Library_Test(const Common::Thread_Utils::LibraryID & lib)
+void Library_Test(const Common::LibraryID & lib)
 {
         // Init vars.
         bool bNoneUnsupportedlibrary = false;       // Whether or not we are testing the None / Unsupported library.

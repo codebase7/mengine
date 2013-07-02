@@ -21,17 +21,15 @@
 #ifndef THREAD_UTILS_STRUCTURES_H
 #define THREAD_UTILS_STRUCTURES_H
 
+// Include the LibraryID struct.
+#include "LibraryID_Struct.h"
+
 namespace Common
 {
         namespace Thread_Utils
         {
-                struct LibraryID {
-                        short IDNum;
-                        const char * Name;
-                };
-
                 /*!
-                        const LibraryID supportedThreadLibs
+                        const Common::LibraryID supportedThreadLibs
 
                         Contains a list of supported threading libraries.
 
@@ -50,7 +48,7 @@ namespace Common
                         (We want to be able to have a human readable string just in case the ID numbers
                         change.)
                 */
-                const LibraryID supportedThreadLibs[] =
+                const Common::LibraryID supportedThreadLibs[] =
                 {
                         {0,"None / Unsupported"},
                         #ifdef TW_PTHREADS_SUPPORT
@@ -75,7 +73,7 @@ namespace Common
                 struct Library_Support_Status
                 {
                         // Library ID.
-                        const Common::Thread_Utils::LibraryID * lib;
+                        const Common::LibraryID * lib;
 
                         // Thread support status.
                         bool    bThreadsSupport;
