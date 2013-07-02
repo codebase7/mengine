@@ -24,11 +24,8 @@
 // These lines determine what libraries to build wappers for.
 #define TW_PTHREADS_SUPPORT 1
 
-// External includes.
-#include <stddef.h>     // For errno.
-#include <time.h>       // For timespec and clock_gettime().
-
 // Internal includes.
+#include "BaseHeader.h"
 #include "Thread_Utils_Structures.h"
 #include "Thread_Utils_Base.h"
 #include "Thread_Utils_Functions.h"

@@ -24,14 +24,6 @@
 
 // Engine Includes
 #include "BaseHeader.h"
-#include "../../Core/Src/Panic.h"
-#include "../../Core/Src/DataProcess.h"
-
-// OS / Arch Dependant Includes
-#ifndef __WIN32
-#include "Posix_common.h"
-
-#endif
 
 namespace FileUtills{
 
