@@ -257,6 +257,36 @@ void Panic::ERROR::disable_logging()
         return;
 }
 
+int Panic::ERROR::get_log_level() const
+{
+        // Return the set log level.
+        return this->logLevel;
+}
+
+bool Panic::ERROR::is_logging_enabled() const
+{
+        // Return whether or not logging is enabled.
+        return this->logfile_enabled;
+}
+
+std::string Panic::ERROR::get_log_file_path() const
+{
+        // Return the log file path.
+        return this->pathToLogFile;
+}
+
+int Panic::ERROR::get_max_log_lines() const
+{
+        // Return the maximum number of log lines.
+        return this->maxLogLines;
+}
+
+int Panic::ERROR::get_current_log_line() const
+{
+        // Return current log line.
+        return this->currentLogLine;
+}
+
 void Panic::FileStream_Status(Panic::ERROR & error, fstream & stream, int log_level)
 {
         // Output status header.
