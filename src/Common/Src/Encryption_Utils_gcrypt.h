@@ -24,6 +24,9 @@
 // Guard against building this if not supported.
 #ifdef GCRYPT_SUPPORT
 
+// External include.
+#include <gcrypt.h>
+
 namespace Common
 {
       namespace Encryption_Utils
