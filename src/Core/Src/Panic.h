@@ -171,6 +171,48 @@ namespace Panic{
                         }
                 }
         }
+        
+        /*!
+                int Panic::ERROR::get_log_level() const
+
+                Returns the currently configured log level.
+        */
+        int get_log_level() const;
+
+        /*!
+                bool Panic::ERROR::is_logging_enabled() const
+
+                Returns whether or not the logging function is enabled.
+
+                Returns true if logging is enabled.
+                Returns false otherwise.
+        */
+        bool is_logging_enabled() const;
+
+        /*!
+                std::string Panic::ERROR::get_log_file_path() const
+
+                Returns the configured log file path.
+
+                If no path is configured, a blank string object is returned.
+        */
+        std::string get_log_file_path() const;
+
+        /*!
+                int Panic::ERROR::get_max_log_lines() const
+
+                Returns the maximum number of lines allowed in a log
+                file before the oldest lines will be overwritten.
+        */
+        int get_max_log_lines() const;
+
+        /*!
+                int Panic::ERROR::get_current_log_line() const
+
+                Returns the current line number in the log file where
+                an error will be written to.
+        */
+        int get_current_log_line() const;
   };
     /*!
             void Panic::FileStream_Status(Panic::ERROR & error, fstream & stream, int log_level)
