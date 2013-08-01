@@ -18,6 +18,9 @@
     https://github.com/codebase7/mengine
 */
 
+#ifndef GENERIC_WRAPPER_H
+#define GENERIC_WRAPPER_H
+
 #include "LibraryID_Struct.h"
 
 namespace Common
@@ -54,3 +57,6 @@ namespace Common
 			short Get_Library_ID();
 	};
 };
+#endif
+
+// End of Generic_Wrapper.h
