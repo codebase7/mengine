@@ -27,5 +27,5 @@ int Common::Encryption_Utils::CryptoEngine::Get_Return_Code() const
 
 const Common::LibraryID & Common::Encryption_Utils::CryptoEngine::Get_Encryption_Library() const
 {
-      return this->enc_lib;
+      return this->lib;
 }

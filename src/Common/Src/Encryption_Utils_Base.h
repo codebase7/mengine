@@ -24,12 +24,11 @@ namespace Common
 {
       namespace Encryption_Utils
       {
-	      class CryptoEngine
+	      class CryptoEngine : public Generic_Wrapper
 	      {
 			private:
 			  
 			protected:
-			  Common::LibraryID enc_lib;		// LibraryID structure for this object.
 			  int libReturnCode;			// Previous return code from the library.
 			  
 			public:

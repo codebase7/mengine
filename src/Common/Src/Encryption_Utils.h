@@ -29,6 +29,7 @@
 
 // Internal includes.
 #include "BaseHeader.h"
+#include "Generic_Wrapper.h"
 #include "Encryption_Utils_Structures.h"
 #include "Encryption_Utils_Base.h"
 #include "Encryption_Utils_Functions.h"

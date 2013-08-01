@@ -48,7 +48,7 @@ namespace Common
 		    public:
 			CryptoEngine_gcrypt()
 			{
-			      enc_lib = Common::Encryption_Utils::supportedEncryptionLibs[1]; // {1, "gcrypt"}  (ID of the encryption library that this struct is for.)
+			      lib = Common::Encryption_Utils::supportedEncryptionLibs[1]; // {1, "gcrypt"}  (ID of the encryption library that this struct is for.)
 			      libReturnCode = 0;
 			}
 			~CryptoEngine_gcrypt()
