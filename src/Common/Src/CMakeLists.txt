@@ -19,5 +19,5 @@ add_library(Encryption_Utils_Multiverse_Engine SHARED Encryption_Utils_Base.cpp 
 target_link_libraries(Encryption_Utils_Multiverse_Engine Core_Multiverse_Engine Panic_Handler_Multiverse_Engine)
 
 # Add common library.
-add_library(Common_Multiverse_Engine SHARED FileUtills.cpp Thread_Utils_Base.cpp Thread_Utils_Functions.cpp Thread_Utils_pthread.cpp)
+add_library(Common_Multiverse_Engine SHARED Generic_Wrapper.cpp FileUtills.cpp Thread_Utils_Base.cpp Thread_Utils_Functions.cpp Thread_Utils_pthread.cpp)
 target_link_libraries(Common_Multiverse_Engine Core_Multiverse_Engine Panic_Handler_Multiverse_Engine ${CMAKE_THREAD_LIBS_INIT})

@@ -1,5 +1,5 @@
 /*!
-    Multiverse Engine Project 06/5/2013 Common Thread_Utils.h
+    Multiverse Engine Project 31/7/2013 Common Generic_Wrapper.cpp
 
     Copyright (C) 2013 Multiverse Engine Project
 
@@ -18,27 +18,14 @@
     https://github.com/codebase7/mengine
 */
 
-#ifndef THREAD_UTILS_H
-#define THREAD_UTILS_H
-
-// These lines determine what libraries to build wappers for.
-#define TW_PTHREADS_SUPPORT 1
-
-// Internal includes.
-#include "BaseHeader.h"
 #include "Generic_Wrapper.h"
-#include "Thread_Utils_Structures.h"
-#include "Thread_Utils_Base.h"
-#include "Thread_Utils_Functions.h"
 
-/*
-        Below are includes for the different library wrappers if they are enabled.
-        NOTE: The actual includes for the external libraries should be put in the wrapper include NOT HERE!
-*/
-#ifdef TW_PTHREADS_SUPPORT
-#include "Thread_Utils_pthread.h"
-#endif
+const char * Common::Generic_Wrapper::Get_Library_Name()
+{
+	return this->lib.Name;
+}
 
-#endif
-
-// End of Thread_Utils.h
+short Common::Generic_Wrapper::Get_Library_ID()
+{
+	return this->lib.IDNum;
+}

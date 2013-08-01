@@ -1,6 +1,6 @@
 /*!
     Multiverse Engine Project 20/5/2013 Common Thread_Utils_Base.cpp
-    
+
     Copyright (C) 2013 Multiverse Engine Project
 
     This program is free software;
@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine
 */
@@ -23,7 +23,7 @@
 const Common::LibraryID & Common::Thread_Utils::Thread::Get_Thread_Library() const
 {
         // Return thread library ID.
-        return this->thread_lib;
+        return this->lib;
 }
 
 int Common::Thread_Utils::Thread::Get_Return_Code() const

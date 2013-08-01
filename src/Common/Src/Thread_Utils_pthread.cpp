@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine    
 */
@@ -26,7 +26,7 @@
 const Common::LibraryID & Common::Thread_Utils::Mutex_pthread::Get_Thread_Library() const
 {
         // Return thread library ID.
-        return this->thread_lib;
+        return this->lib;
 }
 
 int Common::Thread_Utils::Mutex_pthread::Get_Return_Code() const
@@ -38,7 +38,7 @@ int Common::Thread_Utils::Mutex_pthread::Get_Return_Code() const
 short Common::Thread_Utils::Mutex_pthread::Init_Mutex()
 {
         // Check for pthreads.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // Trying to use incorrect library abort.
                 return -1;
@@ -122,7 +122,7 @@ short Common::Thread_Utils::Mutex_pthread::Init_Mutex()
 short Common::Thread_Utils::Mutex_pthread::Destroy_Mutex()
 {
         // Check for pthreads.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // Trying to use incorrect library abort.
                 return -1;
@@ -158,7 +158,7 @@ short Common::Thread_Utils::Mutex_pthread::Destroy_Mutex()
 short Common::Thread_Utils::Mutex_pthread::Lock_Mutex()
 {
         // Check for pthreads.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // Trying to use incorrect library abort.
                 return -1;
@@ -185,7 +185,7 @@ short Common::Thread_Utils::Mutex_pthread::Lock_Mutex()
 short Common::Thread_Utils::Mutex_pthread::Try_Lock_Mutex()
 {
         // Check for pthreads.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // Trying to use incorrect library abort.
                 return -1;
@@ -217,7 +217,7 @@ short Common::Thread_Utils::Mutex_pthread::Try_Lock_Mutex()
 short Common::Thread_Utils::Mutex_pthread::Unlock_Mutex()
 {
         // Check for pthreads.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // Trying to use incorrect library abort.
                 return -1;
@@ -249,7 +249,7 @@ short Common::Thread_Utils::Mutex_pthread::Unlock_Mutex()
 short Common::Thread_Utils::Mutex_pthread::Set_Attribs(pthread_mutexattr_t * attr)
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This thread was not created by our library. Abort.
                 return -1;
@@ -282,7 +282,7 @@ short Common::Thread_Utils::Mutex_pthread::Set_Attribs(pthread_mutexattr_t * att
 short Common::Thread_Utils::Mutex_pthread::Destroy_Mutex_Only()
 {
         // Check for pthreads.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // Trying to use incorrect library abort.
                 return -1;
@@ -322,7 +322,7 @@ short Common::Thread_Utils::Mutex_pthread::Destroy_Mutex_Only()
 short Common::Thread_Utils::Thread_pthread::Create_Thread(void *(*real_funct_ptr)(void*), void * function_args, unsigned long int * thread_id)
 {
         // Check for pthreads in the thread struct.
-        if (this->thread_lib.IDNum != 1)  // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)  // PThreads ID {1, "Pthreads"}.
         {
                 // This has not been inited by the user, or is already being used. Abort.
                 return -1;
@@ -409,7 +409,7 @@ short Common::Thread_Utils::Thread_pthread::Create_Thread(void *(*real_funct_ptr
 short Common::Thread_Utils::Thread_pthread::Destroy_Thread()
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This thread was not created by our library. Abort.
                 return -1;
@@ -452,7 +452,7 @@ short Common::Thread_Utils::Thread_pthread::Destroy_Thread()
 short Common::Thread_Utils::Thread_pthread::Detach_Thread()
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This thread was not created by our library. Abort.
                 return -1;
@@ -475,7 +475,7 @@ short Common::Thread_Utils::Thread_pthread::Detach_Thread()
 short Common::Thread_Utils::Thread_pthread::Join_Thread(void ** ret_from_thread)
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This thread was not created by our library. Abort.
                 return -1;
@@ -498,7 +498,7 @@ short Common::Thread_Utils::Thread_pthread::Join_Thread(void ** ret_from_thread)
 short Common::Thread_Utils::Thread_pthread::Set_Attribs(pthread_attr_t * attr)
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This thread was not created by our library. Abort.
                 return -1;
@@ -531,7 +531,7 @@ short Common::Thread_Utils::Thread_pthread::Set_Attribs(pthread_attr_t * attr)
 const Common::LibraryID & Common::Thread_Utils::Condition_pthread::Get_Thread_Library() const
 {
         // Return thread library ID.
-        return this->thread_lib;
+        return this->lib;
 }
 
 int Common::Thread_Utils::Condition_pthread::Get_Return_Code() const
@@ -543,7 +543,7 @@ int Common::Thread_Utils::Condition_pthread::Get_Return_Code() const
 short Common::Thread_Utils::Condition_pthread::Init_Condition()
 {
         // Check for pthreads.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // Trying to use incorrect library abort.
                 return -1;
@@ -644,7 +644,7 @@ short Common::Thread_Utils::Condition_pthread::Init_Condition()
 short Common::Thread_Utils::Condition_pthread::Destroy_Condition()
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This condition was not created by our library. Abort.
                 return -1;
@@ -694,7 +694,7 @@ short Common::Thread_Utils::Condition_pthread::Destroy_Condition()
 short Common::Thread_Utils::Condition_pthread::Wait()
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This condition variable was not created by our library. Abort.
                 return -1;
@@ -740,7 +740,7 @@ short Common::Thread_Utils::Condition_pthread::Timed_Wait(const unsigned long & 
         timespec time;
 
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This condition variable was not created by our library. Abort.
                 return -1;
@@ -823,7 +823,7 @@ short Common::Thread_Utils::Condition_pthread::Timed_Wait(const unsigned long & 
 short Common::Thread_Utils::Condition_pthread::Signal()
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This condition variable was not created by our library. Abort.
                 return -1;
@@ -846,7 +846,7 @@ short Common::Thread_Utils::Condition_pthread::Signal()
 short Common::Thread_Utils::Condition_pthread::Set_Attribs(pthread_condattr_t * attr)
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This condition variable was not created by our library. Abort.
                 return -1;

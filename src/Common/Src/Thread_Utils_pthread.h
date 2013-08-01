@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine    
 */
@@ -62,7 +62,7 @@ namespace Common
                         public:
                             Thread_pthread()
                             {
-                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
+                                    lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
                                     thread_init = false;
                                     attrib_init = false;
                                     user_attrib = false;
@@ -141,10 +141,9 @@ namespace Common
                             short Set_Attribs(pthread_attr_t * attr = NULL);
                 };
 
-                class Mutex_pthread : public Mutex
+                class Mutex_pthread : public Mutex, public Generic_Wrapper
                 {
                         private:
-                            Common::LibraryID thread_lib;   // Thread library used to create mutex.
                             int rc_from_prevOP;             // Return code from the actual thread library function.
 
                         protected:
@@ -157,7 +156,7 @@ namespace Common
                         public:
                             Mutex_pthread()
                             {
-                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
+                                    lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
                                     rc_from_prevOP = 0;
                                     mutex_init = false;
                                     attrib_init = false;
@@ -168,7 +167,7 @@ namespace Common
                                     Destroy_Mutex();
                             }
 
-                            // Accessor function for the thread_lib.
+                            // Accessor function for the lib.
                             virtual const Common::LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
                             virtual int Get_Return_Code() const;        // Used to get return code from the external library. (NOT Thread_Utils!)
 
@@ -267,7 +266,6 @@ namespace Common
                 class Condition_pthread : public Condition, public Mutex_pthread
                 {
                         private:
-                            Common::LibraryID thread_lib;   // Thread library used to create mutex.
                             int rc_from_prevOP;             // Return code from the actual thread library function.
                             bool condition_init;            // Used to tell if the condition object has been inited by the user.
                             bool cattrib_init;              // Used to tell if the condition attribs object has been inited by the user.
@@ -282,7 +280,7 @@ namespace Common
                         public:
                             Condition_pthread()
                             {
-                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
+                                    lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
                                     rc_from_prevOP = 0;
                                     condition_init = false;
                                     attrib_init = false;
@@ -295,7 +293,7 @@ namespace Common
 
                             }
 
-                            // Accessor function for the thread_lib.
+                            // Accessor function for the lib.
                             virtual const Common::LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
                             virtual int Get_Return_Code() const;        // Used to get return code from the external library. (NOT Thread_Utils!)
 

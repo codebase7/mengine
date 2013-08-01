@@ -1,6 +1,6 @@
 /*!
     Multiverse Engine Project 16/5/2013 Common Thread_Utils_Base.h
-    
+
     Copyright (C) 2013 Multiverse Engine Project
 
     This program is free software;
@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine
 */
@@ -44,18 +44,17 @@ namespace Common
 
                         This class is used to contain information about threads used with the thread wrapper.
                 */
-                class Thread
+                class Thread : public Generic_Wrapper
                 {
                         private:
 
                         protected:
-                            Common::LibraryID thread_lib;   // Thread library used to create thread.
                             int rc_from_prevOP;             // Return code from the actual thread library function.
 
                         public:
                             Thread()
                             {
-                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
                                     rc_from_prevOP = -3;
                             }
                             virtual ~Thread()
@@ -98,7 +97,7 @@ namespace Common
                             A basic constructor to show how the drived object should work. (I.e what vars to set at initilization.)
                             Mutex()
                             {
-                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
                                     rc_from_prevOP = -3;
                             }
                             */
@@ -148,7 +147,7 @@ namespace Common
                             A basic constructor to show how the drived object should work. (I.e what vars to set at initilization.)
                             Condition()
                             {
-                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
                                     rc_from_prevOP = -3;
                             }
                             */
