@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine    
 */
@@ -322,7 +322,7 @@ short Common::Thread_Utils::Mutex_pthread::Destroy_Mutex_Only()
 short Common::Thread_Utils::Thread_pthread::Create_Thread(void *(*real_funct_ptr)(void*), void * function_args, unsigned long int * thread_id)
 {
         // Check for pthreads in the thread struct.
-        if (this->thread_lib.IDNum != 1)  // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)  // PThreads ID {1, "Pthreads"}.
         {
                 // This has not been inited by the user, or is already being used. Abort.
                 return -1;
@@ -409,7 +409,7 @@ short Common::Thread_Utils::Thread_pthread::Create_Thread(void *(*real_funct_ptr
 short Common::Thread_Utils::Thread_pthread::Destroy_Thread()
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This thread was not created by our library. Abort.
                 return -1;
@@ -452,7 +452,7 @@ short Common::Thread_Utils::Thread_pthread::Destroy_Thread()
 short Common::Thread_Utils::Thread_pthread::Detach_Thread()
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This thread was not created by our library. Abort.
                 return -1;
@@ -475,7 +475,7 @@ short Common::Thread_Utils::Thread_pthread::Detach_Thread()
 short Common::Thread_Utils::Thread_pthread::Join_Thread(void ** ret_from_thread)
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This thread was not created by our library. Abort.
                 return -1;
@@ -498,7 +498,7 @@ short Common::Thread_Utils::Thread_pthread::Join_Thread(void ** ret_from_thread)
 short Common::Thread_Utils::Thread_pthread::Set_Attribs(pthread_attr_t * attr)
 {
         // Check and see if the thread_lib used is ours.
-        if (this->thread_lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
+        if (this->lib.IDNum != 1)    // PThreads ID {1, "Pthreads"}.
         {
                 // This thread was not created by our library. Abort.
                 return -1;

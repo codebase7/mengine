@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine    
 */
@@ -62,7 +62,7 @@ namespace Common
                         public:
                             Thread_pthread()
                             {
-                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
+                                    lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
                                     thread_init = false;
                                     attrib_init = false;
                                     user_attrib = false;
