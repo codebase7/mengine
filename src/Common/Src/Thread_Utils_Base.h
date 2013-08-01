@@ -97,7 +97,7 @@ namespace Common
                             A basic constructor to show how the drived object should work. (I.e what vars to set at initilization.)
                             Mutex()
                             {
-                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
                                     rc_from_prevOP = -3;
                             }
                             */
@@ -147,7 +147,7 @@ namespace Common
                             A basic constructor to show how the drived object should work. (I.e what vars to set at initilization.)
                             Condition()
                             {
-                                    thread_lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
                                     rc_from_prevOP = -3;
                             }
                             */
