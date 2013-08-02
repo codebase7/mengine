@@ -21,6 +21,7 @@
 #ifndef GENERIC_WRAPPER_H
 #define GENERIC_WRAPPER_H
 
+// Include LibraryID_Struct.h.
 #include "LibraryID_Struct.h"
 
 namespace Common
