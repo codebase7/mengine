@@ -1,6 +1,6 @@
 /*!
     Multiverse Engine Project 31/5/2013 Common Thread_Utils_Structures.h
-    
+
     Copyright (C) 2013 Multiverse Engine Project
 
     This program is free software;
@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine
 */
@@ -21,8 +21,8 @@
 #ifndef THREAD_UTILS_STRUCTURES_H
 #define THREAD_UTILS_STRUCTURES_H
 
-// Include the LibraryID struct.
-#include "LibraryID_Struct.h"
+// Include Generic_Wrapper.
+#include "Generic_Wrapper.h"	// Includes LibraryID_Struct.h.
 
 namespace Common
 {
