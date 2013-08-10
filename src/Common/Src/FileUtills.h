@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine    
 */
@@ -47,16 +47,21 @@ struct dirlist{
 };
 
 /*!
-      FileUtills::dirlist * getDirectory(const std::string & path)
+        FileUtills::dirlist * getDirectory(const std::string & path, const bool & cleanList)
 
-      Lists the given directory's contents.
+        Lists the given directory's contents.
 
-      Pram: path of directory to check.
+        Pram: path, path of directory to check.
 
-      Returns a pointer to a dirlist if successfull.
-      Returns NULL if an error occurs.
+        Pram: cleanList, If this is true then, the generated list will be sorted
+        (via decrementing sort), and the list will have the entries for the current
+        and parent directories removed.
+        (Default is to do nothing, and return the list as the OS generated it.)
+
+        Returns a pointer to a dirlist if successfull.
+        Returns NULL if an error occurs.
 */
-dirlist * getDirectory(const std::string & path);
+dirlist * getDirectory(const std::string & path, const bool & cleanList = false);
 
 /*!
       int FileUtills::DoesExist(const std::string & Filename, Panic::ERROR & error)

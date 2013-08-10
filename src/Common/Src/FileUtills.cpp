@@ -146,78 +146,94 @@ std::string FileUtills::CheckPathType(const std::string & path)
 FileUtills::dirlist * FileUtills::getDirectory(const std::string & path)
 {
 #ifdef POSIX_COMMON_H
+        // Dumb check.
+        if (path.size() <= 0)
+        {
+                // Invalid path.
+                return NULL;
+        }
 
-    // Dumb check.
-    if (path.size() <= 0)
-    {
-            // Invalid Path.
-            return NULL;
-    }
+        // Init vars.
+        FileUtills::dirlist * buffer;
+        struct dirent * dir;                        // ''
+        DIR * dp;	                    		    // Directory stream to hold directory name..... (Why can't it just take a c string?)
+        std::string tempname = "";	                // Used to store the filename / subdirectory name for the addToArray function.
 
-	// Init vars
-	FileUtills::dirlist * buffer;
-	struct dirent * dir;                        // ''
-	DIR * dp;	                    		    // Directory stream to hold directory name..... (Why can't it just take a c string?)
-	long count = 0;			                    // Used to count the directory entries.
-	std::vector<std::string> list;		        // Used to store the output.
-	std::string tempname = "";	                // Used to store the filename / subdirectory name for the addToArray function.
-	std::vector<std::string>::iterator iter;    // Iterator for output.
+        // Allocate the dirlist.
+        try{
+                buffer = new FileUtills::dirlist;
+        }
+        catch(bad_alloc)
+        {
+                // Could not allocate struct.
+                return NULL;
+        }
 
-	// Put the iter at the beggining of output.
-	iter == list.begin();
+        // Set the path.
+        buffer->path = path;
 
-    // Allocate the dirlist.
-    try{
-            buffer = new FileUtills::dirlist;
-    }
-    catch(bad_alloc)
-    {
-            // Could not allocate struct.
-            return NULL;
-    }
+        // Dump the path as a c string into the Directory stream object......(Overly complicated POS......)
 
-	// Set the path.
-	buffer->path = path;
+        // Check and make sure we can open the directory first.
+        if ((dp = (opendir(path.c_str()))) == NULL)
+        {
+                // An error occured.
+                if (buffer != NULL)
+                {
+                        delete buffer;
+                        buffer = NULL;
+                }
 
-	// Dump the path as a c string into the Directory stream object......(Overly complicated POS......)
+                // Exit function.
+                return NULL;
+        }
 
-	// Check and make sure we can open the directory first.
-	if ((dp = (opendir(path.c_str()))) == NULL)
-	{
-            // An error occured return -1
-            buffer->error.PanicHandler("FileUtills::getDirectory() Failed to access directory.", COMMON_ID);
-            return NULL;
-	}
+        // Start filesystem fetch loop.
+        while ((dir = readdir(dp))) // Call Host OS function.
+        {
+                // Check and see if the cleanList flag is set.
+                if (cleanList)
+                {
+                        // Check to see if d_name is a POSIX directory shortcut.
+                        if ((strcmp(dir->d_name, ".") == 0) || (strcmp(dir->d_name, "..") == 0))
+                        {
+                                // d_name is a directory shortcut, do not add it to the list.
+                                continue;
+                        }
+                }
 
-	// Start While loop.
-	while ((dir = readdir(dp))) // Call Host OS function
-	{
-            // Cast d_name to a string
-            tempname = dir->d_name;
+                // Cast d_name to a string
+                tempname = dir->d_name;
 
-            // Add the data to the array.
-            list.push_back(tempname);
+                // Add the data to the array.
+                buffer->list.push_back(tempname);
+        }
 
-            // Update the counter.
-            count++;
-	}
+        // Close the directory stream and reset it.
+        closedir(dp);
 
-	// Close the directory stream and reset it.
-	closedir(dp);
+        // If we are cleaning the list, call DataProcess::DecrementingSort().
+        if (DataProcess::DecrementingSort(buffer->list) != 0)
+        {
+                // An exception was thrown in the DecrementingSort() function, bail out.
+                if (buffer != NULL)
+                {
+                        delete buffer;
+                        buffer = NULL;
+                }
 
-	// Move the damn output to the correct buffer. Ie put the array pointer into the dirlist structure.
-	buffer->list = list;
+                // Exit function.
+                return NULL;
+        }
 
-	// Set the number of entries
-	buffer->numOfEntries = count;
+        // Set the number of entries
+        buffer->numOfEntries = buffer->list.size();
 
-    // Return the buffer.
-    return buffer;
-
+        // Return the buffer.
+        return buffer;
 #endif
-	// Default return for unimplemted function
-	return NULL;
-
+        // Default return for unimplemted function.
+        return NULL;
 }
 
 short FileUtills::GetGigaFreespace(const std::string & path, size_t & result)
