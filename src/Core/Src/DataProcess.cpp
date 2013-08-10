@@ -6,21 +6,270 @@
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
     either version 2 of the License, or (at your option) any later version.
-    
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
     See the GNU General Public License for more details.
-    
+
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine
 */
 
-
 #include "DataProcess.h"
 #include "FileStreams.h"
+
+short DataProcess::IncrementingSort(std::vector<std::string> & sort)
+{
+        // Init vars.
+        const char * current_entry = NULL;      // Used for comparing entries.
+        const char * next_entry = NULL;         // Used for comparing entries.
+        size_t current_entry_index = 0;         // Used to access the current entry in the vector.
+        size_t next_entry_index = 1;            // Used to access the entry after the current one in the vector.
+        std::string temp = "";                  // Used to hold temporary value.
+
+        // Check size of sort. (We only need to sort data if there is more than one thing to sort.)
+        if (sort.size() > 1)
+        {
+                // Create a try block.
+                try{
+
+                        // OK start main loop.
+                        for (size_t x = 0; x < sort.size(); x++)
+                        {
+                                // Start internal loop.
+                                for (size_t y = 0; y < sort.size(); y++)
+                                {
+                                        // Check to see if this is the last entry in the list.
+                                        if ((y + 1) >= sort.size())
+                                        {
+                                                // This is the last entry, get out of the loop.
+                                                break;
+                                        }
+
+                                        // Get pointers.
+                                        current_entry = sort[current_entry_index].c_str();
+                                        next_entry = sort[next_entry_index].c_str();
+
+                                        // Figure out which string is smaller.
+                                        if ((sort[current_entry_index].size()) >= (sort[next_entry_index].size()))
+                                        {
+                                                // Compare using the shorter string.
+                                                for (size_t z = 0; z < (sort[next_entry_index].size()); z++)
+                                                {
+                                                        // Dereference position in the vector, then dereference the position in the string.
+                                                        if (current_entry[z] < next_entry[z])
+                                                        {
+                                                                // The current entry is less than the next one.
+                                                                temp = sort[next_entry_index];
+
+                                                                // Copy the current entry to the next one.
+                                                                sort[next_entry_index] = sort[current_entry_index];
+
+                                                                // Now copy the temp value (next entry) to the current entry.
+                                                                sort[current_entry_index] = temp;
+
+                                                                // Clear vars.
+                                                                temp.clear();
+                                                                current_entry = NULL;
+                                                                next_entry = NULL;
+
+                                                                // Get out of the loop.
+                                                                break;
+                                                        }
+                                                        else
+                                                        {
+                                                                if (current_entry[z] > next_entry[z])
+                                                                {
+                                                                        // OK, in this case the entries are where they need to be.
+                                                                        break;
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                        else
+                                        {
+                                                // Compare using the shorter string.
+                                                for (size_t z = 0; z < (sort[current_entry_index].size()); z++)
+                                                {
+                                                        // Dereference position in the vector, then dereference the position in the string.
+                                                        if (current_entry[z] < next_entry[z])
+                                                        {
+                                                                // The current entry is less than the next one.
+                                                                temp = sort[next_entry_index];
+
+                                                                // Copy the current entry to the next one.
+                                                                sort[next_entry_index] = sort[current_entry_index];
+
+                                                                // Now copy the temp value (next entry) to the current entry.
+                                                                sort[current_entry_index] = temp;
+
+                                                                // Clear vars.
+                                                                temp.clear();
+                                                                current_entry = NULL;
+                                                                next_entry = NULL;
+
+                                                                // Get out of the loop.
+                                                                break;
+                                                        }
+                                                        else
+                                                        {
+                                                                if (current_entry[z] > next_entry[z])
+                                                                {
+                                                                        // OK, in this case the entries are where they need to be.
+                                                                        break;
+                                                                }
+                                                        }
+                                                }
+                                        }
+
+                                        // Increment the indexes.
+                                        current_entry_index++;
+                                        next_entry_index++;
+                                }
+
+                                // Reset the index values.
+                                current_entry_index = 0;
+                                next_entry_index = 1;
+                        }
+                }
+                catch (...)
+                {
+                        // Exception thrown.
+                        return -9;
+                }
+        }
+
+        // Exit function.
+        return 0;
+}
+
+short DataProcess::DecrementingSort(std::vector<std::string> & sort)
+{
+        // Init vars.
+        const char * current_entry = NULL;      // Used for comparing entries.
+        const char * next_entry = NULL;         // Used for comparing entries.
+        size_t current_entry_index = 0;         // Used to access the current entry in the vector.
+        size_t next_entry_index = 1;            // Used to access the entry after the current one in the vector.
+        std::string temp = "";                  // Used to hold temporary value.
+
+        // Check size of sort. (We only need to sort data if there is more than one thing to sort.)
+        if (sort.size() > 1)
+        {
+                // Create a try block.
+                try{
+
+                        // OK start main loop.
+                        for (size_t x = 0; x < sort.size(); x++)
+                        {
+                                // Start internal loop.
+                                for (size_t y = 0; y < sort.size(); y++)
+                                {
+                                        // Check to see if this is the last entry in the list.
+                                        if ((y + 1) >= sort.size())
+                                        {
+                                                // This is the last entry, get out of the loop.
+                                                break;
+                                        }
+
+                                        // Get pointers.
+                                        current_entry = sort[current_entry_index].c_str();
+                                        next_entry = sort[next_entry_index].c_str();
+
+                                        // Figure out which string is smaller.
+                                        if ((sort[current_entry_index].size()) >= (sort[next_entry_index].size()))
+                                        {
+                                                // Compare using the shorter string.
+                                                for (size_t z = 0; z < (sort[next_entry_index].size()); z++)
+                                                {
+                                                        // Dereference position in the vector, then dereference the position in the string.
+                                                        if (current_entry[z] > next_entry[z])
+                                                        {
+                                                                // The current entry is greater than the next one.
+                                                                temp = sort[next_entry_index];
+
+                                                                // Copy the current entry to the next one.
+                                                                sort[next_entry_index] = sort[current_entry_index];
+
+                                                                // Now copy the temp value (next entry) to the current entry.
+                                                                sort[current_entry_index] = temp;
+
+                                                                // Clear vars.
+                                                                temp.clear();
+                                                                current_entry = NULL;
+                                                                next_entry = NULL;
+
+                                                                // Get out of the loop.
+                                                                break;
+                                                        }
+                                                        else
+                                                        {
+                                                                if (current_entry[z] < next_entry[z])
+                                                                {
+                                                                        // OK, in this case the entries are where they need to be.
+                                                                        break;
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                        else
+                                        {
+                                                // Compare using the shorter string.
+                                                for (size_t z = 0; z < (sort[current_entry_index].size()); z++)
+                                                {
+                                                        // Dereference position in the vector, then dereference the position in the string.
+                                                        if (current_entry[z] > next_entry[z])
+                                                        {
+                                                                // The current entry is greater than the next one.
+                                                                temp = sort[next_entry_index];
+
+                                                                // Copy the current entry to the next one.
+                                                                sort[next_entry_index] = sort[current_entry_index];
+
+                                                                // Now copy the temp value (next entry) to the current entry.
+                                                                sort[current_entry_index] = temp;
+
+                                                                // Clear vars.
+                                                                temp.clear();
+                                                                current_entry = NULL;
+                                                                next_entry = NULL;
+
+                                                                // Get out of the loop.
+                                                                break;
+                                                        }
+                                                        else
+                                                        {
+                                                                if (current_entry[z] < next_entry[z])
+                                                                {
+                                                                        // OK, in this case the entries are where they need to be.
+                                                                        break;
+                                                                }
+                                                        }
+                                                }
+                                        }
+
+                                        // Increment the indexes.
+                                        current_entry_index++;
+                                        next_entry_index++;
+                                }
+
+                                // Reset the index values.
+                                current_entry_index = 0;
+                                next_entry_index = 1;
+                        }
+                }
+                catch (...)
+                {
+                        // Exception thrown.
+                        return -9;
+                }
+        }
+
+        // Exit function.
+        return 0;
+}
 
 bool DataProcess::CheckForEOF(fstream & source)
 {

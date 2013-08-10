@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine    
 */
@@ -47,16 +47,21 @@ struct dirlist{
 };
 
 /*!
-      FileUtills::dirlist * getDirectory(const std::string & path)
+        FileUtills::dirlist * getDirectory(const std::string & path, const bool & cleanList)
 
-      Lists the given directory's contents.
+        Lists the given directory's contents.
 
-      Pram: path of directory to check.
+        Pram: path, path of directory to check.
 
-      Returns a pointer to a dirlist if successfull.
-      Returns NULL if an error occurs.
+        Pram: cleanList, If this is true then, the generated list will be sorted
+        (via decrementing sort), and the list will have the entries for the current
+        and parent directories removed.
+        (Default is to do nothing, and return the list as the OS generated it.)
+
+        Returns a pointer to a dirlist if successfull.
+        Returns NULL if an error occurs.
 */
-dirlist * getDirectory(const std::string & path);
+dirlist * getDirectory(const std::string & path, const bool & cleanList = false);
 
 /*!
       int FileUtills::DoesExist(const std::string & Filename, Panic::ERROR & error)
@@ -297,19 +302,28 @@ short GetByteFreespace(const std::string & path, size_t & result);
 short GetGigaFreespace(const std::string & path, size_t & result);
 
 /*!
-        int FileUtills::DeletePath(const std::string & path, bool recursive)
+        short FileUtills::DeletePath(const std::string & path, const bool & recursive)
 
         Deletes the file or directory given by path.
 
-        Returns 0 if successful
-        -1 if the user lacks permission to remove the path.
-        -2 if the path does not exist.
+        By default this function will NOT delete recursively.
+        If the given path is a non-empty directory, by default this function will throw an error.
+        If the given path is an empty directory, however by default this function WILL delete it.
+
+        Note: If while deleting rescursively, a file or subdirectory can't be deleted, this function will try to continue
+        deleting any other files and subdirectories that can be deleted, but it will throw an error apon exit.
+
+        Returns 0 if successful.
+        -1 if the user lacks permission to delete the path. (Or if recursively deleting a directory, a file or subdirectory could not be deleted.)
+        -2 if the path does not exist. (Or if recursively deleting a directory, a file or subdirectory does not exist.)
         -3 if the function is not supported.
         -4 if a memory error occurs.
-        -5 if an unknown error occurs.
+        -5 if an unknown error occurs. (An error other than a permissions error occured while deleting something.)
         -6 if the path is a non empty directory and recursive is set to false.
+        -7 if while deleting recursively, the parent directory of a deleted directory could not be obtained. (I.e could not "go up a level in the directory tree.")
+        -8 if while deleting recursively, there were files and or subdirectories that could not be deleted. (Some files may have been deleted however.)
 */
-int DeletePath(const std::string & path, bool recursive = false);
+short DeletePath(const std::string & path, const bool & recursive = false);
 
 /*!
         int FileUtills::CopyFile(const std::string & src, const std::string & dest, bool append, size_t begOffset, size_t endOffset)

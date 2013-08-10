@@ -146,78 +146,94 @@ std::string FileUtills::CheckPathType(const std::string & path)
 FileUtills::dirlist * FileUtills::getDirectory(const std::string & path)
 {
 #ifdef POSIX_COMMON_H
+        // Dumb check.
+        if (path.size() <= 0)
+        {
+                // Invalid path.
+                return NULL;
+        }
 
-    // Dumb check.
-    if (path.size() <= 0)
-    {
-            // Invalid Path.
-            return NULL;
-    }
+        // Init vars.
+        FileUtills::dirlist * buffer;
+        struct dirent * dir;                        // ''
+        DIR * dp;	                    		    // Directory stream to hold directory name..... (Why can't it just take a c string?)
+        std::string tempname = "";	                // Used to store the filename / subdirectory name for the addToArray function.
 
-	// Init vars
-	FileUtills::dirlist * buffer;
-	struct dirent * dir;                        // ''
-	DIR * dp;	                    		    // Directory stream to hold directory name..... (Why can't it just take a c string?)
-	long count = 0;			                    // Used to count the directory entries.
-	std::vector<std::string> list;		        // Used to store the output.
-	std::string tempname = "";	                // Used to store the filename / subdirectory name for the addToArray function.
-	std::vector<std::string>::iterator iter;    // Iterator for output.
+        // Allocate the dirlist.
+        try{
+                buffer = new FileUtills::dirlist;
+        }
+        catch(bad_alloc)
+        {
+                // Could not allocate struct.
+                return NULL;
+        }
 
-	// Put the iter at the beggining of output.
-	iter == list.begin();
+        // Set the path.
+        buffer->path = path;
 
-    // Allocate the dirlist.
-    try{
-            buffer = new FileUtills::dirlist;
-    }
-    catch(bad_alloc)
-    {
-            // Could not allocate struct.
-            return NULL;
-    }
+        // Dump the path as a c string into the Directory stream object......(Overly complicated POS......)
 
-	// Set the path.
-	buffer->path = path;
+        // Check and make sure we can open the directory first.
+        if ((dp = (opendir(path.c_str()))) == NULL)
+        {
+                // An error occured.
+                if (buffer != NULL)
+                {
+                        delete buffer;
+                        buffer = NULL;
+                }
 
-	// Dump the path as a c string into the Directory stream object......(Overly complicated POS......)
+                // Exit function.
+                return NULL;
+        }
 
-	// Check and make sure we can open the directory first.
-	if ((dp = (opendir(path.c_str()))) == NULL)
-	{
-            // An error occured return -1
-            buffer->error.PanicHandler("FileUtills::getDirectory() Failed to access directory.", COMMON_ID);
-            return NULL;
-	}
+        // Start filesystem fetch loop.
+        while ((dir = readdir(dp))) // Call Host OS function.
+        {
+                // Check and see if the cleanList flag is set.
+                if (cleanList)
+                {
+                        // Check to see if d_name is a POSIX directory shortcut.
+                        if ((strcmp(dir->d_name, ".") == 0) || (strcmp(dir->d_name, "..") == 0))
+                        {
+                                // d_name is a directory shortcut, do not add it to the list.
+                                continue;
+                        }
+                }
 
-	// Start While loop.
-	while ((dir = readdir(dp))) // Call Host OS function
-	{
-            // Cast d_name to a string
-            tempname = dir->d_name;
+                // Cast d_name to a string
+                tempname = dir->d_name;
 
-            // Add the data to the array.
-            list.push_back(tempname);
+                // Add the data to the array.
+                buffer->list.push_back(tempname);
+        }
 
-            // Update the counter.
-            count++;
-	}
+        // Close the directory stream and reset it.
+        closedir(dp);
 
-	// Close the directory stream and reset it.
-	closedir(dp);
+        // If we are cleaning the list, call DataProcess::DecrementingSort().
+        if (DataProcess::DecrementingSort(buffer->list) != 0)
+        {
+                // An exception was thrown in the DecrementingSort() function, bail out.
+                if (buffer != NULL)
+                {
+                        delete buffer;
+                        buffer = NULL;
+                }
 
-	// Move the damn output to the correct buffer. Ie put the array pointer into the dirlist structure.
-	buffer->list = list;
+                // Exit function.
+                return NULL;
+        }
 
-	// Set the number of entries
-	buffer->numOfEntries = count;
+        // Set the number of entries
+        buffer->numOfEntries = buffer->list.size();
 
-    // Return the buffer.
-    return buffer;
-
+        // Return the buffer.
+        return buffer;
 #endif
-	// Default return for unimplemted function
-	return NULL;
-
+        // Default return for unimplemted function.
+        return NULL;
 }
 
 short FileUtills::GetGigaFreespace(const std::string & path, size_t & result)
@@ -1650,182 +1666,326 @@ std::string FileUtills::GetParent(const std::string & path)
 
 }
 
-int FileUtills::DeletePath(const std::string & path, bool recursive)
+short FileUtills::DeletePath(const std::string & path, const bool & recursive)
 {
 #ifdef POSIX_COMMON_H
-        // init vars.
-        bool done = false;                          // Used to know when to exit the recursive iterator loop.
-        bool resetIterLoop = false;                 // Used to control resetting the recursive iterator loop.
-        int result = 0;                             // Used to store results from calls to other functions.
-        std::string dummy = "";                     // Used to generate paths.
-        FileUtills::dirlist * plist = NULL;         // Used to store paths for recursive deletions.
-        std::vector<std::string>::iterator iter;    // plist->list (Directory Listing).
+        // Init vars.
+        bool done = false;                              // Used to know when to exit the recursive iterator loop.
+        bool resetIterLoop = false;                     // Used to control resetting the recursive iterator loop.
+        bool unableToDeleteAll = false;                 // Used to tell if we could not delete something while deleting recursively.
+        int result = 0;                                 // Used to store results from calls to other functions.
+        size_t x = 0;                                   // Used by the recursion loop, for accessing the directory list.
+        std::string currentabspath = "";                // Used to contain the current absolute path.
+        std::string dummy = "";                         // Used to construct temporary paths.
+        FileUtills::dirlist * plist = NULL;             // Used to store paths for recursive deletions.
+        std::vector<std::string>::iterator iter;        // plist->list (Directory Listing).
+        std::vector<size_t> directory_offsets;          // Used to store the offsets in the directory listings.
 
-        // Check and see if the file can be erased
+        // Check and see if the file can be erased.
         result = FileUtills::CheckPermissions(path);
-
-        switch (result){
-            // Permission OK
-            case 0:
-                break;
-            // Permission BAD
-            case -1:
-                return -1;
-                break;
-            // Path does not exist
-            case -2:
-                return -2;
-                break;
-            // Either an unknown error or function is not supported
-            case -3:
-                return -3;
-                break;
-            // Possible memory error
-            default:
-                return -4;
-                break;
-        }
 
         // Attempt to delete the path if the OS permissions allow it.
         if (result == 0)
         {
-            // Call removal function.
-            if (remove(path.c_str()) != 0)
-            {
-                    // Check the error.
-                    if (errno == EACCES)
-                    {
-                            // Permissions error.
-                            return -1;
-                    }
-                    if (errno == EPERM)
-                    {
-                            // Permissions error.
-                            return -1;
-                    }
-                    if (errno == ENOTEMPTY) // Path is a non empty directory.
-                    {
-                            // If we have recursive set to true we can delete the path, else return an error.
-                            if (!recursive)
-                            {
-                                    return -6;
-                            }
+                // Call removal function.
+                if (remove(path.c_str()) != 0)
+                {
+                        // Check the error.
+                        if (errno == EACCES)
+                        {
+                                // Permissions error.
+                                return -1;
+                        }
+                        if (errno == EPERM)
+                        {
+                                // Permissions error.
+                                return -1;
+                        }
+                        if (errno == ENOTEMPTY) // Path is a non empty directory.
+                        {
+                                // If we have recursive set to true we can delete the path, else return an error.
+                                if (recursive)
+                                {
+                                        // Copy the src path to the currentabspath var.
+                                        currentabspath = path;
 
-                            // OK we need to get the paths of every file in the directory and any other directories.
-                            plist = NULL;
-                            plist = FileUtills::getDirectory(path);
-                            if (plist == NULL)
-                            {
-                                    // Could not get directory list.
-                                    return -4;
-                            }
+                                        // Begin recursion loop.
+                                        do
+                                        {
+                                                // OK we need to get the paths of every file in the directory and any other directories.
+                                                plist = NULL;
+                                                plist = FileUtills::getDirectory(currentabspath, true);
+                                                if (plist == NULL)
+                                                {
+                                                        // Could not get directory list.
+                                                        if (plist != NULL)
+                                                        {
+                                                                delete plist;
+                                                                plist = NULL;
+                                                        }
+                                                        return -4;
+                                                }
 
-                            // Reset the iter just to be safe.
-                            iter = plist->list.begin();
+                                                // Reset the iter just to be safe.
+                                                iter = plist->list.begin();
 
-                            // For each entry try to delete it.
-                            while (!done)
-                            {
-                                    // Check and see if we need to reset the loop.
-                                    if (resetIterLoop)
-                                    {
-                                            // Reset the vars and clear the reset flag.
-                                            iter = plist->list.begin();
-                                            resetIterLoop = false;
-                                    }
+                                                // Check and see if the directory offset list has anything in it.
+                                                if ((!resetIterLoop) && (directory_offsets.size() > 0))
+                                                {
+                                                        // We have an offset, so init x to that offset.
+                                                        x = directory_offsets[(directory_offsets.size() - 1)];      // size() returns the number of valid elements in the vector.
 
-                                    // Reset dummy.
-                                    dummy.clear();
+                                                        // Fix the iterator.
+                                                        iter = iter + x;
 
-                                    try {
-                                            // Get path from the list.
-                                            dummy = path;
-                                            dummy += DIR_SEP;
-                                            dummy += *iter;
-                                    }
-                                    catch (bad_alloc)
-                                    {
-                                            delete plist;
-                                            plist = NULL;
-                                            return -4;
-                                    }
-                                    catch (length_error)
-                                    {
-                                            delete plist;
-                                            plist = NULL;
-                                            return -4;
-                                    }
+                                                        // Erase the offset from the vector.
+                                                        directory_offsets.erase((directory_offsets.end() - 1));     // end() returns the position after the last valid element in the vector.
+                                                }
+                                                else
+                                                {
+                                                        // We don't have any offsets, (or we just switched to a subdirectory) so init x to zero.
+                                                        x = 0;
 
-                                    // Call DeletePath(). (Recursive function warning......)
-                                    result = FileUtills::DeletePath(dummy, true);
-                                    if (result != 0)
-                                    {
-                                            // Return error.
-                                            delete plist;
-                                            plist = NULL;
-                                            return result;
-                                    }
+                                                        // Unset resetIterLoop.
+                                                        resetIterLoop = false;
+                                                }
 
-                                    // Erase the entry.
-                                    plist->list.erase(iter);
+                                                // Begin loop to check for more subdirectories.
+                                                for (; x < plist->list.size(); x++)
+                                                {
+                                                        // Create temp path.
+                                                        dummy.clear();
+                                                        dummy = currentabspath + DIR_SEP + (plist->list[x]);
+                                                        dummy = RemoveTrailingSlash(dummy);     // If we got a DIR_SEP at the end of the string get rid of it.
 
-                                    /*
-                                            Get new iterator, we do this anyway in the reset section, but to avoid a
-                                            segfault, we do it here too.
-                                    */
-                                    iter = plist->list.begin();
+                                                        // Check to see if the current entry in the list is a directory.
+                                                        switch (FileUtills::IsFileOrDirectory(dummy))
+                                                        {
+                                                                case 0:         // Not a file or directory. (Try to remove anyway.)
+                                                                case 1:         // File.
+                                                                    // Attempt to delete file.
+                                                                    if (remove(dummy.c_str()) != 0)
+                                                                    {
+                                                                            // Set unableToDeleteAll.
+                                                                            unableToDeleteAll = true;
 
-                                    // Set the reset flag.
-                                    resetIterLoop = true;
+                                                                            /*
+                                                                                Note: We need someway of keeping track of what
+                                                                                files we've already attempted to delete,
+                                                                                Otherwise we'll end up in an indefinte loop.
 
-                                    // Check for end of loop.
-                                    if (((iter + 1) == (plist->list.end())) || ((plist->list.size()) <= 0))
-                                    {
-                                            // End of loop.
-                                            done = true;
-                                            break;
-                                    }
+                                                                                The easist way to to have the list generated the same
+                                                                                way each time and store the offsets. (I.e each call to
+                                                                                FileUtills::getDirectory() returns the same list. As
+                                                                                opposed to just the way the OS spits out the directory
+                                                                                listing.)
 
-                                    // Bounds check.
-                                    if ((iter < (plist->list.begin())) || (iter >= (plist->list.end())))
-                                    {
-                                            // Out of bounds.
-                                            delete plist;
-                                            plist = NULL;
-                                            return -4;
-                                    }
+                                                                                Then when the subdirectory is removed, (or after the failed removal
+                                                                                attempt) find where that subdirectory was in the list and continue.
+                                                                            */
+                                                                    }
+                                                                    break;
+                                                                case 2:         // Directory.
+                                                                    // Set currentabspath to this path.
+                                                                    currentabspath = dummy;
 
-                                    // Increment the iterator.
-                                    iter++;
-                            }
+                                                                    // Set the current directory list offset (x) in to the vector.
+                                                                    directory_offsets.push_back(x);
 
-                            // Delete the plist.
-                            delete plist;
-                            plist = NULL;
+                                                                    // Set reset flag.
+                                                                    resetIterLoop = true;
 
-                            // Recall DeletePath on our path now that it is empty.
-                            result = FileUtills::DeletePath(path, true);
-                            if (result != 0)
-                            {
-                                    // Return error.
-                                    return result;
-                            }
+                                                                    // Get out of this loop.
+                                                                    break;
+                                                                case -3:        // OS not supported.
+                                                                    if (plist != NULL)
+                                                                    {
+                                                                            delete plist;
+                                                                            plist = NULL;
+                                                                    }
+                                                                    return -3;
+                                                                case -4:        // Permission error.
+                                                                case -5:        // Arg error.
+                                                                case -6:        // Path componet does not exist.
+                                                                case -7:        // Part of path is a file.
+                                                                case -9:        // Memory error.
+                                                                default:
+                                                                    // Set unableToDeleteAll.
+                                                                    unableToDeleteAll = true;
+                                                                    break;
+                                                        };
 
-                            // Exit the function.
-                            return 0;
-                    }
-                    else
-                    {
-                            // Some other error.
-                            return -5;
-                    }
-            }
-            return 0;
+                                                        // Check to see if reset flag is set.
+                                                        if (resetIterLoop)
+                                                        {
+                                                                // Get out of this loop.
+                                                                break;
+                                                        }
+                                                }
+
+                                                // Check to see how the previous loop exited.
+                                                if (!resetIterLoop)
+                                                {
+                                                        // Remove the directory.
+                                                        if (remove(currentabspath.c_str()) != 0)
+                                                        {
+                                                                // Check and see if unableToDeleteAll was set. If it was set, we ignore this error.
+                                                                if (!unableToDeleteAll)
+                                                                {
+                                                                        // Check the error.
+                                                                        if (errno == EACCES)
+                                                                        {
+                                                                                // Permissions error.
+                                                                                if (plist != NULL)
+                                                                                {
+                                                                                        delete plist;
+                                                                                        plist = NULL;
+                                                                                }
+                                                                                return -1;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                                if (errno == EPERM)
+                                                                                {
+                                                                                        // Permissions error.
+                                                                                        if (plist != NULL)
+                                                                                        {
+                                                                                                delete plist;
+                                                                                                plist = NULL;
+                                                                                        }
+                                                                                        return -1;
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                        // Some other error.
+                                                                                        if (plist != NULL)
+                                                                                        {
+                                                                                                delete plist;
+                                                                                                plist = NULL;
+                                                                                        }
+                                                                                        return -5;
+                                                                                }
+                                                                        }
+                                                                }
+                                                                else
+                                                                {
+                                                                        // Increment the offset in the vector. (We have dealt with this subdirectory.)
+                                                                        if (directory_offsets.size() > 0)
+                                                                        {
+                                                                                directory_offsets[(directory_offsets.size() - 1)] = (directory_offsets[(directory_offsets.size() - 1)] + 1);
+                                                                        }
+                                                                }
+                                                        }
+
+                                                        // Check to see if we removed the source dir.
+                                                        if (currentabspath != path)
+                                                        {
+                                                                // Get the parent directory of currentabspath.
+                                                                currentabspath = FileUtills::GetParent(currentabspath);
+                                                                if (currentabspath.size() <= 0)
+                                                                {
+                                                                        // Could not get parent directory.
+                                                                        if (plist != NULL)
+                                                                        {
+                                                                                delete plist;
+                                                                                plist = NULL;
+                                                                        }
+                                                                        return -7;
+                                                                }
+
+                                                                // Delete the old plist.
+                                                                if (plist != NULL)
+                                                                {
+                                                                        delete plist;
+                                                                        plist = NULL;
+                                                                }
+                                                        }
+                                                        else
+                                                        {
+                                                                // Delete the old plist.
+                                                                if (plist != NULL)
+                                                                {
+                                                                        delete plist;
+                                                                        plist = NULL;
+                                                                }
+
+                                                                // All directories have been deleted.
+                                                                done = true;
+                                                        }
+                                                }
+                                                else
+                                                {
+                                                        // Delete the old plist.
+                                                        if (plist != NULL)
+                                                        {
+                                                                delete plist;
+                                                                plist = NULL;
+                                                        }
+                                                }
+                                        }while (!done);
+
+                                        // Delete the plist.
+                                        if (plist != NULL)
+                                        {
+                                                delete plist;
+                                                plist = NULL;
+                                        }
+
+                                        // Clear dummy and currentabspath.
+                                        dummy.clear();
+                                        currentabspath.clear();
+
+                                        // Flush the directory_offsets vector.
+                                        directory_offsets.clear();
+
+                                        // Check and see if the unableToDeleteAll flag is set.
+                                        if (unableToDeleteAll)
+                                        {
+                                                // We can't delete some things so return an error.
+                                                return -8;
+                                        }
+                                }
+                                else
+                                {
+                                        // Path is not empty and we are not deleting recursively.
+                                        return -6;
+                                }
+                        }
+                        else
+                        {
+                                // Some other error.
+                                return -5;
+                        }
+                }
         }
-#endif
-    // System not supported.
-    return -3;
+        else
+        {
+                // Determine the error.
+                switch (result){
+                    // Permission BAD
+                    case -1:
+                        return -1;
+                        break;
+                    // Path does not exist
+                    case -2:
+                        return -2;
+                        break;
+                    // Either an unknown error or function is not supported
+                    case -3:
+                        return -3;
+                        break;
+                    // Possible memory error
+                    default:
+                        return -4;
+                        break;
+                };
+        }
 
+        // Exit function.
+        return 0;
+#endif
+        // System not supported.
+        return -3;
 }
 
 int FileUtills::CopyFile(const std::string & src, const std::string & dest, bool append, size_t begOffset, size_t endOffset)
