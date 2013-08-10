@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License along with this program; 
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine
 */
@@ -241,6 +241,34 @@ class Data_Object{
         */
         size_t insert(size_t offset, const Data_Object & source);
 };
+
+/*!
+        short DataProcess::IncrementingSort(std::vector<std::string> & sort)
+
+        This function sorts strings by incrementing value.
+        ( I.e The entire string is parsed, and the strings with
+         characters that are larger in value than the previous string
+         are moved up the list. I.e Have their positions swapped
+         in the list.)
+
+         Returns 0 on success.
+         Returns -9 if an exception is thrown.
+*/
+short IncrementingSort(std::vector<std::string> & sort);
+
+/*!
+        short DataProcess::DecrementingSort(std::vector<std::string> & sort)
+
+        This function sorts strings by decrementing value.
+        ( I.e The entire string is parsed, and the strings with
+         characters that are larger in value than the previous string
+         are moved down the list. I.e Have their positions swapped
+         in the list.)
+
+         Returns 0 on success.
+         Returns -9 if an exception is thrown.
+*/
+short DecrementingSort(std::vector<std::string> & sort);
 
 /*!
     bool DataProcess::CheckForEOF(fstream & source)
