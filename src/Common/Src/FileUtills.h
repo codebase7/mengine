@@ -326,26 +326,40 @@ short GetGigaFreespace(const std::string & path, size_t & result);
 short DeletePath(const std::string & path, const bool & recursive = false);
 
 /*!
-        int FileUtills::CopyFile(const std::string & src, const std::string & dest, bool append, size_t begOffset, size_t endOffset)
+        short FileUtills::CopyFile(const std::string & src, const std::string & dest, const bool & append, const size_t & begOffset, const size_t & endOffset)
 
         Copies endOffset bytes starting at begOffset, from source file to dest file.
 
-        By default the entire file is copied.
+        This function only works on FILES. Not directories. To copy a directory, call FileUtills::CopyPath().
 
-        Note: This function expects that dest is the file path to copy to not the parent directory.
+        @pram src, absolute path to the source file.
+        @pram dest, absolute path to the dest file.
+        @pram append, Whether or not to append data to the dest file. (Note only applies if the dest file exists.
+                                                                         If append is false, then the dest file will be overwritten.)
+        @pram begOffset, Location in the source file to start copying data from.
+        @pram endOffset, Location in the source file to stop copying data when it is reached.
+
+        By default the entire file is copied and the dest file is overwritten.
+
+        Note: This function expects that both given paths are absolute. (I.e Complete paths to both files.)
+        (If the paths are not absolute, then the source and dest files must be relative to the current working directory.)
 
         Returns 0 on success.
-        -1 on Source permission error.
-        -10 on destiation directory permission error.
-        -2 if source does not exist.
-        -20 if destiontion directory does not exist.
-        -21 if the destionation path / file already exists.
-        -3 if the function is not supported.
-        -4 if a memory error occurs.
-        -5 if an unknown error occurs.
-        -6 if copy fails.
+        Returns -5 if the given begOffset is bigger than the given endOffset. (I.e you reversed the offsets.)
+        Returns -9 if the memory buffer could not be allocated, or if an exception is thrown while copying data.
+        Returns -10 if the source path is not given.
+        Returns -11 if the source file could not be opened.
+        Returns -12 if the beginning offset given is larger than the source file.
+        Returns -13 if the ending offset given is larger than the source file.
+        Returns -14 if an I/O error occurs while reading the source file.
+        Returns -15 if a logical error occurs while reading the source file.
+        Returns -16 if end of file was encountered unexpectedly. (I.e It was expected that the source file had more data in it.)
+        Returns -20 if the dest path is not given.
+        Returns -21 if dest file could not be opened.
+        Returns -24 if an I/O error occurs while writing to the dest file.
+        Returns -25 if a logical error occurs while writing to the dest file.
 */
-int CopyFile(const std::string & src, const std::string & dest, bool append = false, size_t begOffset = 0, size_t endOffset = 0);
+short CopyFile(const std::string & src, const std::string & dest, const bool & append = false, const size_t & begOffset = 0, const size_t & endOffset = 0);
 
 /*!
         int FileUtills::MoveFile(const std::string & src, const std::string & dest, bool overwrite)
