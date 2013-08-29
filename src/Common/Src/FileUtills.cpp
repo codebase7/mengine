@@ -2286,6 +2286,353 @@ short FileUtills::CopyFile(const std::string & src, const std::string & dest, co
         return result;
 }
 
+short FileUtills::CopyPath(const std::string & src, const std::string & dest, const bool & recursive, 
+						   const bool & rename, const bool & abort_on_failure,
+						   const bool & append, const size_t & begOffset, const size_t & endOffset)
+{
+		// Init vars.
+		bool done = false;				// Used to know when to exit the recursive iterator loop.
+		bool resetIterLoop = false;			// Used to control resetting the recursive iterator loop.
+		bool unableToCopyAll = false;			// Used to know if a file copy failed while recursively copying files.
+		short result = 0;				// Used to store results from calls to other functions.
+		std::string currentabspath_src = "";		// Used to contain the current absolute source path.
+		std::string currentabspath_dest = "";		// Used to contain the current absolute destionation path.
+		std::string src_path = "";			// Used to construct temporary source paths.
+		std::string dest_path = "";			// Used to construct temporary destionation paths.
+		size_t x = 0;					// Used by the recursion loop, for accessing the directory list.
+		FileUtills::dirlist * plist = NULL;		// Used to store paths for recursive copying.
+		std::vector<std::string>::iterator iter;	// plist->list (Directory Listing).
+		std::vector<size_t> directory_offsets;		// Used to store the offsets in the directory listings.
+        
+		// Check and see if the src is a file or a directory.
+		result = FileUtills::IsFileOrDirectory(src);
+		if (result == 2)	// Directory.
+		{
+				// Copy the src path to the currentabspath_src and the dest path to the currentabspath_dest var.
+				currentabspath_src = src;
+				currentabspath_dest = dest;
+				
+				// OK, check and see if the dest directory exists.
+				result = FileUtills::IsFileOrDirectory(currentabspath_dest);
+				if (result == -6) // Directory does not exist.
+				{
+						// Create the dest directory.
+						result = FileUtills::CreateDirectory(currentabspath_dest);
+						if (result != 0)
+						{
+								// OK, we can't create the dest directory.
+								result = -1;
+						}
+				}
+				else
+				{
+						if (result == 2)		// Dest Directory exists.
+						{
+								// Set result to zero. (0)
+								result = 0;
+						}
+						else
+						{
+								if (result >= 0)
+								{
+										// OK, dest is some file or other filesystem entry, so we can't copy a directory to it.
+										result = -2;
+								}
+						}
+				}
+				
+				// Make sure that result == 0. (I.e. that we can continue.)
+				if (result == 0)
+				{
+						// Begin recursion loop.
+						do
+						{
+								// OK we need to get the paths of every file in the directory and any other directories.
+								plist = NULL;
+								plist = FileUtills::getDirectory(currentabspath_src, true);
+								if (plist == NULL)
+								{
+										// Could not get directory list.
+										if (plist != NULL)
+										{
+												delete plist;
+												plist = NULL;
+										}
+										result = -4;
+										
+										// Exit loop.
+										done = true;
+										break;
+								}
+
+								// Reset the iter just to be safe.
+								iter = plist->list.begin();
+
+								// Check and see if the directory offset list has anything in it.
+								if ((!resetIterLoop) && (directory_offsets.size() > 0))
+								{
+										// We have an offset, so init x to that offset.
+										x = directory_offsets[(directory_offsets.size() - 1)];      // size() returns the number of valid elements in the vector.
+										
+										// Fix the iterator.
+										iter = iter + x;
+
+										// Erase the offset from the vector.
+										directory_offsets.erase((directory_offsets.end() - 1));     // end() returns the position after the last valid element in the vector.
+								}
+								else
+								{
+										// We don't have any offsets, (or we just switched to a subdirectory) so init x to zero.
+										x = 0;
+
+										// Unset resetIterLoop.
+										resetIterLoop = false;
+								}
+
+								// Begin loop to check for more subdirectories.
+								for (; x < plist->list.size(); x++)
+								{
+										// Create temp paths.
+										src_path.clear();
+										src_path = currentabspath_src + DIR_SEP + (plist->list[x]);
+										src_path = RemoveTrailingSlash(src_path);     // If we got a DIR_SEP at the end of the string get rid of it.
+										dest_path.clear();
+										dest_path = currentabspath_dest + DIR_SEP + (plist->list[x]);
+										dest_path = RemoveTrailingSlash(dest_path);     // If we got a DIR_SEP at the end of the string get rid of it.
+
+										// Check to see if the current entry in the list is a directory.
+										switch (FileUtills::IsFileOrDirectory(src_path))
+										{
+												case 0:         // Not a file or directory. (Try to copy anyway.)
+												case 1:         // File.
+													// Attempt to copy file.
+													result = FileUtills::CopyFile(src_path, dest_path, false, 0, 0); 
+													if (result != 0)
+													{
+															if (result != -3)	// If result does = -3 it means the OS / Arch is unsupported by CopyFile().
+															{
+																	// Set unableToCopyAll.
+																	unableToCopyAll = true;
+
+																	/*
+																			Note: We need someway of keeping track of what
+																			files we've already attempted to copy,
+																			Otherwise we'll end up in an indefinte loop.
+
+																			The easist way to to have the list generated the same
+																			way each time and store the offsets. (I.e each call to
+																			FileUtills::getDirectory() returns the same list. As
+																			opposed to just the way the OS spits out the directory
+																			listing.)
+
+																			Then when we return from a subdirectory,
+																			we find where that subdirectory was in the list and continue.
+																	*/
+															}
+													}
+													break;
+												case 2:         // Directory.
+													// Check recursive flag.
+													if (recursive)
+													{
+															// Set currentabspath_src and currentabspath_dest to this path.
+															currentabspath_src = src_path;
+															currentabspath_dest = dest_path;
+
+															// Set the current directory list offset (x) in to the vector.
+															directory_offsets.push_back(x);
+
+															// Set reset flag.
+															resetIterLoop = true;
+
+															// Get out of this loop.
+													}	// Ignore otherwise.
+													break;
+												case -3:        // OS not supported.
+													if (plist != NULL)
+													{
+															delete plist;
+															plist = NULL;
+													}
+													result = -3;
+													break;
+												case -4:        // Permission error.
+												case -5:        // Arg error.
+												case -6:        // Path componet does not exist.
+												case -7:        // Part of path is a file.
+												case -9:        // Memory error.
+												default:
+													// Set unableToCopyAll.
+													unableToCopyAll = true;
+													break;
+										};
+
+										// Check to see if reset flag is set, if we hit OS / Arch unsupported, or if we failed and the user requested abort on failure.
+										if ((resetIterLoop) || (result == -3) || ((unableToCopyAll) && (abort_on_failure)))
+										{
+												// Get out of this loop.
+												break;
+										}
+								}
+
+								// Check to see how the previous loop exited.
+								if ((result == -3) || ((abort_on_failure) && (unableToCopyAll)))
+								{
+										/* OS / Arch not supported, or
+										 * we failed to copy something and the user requested abort on failure.
+										 * No point in trying to continue.
+										 */
+										done = true;
+								}
+								else
+								{
+										if (resetIterLoop)	// Entering subdirectory.
+										{
+												// Delete the old plist.
+												if (plist != NULL)
+												{
+														delete plist;
+														plist = NULL;
+												}
+
+												// Check and see if the dest directory exists.
+												result = FileUtills::IsFileOrDirectory(currentabspath_dest);
+												if (result == -6)	// Directory does NOT exist.
+												{
+														// Create subdirectory.
+														result = FileUtills::CreateDirectory(currentabspath_dest);
+														if (result != 0)
+														{
+																if (result == -3)	// -3 means OS / Arch not supported.
+																{
+																		// Exit loop.
+																		done = true;
+																}
+																else
+																{
+																		// Could not create subdirectory.
+																		unableToCopyAll = true;
+																		
+																		// Set resetIterLoop, so that the loop will continue from the parent directory.
+																		resetIterLoop = false;
+																}
+														}
+												}
+												else
+												{
+														// Check to see if currentabspath_dest is a some sort of filesystem entry.
+														if (result >= 0)
+														{
+																// OK, we can't create a directory where a file (or some other filesystem entry) exists.
+																unableToCopyAll = true;
+														}
+														else
+														{
+																if (result == -3)	// OS / Arch not supported.
+																{
+																		// Exit loop.
+																		done = true;
+																}
+																else
+																{
+																		// An error occured.
+																		unableToCopyAll = true;
+																}
+														}
+												}
+										}
+										if ((abort_on_failure) && (unableToCopyAll))	// Check for abort on fail. (We do this here due to the above if statement possibly triggering it.)
+										{
+											// Recheck failure due to subdirectory.
+											done = true;
+											break;
+										}
+										if (!resetIterLoop)	// Leaving the subdirectory.
+										{
+												/* (Note: We do a recheck here, because the above if 
+												* statement may set this to false. It prevents us from duping 
+												* this section in the above if statement.)
+												*/
+												
+												// Check to see if we reached the top level source dir.
+												if (currentabspath_src != src)
+												{
+														// Get the parent directory of currentabspath_src and currentabspath_dest.
+														currentabspath_src = FileUtills::GetParent(currentabspath_src);
+														if (currentabspath_src.size() <= 0)
+														{
+																// Could not get parent directory.
+																result = -7;
+																done = true;
+														}
+														currentabspath_dest = FileUtills::GetParent(currentabspath_dest);
+														if (currentabspath_dest.size() <= 0)
+														{
+																// Could not get parent directory.
+																result = -7;
+																done = true;
+														}
+
+														// Delete the old plist.
+														if (plist != NULL)
+														{
+																delete plist;
+																plist = NULL;
+														}
+												}
+												else
+												{
+														// Delete the old plist.
+														if (plist != NULL)
+														{
+																delete plist;
+																plist = NULL;
+														}
+
+														// All directories have been copied.
+														done = true;
+												}
+										}
+								}
+						}while (!done);
+
+						// Delete the plist.
+						if (plist != NULL)
+						{
+								delete plist;
+								plist = NULL;
+						}
+
+						// Clear src_path, dest_path, currentabspath_src, and currentabspath_dest.
+						src_path.clear();
+						dest_path.clear();
+						currentabspath_src.clear();
+						currentabspath_dest.clear();
+
+						// Flush the directory_offsets vector.
+						directory_offsets.clear();
+
+						// Check and see if the unableToCopyAll flag is set.
+						if (((result == 0) && (unableToCopyAll)) || ((abort_on_failure) && (unableToCopyAll)))
+						{
+								// We can't copy some things so return an error.
+								result = -8;
+						}
+				}
+		}
+		else	// Treat as single file.
+		{
+				if (result > 0)
+				{
+						// Call CopyFile.
+						result = FileUtills::CopyFile(src, dest, append, begOffset, endOffset);
+				}	// Anything else is an error.
+		}
+
+		// Return result.
+		return result;
+}
+
 int FileUtills::MoveFile(const std::string & src, const std::string & dest, bool overwrite)
 {
         // Dumb check.

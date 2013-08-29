@@ -382,6 +382,67 @@ short DeletePath(const std::string & path, const bool & recursive = false);
 short CopyFile(const std::string & src, const std::string & dest, const bool & append = false, const size_t & begOffset = 0, const size_t & endOffset = 0);
 
 /*!
+	short FileUtills::CopyPath(const std::string & src, const std::string & dest, const bool & recursive,
+						   const bool & rename, const bool & abort_on_failure,
+						   const bool & append, const size_t & begOffset, const size_t & endOffset)
+	
+	This function takes a given source path and copies it to the given dest path.
+	
+	This function supports files and directories.
+	(Do note that while copying files, you must give ABS (absolute) paths to the src and dest. 
+	If you give a file as src and a directory as dest, the function WILL return an error.)
+	
+	If the given src is a file, then this function acts as a wrapper to FileUtills::CopyFile(), and returns all of it's
+	error codes.
+	
+	If the given src is a directory, then this function will copy the entire directory to the given dest, creating dest if
+	nessacarry. If recursive is set to true, then the entire directory AND it's subdirectories will be copied. 
+	(The subdirectories will be created as needed, if a subdirectory already exists, then the data from src will be merged.)
+	
+	@pram recursive, if this is true, then this function will recursively copy all subdirectories from src. Merging / creating
+	subdirectories as needed. Otherwise this function will only copy the top level directory. (Default)
+	If src is a file, then this pram has no effect.
+	
+	@pram rename, if this is set to true, then this function will try to rename the file rather than copy it.
+	otherwise a copy will be performed (Default).
+	It should be noted that a rename is equivelent to calling CopyFile(), and then DeletePath() on the same source. 
+	(Minus the overhead and extra disk space use of actually copying the source first.) And that renaming a
+	src will only work if the dest is on the same filesystem.
+	In the event that rename fails, then a copy will be performed UNLESS abort_on_failure is set to true. In that case
+	the function will abort imeadently.
+	NOTE: Currently rename does nothing, as the RenamePath() function does not exist.
+	
+	@pram abort_on_failure, if this is set to true then this function will abort when the first failure is encountered.
+	otherwise this function will try to continue with the remaining list of files and subdirectories. (Default)
+	
+	@pram append, this is only used if src is a file. (As this function acts as a wrapper to CopyFile() in that case,
+	see FileUtills::CopyFile() for it's description. This function provides the same default value for this pram as CopyFile().)
+	If src is a directory, this pram has no effect.
+	
+	@pram begOffset, this is only used if src is a file. (As this function acts as a wrapper to CopyFile() in that case,
+	see FileUtills::CopyFile() for it's description. This function provides the same default value for this pram as CopyFile().)
+	If src is a directory, this pram has no effect.
+	
+	@pram endOffset, this is only used if src is a file. (As this function acts as a wrapper to CopyFile() in that case,
+	see FileUtills::CopyFile() for it's description. This function provides the same default value for this pram as CopyFile().)
+	If src is a directory, this pram has no effect.
+	
+	Below are return codes for when src is a directory, if src is a file, then the return codes for this function are identical to
+	FileUtills::CopyFile(). Please see FileUtills::CopyFile() for it's return codes.
+	
+	Returns 0 on success.
+	Returns -8 if the function was unable to copy all files. (Some files may have been copied however.)
+	Returns -1 if the function was unable to create top level dest path and top level dest path does not exist.
+	Returns -2 if the top level dest path exists and is a file or some other filesystem entry. 
+	Returns -3 if the host OS / Arch is unsupported.
+	Returns -4 if the function could not get a directory listing.
+	Returns -7 if the function could not get parent directory string.
+*/
+short CopyPath(const std::string & src, const std::string & dest, const bool & recursive = false,
+	       const bool & rename = false, const bool & abort_on_failure = false,
+	       const bool & append = false, const size_t & begOffset = 0, const size_t & endOffset = 0);
+
+/*!
         int FileUtills::MoveFile(const std::string & src, const std::string & dest, bool overwrite)
 
         Acts as a wrapper for a call to CopyFile and DeletePath.
