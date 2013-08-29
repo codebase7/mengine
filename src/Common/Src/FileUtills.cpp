@@ -537,7 +537,7 @@ short FileUtills::GetByteFreespace(const std::string & path, size_t & result)
 	return -3;
 }
 
-int FileUtills::CreateDirectory(const std::string & directory, Panic::ERROR & error, bool createRecursive)
+short FileUtills::CreateDirectory(const std::string & directory, Panic::ERROR & error, const bool & createRecursive)
 {
 #ifdef POSIX_COMMON_H
 	// Init vars.
@@ -876,266 +876,342 @@ int FileUtills::CreateDirectory(const std::string & directory, Panic::ERROR & er
 	return -3;
 }
 
-
-/*bool FileUtills::CreateDirectory(std::string directory, Panic::ERROR & error, bool createRecursive)
+short FileUtills::CreateDirectory(const std::string & directory, const bool & createRecursive)
 {
 #ifdef POSIX_COMMON_H
-	// Init vars
-	int errorcode = 0; 			// Used to tell if we get an error
-	int permissioncheck = 0;		// Used for return code from FileUtills::CheckPermissions
-	int position = 0; 			// Used for storing the last seperator location.
-	int size = 0; 				// Stores the total size of the directory string.
-	std::string buffer = ""; 		// Used to contain a partial directory path.
-	std::string parentbuffer = "";		// Used to store the Parent directory path.
-	bool foundSeperator = false; 		// Used to end the search loop for a Path Seperator.
-	bool done = false; 			// Used to end the check for directory exist loop.
-	bool relitivepath = false;		// Used to tell if we have a relitvie path.
+	// Init vars.
+	std::string buffer = ""; 		// Used to store the current directory path.
+	std::string parentbuffer = "";	// Used to store the parent directory's path.
+	std::string realpath = "";		// Used to store the real directory path if a relative path or a user path is given instead of an absolute path.
+	int errorcode = 0;			    // Used to store return error codes.
+	size_t position = 0;			// Used to store current search position in buffer.
+	size_t size = 0;			    // Used to store the size of the path string
+	int permission = 0;			    // Used to store return code from FileUtills::CheckPermissions().
+	bool skiploop = false;			// Used to control the recursive directory creation loop.
+	bool isrelative = false;		// Used to tell if the path is relative or abosulute.
+	bool isHome = false;			// Used to tell if the path is in a user's home directory.
+	char charArray[1000];			// Used for the cwd function.
+	char * pCWD;				    // Used to store result of the getCWD function.
 
-	// Check to see if the full directory path already exists.
-	if (FileUtills::DoesExist(directory, error) == true)
+    	// Check to see if the full directory path already exists.
+	if (FileUtills::DoesExist(directory) == true)
 	{
 	    // Directory already exists thus return true.
-	    return true;
+	    return -3;
 	}
 
+	// Check for a directory seperator on the end of the path and remove it if it is found.
+	buffer = RemoveTrailingSlash(directory);
 
+	// Get the size of the buffer string.
+	size = buffer.size();
 
-	// Get size of the Directory string.
-	size = directory.size();
-
-	// Copy the directory string to buffer
-	buffer = directory;
-
-	// Check and see if a directory seperator is on the end of the string.
-	if ((directory.find_last_of(DIR_SEP)) == (size-1))
+	// Determine if we have a relative path or a absolute one.
+	if (buffer.find_first_of(DIR_SEP) == 0)
 	{
-		// Remove the trailing Directory seperator so we don't screw up the next check.
-		 buffer = directory.substr(0, (size-1));
+		isrelative = false;
 	}
 
-	// Remove the directory to create from the path so we can see if the Parent directory exists.
+	if (buffer.find("./") == 0) // BUG: this should not be called when string != "./"<some path>.
+	{
+		// Ok relative path get the full path
+		isrelative = true;
+		pCWD = getcwd(charArray, sizeof(charArray));
+		buffer = pCWD;
+
+		buffer += directory.substr(1, size);
+
+		// Remove the slash if it was added back.
+		buffer = RemoveTrailingSlash(buffer);
+
+		// Copy it to the realpath.
+		realpath = buffer;
+
+	}
+
+	// Also check if it's in a user's home subdirectory.
+	if (buffer.find_first_of('~') == 0)
+	{
+		// Ok user path, get the full path.
+		isHome = true;
+		pCWD = getenv("HOME");
+		buffer = pCWD;
+		buffer += directory.substr(1, size);
+
+		// remove the slash if it was added back.
+		buffer = RemoveTrailingSlash(buffer);
+
+		// Copy it to the real path.
+		realpath = buffer;
+	}
+
+	// Assume relative if we have something else here.
+	if (buffer.find_first_of(DIR_SEP) != 0 && isHome == false && isrelative == false) // BUG: This does not get called.
+	{
+		// Set isrelative to true and retrive the current working directory.
+		isrelative = true;
+		pCWD = getcwd(charArray, sizeof(charArray));
+		buffer = pCWD;
+
+		// Add a DIR_SEP to the string or we will mess up the directory name.
+		buffer += DIR_SEP;
+
+		// Add all data from the Directory string because the string does not have a DIR_SEP at position zero.
+		buffer += directory.substr(0, size);
+
+		// Remove the slash if it was added back.
+		buffer = RemoveTrailingSlash(buffer);
+
+		// Copy it to the realpath.
+		realpath = buffer;
+	}
+
+	// Get the parent directory out of the buffer and store it for later.
 	position = buffer.find_last_of(DIR_SEP);
 	parentbuffer = buffer.substr(0, position);
 
-	// Check and see if the parent directory exists.
-	errorcode = DoesExist(parentbuffer, error);
+	 // Check and see if the parent directory exists.
+	errorcode = FileUtills::CheckParent(directory);	// Switch
 
-	// Check and make sure we didn't get a -2 out of DoesExist. (Or a bad error code.)
-	if (errorcode == -2 || errorcode > 0 || errorcode < -2)
-	{
-		// Ok we have a problem. Exit the function. Do not call PanicHandler.
-		return false;
+	switch (errorcode) {
+      case -1:  // Can't write to the parent directory exit the function.
+		return -1;
+		permission = 0;
+        break;
+	  case -2:  // Parent Directory does not exist,
+	    if (createRecursive == false)
+	    {
+                // Don't create the directory structure.
+                return -2;
+	    }
+	    break;
+
+	  case 0:  // Parent Directory does exist and is writeable.
+        // since we can write to the directory skip the loop.
+		skiploop = true;
+		break;
+      default: // Ether there was an unknown error or this Arch / OS is not supported. ether way return -4.
+	    return -4;
+	    errorcode = 0;
+	    break;
 	}
 
-	// If createRecursive is false and the parent does not exist exit the function.
-	if (errorcode == -1 && createRecursive == false)
+	// Clear the vars for the recursive directory creation loop.
+	permission = 0;
+	position = 0;
+	errorcode = 0;
+
+	// Set buffer so we can check the path correctly.
+	// If we have a relative or user path use the real path.
+	if (isHome == true || isrelative == true)
 	{
-		// Don't create the directory structure. Call PanicHandler and return false.
-		error.PanicHandler("FileUtills::CreateDirectory : Parent Directory does not exist. createRecursive is false, will not create directory.");
-		return false;
+		buffer = realpath.substr(0, (realpath.find_first_of( DIR_SEP , 1)));
+
+		// Also set the size of the string correctly.
+		size = realpath.size();
+	}
+	else
+	{
+		// Otherwise use the directory string.
+		buffer = directory.substr(0, (directory.find_first_of( DIR_SEP, 1)));
+
+		// Also set the size of the string correctly.
+		size = directory.size();
 	}
 
-	// If Parent directory exists skip the Create Parent Directory loop.
+	// If the parent directory does not exist and createRecursive is true then begin main loop.
+	while (skiploop != true)
+	{
+		// If we are at position 0 and there is a DIR_SEP there incremnt position by one.
+		if (position == 0 && buffer.find_first_of(DIR_SEP) == 0)
+		{
+			// Incremnt the position by one.
+			position++;
+		}
+
+		// Start with root directory and run though the following until we reach the requested directory.
+
+		if (isHome == true || isrelative == true)	// If true use realpath
+		{
+			if ((position = realpath.find_first_of(DIR_SEP, position)) == string::npos)
+			{
+				// This is the requested directory so exit the loop.
+				skiploop = true;
+				break;
+			}
+		}
+		else 		// Otherwise use directory.
+		{
+			if ((position = directory.find_first_of(DIR_SEP, position)) == string::npos)
+			{
+				// This is the requested directory so exit the loop.
+				skiploop = true;
+				break;
+			}
+		}
+
+		// Do a sanity check for the size of the string.
+		if (position < 0 || position > size)
+		{
+			// Ok something went wrong.
+			return -4;
+		}
+
+		// Dump the last buffer into the parentdirectory buffer.
+		parentbuffer = buffer;
+
+		// Cut up the directory string so we can check for it.
+
+		if (isHome == true || isrelative == true)
+		{
+			buffer = realpath.substr(0, position);
+		}
+		else
+		{
+			buffer = directory.substr(0, position);
+		}
+
+		// Do Check.
+		errorcode = FileUtills::DoesExist(buffer);
+
+		switch (errorcode){
+		  case -1:		// Directory does not exist on system.
+		    // Check and see if we can create it.
+		    permission = FileUtills::CheckPermissions(parentbuffer);
+
+		    switch (permission){
+		      case -1:
+			// Permission Check Failed.
+			return false;
+			break;
+
+		      case 0:
+			// Ok try and create the directory.
+			if ((errorcode = (mkdir(buffer.c_str(), S_IRWXU))) != 0)
+			{
+				// An error ocurred find out what.
+
+				switch (errno) {
+				  case EACCES:		// Permission error.
+				    return -1;
+				    break;
+				  case EEXIST:		// Path exists on system.
+				    return -3;
+				    break;
+				  case ENOSPC:		// Out of disk space.
+				    return -2;
+				    break;
+				  default:		// We really don't care about the other errors.
+				    return -4;
+				    break;
+				}
+			}
+
+			// Update the position counter.
+			position++;
+
+			// Check and see if that was the last directory to create.
+			if (isHome == true || isrelative == true)
+			{
+				// Check realpath.
+				if (buffer == realpath)
+				{
+				  skiploop = true;
+				  return 0;
+				}
+			}
+			// Otherwise check the directory buffer.
+			if (buffer == directory)
+			{
+				skiploop = true;
+				return 0;
+			}
+			break;
+
+		      default:
+			// Bad errorcode exit function.
+			return -4;
+			break;
+		    }
+		    permission = 0;
+		    errorcode = 0;
+		    break;
+
+		  case 0:		// Ok directory does exist.
+		    position++;
+		    break;
+
+		  default:
+		    // Bad error code exit function.
+		    return -4;
+		}
+
+
+
+		// If the next directory does exist then skip the remaining portion of the checks and restart with the next directory.
+
+		// If the next directory does not exist the check the permissions of this one.
+
+			// If we can write to this directory then create the directory.
+
+				// If the directory creation was successful then check and see what to do next.
+
+					// If we have created the requested directory exit the function
+					//return true.
+
+					// If we have not created the requested directory contiune loop with the next
+					// directory.
+
+				// If we encountered a fatal error exit the function return false.
+
+			// If we can't write to this directory exit the function, return false.
+
+			// If the permission check fails with a fatal error exit the function return false.
+
+		// If the existance check fails exit the function, return false.
+	}
+
+
+
+	//If we have a relative or user path use realpath.
+	if (isHome == true || isrelative == true)
+	{
+		buffer = realpath;
+	}
+	else // Otherwise use the directory string.
+	{
+
+		buffer = directory;
+	}
+
+	// Ok try and create the directory.
+	if ((errorcode = (mkdir(buffer.c_str(), S_IRWXU))) != 0)
+	{
+		// An error ocurred find out what.
+
+		switch (errno) {
+		  case EACCES:		// Permission error.
+		    return -1;
+		    break;
+		  case EEXIST:		// Path exists on system.
+		    return -5;
+		    break;
+		  case ENOSPC:		// Out of disk space.
+		    return -4;
+		    break;
+		  default:		// We really don't care about the other errors.
+		    return -6;
+		    break;
+		}
+	}
 	if (errorcode == 0)
 	{
-	  // Set done to true so we skip the loop.
-	  done = true;
-	}
-
-	// Reset vars for detection loop
-	errorcode = 0;
-	position = 0;
-	buffer = parentbuffer;
-
-	// Check and see if we have a relitive directory or a full path.
-	if ((buffer.find_first_of(DIR_SEP, position)) != 0)
-	{
-		relitivepath = true;
-	}
-
-	// Begin trying to create the upper level directories if they don't exist.
-	while (done != true)
-	{
-			// Update the total size
-			size = buffer.size();
-
-			// In POSIX the seperator will always be at position 0. Unless a relitive directory is given.
-			// So we have to compensate for this.
-
-			if (relitivepath == false && position == 0 && size > 0)
-			{
-				// Fix the position.
-				position++;
-			}
-
-			// if we really are at the root level do nothing about the position
-
-			// Find first seperator.
-			position = buffer.find_first_of(DIR_SEP, position);
-
-			// If position is past the end of the string or if it's less than 0 call PanicHandler
-			if (position > size || position < 0)
-			{
-				// Error Call PanicHandler
-				error.PanicHandler("FileUtills::CreateDirectory : position is out of bounds. Unable to continue parsing directories. Returning false.");
-				return false;
-			}
-
-			// Remove everything after it and the seperator as well
-			buffer = directory.substr(0, (position));
-
-			// Check and see if the directory exists.
-			errorcode = FileUtills::DoesExist(buffer, error);
-
-			// Check errorcode.
-			if (errorcode == 0)
-			{
-
-			  // OK the directory exists so let's see if we can actully write to it.
-			  permissioncheck = FileUtills::CheckPermissions(buffer, error);
-
-			  if (permissioncheck == -1) // Permission for / or /home is read only this condition will always be true.
-			  {
-				// We can't write here so we have to exit the function.
-				error.PanicHandler("FileUtills::CreateDirectory : Unable to write to parent folder, Access Denied. Returning false.");
-				return false;
-			  }
-
-			  if (permissioncheck == -2)
-			  {
-				// OK we got a does not exist. The check has failed regardless so exit the function.
-				error.PanicHandler("FileUtills::CreateDirectory : Parent Directory does not exist, second check failed. Returning false.");
-				return false;
-			  }
-
-			  if (permissioncheck < -2 || permissioncheck > 0)
-			  {
-				// Ok this should not happen exit the function.
-				return false;
-			  }
-			  // The directory exists so check to see if it's the last one before the to be created directory.
-			  if (buffer == parentbuffer)
-			  {
-				 // Set exit condition
-				 done = true;
-
-				 // Reset errorcode and permissioncheck
-				 errorcode = 0;
-				 permissioncheck = 0;
-			  }
-			}
-			cout <<"\n\nend of test.\n\n";
-			// If the directory does not exist attpemt to create it.
-			if (errorcode == -1)
-			{
-				// Reset errorcode
-				errorcode = 0;
-
-				// First Check Permissions so we know if this will work or not.
-				permissioncheck = FileUtills::CheckPermissions(buffer, error);
-
-				// If permissions are bad bail out.
-				if (permissioncheck == -1)
-				{
-					// User lacks permission exit function.
-					error.PanicHandler("FileUtills::CreateDirectory : User lacks permission to create directory. Access Denied.");
-					return false;
-				}
-
-				// If anything else exit function.
-				if (permissioncheck > 0 || permissioncheck <= -2)
-				{
-					// Exit function
-					return false;
-				}
-
-				if (permissioncheck == 0)
-				{
-					// Reset errorcode and permissioncheck
-					errorcode = 0;
-					permissioncheck = 0;
-
-					// Directory does not exist so we must create it.
-					errorcode = mkdir(buffer.c_str(), 770);
-				}
-
-				// Verifiy that new directory exists
-				errorcode = FileUtills::DoesExist(buffer, error);
-
-				// if errorcode is -1 we have a problem.
-				if (errorcode == -1)
-				{
-					// Call PanicHandler
-					error.PanicHandler("FileUtills::CreateDirectory : Parent Directory creation has failed. Returning false.");
-					return false;
-				}
-
-				// If errorcode is anything else we really have a problem.
-				if (errorcode > 0 || errorcode < -1)
-				{
-					// Exit the function return false
-					return false;
-				}
-
-				// errorcode is good reset it to be safe though
-				errorcode = 0;
-
-			}
-
-			// Check and see if errorcode is bad.
-			if (errorcode > 0 || errorcode < -1)
-			{
-				// We have an issue return false.
-				return false;int
-			}
-			// TODO: did this backwards should go form root level to the directory we need to create.
-
-		// Reset the buffer
-		buffer = directory.substr(0, (directory.size()));
-
-		// Increment position
-		position++;
-	}
-	// Reset permissioncheck
-	permissioncheck = 0;
-
-	// Check the permissions on the parent directory.
-	permissioncheck = FileUtills::CheckPermissions(parentbuffer, error);
-
-	// If we have permission create the directory.
-	if (permissioncheck == 0)
-	{
-		// Make the directory
-		errorcode = mkdir(directory.c_str(), 770);
-
-		// Check for error TODO: actully return what error we recive.
-		if (errorcode < 0)
-		{
-			 return false;
-		}
-		if (errorcode == 0)
-		{
-			// Exit Function.
-			return true;
-		}
-	}
-	if (permissioncheck == -1)
-	{
-		// Permission Denied return false
-		error.PanicHandler("FileUtills::CreateDirectory : User lacks permission to create directory. Access Denied.");
-		return false;
-	}
-	if (permissioncheck > 0 || permissioncheck <= -2)
-	{
-		 // Error occured exit function
-		 return false;
+		return 0;
 	}
 #endif
-
-	// Return False as we have no support on this platform.
-	return false;
+	// If an implemetation does not exist for this platform then exit the function, return false.
+	return -3;
 }
-*/
 
 int FileUtills::CheckPermissions(const std::string & Filename, Panic::ERROR & error, bool read, bool write)
 {

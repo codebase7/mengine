@@ -153,11 +153,13 @@ std::string GetParent(const std::string & path);
 std::string CheckPathType(const std::string & path);
 
 /*!
-          int FileUtills::CreateDirectory(const std::string & directory, Panic::ERROR & error, bool createRecursive)
-          Prams : @std::string directory
+          short FileUtills::CreateDirectory(const std::string & directory, Panic::ERROR & error, const bool & createRecursive)
+          @pram : directory, path to create.
+          @pram : error, error handler for a human readable error message.
+          @pram : createRecursive, if this is set to true, then this function will try to create the 
+          parent directories of the given directory if they do not exist.
 
-          Creates given directory on the filesystem. if a parent directory does not exist
-          it will create it.
+          Creates given directory on the filesystem.
 
           This function uses the Panic::ERROR class.
 
@@ -169,7 +171,25 @@ std::string CheckPathType(const std::string & path);
           Returns -5 if the directory already exists.
           Returns -6 if another error is encountered.
 */
-int CreateDirectory(const std::string & directory, Panic::ERROR & error, bool createRecursive = false);
+short CreateDirectory(const std::string & directory, Panic::ERROR & error, const bool & createRecursive = false);
+
+/*!
+          short FileUtills::CreateDirectory(const std::string & directory, const bool & createRecursive)
+          @pram : directory, path to create.
+          @pram : createRecursive, if this is set to true, then this function will try to create the 
+          parent directories of the given directory if they do not exist.
+
+          Creates given directory on the filesystem.
+
+          Returns 0 if directory creation was successful.
+          Returns -1 if permission is denied.
+          Returbs -2 if the parent directory does not exist and createRecursive is false.
+          Returns -3 if this function is unsupported.
+          Returns -4 if the disk is full.
+          Returns -5 if the directory already exists.
+          Returns -6 if another error is encountered.
+*/
+short CreateDirectory(const std::string & directory, const bool & createRecursive = false);
 
 /*!
           int FileUtills::CheckPermissions(const std::string & path, Panic::ERROR & error, bool read, bool write)
