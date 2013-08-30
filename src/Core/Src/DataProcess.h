@@ -243,6 +243,25 @@ class Data_Object{
 };
 
 /*!
+	size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
+	
+	This function generates psudo-random numbers based on the given max_value.
+	
+	@pram min_value, the minimum value that is acceptable for the function to return.
+	@pram max_value, the maximum value that is acceptable for the function to return.
+	
+	E.x. If you want a range of 1 to 100 set min_value to 1 and max_value to 100.
+	
+	By default this function returns a number between 0 and 255.
+	
+	@pram reset_rand, if this is set to true, the rng will be re-seeded with the current time value returned by time(NULL).
+	Otherwise the next psudo-random number from the current seed will be returned. (Default)
+	
+	Returns the generated psudo-random number.
+*/
+size_t Trivial_Random_Number_Generator(const size_t & min_value = 0, const size_t & max_value = 255, const bool & reset_rand = false);
+
+/*!
         short DataProcess::IncrementingSort(std::vector<std::string> & sort)
 
         This function sorts strings by incrementing value.

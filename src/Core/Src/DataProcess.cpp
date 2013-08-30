@@ -21,6 +21,27 @@
 #include "DataProcess.h"
 #include "FileStreams.h"
 
+size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
+{ 
+	// NO, it's not 4..... (Although it could be. I won't lie.)
+  
+	// Set static.
+	static bool rand_set;
+	
+	// Check if we need to set the rng.
+	if ((!rand_set) || (reset_rand))
+	{
+		// Seed random number generator.
+		srand(time(NULL));
+		
+		// Set rand_set.
+		rand_set = true;
+	}
+	
+	// Return the result.
+	return (rand() % max_value + min_value);
+}
+
 short DataProcess::IncrementingSort(std::vector<std::string> & sort)
 {
         // Init vars.
@@ -309,7 +330,6 @@ bool DataProcess::CheckForEOF(fstream & source)
 std::string DataProcess::GenerateUID(long int length)
 {
         // Init vars.
-        srand(time(NULL));              // Random Number Generator.
         std::string output = "";        // Data that will be returned.
         int y = 0;                      // Result from rand().
 
@@ -327,7 +347,7 @@ std::string DataProcess::GenerateUID(long int length)
                 else
                 {
                         // Generate Random
-                        y = rand();
+                        y = DataProcess::Trivial_Random_Number_Generator();
 
                         // Check for Alpha numeric. ASCII CODES 0-9 (48-57) A-Z (65 - 90) a-z (97 - 122)
                         if (((y > 47) & (y < 58)) || ((y > 64) & (y < 91)) || ((y > 96) & (y < 123)))
