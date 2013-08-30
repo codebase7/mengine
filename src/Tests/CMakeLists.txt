@@ -1,2 +1,4 @@
 add_executable(Thread_Test Thread_Utils_test.cpp)
 target_link_libraries(Thread_Test Common_Multiverse_Engine)
+add_executable(FileUtills_CopyPath_Test FileUtills_CopyPath_test.cpp)
+target_link_libraries(FileUtills_CopyPath_Test Common_Multiverse_Engine)

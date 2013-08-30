@@ -25,6 +25,8 @@
 #include <iostream>     // For std::cout / NULL macro.
 #include <string.h>     // For strcmp.
 #include <unistd.h>     // For sleep.
+#include <time.h>	// For time().
+#include <stdlib.h>	// For rand() / srand().
 
 // Define compile date time stamp.
 #ifndef TESTCOMPILEDATE
