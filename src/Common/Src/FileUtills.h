@@ -367,17 +367,17 @@ short DeletePath(const std::string & path, const bool & recursive = false);
         Returns 0 on success.
         Returns -5 if the given begOffset is bigger than the given endOffset. (I.e you reversed the offsets.)
         Returns -9 if the memory buffer could not be allocated, or if an exception is thrown while copying data.
-        Returns -10 if the source path is not given.
+        Returns -10 if the source file was not given.
         Returns -11 if the source file could not be opened.
         Returns -12 if the beginning offset given is larger than the source file.
         Returns -13 if the ending offset given is larger than the source file.
-        Returns -14 if an I/O error occurs while reading the source file.
-        Returns -15 if a logical error occurs while reading the source file.
+        Returns -14 if an I/O error occured while reading the source file.
+        Returns -15 if a logical error occured while reading the source file.
         Returns -16 if end of file was encountered unexpectedly. (I.e It was expected that the source file had more data in it.)
-        Returns -20 if the dest path is not given.
+        Returns -20 if the dest file was not given.
         Returns -21 if dest file could not be opened.
-        Returns -24 if an I/O error occurs while writing to the dest file.
-        Returns -25 if a logical error occurs while writing to the dest file.
+        Returns -24 if an I/O error occured while writing to the dest file.
+        Returns -25 if a logical error occured while writing to the dest file.
 */
 short CopyFile(const std::string & src, const std::string & dest, const bool & append = false, const size_t & begOffset = 0, const size_t & endOffset = 0);
 
@@ -431,12 +431,12 @@ short CopyFile(const std::string & src, const std::string & dest, const bool & a
 	FileUtills::CopyFile(). Please see FileUtills::CopyFile() for it's return codes.
 	
 	Returns 0 on success.
-	Returns -8 if the function was unable to copy all files. (Some files may have been copied however.)
 	Returns -1 if the function was unable to create top level dest path and top level dest path does not exist.
 	Returns -2 if the top level dest path exists and is a file or some other filesystem entry. 
 	Returns -3 if the host OS / Arch is unsupported.
 	Returns -4 if the function could not get a directory listing.
 	Returns -7 if the function could not get parent directory string.
+	Returns -8 if the function was unable to copy all files. (Some files may have been copied however.)
 */
 short CopyPath(const std::string & src, const std::string & dest, const bool & recursive = false,
 	       const bool & rename = false, const bool & abort_on_failure = false,
