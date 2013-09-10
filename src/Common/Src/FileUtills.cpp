@@ -2286,9 +2286,9 @@ short FileUtills::CopyFile(const std::string & src, const std::string & dest, co
         return result;
 }
 
-short FileUtills::CopyPath(const std::string & src, const std::string & dest, const bool & recursive, 
+short FileUtills::CopyPath(const std::string & src, const std::string & dest, const bool & recursive,
 						   const bool & rename, const bool & abort_on_failure,
-						   const bool & append, const size_t & begOffset, const size_t & endOffset)
+						   const bool & append, const streamsize & begOffset, const streamsize & endOffset)
 {
 		// Init vars.
 		bool done = false;				// Used to know when to exit the recursive iterator loop.
@@ -2303,7 +2303,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 		FileUtills::dirlist * plist = NULL;		// Used to store paths for recursive copying.
 		std::vector<std::string>::iterator iter;	// plist->list (Directory Listing).
 		std::vector<size_t> directory_offsets;		// Used to store the offsets in the directory listings.
-        
+
 		// Check and see if the src is a file or a directory.
 		result = FileUtills::IsFileOrDirectory(src);
 		if (result == 2)	// Directory.
@@ -2311,7 +2311,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 				// Copy the src path to the currentabspath_src and the dest path to the currentabspath_dest var.
 				currentabspath_src = src;
 				currentabspath_dest = dest;
-				
+
 				// OK, check and see if the dest directory exists.
 				result = FileUtills::IsFileOrDirectory(currentabspath_dest);
 				if (result == -6) // Directory does not exist.
@@ -2340,7 +2340,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 								}
 						}
 				}
-				
+
 				// Make sure that result == 0. (I.e. that we can continue.)
 				if (result == 0)
 				{
@@ -2359,7 +2359,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 												plist = NULL;
 										}
 										result = -4;
-										
+
 										// Exit loop.
 										done = true;
 										break;
@@ -2373,7 +2373,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 								{
 										// We have an offset, so init x to that offset.
 										x = directory_offsets[(directory_offsets.size() - 1)];      // size() returns the number of valid elements in the vector.
-										
+
 										// Fix the iterator.
 										iter = iter + x;
 
@@ -2406,7 +2406,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 												case 0:         // Not a file or directory. (Try to copy anyway.)
 												case 1:         // File.
 													// Attempt to copy file.
-													result = FileUtills::CopyFile(src_path, dest_path, false, 0, 0); 
+													result = FileUtills::CopyFile(src_path, dest_path, false, 0, 0);
 													if (result != 0)
 													{
 															if (result != -3)	// If result does = -3 it means the OS / Arch is unsupported by CopyFile().
@@ -2512,7 +2512,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 																{
 																		// Could not create subdirectory.
 																		unableToCopyAll = true;
-																		
+
 																		// Set resetIterLoop, so that the loop will continue from the parent directory.
 																		resetIterLoop = false;
 																}
@@ -2549,11 +2549,11 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 										}
 										if (!resetIterLoop)	// Leaving the subdirectory.
 										{
-												/* (Note: We do a recheck here, because the above if 
-												* statement may set this to false. It prevents us from duping 
+												/* (Note: We do a recheck here, because the above if
+												* statement may set this to false. It prevents us from duping
 												* this section in the above if statement.)
 												*/
-												
+
 												// Check to see if we reached the top level source dir.
 												if (currentabspath_src != src)
 												{
@@ -2562,14 +2562,14 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 														if (currentabspath_src.size() <= 0)
 														{
 																// Could not get parent directory.
-																result = -7;
+																result = -5;
 																done = true;
 														}
 														currentabspath_dest = FileUtills::GetParent(currentabspath_dest);
 														if (currentabspath_dest.size() <= 0)
 														{
 																// Could not get parent directory.
-																result = -7;
+																result = -5;
 																done = true;
 														}
 
@@ -2616,17 +2616,48 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 						if (((result == 0) && (unableToCopyAll)) || ((abort_on_failure) && (unableToCopyAll)))
 						{
 								// We can't copy some things so return an error.
-								result = -8;
+								result = -6;
 						}
 				}
 		}
 		else	// Treat as single file.
 		{
-				if (result > 0)
+				if ((result == 0) || (result == 1))
 				{
 						// Call CopyFile.
 						result = FileUtills::CopyFile(src, dest, append, begOffset, endOffset);
-				}	// Anything else is an error.
+				}
+				else
+				{
+                        // IsFileOrDirectory() returned an error.
+                        switch (result)
+                        {
+                                case -3:
+                                    // IsFileOrDirectory() is not supported on this system.
+                                    result = -13;
+                                    break;
+                                case -4:
+                                    // A permissions error occured.
+                                    result = -14;
+                                    break;
+                                case -5:
+                                    // The given path is empty.
+                                    result = -15;
+                                    break;
+                                case -6:
+                                    // A path componet does not exist.
+                                    result = -16;
+                                    break;
+                                case -7:
+                                    // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
+                                    result = -17;
+                                    break;
+                                default:
+                                    // All other errors.
+                                    result = -19;
+                                    break;
+                        };
+				}
 		}
 
 		// Return result.
