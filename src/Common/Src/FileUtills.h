@@ -432,7 +432,7 @@ short CopyFile(const std::string & src, const std::string & dest, const bool & a
 	
 	Returns 0 on success.
 	Returns -1 if the function was unable to create top level dest path and top level dest path does not exist.
-	Returns -2 if the top level dest path exists and is a file or some other filesystem entry. 
+	Returns -2 if the top level dest path exists and is a file or some other filesystem entry.
 	Returns -3 if the host OS / Arch is unsupported.
 	Returns -4 if the function could not get a directory listing.
 	Returns -7 if the function could not get parent directory string.
@@ -443,9 +443,9 @@ short CopyPath(const std::string & src, const std::string & dest, const bool & r
 	       const bool & append = false, const size_t & begOffset = 0, const size_t & endOffset = 0);
 
 /*!
-        short FileUtills::MoveFile(const std::string & src, const std::string & dest, const bool & overwrite)
+        short FileUtills::MovePath(const std::string & src, const std::string & dest, const bool & overwrite)
 
-        Acts as a wrapper for a call to CopyFile and DeletePath.
+        Acts as a wrapper for a call to CopyPath and DeletePath.
         The src file is copied to the dest file and then the src file is deleted.
 
         Returns 0 on success.
@@ -457,7 +457,7 @@ short CopyPath(const std::string & src, const std::string & dest, const bool & r
         Returns -4 If an error occurs while moving data.
         Returns -5 If an argument to the function is bad.
 */
-short MoveFile(const std::string & src, const std::string & dest, const bool & overwrite = false);
+short MovePath(const std::string & src, const std::string & dest, const bool & overwrite = false);
 
 }
 

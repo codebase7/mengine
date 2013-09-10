@@ -2633,82 +2633,84 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 		return result;
 }
 
-short FileUtills::MoveFile(const std::string & src, const std::string & dest, const bool & overwrite)
+short FileUtills::MovePath(const std::string & src, const std::string & dest, const bool & overwrite)
 {
         // Dumb check.
-        if (src.size() <= 0)
+        if ((src.size() <= 0) || (dest.size() <= 0))
         {
-                // Bad src.
-                return -5;
-        }
-        if (dest.size() <= 0)
-        {
-                // Bad dest.
+                // Bad src or dest.
                 return -5;
         }
 
         // Init vars.
-        short fileResult = 0;         // Used for return codes.
+        short result = 0;         // Used for return codes.
 
         // Check and see if dest already exists.
-        fileResult = FileUtills::DoesExist(dest);
-        switch (fileResult)
+        result = FileUtills::DoesExist(dest);
+        switch (result)
         {
-                case 0:     // File exists.
+                case 0:     // Path exists.
                     if (overwrite == true)
                     {
-                            // Attempt to delete dest file.
-                            fileResult = FileUtills::DeletePath(dest);
-                            switch (fileResult)
+                            // Attempt to delete dest path.
+                            result = FileUtills::DeletePath(dest, true);
+                            switch (result)
                             {
                                     case 0:     // Delete OK.
                                         break;
-                                    default:    // Unable to delete file.
-                                        return -21;
+                                    default:    // Unable to delete path.
+                                        result = -21;
                                         break;
                             };
                     }
                     else
                     {
-                            // Can't delete existing file bail out.
-                            return -20;
+                            // Can't delete existing path bail out.
+                            result = -20;
                             break;
                     }
                     break;
-                case -1:    // File does not exist.
+                case -1:    // Path does not exist.
                     break;
                 default:    // Some error.
-                    return -22;
+                    result = -22;
                     break;
         };
 
-        // Copy entire file to the dest.
-        fileResult = FileUtills::CopyFile(src, dest);
-        switch (fileResult)
-        {
-                case 0:     // Copy ok.
-                    break;
-                case -1:    // Source Permission error.
-                    return -10;
-                case -2:    // Source Does not exist.
-                    return -10;
-                default:    // Some error.
-                    return -4;
-                    break;
-        };
-
-        // Delete original file.
-        fileResult = FileUtills::DeletePath(src);
-        switch (fileResult)
-        {
-                case 0:     // Delete ok.
-                    return 0;
-                    break;
-                default:    // Some error.
-                    return -4;
-                    break;
-        };
-
+	// Check to see if we can continue.
+	if ((result == -1) || (result == 0))
+	{
+		// Copy entire path to the dest.
+		result = FileUtills::CopyPath(src, dest);
+		switch (result)
+		{
+			case 0:     // Copy ok.
+			    break;
+			case -1:    // Source Permission error.
+			    result = -10;
+			case -2:    // Source Does not exist.
+			    result = -10;
+			default:    // Some error.
+			    result = -4;
+			    break;
+		};
+		
+		// Check to see if the copy was successful.
+		if (result == 0)
+		{
+			// Delete original path.
+			result = FileUtills::DeletePath(src, true);
+			switch (result)
+			{
+				case 0:     // Delete ok.
+				    break;
+				default:    // Some error.
+				    result = -4;
+				    break;
+			};
+		}
+	}
+	
         // Default return.
-        return -3;
+        return result;
 }
