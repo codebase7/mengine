@@ -346,16 +346,22 @@ short GetGigaFreespace(const std::string & path, size_t & result);
 short DeletePath(const std::string & path, const bool & recursive = false);
 
 /*!
-        short FileUtills::CopyFile(const std::string & src, const std::string & dest, const bool & append, const size_t & begOffset, const size_t & endOffset)
+        short FileUtills::CopyFile(const std::string & src, const std::string & dest, const bool & append,
+                                   const streamsize & begOffset, const streamsize & endOffset)
 
         Copies endOffset bytes starting at begOffset, from source file to dest file.
+
+        Offset rules:
+        If offsets are used, they must be positive. (If one of the given offsets is negative an error is returned.)
+        If zeros are used for both offsets, then the entire file will be copied.
+        If endOffset is greater than begOffset an error will be returned.
 
         This function only works on FILES. Not directories. To copy a directory, call FileUtills::CopyPath().
 
         @pram src, absolute path to the source file.
         @pram dest, absolute path to the dest file.
         @pram append, Whether or not to append data to the dest file. (Note only applies if the dest file exists.
-                                                                         If append is false, then the dest file will be overwritten.)
+                                                                        If append is false, then the dest file will be overwritten.)
         @pram begOffset, Location in the source file to start copying data from.
         @pram endOffset, Location in the source file to stop copying data when it is reached.
 
@@ -365,8 +371,9 @@ short DeletePath(const std::string & path, const bool & recursive = false);
         (If the paths are not absolute, then the source and dest files must be relative to the current working directory.)
 
         Returns 0 on success.
+        Returns -1 if a given offset is negative.
         Returns -5 if the given begOffset is bigger than the given endOffset. (I.e you reversed the offsets.)
-        Returns -9 if the memory buffer could not be allocated, or if an exception is thrown while copying data.
+        Returns -9 if the memory buffer could not be allocated.
         Returns -10 if the source file was not given.
         Returns -11 if the source file could not be opened.
         Returns -12 if the beginning offset given is larger than the source file.
@@ -378,8 +385,10 @@ short DeletePath(const std::string & path, const bool & recursive = false);
         Returns -21 if dest file could not be opened.
         Returns -24 if an I/O error occured while writing to the dest file.
         Returns -25 if a logical error occured while writing to the dest file.
+        Returns -99 if an exception is thrown while copying data.
 */
-short CopyFile(const std::string & src, const std::string & dest, const bool & append = false, const size_t & begOffset = 0, const size_t & endOffset = 0);
+short CopyFile(const std::string & src, const std::string & dest, const bool & append = false,
+               const streamsize & begOffset = 0, const streamsize & endOffset = 0);
 
 /*!
 	short FileUtills::CopyPath(const std::string & src, const std::string & dest, const bool & recursive,
