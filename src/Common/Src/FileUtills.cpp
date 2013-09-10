@@ -2633,7 +2633,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 		return result;
 }
 
-int FileUtills::MoveFile(const std::string & src, const std::string & dest, bool overwrite)
+short FileUtills::MoveFile(const std::string & src, const std::string & dest, const bool & overwrite)
 {
         // Dumb check.
         if (src.size() <= 0)
@@ -2648,7 +2648,7 @@ int FileUtills::MoveFile(const std::string & src, const std::string & dest, bool
         }
 
         // Init vars.
-        int fileResult = 0;         // Used for return codes.
+        short fileResult = 0;         // Used for return codes.
 
         // Check and see if dest already exists.
         fileResult = FileUtills::DoesExist(dest);

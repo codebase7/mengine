@@ -443,7 +443,7 @@ short CopyPath(const std::string & src, const std::string & dest, const bool & r
 	       const bool & append = false, const size_t & begOffset = 0, const size_t & endOffset = 0);
 
 /*!
-        int FileUtills::MoveFile(const std::string & src, const std::string & dest, bool overwrite)
+        short FileUtills::MoveFile(const std::string & src, const std::string & dest, const bool & overwrite)
 
         Acts as a wrapper for a call to CopyFile and DeletePath.
         The src file is copied to the dest file and then the src file is deleted.
@@ -457,7 +457,7 @@ short CopyPath(const std::string & src, const std::string & dest, const bool & r
         Returns -4 If an error occurs while moving data.
         Returns -5 If an argument to the function is bad.
 */
-int MoveFile(const std::string & src, const std::string & dest, bool overwrite = false);
+short MoveFile(const std::string & src, const std::string & dest, const bool & overwrite = false);
 
 }
 
