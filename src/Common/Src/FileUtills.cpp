@@ -1538,32 +1538,6 @@ int FileUtills::IsFileOrDirectory(const std::string & path)
         call_result = stat(path.c_str(), buf);
 
         // Check the result.
-        if (call_result != 0)
-        {
-                // Error, see if it was a permissions error.
-                if (errno == EACCES)
-                {
-                        // Permissions error.
-                        result = -4;
-                }
-                if (errno == ENOENT)
-                {
-                        // A path componet does not exist.
-                        result = -6;
-                }
-                if (errno == ENOTDIR)
-                {
-                        // Path has a file in it, and is not the final componet.
-                        result = -7;
-                }
-                else
-                {
-                        // Some other error.
-                        result = -9;
-                }
-        }
-
-        // Guard against failed operation.
         if (call_result == 0)
         {
                 // Check the stat structure.
@@ -1572,12 +1546,38 @@ int FileUtills::IsFileOrDirectory(const std::string & path)
                         // Path is a regular file.
                         result = 1;
                 }
-                if (S_ISDIR((buf->st_mode)))
-                {
-                        // Path is a directory.
-                        result = 2;
-                }
+                else
+		{
+			if (S_ISDIR((buf->st_mode)))
+			{
+				// Path is a directory.
+				result = 2;
+			}
+		}
         }
+        else
+	{
+		// Error, see if it was a permissions error.
+		switch (errno)
+		{
+			case EACCES:
+			    // Permissions error.
+			    result = -4;
+			    break;
+			case ENOENT:
+			    // A path componet does not exist.
+			    result = -6;
+			    break;
+			case ENOTDIR:
+			    // Path has a file in it, and is not the final componet.
+			    result = -7;
+			    break;
+			default:
+			    // Some other error.
+			    result = -9;
+			    break;
+		};
+	}
 
         // Delete stat buffer.
         delete buf;
