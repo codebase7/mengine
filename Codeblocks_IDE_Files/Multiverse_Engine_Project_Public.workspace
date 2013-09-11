@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="Multiverse_Engine_Project_Public_Core/Multiverse_Engine_Project_Public_Core.cbp" />
+		<Project filename="Multiverse_Engine_Project_Public_Panic_Handler/Multiverse_Engine_Project_Public_Panic_Handler.cbp" />
+		<Project filename="Multiverse_Engine_Project_Public_Common/Multiverse_Engine_Project_Public_Common.cbp">
+			<Depends filename="Multiverse_Engine_Project_Public_Core/Multiverse_Engine_Project_Public_Core.cbp" />
+			<Depends filename="Multiverse_Engine_Project_Public_Panic_Handler/Multiverse_Engine_Project_Public_Panic_Handler.cbp" />
+		</Project>
+		<Project filename="Multiverse_Engine_Project_Public_Unit_Tests/Multiverse_Engine_Project_Public_Unit_Tests.cbp" active="1">
+			<Depends filename="Multiverse_Engine_Project_Public_Core/Multiverse_Engine_Project_Public_Core.cbp" />
+			<Depends filename="Multiverse_Engine_Project_Public_Panic_Handler/Multiverse_Engine_Project_Public_Panic_Handler.cbp" />
+			<Depends filename="Multiverse_Engine_Project_Public_Common/Multiverse_Engine_Project_Public_Common.cbp" />
+		</Project>
+	</Workspace>
+</CodeBlocks_workspace_file>
