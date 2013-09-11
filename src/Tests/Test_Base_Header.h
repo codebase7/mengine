@@ -1,5 +1,5 @@
 /*!
-    Multiverse Engine Project 02/6/2013 Tests Test_Base_Header.h
+    Multiverse Engine Project 02/6/2013 Unit Tests Test_Base_Header.h
     
     Copyright (C) 2013 Multiverse Engine Project
 
@@ -38,9 +38,27 @@
 #endif
 
 // Define section deviders.
+#ifndef START_TEST_SECTION
 #define START_TEST_SECTION "\n\n=============== START OF TEST SECTION ================\n\n"
+#endif
 
+#ifndef END_TEST_SECTION
 #define END_TEST_SECTION "\n\n=============== END OF TEST SECTION ================\n\n"
+#endif
+
+// Define max failures.
+#ifndef MAX_FAILURES
+#define MAX_FAILURES 3
+#endif
+
+// Define Unknown Error message.
+const char UNKNOWN_ERROR[] = "Unknown Error.";
+
+// Define Error_Messages struct.
+struct Error_Messages{
+	short error_code;
+	const char * message;
+};
 
 #endif
 

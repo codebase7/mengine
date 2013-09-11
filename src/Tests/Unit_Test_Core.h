@@ -1,5 +1,5 @@
 /*!
-    Multiverse Engine Project 21/8/2012 Core UnitTests.cpp
+    Multiverse Engine Project 21/8/2012 Unit Tests Unit_Test_Core.h
         
     Copyright (C) 2013 Multiverse Engine Project
 
@@ -18,23 +18,15 @@
     https://github.com/codebase7/mengine
 */
 
-#include "CoreMain.h"
-#include "Unit_Tests.h"
+#ifndef CORE_UNIT_TESTS_H
+#define CORE_UNIT_TESTS_H
 
-#ifdef CORE_UNIT_TESTS_H
-int main()
-{
-        // Init result var.
-        int result = 0;
+// Include headers from Core.
+#include "../Core/Src/DataProcess.h"
 
-        // Starting Unit tests.
-        std::cout << "Multiverse_Engine_Project " << COREVERSION << " Compiled on: " << CORECOMPILEDATE << " " << CORECOMPILETIME << "\n";
-        std::cout << "Core Unit tests build\n\n";
-        std::cout << "Starting Unit tests for DataProcess::Data_Object. Please be pacent this can take some time.\n";
-        result = Unit_Test_Data_Object();
-        std::cout << "Result: ";
-        std::cout << result <<"\n\n";
-        return result;
-}
+int Unit_Test_Data_Object();
+int Unit_Test_Data_Object_Insert_char();
 
 #endif
+
+// End of Unit_Test_Core.h

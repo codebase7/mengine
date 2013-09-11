@@ -1,5 +1,3 @@
 add_library(Core_Multiverse_Engine SHARED DataProcess.cpp FileStreams.cpp)
 add_library(Panic_Handler_Multiverse_Engine SHARED Panic.cpp)
-TARGET_LINK_LIBRARIES(Panic_Handler_Multiverse_Engine Core_Multiverse_Engine)
-add_executable(Core_Unit_Tests UnitTests.cpp UnitTests_Data_Object.cpp UnitTests_Data_Object_Insert_char.cpp)
-TARGET_LINK_LIBRARIES(Core_Unit_Tests Core_Multiverse_Engine Panic_Handler_Multiverse_Engine)
+

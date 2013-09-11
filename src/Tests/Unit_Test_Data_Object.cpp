@@ -1,5 +1,5 @@
 /*!
-    Multiverse Engine Project 21/8/2012 Core UnitTests_Data_Object.cpp
+    Multiverse Engine Project 21/8/2012 Unit Tests Unit_Test_Data_Object.cpp
     
     Copyright (C) 2013 Multiverse Engine Project
 
@@ -18,7 +18,6 @@
     https://github.com/codebase7/mengine
 */
 
-#include "CoreMain.h"
 #include "Unit_Tests.h"
 
 int Unit_Test_Data_Object()

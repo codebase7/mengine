@@ -1,5 +1,5 @@
 /*!
-    Multiverse Engine Project 21/8/2012 Core UnitTests.h
+    Multiverse Engine Project 04/9/2013 Unit Tests Unit_Tests.h
         
     Copyright (C) 2013 Multiverse Engine Project
 
@@ -18,11 +18,12 @@
     https://github.com/codebase7/mengine
 */
 
-#ifndef CORE_UNIT_TESTS_H
-#define CORE_UNIT_TESTS_H
+#ifndef UNIT_TESTS_H
+#define UNIT_TESTS_H
 
-int Unit_Test_Data_Object();
-int Unit_Test_Data_Object_Insert_char();
+#include "Test_Base_Header.h"
+#include "Unit_Test_Core.h"
+#include "Unit_Test_Common.h"
 
 #endif
 

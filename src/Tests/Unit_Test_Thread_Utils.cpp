@@ -18,8 +18,7 @@
     https://github.com/codebase7/mengine
 */
 
-#include "Test_Base_Header.h"
-#include "../Common/Src/Thread_Utils.h"
+#include "Unit_Tests.h"
 
 void Hacky_Delay()
 {
@@ -32,14 +31,6 @@ void Hacky_Delay()
         // Exit function.
         return;
 }
-
-// Avoid problem with thread termination.....
-struct return_me
-{
-        bool cont;
-        void * object;
-        short rc;
-};
 
 void *Test_Function_1(void * dummy)
 {
@@ -1789,13 +1780,10 @@ void Library_Test(const Common::LibraryID & lib)
         return;
 }
 
-int main()
+int unit_test_thread_utils_main()
 {
         // Init vars.
         short ret = 0;
-
-        // Output compile date time.
-        std::cout << "Thread_Utils Test\nCompiled on " << TESTCOMPILEDATE << " at " << TESTCOMPILETIME << '\n' << '\n';
 
         // Output all supported threading libraries.
         Output_All_Supported_Threading_Libraries();
@@ -1814,9 +1802,6 @@ int main()
 
         // Run basic thread test.
         Basic_Thread_Test();
-
-        // Tell user we are finished.
-        std::cout << "All tests completed. Exiting.\n";
 
         // Exit test.
         return 0;
