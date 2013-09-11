@@ -72,6 +72,14 @@ const Error_Messages FileUtills_DeletePath_Error_Messages[] = {
 	{-8, "While recursively deleting data, there were files and or subdirectories that could not be deleted. (Some files may have been deleted however.)"}
 };
 
+const Error_Messages FileUtills_IsFileOrDirectory_Error_Messages[] = {
+    {-3, "OS / Arch is unsupported."},
+    {-4, "A permissions error occured."},
+    {-5, "The given path was empty."},
+    {-6, "A path componet does not exist."},
+    {-7, "The given path has a file in it and is not at the end. (I.e you are treating a file as a directory.)"}
+};
+
 // Define error functions.
 const char * Get_FileUtills_CreateDirectory_Error_Message(const short & error_code);
 const char * Get_FileUtills_CopyFile_Error_Message(const short & error_code);
