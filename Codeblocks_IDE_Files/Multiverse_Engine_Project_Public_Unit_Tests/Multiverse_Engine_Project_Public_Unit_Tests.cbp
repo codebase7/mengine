@@ -9,7 +9,7 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="../../build/Debug/Unit_Tests" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../../build/obj/Debug/" />
+				<Option object_output="../../build/Debug/obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -23,7 +23,7 @@
 			</Target>
 			<Target title="Release">
 				<Option output="../../build/Release/Unit_Tests" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../../build/obj/Release/" />
+				<Option object_output="../../build/Release/obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
