@@ -2438,6 +2438,37 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 										// OK, dest is some file or other filesystem entry, so we can't copy a directory to it.
 										result = -2;
 								}
+								else
+								{
+										// IsFileOrDirectory() returned an error.
+										switch (result)
+										{
+											case -3:
+											    // IsFileOrDirectory() is not supported on this system.
+											    result = -13;
+											    break;
+											case -4:
+											    // A permissions error occured.
+											    result = -14;
+											    break;
+											case -5:
+											    // The given path is empty.
+											    result = -15;
+											    break;
+											case -6:
+											    // A path componet does not exist.
+											    result = -16;
+											    break;
+											case -7:
+											    // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
+											    result = -17;
+											    break;
+											default:
+											    // All other errors.
+											    result = -19;
+											    break;
+										};
+								}
 						}
 				}
 
@@ -2509,7 +2540,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 													result = FileUtills::CopyFile(src_path, dest_path, false, 0, 0);
 													if (result != 0)
 													{
-															if (result != -3)	// If result does = -3 it means the OS / Arch is unsupported by CopyFile().
+															if ((result != -3) || (result == -33))	// If result does = -3 (CopyFile), or -33 (IsFileOrDirectory) it means the OS / Arch is unsupported by CopyFile().
 															{
 																	// Set unableToCopyAll.
 																	unableToCopyAll = true;
@@ -2576,7 +2607,7 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 								}
 
 								// Check to see how the previous loop exited.
-								if ((result == -3) || ((abort_on_failure) && (unableToCopyAll)))
+								if ((result == -3) || (result == -33) || ((abort_on_failure) && (unableToCopyAll)))
 								{
 										/* OS / Arch not supported, or
 										 * we failed to copy something and the user requested abort on failure.
@@ -2718,45 +2749,52 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 								// We can't copy some things so return an error.
 								result = -6;
 						}
+						
+						// Check and see if IsFileOrDirectory() returned -3.
+						if (result == -33)
+						{
+							// IsFileOrDirectory() is not supported.
+							result = -13;
+						}
 				}
 		}
 		else	// Treat as single file.
 		{
 				if ((result == 0) || (result == 1))
 				{
-						// Call CopyFile.
-						result = FileUtills::CopyFile(src, dest, append, begOffset, endOffset);
+					// Call CopyFile.
+					result = FileUtills::CopyFile(src, dest, append, begOffset, endOffset);
 				}
 				else
 				{
-                        // IsFileOrDirectory() returned an error.
-                        switch (result)
-                        {
-                                case -3:
-                                    // IsFileOrDirectory() is not supported on this system.
-                                    result = -13;
-                                    break;
-                                case -4:
-                                    // A permissions error occured.
-                                    result = -14;
-                                    break;
-                                case -5:
-                                    // The given path is empty.
-                                    result = -15;
-                                    break;
-                                case -6:
-                                    // A path componet does not exist.
-                                    result = -16;
-                                    break;
-                                case -7:
-                                    // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
-                                    result = -17;
-                                    break;
-                                default:
-                                    // All other errors.
-                                    result = -19;
-                                    break;
-                        };
+					// IsFileOrDirectory() returned an error.
+					switch (result)
+					{
+						case -3:
+						    // IsFileOrDirectory() is not supported on this system.
+						    result = -13;
+						    break;
+						case -4:
+						    // A permissions error occured.
+						    result = -14;
+						    break;
+						case -5:
+						    // The given path is empty.
+						    result = -15;
+						    break;
+						case -6:
+						    // A path componet does not exist.
+						    result = -16;
+						    break;
+						case -7:
+						    // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
+						    result = -17;
+						    break;
+						default:
+						    // All other errors.
+						    result = -19;
+						    break;
+					};
 				}
 		}
 
