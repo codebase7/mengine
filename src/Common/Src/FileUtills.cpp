@@ -1,19 +1,19 @@
 /*!
     Multiverse Engine Project 04/12/2011 FileUtills FileUtills.cpp
-    
+
     Copyright (C) 2013 Multiverse Engine Project
 
     This program is free software;
-    you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
+    you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
     either version 2 of the License, or (at your option) any later version.
 
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along with this program; 
+    You should have received a copy of the GNU General Public License along with this program;
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-      
+
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine
 */
@@ -2037,23 +2037,24 @@ short FileUtills::DeletePath(const std::string & path, const bool & recursive)
         else
         {
                 // Determine the error.
-                switch (result){
-                    // Permission BAD
-                    case -1:
-                        return -1;
-                        break;
-                    // Path does not exist
-                    case -2:
-                        return -2;
-                        break;
-                    // Either an unknown error or function is not supported
-                    case -3:
-                        return -3;
-                        break;
-                    // Possible memory error
-                    default:
-                        return -4;
-                        break;
+                switch (result)
+                {
+                        // Permission BAD
+                        case -1:
+                            return -1;
+                            break;
+                        // Path does not exist
+                        case -2:
+                            return -2;
+                            break;
+                        // Either an unknown error or function is not supported
+                        case -3:
+                            return -3;
+                            break;
+                        // Possible memory error
+                        default:
+                            return -4;
+                            break;
                 };
         }
 
@@ -2101,284 +2102,290 @@ short FileUtills::CopyFile(const std::string & src, const std::string & dest, co
                         }
                         else
                         {
-				// Check to see if src is a directory.
-				result = FileUtills::IsFileOrDirectory(src);
-				if (result == 2)
-				{
-					// Src is a directory, do not continue.
-					result = -17;
-				}
-				else
-				{
-					// Check for negative return code.
-					if (result < 0)
-					{
-						// IsFileOrDirectory() returned an error.
-						switch (result)
-						{
-							    case -3:
-								// IsFileOrDirectory() is not supported on this system.
-								result = -33;
-								break;
-							    case -4:
-								// A permissions error occured.
-								result = -34;
-								break;
-							    case -5:
-								// The given path is empty.
-								result = -35;
-								break;
-							    case -6:
-								// A path componet does not exist.
-								result = -36;
-								break;
-							    case -7:
-								// The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
-								result = -37;
-								break;
-							    default:
-								// All other errors.
-								result = -39;
-								break;
-						};
-					}
-					else
-					{
-			  
-						// Attempt to open the file.
-						input.open(src.c_str(), ios::in | ios::binary);
-						if (!input.is_open())
-						{
-							// Could not open file.
-							result = -11;
-						}
-						else
-						{
-							// Get file size.
-							input.seekg(0, ios::end);
-							input_size = input.tellg();
-							input.seekg(0, ios::beg);
+                                // Check to see if src is a directory.
+                                result = FileUtills::IsFileOrDirectory(src);
+                                if (result == 2)
+                                {
+                                        // Src is a directory, do not continue.
+                                        result = -17;
+                                }
+                                else
+                                {
+                                        // Check for negative return code.
+                                        if (result < 0)
+                                        {
+                                                // IsFileOrDirectory() returned an error.
+                                                switch (result)
+                                                {
+                                                        case -3:
+                                                            // IsFileOrDirectory() is not supported on this system.
+                                                            result = -33;
+                                                            break;
+                                                        case -4:
+                                                            // A permissions error occured.
+                                                            result = -34;
+                                                            break;
+                                                        case -5:
+                                                            // The given path is empty.
+                                                            result = -35;
+                                                            break;
+                                                        case -6:
+                                                            // A path componet does not exist.
+                                                            result = -36;
+                                                            break;
+                                                        case -7:
+                                                            // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
+                                                            result = -37;
+                                                            break;
+                                                        default:
+                                                            // All other errors.
+                                                            result = -39;
+                                                            break;
+                                                };
+                                        }
+                                        else
+                                        {
+                                                // Attempt to open the file.
+                                                input.open(src.c_str(), ios::in | ios::binary);
+                                                if (!input.is_open())
+                                                {
+                                                        // Could not open file.
+                                                        result = -11;
+                                                }
+                                                else
+                                                {
+                                                        // Get file size.
+                                                        input.seekg(0, ios::end);
+                                                        input_size = input.tellg();
+                                                        input.seekg(0, ios::beg);
 
-							// Determine if the input file has the needed amount of bytes to copy.
-							if (input_size < begOffset)
-							{
-								// Input file is smaller than the beginning offset.
-								result = -12;
-							}
-							else
-							{
-								if (input_size < endOffset)
-								{
-									// Input file is smaller than the ending offset.
-									result = -13;
-								}
-								else
-								{
-									// Check to see if we are copying the entire file.
-									if ((begOffset == 0) && (endOffset == 0))   // Shortcut so the caller does not need to know the size of the file.
-									{
-										// We are copying the entire file.
-										bytes_to_copy = input_size;
-									}
-									else
-									{
-										// Calculate the total amount of bytes to copy.
-										bytes_to_copy = endOffset - begOffset;
+                                                        // Determine if the input file has the needed amount of bytes to copy.
+                                                        if (input_size < begOffset)
+                                                        {
+                                                                // Input file is smaller than the beginning offset.
+                                                                result = -12;
+                                                        }
+                                                        else
+                                                        {
+                                                                if (input_size < endOffset)
+                                                                {
+                                                                        // Input file is smaller than the ending offset.
+                                                                        result = -13;
+                                                                }
+                                                                else
+                                                                {
+                                                                        // Check to see if we are copying the entire file.
+                                                                        if ((begOffset == 0) && (endOffset == 0))   // Shortcut so the caller does not need to know the size of the file.
+                                                                        {
+                                                                                // We are copying the entire file.
+                                                                                bytes_to_copy = input_size;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                                // Calculate the total amount of bytes to copy.
+                                                                                bytes_to_copy = endOffset - begOffset;
 
-										// Seek to the beginning offset in the source file.
-										input.seekg(begOffset, ios::beg);
-									}
+                                                                                // Seek to the beginning offset in the source file.
+                                                                                input.seekg(begOffset, ios::beg);
+                                                                        }
 
-									// Check the length of the dest.
-									if (dest.size() <= 0)
-									{
-										// Invalid dest path.
-										result = -20;
-									}
-									else
-									{
-										// Check and see if dest is a directory.
-										result = FileUtills::IsFileOrDirectory(dest);
-										if (result == 2)
-										{
-											// Dest is a directory, abort.
-											result = -27;
-										}
-										else
-										{
-											// Check for negative return code.
-											if (result < 0)
-											{
-												// IsFileOrDirectory() returned an error.
-												switch (result)
-												{
-													    case -3:
-														// IsFileOrDirectory() is not supported on this system.
-														result = -33;
-														break;
-													    case -4:
-														// A permissions error occured.
-														result = -34;
-														break;
-													    case -5:
-														// The given path is empty.
-														result = -35;
-														break;
-													    case -6:
-														// A path componet does not exist.
-														result = -36;
-														break;
-													    case -7:
-														// The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
-														result = -37;
-														break;
-													    default:
-														// All other errors.
-														result = -39;
-														break;
-												};
-											}
-											else
-											{
-												// Open output file.
-												if (append)
-												{
-													output.open(dest.c_str(), ios::in | ios::out | ios::binary | ios::app);
-													output.seekg(0, ios::end);
-													output.seekp(0, ios::end);
-												}
-												else
-												{
-													output.open(dest.c_str(), ios::in | ios::out | ios::binary | ios::trunc);
-												}
+                                                                        // Check the length of the dest.
+                                                                        if (dest.size() <= 0)
+                                                                        {
+                                                                                // Invalid dest path.
+                                                                                result = -20;
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                                // Check and see if dest is a directory.
+                                                                                result = FileUtills::IsFileOrDirectory(dest);
+                                                                                if (result == 2)
+                                                                                {
+                                                                                        // Dest is a directory, abort.
+                                                                                        result = -27;
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                        // Check for negative return code. (That is NOT the non existant file error.)
+                                                                                        if ((result != -6) && (result < 0))
+                                                                                        {
+                                                                                                // IsFileOrDirectory() returned an error.
+                                                                                                switch (result)
+                                                                                                {
+                                                                                                        case -3:
+                                                                                                            // IsFileOrDirectory() is not supported on this system.
+                                                                                                            result = -33;
+                                                                                                            break;
+                                                                                                        case -4:
+                                                                                                            // A permissions error occured.
+                                                                                                            result = -34;
+                                                                                                            break;
+                                                                                                        case -5:
+                                                                                                            // The given path is empty.
+                                                                                                            result = -35;
+                                                                                                            break;
+                                                                                                        case -6:
+                                                                                                            // A path componet does not exist.
+                                                                                                            result = -36;
+                                                                                                            break;
+                                                                                                        case -7:
+                                                                                                            // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
+                                                                                                            result = -37;
+                                                                                                            break;
+                                                                                                        default:
+                                                                                                            // All other errors.
+                                                                                                            result = -39;
+                                                                                                            break;
+                                                                                                };
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                                // Check and see if we got the non existant file error from IsFileOrDirectory().
+                                                                                                if (result == -6)
+                                                                                                {
+                                                                                                        // Reset result.
+                                                                                                        result = 0;
+                                                                                                }
 
-												// Check to see if the file is open.
-												if (!output.is_open())
-												{
-													// Could not open output file.
-													result = -21;
-												}
-												else
-												{
-													// Begin try block.
-													try{
-														// Allocate memory buffer.
-														pBuffer = (char*)malloc(buffer_size);
-														if (pBuffer == NULL)
-														{
-															// Could not allocate memory buffer.
-															result = -9;
-														}
-														else
-														{
-															// Blank the buffer.
-															memset(pBuffer, '\0', buffer_size);
+                                                                                                // Open output file.
+                                                                                                if (append)
+                                                                                                {
+                                                                                                        output.open(dest.c_str(), ios::in | ios::out | ios::binary | ios::app);
+                                                                                                        output.seekg(0, ios::end);
+                                                                                                        output.seekp(0, ios::end);
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                        output.open(dest.c_str(), ios::in | ios::out | ios::binary | ios::trunc);
+                                                                                                }
 
-															// Start copy loop.
-															while (total_bytes_copied < bytes_to_copy)
-															{
-																// Check the state of the file streams.
-																if (input.fail())
-																{
-																	// Input file stream error.
-																	if (input.bad())
-																	{
-																		// Read IO error.
-																		result = -14;
-																	}
-																	else
-																	{
-																		// Logical IO error.
-																		result = -15;
-																	}
+                                                                                                // Check to see if the file is open.
+                                                                                                if (!output.is_open())
+                                                                                                {
+                                                                                                        // Could not open output file.
+                                                                                                        result = -21;
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                        // Begin try block.
+                                                                                                        try{
+                                                                                                                // Allocate memory buffer.
+                                                                                                                pBuffer = (char*)malloc(buffer_size);
+                                                                                                                if (pBuffer == NULL)
+                                                                                                                {
+                                                                                                                        // Could not allocate memory buffer.
+                                                                                                                        result = -9;
+                                                                                                                }
+                                                                                                                else
+                                                                                                                {
+                                                                                                                        // Blank the buffer.
+                                                                                                                        memset(pBuffer, '\0', buffer_size);
 
-																	// Get out of the loop.
-																	break;
-																}
-																if (input.eof())
-																{
-																	// ??? We should not have hit eof....
-																	result = -16;
+                                                                                                                        // Start copy loop.
+                                                                                                                        while (total_bytes_copied < bytes_to_copy)
+                                                                                                                        {
+                                                                                                                                // Check the state of the file streams.
+                                                                                                                                if (input.fail())
+                                                                                                                                {
+                                                                                                                                        // Input file stream error.
+                                                                                                                                        if (input.bad())
+                                                                                                                                        {
+                                                                                                                                                // Read IO error.
+                                                                                                                                                result = -14;
+                                                                                                                                        }
+                                                                                                                                        else
+                                                                                                                                        {
+                                                                                                                                                // Logical IO error.
+                                                                                                                                                result = -15;
+                                                                                                                                        }
 
-																	// Get out of the loop.
-																	break;
-																}
-																if (output.fail())
-																{
-																	// Output file stream error.
-																	if (output.bad())
-																	{
-																		// Write IO error.
-																		result = -24;
-																	}
-																	else
-																	{
-																		// Logical IO error.
-																		result = -25;
-																	}
+                                                                                                                                        // Get out of the loop.
+                                                                                                                                        break;
+                                                                                                                                }
+                                                                                                                                if (input.eof())
+                                                                                                                                {
+                                                                                                                                        // ??? We should not have hit eof....
+                                                                                                                                        result = -16;
 
-																	// Get out of the loop.
-																	break;
-																}
+                                                                                                                                        // Get out of the loop.
+                                                                                                                                        break;
+                                                                                                                                }
+                                                                                                                                if (output.fail())
+                                                                                                                                {
+                                                                                                                                        // Output file stream error.
+                                                                                                                                        if (output.bad())
+                                                                                                                                        {
+                                                                                                                                                // Write IO error.
+                                                                                                                                                result = -24;
+                                                                                                                                        }
+                                                                                                                                        else
+                                                                                                                                        {
+                                                                                                                                                // Logical IO error.
+                                                                                                                                                result = -25;
+                                                                                                                                        }
 
-																// Check and see if the data remaining to copy is less than the buffer size.
-																if ((bytes_to_copy - total_bytes_copied) < buffer_size)
-																{
-																	// OK we only need to copy the remaining data.
-																	input.read(pBuffer, (bytes_to_copy - total_bytes_copied));
-																}
-																else
-																{
-																	// Fill up the buffer.
-																	input.read(pBuffer, buffer_size);
-																}
+                                                                                                                                        // Get out of the loop.
+                                                                                                                                        break;
+                                                                                                                                }
 
-																// Get the number of read bytes.
-																count = input.gcount();
+                                                                                                                                // Check and see if the data remaining to copy is less than the buffer size.
+                                                                                                                                if ((bytes_to_copy - total_bytes_copied) < buffer_size)
+                                                                                                                                {
+                                                                                                                                        // OK we only need to copy the remaining data.
+                                                                                                                                        input.read(pBuffer, (bytes_to_copy - total_bytes_copied));
+                                                                                                                                }
+                                                                                                                                else
+                                                                                                                                {
+                                                                                                                                        // Fill up the buffer.
+                                                                                                                                        input.read(pBuffer, buffer_size);
+                                                                                                                                }
 
-																// Write out the bytes to the output file.
-																output.write(pBuffer, count);
+                                                                                                                                // Get the number of read bytes.
+                                                                                                                                count = input.gcount();
 
-																// Add the bytes copied to the total.
-																total_bytes_copied += count;
-															}
+                                                                                                                                // Write out the bytes to the output file.
+                                                                                                                                output.write(pBuffer, count);
 
-															// Deallocate memory buffer.
-															memset(pBuffer, '\0', buffer_size);
-															if (pBuffer != NULL)
-															{
-																free(pBuffer);
-																pBuffer = NULL;
-															}
-														}
-													}
-													catch(...)
-													{
-														// Exception thrown during copy loop.
-														result = -99;
-													}
+                                                                                                                                // Add the bytes copied to the total.
+                                                                                                                                total_bytes_copied += count;
+                                                                                                                        }
 
-													// Close output file.
-													if (output.is_open())
-													{
-														output.close();
-													}
-												}
-											}
-										}
-									}
-								}
-							}
+                                                                                                                        // Deallocate memory buffer.
+                                                                                                                        memset(pBuffer, '\0', buffer_size);
+                                                                                                                        if (pBuffer != NULL)
+                                                                                                                        {
+                                                                                                                                free(pBuffer);
+                                                                                                                                pBuffer = NULL;
+                                                                                                                        }
+                                                                                                                }
+                                                                                                        }
+                                                                                                        catch(...)
+                                                                                                        {
+                                                                                                                // Exception thrown during copy loop.
+                                                                                                                result = -99;
+                                                                                                        }
 
-							// Close input file.
-							if (input.is_open())
-							{
-								input.close();
-							}
-						}
-					}
-				}
-			}
+                                                                                                        // Close output file.
+                                                                                                        if (output.is_open())
+                                                                                                        {
+                                                                                                                output.close();
+                                                                                                        }
+                                                                                                }
+                                                                                        }
+                                                                                }
+                                                                        }
+                                                                }
+                                                        }
+
+                                                        // Close input file.
+                                                        if (input.is_open())
+                                                        {
+                                                                input.close();
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
                 }
         }
 
@@ -2443,30 +2450,30 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 										// IsFileOrDirectory() returned an error.
 										switch (result)
 										{
-											case -3:
-											    // IsFileOrDirectory() is not supported on this system.
-											    result = -13;
-											    break;
-											case -4:
-											    // A permissions error occured.
-											    result = -14;
-											    break;
-											case -5:
-											    // The given path is empty.
-											    result = -15;
-											    break;
-											case -6:
-											    // A path componet does not exist.
-											    result = -16;
-											    break;
-											case -7:
-											    // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
-											    result = -17;
-											    break;
-											default:
-											    // All other errors.
-											    result = -19;
-											    break;
+                                                case -3:
+                                                    // IsFileOrDirectory() is not supported on this system.
+                                                    result = -13;
+                                                    break;
+                                                case -4:
+                                                    // A permissions error occured.
+                                                    result = -14;
+                                                    break;
+                                                case -5:
+                                                    // The given path is empty.
+                                                    result = -15;
+                                                    break;
+                                                case -6:
+                                                    // A path componet does not exist.
+                                                    result = -16;
+                                                    break;
+                                                case -7:
+                                                    // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
+                                                    result = -17;
+                                                    break;
+                                                default:
+                                                    // All other errors.
+                                                    result = -19;
+                                                    break;
 										};
 								}
 						}
@@ -2674,9 +2681,9 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 										}
 										if ((abort_on_failure) && (unableToCopyAll))	// Check for abort on fail. (We do this here due to the above if statement possibly triggering it.)
 										{
-											// Recheck failure due to subdirectory.
-											done = true;
-											break;
+                                                // Recheck failure due to subdirectory.
+                                                done = true;
+                                                break;
 										}
 										if (!resetIterLoop)	// Leaving the subdirectory.
 										{
@@ -2749,12 +2756,12 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 								// We can't copy some things so return an error.
 								result = -6;
 						}
-						
+
 						// Check and see if IsFileOrDirectory() returned -3.
 						if (result == -33)
 						{
-							// IsFileOrDirectory() is not supported.
-							result = -13;
+                                // IsFileOrDirectory() is not supported.
+                                result = -13;
 						}
 				}
 		}
@@ -2762,39 +2769,39 @@ short FileUtills::CopyPath(const std::string & src, const std::string & dest, co
 		{
 				if ((result == 0) || (result == 1))
 				{
-					// Call CopyFile.
-					result = FileUtills::CopyFile(src, dest, append, begOffset, endOffset);
+                        // Call CopyFile.
+                        result = FileUtills::CopyFile(src, dest, append, begOffset, endOffset);
 				}
 				else
 				{
-					// IsFileOrDirectory() returned an error.
-					switch (result)
-					{
-						case -3:
-						    // IsFileOrDirectory() is not supported on this system.
-						    result = -13;
-						    break;
-						case -4:
-						    // A permissions error occured.
-						    result = -14;
-						    break;
-						case -5:
-						    // The given path is empty.
-						    result = -15;
-						    break;
-						case -6:
-						    // A path componet does not exist.
-						    result = -16;
-						    break;
-						case -7:
-						    // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
-						    result = -17;
-						    break;
-						default:
-						    // All other errors.
-						    result = -19;
-						    break;
-					};
+                        // IsFileOrDirectory() returned an error.
+                        switch (result)
+                        {
+                                case -3:
+                                    // IsFileOrDirectory() is not supported on this system.
+                                    result = -13;
+                                    break;
+                                case -4:
+                                    // A permissions error occured.
+                                    result = -14;
+                                    break;
+                                case -5:
+                                    // The given path is empty.
+                                    result = -15;
+                                    break;
+                                case -6:
+                                    // A path componet does not exist.
+                                    result = -16;
+                                    break;
+                                case -7:
+                                    // The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
+                                    result = -17;
+                                    break;
+                                default:
+                                    // All other errors.
+                                    result = -19;
+                                    break;
+                        };
 				}
 		}
 
@@ -2846,40 +2853,40 @@ short FileUtills::MovePath(const std::string & src, const std::string & dest, co
                     break;
         };
 
-	// Check to see if we can continue.
-	if ((result == -1) || (result == 0))
-	{
-		// Copy entire path to the dest.
-		result = FileUtills::CopyPath(src, dest);
-		switch (result)
-		{
-			case 0:     // Copy ok.
-			    break;
-			case -1:    // Source Permission error.
-			    result = -10;
-			case -2:    // Source Does not exist.
-			    result = -10;
-			default:    // Some error.
-			    result = -4;
-			    break;
-		};
-		
-		// Check to see if the copy was successful.
-		if (result == 0)
-		{
-			// Delete original path.
-			result = FileUtills::DeletePath(src, true);
-			switch (result)
-			{
-				case 0:     // Delete ok.
-				    break;
-				default:    // Some error.
-				    result = -4;
-				    break;
-			};
-		}
-	}
-	
+        // Check to see if we can continue.
+        if ((result == -1) || (result == 0))
+        {
+                // Copy entire path to the dest.
+                result = FileUtills::CopyPath(src, dest);
+                switch (result)
+                {
+                        case 0:     // Copy ok.
+                            break;
+                        case -1:    // Source Permission error.
+                            result = -10;
+                        case -2:    // Source Does not exist.
+                            result = -10;
+                        default:    // Some error.
+                            result = -4;
+                            break;
+                };
+
+                // Check to see if the copy was successful.
+                if (result == 0)
+                {
+                        // Delete original path.
+                        result = FileUtills::DeletePath(src, true);
+                        switch (result)
+                        {
+                                case 0:     // Delete ok.
+                                    break;
+                                default:    // Some error.
+                                    result = -4;
+                                    break;
+                        };
+                }
+        }
+
         // Default return.
         return result;
 }
