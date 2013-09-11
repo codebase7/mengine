@@ -381,10 +381,18 @@ short DeletePath(const std::string & path, const bool & recursive = false);
         Returns -14 if an I/O error occured while reading the source file.
         Returns -15 if a logical error occured while reading the source file.
         Returns -16 if end of file was encountered unexpectedly. (I.e It was expected that the source file had more data in it.)
+        Returns -17 if the given source file was a directory.
         Returns -20 if the dest file was not given.
         Returns -21 if dest file could not be opened.
         Returns -24 if an I/O error occured while writing to the dest file.
         Returns -25 if a logical error occured while writing to the dest file.
+        Returns -27 if the given dest file was a directory.
+	Returns -33 if FileUtills::IsFileOrDirectory() returns -3. (OS / Arch not supported.)
+	Returns -34 if FileUtills::IsFileOrDirectory() returns -4. (A permissions error occured.)
+	Returns -35 if FileUtills::IsFileOrDirectory() returns -5. (The given path is empty.)
+	Returns -36 if FileUtills::IsFileOrDirectory() returns -6. (A path componet does not exist.)
+	Returns -37 if FileUtills::IsFileOrDirectory() returns -7. (The path has a file in it and is not at the end. (I.e you are treating a file as a directory.))
+	Returns -39 if FileUtills::IsFileOrDirectory() returns -9. (All other errors.)
         Returns -99 if an exception is thrown while copying data.
 */
 short CopyFile(const std::string & src, const std::string & dest, const bool & append = false,

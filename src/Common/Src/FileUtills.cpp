@@ -2101,193 +2101,284 @@ short FileUtills::CopyFile(const std::string & src, const std::string & dest, co
                         }
                         else
                         {
-                                // Attempt to open the file.
-                                input.open(src.c_str(), ios::in | ios::binary);
-                                if (!input.is_open())
-                                {
-                                        // Could not open file.
-                                        result = -11;
-                                }
-                                else
-                                {
-                                        // Get file size.
-                                        input.seekg(0, ios::end);
-                                        input_size = input.tellg();
-                                        input.seekg(0, ios::beg);
+				// Check to see if src is a directory.
+				result = FileUtills::IsFileOrDirectory(src);
+				if (result == 2)
+				{
+					// Src is a directory, do not continue.
+					result = -17;
+				}
+				else
+				{
+					// Check for negative return code.
+					if (result < 0)
+					{
+						// IsFileOrDirectory() returned an error.
+						switch (result)
+						{
+							    case -3:
+								// IsFileOrDirectory() is not supported on this system.
+								result = -33;
+								break;
+							    case -4:
+								// A permissions error occured.
+								result = -34;
+								break;
+							    case -5:
+								// The given path is empty.
+								result = -35;
+								break;
+							    case -6:
+								// A path componet does not exist.
+								result = -36;
+								break;
+							    case -7:
+								// The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
+								result = -37;
+								break;
+							    default:
+								// All other errors.
+								result = -39;
+								break;
+						};
+					}
+					else
+					{
+			  
+						// Attempt to open the file.
+						input.open(src.c_str(), ios::in | ios::binary);
+						if (!input.is_open())
+						{
+							// Could not open file.
+							result = -11;
+						}
+						else
+						{
+							// Get file size.
+							input.seekg(0, ios::end);
+							input_size = input.tellg();
+							input.seekg(0, ios::beg);
 
-                                        // Determine if the input file has the needed amount of bytes to copy.
-                                        if (input_size < begOffset)
-                                        {
-                                                // Input file is smaller than the beginning offset.
-                                                result = -12;
-                                        }
-                                        else
-                                        {
-                                                if (input_size < endOffset)
-                                                {
-                                                        // Input file is smaller than the ending offset.
-                                                        result = -13;
-                                                }
-                                                else
-                                                {
-                                                        // Check to see if we are copying the entire file.
-                                                        if ((begOffset == 0) && (endOffset == 0))   // Shortcut so the caller does not need to know the size of the file.
-                                                        {
-                                                                // We are copying the entire file.
-                                                                bytes_to_copy = input_size;
-                                                        }
-                                                        else
-                                                        {
-                                                                // Calculate the total amount of bytes to copy.
-                                                                bytes_to_copy = endOffset - begOffset;
+							// Determine if the input file has the needed amount of bytes to copy.
+							if (input_size < begOffset)
+							{
+								// Input file is smaller than the beginning offset.
+								result = -12;
+							}
+							else
+							{
+								if (input_size < endOffset)
+								{
+									// Input file is smaller than the ending offset.
+									result = -13;
+								}
+								else
+								{
+									// Check to see if we are copying the entire file.
+									if ((begOffset == 0) && (endOffset == 0))   // Shortcut so the caller does not need to know the size of the file.
+									{
+										// We are copying the entire file.
+										bytes_to_copy = input_size;
+									}
+									else
+									{
+										// Calculate the total amount of bytes to copy.
+										bytes_to_copy = endOffset - begOffset;
 
-                                                                // Seek to the beginning offset in the source file.
-                                                                input.seekg(begOffset, ios::beg);
-                                                        }
+										// Seek to the beginning offset in the source file.
+										input.seekg(begOffset, ios::beg);
+									}
 
-                                                        // Check the length of the dest.
-                                                        if (dest.size() <= 0)
-                                                        {
-                                                                // Invalid dest path.
-                                                                result = -20;
-                                                        }
-                                                        else
-                                                        {
-                                                                // Open output file.
-                                                                if (append)
-                                                                {
-                                                                        output.open(dest.c_str(), ios::in | ios::out | ios::binary | ios::app);
-                                                                        output.seekg(0, ios::end);
-                                                                        output.seekp(0, ios::end);
-                                                                }
-                                                                else
-                                                                {
-                                                                        output.open(dest.c_str(), ios::in | ios::out | ios::binary | ios::trunc);
-                                                                }
+									// Check the length of the dest.
+									if (dest.size() <= 0)
+									{
+										// Invalid dest path.
+										result = -20;
+									}
+									else
+									{
+										// Check and see if dest is a directory.
+										result = FileUtills::IsFileOrDirectory(dest);
+										if (result == 2)
+										{
+											// Dest is a directory, abort.
+											result = -27;
+										}
+										else
+										{
+											// Check for negative return code.
+											if (result < 0)
+											{
+												// IsFileOrDirectory() returned an error.
+												switch (result)
+												{
+													    case -3:
+														// IsFileOrDirectory() is not supported on this system.
+														result = -33;
+														break;
+													    case -4:
+														// A permissions error occured.
+														result = -34;
+														break;
+													    case -5:
+														// The given path is empty.
+														result = -35;
+														break;
+													    case -6:
+														// A path componet does not exist.
+														result = -36;
+														break;
+													    case -7:
+														// The path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
+														result = -37;
+														break;
+													    default:
+														// All other errors.
+														result = -39;
+														break;
+												};
+											}
+											else
+											{
+												// Open output file.
+												if (append)
+												{
+													output.open(dest.c_str(), ios::in | ios::out | ios::binary | ios::app);
+													output.seekg(0, ios::end);
+													output.seekp(0, ios::end);
+												}
+												else
+												{
+													output.open(dest.c_str(), ios::in | ios::out | ios::binary | ios::trunc);
+												}
 
-                                                                // Check to see if the file is open.
-                                                                if (!output.is_open())
-                                                                {
-                                                                        // Could not open output file.
-                                                                        result = -21;
-                                                                }
-                                                                else
-                                                                {
-                                                                        // Begin try block.
-                                                                        try{
-                                                                                // Allocate memory buffer.
-                                                                                pBuffer = (char*)malloc(buffer_size);
-                                                                                if (pBuffer == NULL)
-                                                                                {
-                                                                                        // Could not allocate memory buffer.
-                                                                                        result = -9;
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                        // Blank the buffer.
-                                                                                        memset(pBuffer, '\0', buffer_size);
+												// Check to see if the file is open.
+												if (!output.is_open())
+												{
+													// Could not open output file.
+													result = -21;
+												}
+												else
+												{
+													// Begin try block.
+													try{
+														// Allocate memory buffer.
+														pBuffer = (char*)malloc(buffer_size);
+														if (pBuffer == NULL)
+														{
+															// Could not allocate memory buffer.
+															result = -9;
+														}
+														else
+														{
+															// Blank the buffer.
+															memset(pBuffer, '\0', buffer_size);
 
-                                                                                        // Start copy loop.
-                                                                                        while (total_bytes_copied < bytes_to_copy)
-                                                                                        {
-                                                                                                // Check the state of the file streams.
-                                                                                                if (input.fail())
-                                                                                                {
-                                                                                                        // Input file stream error.
-                                                                                                        if (input.bad())
-                                                                                                        {
-                                                                                                                // Read IO error.
-                                                                                                                result = -14;
-                                                                                                        }
-                                                                                                        else
-                                                                                                        {
-                                                                                                                // Logical IO error.
-                                                                                                                result = -15;
-                                                                                                        }
+															// Start copy loop.
+															while (total_bytes_copied < bytes_to_copy)
+															{
+																// Check the state of the file streams.
+																if (input.fail())
+																{
+																	// Input file stream error.
+																	if (input.bad())
+																	{
+																		// Read IO error.
+																		result = -14;
+																	}
+																	else
+																	{
+																		// Logical IO error.
+																		result = -15;
+																	}
 
-                                                                                                        // Get out of the loop.
-                                                                                                        break;
-                                                                                                }
-                                                                                                if (input.eof())
-                                                                                                {
-                                                                                                        // ??? We should not have hit eof....
-                                                                                                        result = -16;
+																	// Get out of the loop.
+																	break;
+																}
+																if (input.eof())
+																{
+																	// ??? We should not have hit eof....
+																	result = -16;
 
-                                                                                                        // Get out of the loop.
-                                                                                                        break;
-                                                                                                }
-                                                                                                if (output.fail())
-                                                                                                {
-                                                                                                        // Output file stream error.
-                                                                                                        if (output.bad())
-                                                                                                        {
-                                                                                                                // Write IO error.
-                                                                                                                result = -24;
-                                                                                                        }
-                                                                                                        else
-                                                                                                        {
-                                                                                                                // Logical IO error.
-                                                                                                                result = -25;
-                                                                                                        }
+																	// Get out of the loop.
+																	break;
+																}
+																if (output.fail())
+																{
+																	// Output file stream error.
+																	if (output.bad())
+																	{
+																		// Write IO error.
+																		result = -24;
+																	}
+																	else
+																	{
+																		// Logical IO error.
+																		result = -25;
+																	}
 
-                                                                                                        // Get out of the loop.
-                                                                                                        break;
-                                                                                                }
+																	// Get out of the loop.
+																	break;
+																}
 
-                                                                                                // Check and see if the data remaining to copy is less than the buffer size.
-                                                                                                if ((bytes_to_copy - total_bytes_copied) < buffer_size)
-                                                                                                {
-                                                                                                        // OK we only need to copy the remaining data.
-                                                                                                        input.read(pBuffer, (bytes_to_copy - total_bytes_copied));
-                                                                                                }
-                                                                                                else
-                                                                                                {
-                                                                                                        // Fill up the buffer.
-                                                                                                        input.read(pBuffer, buffer_size);
-                                                                                                }
+																// Check and see if the data remaining to copy is less than the buffer size.
+																if ((bytes_to_copy - total_bytes_copied) < buffer_size)
+																{
+																	// OK we only need to copy the remaining data.
+																	input.read(pBuffer, (bytes_to_copy - total_bytes_copied));
+																}
+																else
+																{
+																	// Fill up the buffer.
+																	input.read(pBuffer, buffer_size);
+																}
 
-                                                                                                // Get the number of read bytes.
-                                                                                                count = input.gcount();
+																// Get the number of read bytes.
+																count = input.gcount();
 
-                                                                                                // Write out the bytes to the output file.
-                                                                                                output.write(pBuffer, count);
+																// Write out the bytes to the output file.
+																output.write(pBuffer, count);
 
-                                                                                                // Add the bytes copied to the total.
-                                                                                                total_bytes_copied += count;
-                                                                                        }
+																// Add the bytes copied to the total.
+																total_bytes_copied += count;
+															}
 
-                                                                                        // Deallocate memory buffer.
-                                                                                        memset(pBuffer, '\0', buffer_size);
-                                                                                        if (pBuffer != NULL)
-                                                                                        {
-                                                                                                free(pBuffer);
-                                                                                                pBuffer = NULL;
-                                                                                        }
-                                                                                }
-                                                                        }
-                                                                        catch(...)
-                                                                        {
-                                                                                // Exception thrown during copy loop.
-                                                                                result = -99;
-                                                                        }
+															// Deallocate memory buffer.
+															memset(pBuffer, '\0', buffer_size);
+															if (pBuffer != NULL)
+															{
+																free(pBuffer);
+																pBuffer = NULL;
+															}
+														}
+													}
+													catch(...)
+													{
+														// Exception thrown during copy loop.
+														result = -99;
+													}
 
-                                                                        // Close output file.
-                                                                        if (output.is_open())
-                                                                        {
-                                                                                output.close();
-                                                                        }
-                                                                }
-                                                        }
-                                                }
-                                        }
+													// Close output file.
+													if (output.is_open())
+													{
+														output.close();
+													}
+												}
+											}
+										}
+									}
+								}
+							}
 
-                                        // Close input file.
-                                        if (input.is_open())
-                                        {
-                                                input.close();
-                                        }
-                                }
-                        }
+							// Close input file.
+							if (input.is_open())
+							{
+								input.close();
+							}
+						}
+					}
+				}
+			}
                 }
         }
 
