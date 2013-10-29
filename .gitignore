@@ -5,3 +5,8 @@ doc/doxygen_doc/*
 # Ignore any object or archive file anywhere in the tree.
 *.[oa]
 
+# Ignore the Code::Blocks IDE layout files.
+Codeblocks_IDE_Files/*/*.layout
+
+# Ignore any Code::Blocks IDE temp files.
+*.cbTemp
