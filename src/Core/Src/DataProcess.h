@@ -130,7 +130,18 @@ class Data_Object{
         {
                 return this->length;
         }
-        void set(const char * source, size_t source_length);
+
+	/*!
+		void DataProcess::Data_Object::set(const char * source, const size_t & source_length)
+
+		This function clears the Data_Object's buffer, and then copies
+		source_length amount of data from source to the Data_Object's buffer.
+
+		If this function encounters an error, (i.e. NULL source, bad source_length,
+		an exception, etc.) then this function will silently fail and the Data_Object
+		will be cleared.
+	*/
+	void set(const char * source, const size_t & source_length);
 
         /*!
                 void DataProcess::Data_Object::clear()

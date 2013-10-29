@@ -2006,7 +2006,7 @@ void DataProcess::Data_Object::clear()
         return;
 }
 
-void DataProcess::Data_Object::set(const char * source, size_t source_length)
+void DataProcess::Data_Object::set(const char * source, const size_t & source_length)
 {
         // Clear the old data.
         this->clear();
