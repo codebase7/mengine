@@ -1,17 +1,17 @@
 /*!
     Multiverse Engine Project DataProcess DataProcess.h
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
-    you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
+    you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
     either version 2 of the License, or (at your option) any later version.
 
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along with this program; 
+    You should have received a copy of the GNU General Public License along with this program;
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
     Official source repository and project information can be found at
@@ -255,19 +255,19 @@ class Data_Object{
 
 /*!
 	size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
-	
+
 	This function generates psudo-random numbers based on the given max_value.
-	
+
 	@pram min_value, the minimum value that is acceptable for the function to return.
 	@pram max_value, the maximum value that is acceptable for the function to return.
-	
+
 	E.x. If you want a range of 1 to 100 set min_value to 1 and max_value to 100.
-	
+
 	By default this function returns a number between 0 and 255.
-	
+
 	@pram reset_rand, if this is set to true, the rng will be re-seeded with the current time value returned by time(NULL).
 	Otherwise the next psudo-random number from the current seed will be returned. (Default)
-	
+
 	Returns the generated psudo-random number.
 */
 size_t Trivial_Random_Number_Generator(const size_t & min_value = 0, const size_t & max_value = 255, const bool & reset_rand = false);
@@ -424,14 +424,24 @@ short getnumberFromString(char input);
 void dumpDataToConsole(const char * data, size_t length, size_t offset = 0, bool print_bad_chars = false, bool memory_format = false);
 
 /*!
-        DataProcess::Data_Object DataProcess::getStringFromSizeT(size_t number)
+        DataProcess::Data_Object DataProcess::getStringFromSizeT(const size_t & number)
 
         Takes given size_t and outputs the equilvent string in a DataProcess::Data_Object.
 
         Returns: DataProcess::Data_Object with string equilvent to number if successful.
         Returns: empty DataProcess::Data_Object if this function fails.
 */
-DataProcess::Data_Object getStringFromSizeT(size_t number);
+DataProcess::Data_Object getStringFromSizeT(const size_t & number);
+
+/*!
+        std::string DataProcess::getStdStringFromSizeT(const size_t & number)
+
+        Takes given size_t and outputs the equilvent string in a std::string.
+
+        Returns: std::string with string equilvent to number if successful.
+        Returns: empty std::string if this function fails.
+*/
+std::string getStdStringFromSizeT(const size_t & number);
 
 /*!
         DataProcess::Data_Object DataProcess::getStringFromInt(long int number)
@@ -444,6 +454,44 @@ DataProcess::Data_Object getStringFromSizeT(size_t number);
         Returns: empty DataProcess::Data_Object if this function fails.
 */
 DataProcess::Data_Object getStringFromInt(long int number);
+
+/*!
+ * 	template<typename T>
+ * 	void DataProcess::removeFromVector(std::vector<T> & container, const size_t & offset)
+ *
+ * 	This is a template function that takes the given vector and offset and erases the
+ * 	element at that offset.
+ *
+ * 	If the given offset is outside of the vector, (I.e. the offset lacks that many elements),
+ * 	then this function will silently fail.
+ *
+ * 	This function uses std::advance(), to avoid issues in the event a non-random-access iterator
+ * 	is used by the given container.
+ *
+ * 	(Why the std::vector template does not include the ability to call erase() with an offset
+ * 	I have no idea.....)
+ *
+ * 	It has no return.
+ */
+template<typename T>
+void removeFromVector(std::vector<T> & container, const size_t & offset)
+{
+	// Init iter.
+	typename std::vector<T>::iterator iter = container.begin();
+
+	// Check and make sure that the offset is valid.
+	if (offset < container.size())
+	{
+		// Move to correct position.
+		std::advance(iter, offset);
+
+		// Erase the element.
+		container.erase(iter);
+	}
+
+	// Exit function.
+	return;
+}
 
 /*!
         short DataProcess::RegularExpressionParser(const std::string & expression, const std::string & input, Panic::ERROR * error)
