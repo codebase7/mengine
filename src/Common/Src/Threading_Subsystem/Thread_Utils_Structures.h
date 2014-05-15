@@ -22,7 +22,7 @@
 #define THREAD_UTILS_STRUCTURES_H
 
 // Include Generic_Wrapper.
-#include "Generic_Wrapper.h"	// Includes LibraryID_Struct.h.
+#include "../Generic_Wrapper.h"	// Includes LibraryID_Struct.h.
 
 namespace Common
 {
