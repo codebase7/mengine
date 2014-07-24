@@ -107,7 +107,7 @@ int FileUtills::GetUserProfileDirectoryPath(std::string & path)
 			path.clear();
 		}
 	}
-	catch (exception ex)
+	catch (exception &ex)
 	{
 		// Exception thown.
 		Common::commonLastErrorCode = Common::COMMON_EXCEPTION_THROWN;
@@ -127,6 +127,87 @@ int FileUtills::GetUserProfileDirectoryPath(std::string & path)
 		// Release the buffer.
 		free(pHD);
 		pHD = NULL;
+	}
+
+	// Restore errno.
+	errno = errorg;
+#endif	// __linux__
+
+	// Exit function.
+	return Common::commonLastErrorCode;
+}
+
+int FileUtills::GetCurrentWorkingDirectoryPath(std::string & path)
+{
+	// Reset Common::commonLastErrorCode.
+	Common::commonLastErrorCode = Common::COMMON_FUNCTION_NOT_IMPLEMENTED;
+#ifdef __linux__
+	// Init vars.
+	int errorg = 0;			// Used to hold the original state of errno so it can be restored after we finish.
+	int errcpy = 0;			// Used to store errno if needed.
+	char * pCWD = NULL;		// Used to fetch path from system.
+
+	// Backup and clear errno.
+	errorg = errno;
+	errno = 0;
+
+	// Blank out the path value.
+	path.clear();
+
+	// Get current directory.
+	try {
+		/*
+		 * 	NOTE: The call below is linux (libc5, libc6, and glibc) specific.
+		 * 	(The standard requires a preallocated buffer.)
+		 * 
+		 * 	I dislike the idea of a preallocated buffer as we cannot reliably
+		 * 	determine the needed length. (Plus it could change between calls.)
+		 * 
+		 * 	This really should be checked for and an error thrown if the OS /
+		 * 	libc in use does not support this usage.
+		 */
+		pCWD = getcwd(NULL, 0);
+		if ((errno == 0) && (pCWD != NULL))
+		{
+			// Copy the path.
+			path = pCWD;
+
+			// Set commonLastErrorCode.
+			Common::commonLastErrorCode = Common::COMMON_SUCCESS;
+		}
+		else
+		{
+			// Could not get current working directory path variable.
+			errcpy = errno;
+			Common::commonLastErrorCode = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
+			COMMON_LOG_VERBOSE("GetCurrentWorkingDirectoryPath(): ");
+			COMMON_LOG_VERBOSE(Common::Get_Error_Message(Common::commonLastErrorCode));
+			COMMON_LOG_VERBOSE(" Could not get current working directory path from enviorment.\n");
+
+			// Reset path.
+			path.clear();
+		}
+	}
+	catch(exception &ex)
+	{
+		// Exception thown.
+		Common::commonLastErrorCode = Common::COMMON_EXCEPTION_THROWN;
+		COMMON_LOG_VERBOSE("GetCurrentWorkingDirectoryPath(): ");
+		COMMON_LOG_VERBOSE(Common::Get_Error_Message(Common::commonLastErrorCode));
+		COMMON_LOG_VERBOSE(" ");
+		COMMON_LOG_VERBOSE(ex.what());
+		COMMON_LOG_VERBOSE("\n");
+
+		// Reset path.
+		path.clear();
+	}
+
+	// Check for an allocated buffer.
+	if (pCWD != NULL)
+	{
+		// Release the buffer.
+		free(pCWD);
+		pCWD = NULL;
 	}
 
 	// Restore errno.

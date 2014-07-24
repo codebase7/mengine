@@ -68,6 +68,19 @@ struct dirlist{
 int GetUserProfileDirectoryPath(std::string & path);
 
 /*!
+ * 	int FileUtills::GetCurrentWorkingDirectoryPath(std::string & path)
+ *
+ * 	Fetches the current working directory from the enviorment, and stores
+ * 	it in the given path argument. (Note: The given path argument will be
+ * 	erased when this function is called. So take care not to leave something
+ * 	in it you need.)
+ *
+ * 	If the function fails for any reason, path will be an empty string,
+ *	and Common::commonLastErrorCode will be set to the approiate error.
+ */
+int GetCurrentWorkingDirectoryPath(std::string & path);
+
+/*!
  * 	std::string FileUtills::GetExecDirectory()
  *
  * 	Returns a NULL terminated std::string the path to the directory where the
