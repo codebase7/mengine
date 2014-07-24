@@ -2,7 +2,7 @@
     Multiverse Engine Project 04/12/2011 FileUtills FileUtills.h
     Yes we are reinventing the wheel here, go with it.
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -23,7 +23,15 @@
 #define FILEUTILLS
 
 // Engine Includes
-#include "BaseHeader.h"
+#ifdef __win32
+#include "..\BaseHeader.h"
+#include "..\Error_Handler\Common_Error_Handler.h"
+#include "..\Error_Handler\Common_Error_Handler_Internal.h"
+#else
+#include "../BaseHeader.h"
+#include "../Error_Handler/Common_Error_Handler.h"
+#include "../Error_Handler/Common_Error_Handler_Internal.h"
+#endif
 
 namespace FileUtills{
 
