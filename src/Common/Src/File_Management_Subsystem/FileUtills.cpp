@@ -99,7 +99,7 @@ int FileUtills::GetUserProfileDirectoryPath(std::string & path)
 			// Could not get user profile directory path variable.
 			errcpy = errno;
 			Common::commonLastErrorCode = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
-			COMMON_LOG_VERBOSE("GetUserProfileDirectoryPath(): ");
+			COMMON_LOG_VERBOSE("FileUtills::GetUserProfileDirectoryPath(): ");
 			COMMON_LOG_VERBOSE(Common::Get_Error_Message(Common::commonLastErrorCode));
 			COMMON_LOG_VERBOSE(" Could not get user profile directory path from enviorment.\n");
 
@@ -111,7 +111,7 @@ int FileUtills::GetUserProfileDirectoryPath(std::string & path)
 	{
 		// Exception thown.
 		Common::commonLastErrorCode = Common::COMMON_EXCEPTION_THROWN;
-		COMMON_LOG_VERBOSE("GetUserProfileDirectoryPath(): ");
+		COMMON_LOG_VERBOSE("FileUtills::GetUserProfileDirectoryPath(): ");
 		COMMON_LOG_VERBOSE(Common::Get_Error_Message(Common::commonLastErrorCode));
 		COMMON_LOG_VERBOSE(" ");
 		COMMON_LOG_VERBOSE(ex.what());
@@ -180,7 +180,7 @@ int FileUtills::GetCurrentWorkingDirectoryPath(std::string & path)
 			// Could not get current working directory path variable.
 			errcpy = errno;
 			Common::commonLastErrorCode = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
-			COMMON_LOG_VERBOSE("GetCurrentWorkingDirectoryPath(): ");
+			COMMON_LOG_VERBOSE("FileUtills::GetCurrentWorkingDirectoryPath(): ");
 			COMMON_LOG_VERBOSE(Common::Get_Error_Message(Common::commonLastErrorCode));
 			COMMON_LOG_VERBOSE(" Could not get current working directory path from enviorment.\n");
 
@@ -192,7 +192,7 @@ int FileUtills::GetCurrentWorkingDirectoryPath(std::string & path)
 	{
 		// Exception thown.
 		Common::commonLastErrorCode = Common::COMMON_EXCEPTION_THROWN;
-		COMMON_LOG_VERBOSE("GetCurrentWorkingDirectoryPath(): ");
+		COMMON_LOG_VERBOSE("FileUtills::GetCurrentWorkingDirectoryPath(): ");
 		COMMON_LOG_VERBOSE(Common::Get_Error_Message(Common::commonLastErrorCode));
 		COMMON_LOG_VERBOSE(" ");
 		COMMON_LOG_VERBOSE(ex.what());
