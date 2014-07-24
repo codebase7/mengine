@@ -1,6 +1,9 @@
 # Set CMAKE_THREAD_PREFER_PTHREAD.
 set(CMAKE_THREAD_PREFER_PTHREAD 1)
 
+# Create the error handler.
+add_subdirectory(Error_Handler)
+
 # Create the Dynamic_Library_Subsystem.
 add_subdirectory(Dynamic_Library_Subsystem)
 
