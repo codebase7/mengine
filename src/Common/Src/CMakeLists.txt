@@ -1,6 +1,9 @@
 # Set CMAKE_THREAD_PREFER_PTHREAD.
 set(CMAKE_THREAD_PREFER_PTHREAD 1)
 
+# Create the Dynamic_Library_Subsystem.
+add_subdirectory(Dynamic_Library_Subsystem)
+
 # Look for the pthreads library.
 find_package(Threads REQUIRED)
 if (Threads_FOUND)
