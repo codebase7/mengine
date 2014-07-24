@@ -3,7 +3,7 @@
 
     This file contains Error Handler functions.
     
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -27,7 +27,7 @@ std::string Panic::ERROR::ReturnLastError() const
         return this->LastError;
 }
 
-std::string Panic::ERROR::PanicHandler(std::string message, int moduleID, int log_level, bool killengine)
+std::string Panic::ERROR::PanicHandler(const std::string & message, const int & moduleID, const unsigned int & log_level, const bool & killengine)
 {
         // Init vars.
         fstream old_log_file;
@@ -177,7 +177,7 @@ std::string Panic::ERROR::PanicHandler(std::string message, int moduleID, int lo
         return "OK";
 }
 
-short Panic::ERROR::enable_logging(std::string path_to_logfile, short log_level, int max_lines)
+short Panic::ERROR::enable_logging(const std::string & path_to_logfile, const unsigned int & log_level, const unsigned int & max_lines)
 {
         // Dumb check.
         if (path_to_logfile.size() <= 0)
@@ -185,7 +185,7 @@ short Panic::ERROR::enable_logging(std::string path_to_logfile, short log_level,
                 // No valid path.
                 return -5;
         }
-        if (log_level <= 0)
+        if (log_level <= ERROR_DISABLE)
         {
                 // Invalid log level.
                 return -5;
@@ -248,7 +248,7 @@ void Panic::ERROR::disable_logging()
 
         // Reset the vars.
         this->currentLogLine = 0;
-        this->logLevel = 0;
+        this->logLevel = ERROR_DISABLE;
         this->maxLogLines = 0;
         this->pathToLogFile = "";
         this->logfile_enabled = false;
@@ -257,7 +257,7 @@ void Panic::ERROR::disable_logging()
         return;
 }
 
-int Panic::ERROR::get_log_level() const
+unsigned int Panic::ERROR::get_log_level() const
 {
         // Return the set log level.
         return this->logLevel;
@@ -275,19 +275,19 @@ std::string Panic::ERROR::get_log_file_path() const
         return this->pathToLogFile;
 }
 
-int Panic::ERROR::get_max_log_lines() const
+unsigned int Panic::ERROR::get_max_log_lines() const
 {
         // Return the maximum number of log lines.
         return this->maxLogLines;
 }
 
-int Panic::ERROR::get_current_log_line() const
+unsigned int Panic::ERROR::get_current_log_line() const
 {
         // Return current log line.
         return this->currentLogLine;
 }
 
-void Panic::FileStream_Status(Panic::ERROR & error, fstream & stream, int log_level)
+void Panic::FileStream_Status(Panic::ERROR & error, fstream & stream, const unsigned int & log_level)
 {
         // Output status header.
         error.PanicHandler("FileStream_Status:", ERROR_ID, log_level);

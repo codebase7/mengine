@@ -2,7 +2,7 @@
     Multiverse Engine Project 5/5/2011 Core Panic.h
     This header contains Error Handler functions.
     
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -45,25 +45,20 @@
 #define PORT_AUDIO_ID 9
 #define ERROR_ID 10
 
-// Error Levels
-#define ERROR_CRITICAL 1
-#define ERROR_WARNING 2
-#define ERROR_INFO 3
-#define ERROR_DEBUG 4
-#define ERROR_VERBOSE 5
+#include "Panic_Error_Levels.h"		// Defines the error / log levels.
 
 namespace Panic{
   class ERROR {
 
   private:
-        std::string PreviousErrors[5];	     // Used to contain older errors.
-        std::string LastError; 		         // Contains the last error thrown.
-        std::string pathToLogFile;		     // Contains path to the log file.
-        short logLevel;		 		// Determines when to write to the log file.
-        int maxLogLines;		  	// Determines when the log file will start being overwritten.
-        int currentLogLine;			// Contains the current Log line.
-        fstream logfile;            // File handler for the log file.
-        bool logfile_enabled;       // Used to tell if we are writing to a log file or not.
+        std::string PreviousErrors[5];		// Used to contain older errors.
+        std::string LastError;			// Contains the last error thrown.
+        std::string pathToLogFile;		// Contains path to the log file.
+        unsigned int logLevel;			// Determines when to write to the log file.
+        unsigned int maxLogLines;		// Determines when the log file will start being overwritten.
+        unsigned int currentLogLine;		// Contains the current Log line.
+        fstream logfile;			// File handler for the log file.
+        bool logfile_enabled;			// Used to tell if we are writing to a log file or not.
 
         /*
             Disable the copy constructor and assignment operator.
@@ -83,7 +78,7 @@ namespace Panic{
         {
                 LastError = "";
                 pathToLogFile = "";
-                logLevel = 0;
+                logLevel = ERROR_DISABLE;
                 maxLogLines = 0;
                 currentLogLine = 0;
                 logfile_enabled = false;
@@ -109,7 +104,7 @@ namespace Panic{
         std::string ReturnLastError() const;
 
         /*!
-            PanicHandler(std::string message, int moduleID, int log_level, bool killengine)
+            PanicHandler(const std::string & message, const int & moduleID, const int & log_level, const bool & killengine)
 
             Prints an error message to the user and logs it if applicable.
             message message to give user.
@@ -118,10 +113,10 @@ namespace Panic{
             killengine if true will halt the engine. Default false.
             returns "OK" if successful. otherwise you should probaly shutdown the engine.
         */
-        std::string PanicHandler(std::string message, int moduleID = 0, int log_level = 1, bool killengine = false);
+        std::string PanicHandler(const std::string & message, const int & moduleID = 0, const unsigned int & log_level = ERROR_CRITICAL, const bool & killengine = false);
 
         /*!
-            enable_logging(std::string path_to_logfile, short log_level, int max_lines)
+            enable_logging(const std::string & path_to_logfile, const unsigned int & log_level, const unsigned int & max_lines)
 
             This function enables writing the log to a file.
 
@@ -139,7 +134,7 @@ namespace Panic{
             Returns -5 if a invalid pramater is passed.
             Returns -9 if the log file can't be opened.
         */
-        short enable_logging(std::string path_to_logfile, short log_level, int max_lines);
+        short enable_logging(const std::string & path_to_logfile, const unsigned int & log_level, const unsigned int & max_lines);
 
         /*!
             disable_logging()
@@ -149,16 +144,16 @@ namespace Panic{
         void disable_logging();
 
         /*!
-            change_log_level(int log_level)
+            change_log_level(const unsigned int & log_level)
 
             Changes the log file level.
 
-            log_level must be greater than zero, and a log file must already be open
+            log_level must be greater than ERROR_DISABLE, and a log file must already be open
             for this function to work.
         */
-        void change_log_level(int log_level)
+        void change_log_level(const unsigned int & log_level)
         {
-                if (log_level <= 0)
+                if (log_level <= ERROR_DISABLE)
                 {
                         // Nothing to do.
                         return;
@@ -177,7 +172,7 @@ namespace Panic{
 
                 Returns the currently configured log level.
         */
-        int get_log_level() const;
+        unsigned int get_log_level() const;
 
         /*!
                 bool Panic::ERROR::is_logging_enabled() const
@@ -199,27 +194,27 @@ namespace Panic{
         std::string get_log_file_path() const;
 
         /*!
-                int Panic::ERROR::get_max_log_lines() const
+                unsigned int Panic::ERROR::get_max_log_lines() const
 
                 Returns the maximum number of lines allowed in a log
                 file before the oldest lines will be overwritten.
         */
-        int get_max_log_lines() const;
+        unsigned int get_max_log_lines() const;
 
         /*!
-                int Panic::ERROR::get_current_log_line() const
+                unsigned int Panic::ERROR::get_current_log_line() const
 
                 Returns the current line number in the log file where
                 an error will be written to.
         */
-        int get_current_log_line() const;
+        unsigned int get_current_log_line() const;
   };
     /*!
-            void Panic::FileStream_Status(Panic::ERROR & error, fstream & stream, int log_level)
+            void Panic::FileStream_Status(Panic::ERROR & error, fstream & stream, const unsigned int & log_level)
 
             Gets the status for a given file stream, and outputs that status to the given error handler with the given log_level.
     */
-    void FileStream_Status(Panic::ERROR & error, fstream & stream, int log_level);
+    void FileStream_Status(Panic::ERROR & error, fstream & stream, const unsigned int & log_level);
     
     /*!
             const char * Panic::Get_Library_Version()
