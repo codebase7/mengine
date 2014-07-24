@@ -1,7 +1,7 @@
 /*!
     Multiverse Engine Project 04/9/2013 Unit Tests Unit_Tests.h
         
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -18,13 +18,15 @@
     https://github.com/codebase7/mengine
 */
 
+// Include guard.
 #ifndef UNIT_TESTS_H
 #define UNIT_TESTS_H
 
+// Internal includes.
 #include "Test_Base_Header.h"
 #include "Unit_Test_Core.h"
 #include "Unit_Test_Common.h"
 
-#endif
+#endif	// UNIT_TESTS_H
 
 // End of Unit_Tests.h

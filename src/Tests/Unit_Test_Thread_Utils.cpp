@@ -1,7 +1,7 @@
 /*!
     Basic Test for thread_utils. 22/5/2013
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -47,7 +47,7 @@ void *Test_Function_Mutex_Lock(void * dummy)
         size_t counter = 0;
 
         // Init pointers.
-        Common::Thread_Utils::Mutex * mu = NULL;
+        TU_Mutex * mu = NULL;
         return_me * rm = NULL;
 
         // Get rc.
@@ -61,7 +61,7 @@ void *Test_Function_Mutex_Lock(void * dummy)
         }
 
         // Dereference the pointer.
-        mu = (Common::Thread_Utils::Mutex*)rm->object;
+        mu = (TU_Mutex*)rm->object;
 
         // Check for NULL.
         if (mu == NULL)
@@ -98,7 +98,7 @@ void *Test_Function_Condition_Lock(void * dummy)
         short ret = 0;
 
         // Init pointers.
-        Common::Thread_Utils::Condition * cond = NULL;
+        TU_Condition * cond = NULL;
         return_me * rm = NULL;
 
         // Get rc.
@@ -112,7 +112,7 @@ void *Test_Function_Condition_Lock(void * dummy)
         }
 
         // Dereference the pointer.
-        cond = (Common::Thread_Utils::Condition*)rm->object;
+        cond = (TU_Condition*)rm->object;
 
         // Check for NULL.
         if (cond == NULL)
@@ -147,7 +147,7 @@ void *Test_Function_Condition_Wait_Lock(void * dummy)
         short ret = 0;
 
         // Init pointers.
-        Common::Thread_Utils::Condition * cond = NULL;
+        TU_Condition * cond = NULL;
         return_me * rm = NULL;
 
         // Get rc.
@@ -161,7 +161,7 @@ void *Test_Function_Condition_Wait_Lock(void * dummy)
         }
 
         // Dereference the pointer.
-        cond = (Common::Thread_Utils::Condition*)rm->object;
+        cond = (TU_Condition*)rm->object;
 
         // Check for NULL.
         if (cond == NULL)
@@ -194,11 +194,11 @@ void *Test_Function_Condition_Wait_Lock(void * dummy)
         return NULL;
 }
 
-Common::Thread_Utils::Thread * Create_NONE_UNSUPPORTED_Thread_Class()
+TU_Thread * Create_NONE_UNSUPPORTED_Thread_Class()
 {
         // Init vars.
-        Common::Thread_Utils::Thread * th = NULL;
-        Common::LibraryID Library_ID_Test = Common::Thread_Utils::supportedThreadLibs[0];
+        TU_Thread * th = NULL;
+        Common_LibraryID Library_ID_Test = TU_LibID_none;
 
         // Tell user we are attempting to create a thread with the given library.
         std::cout << "Attempting to create thread using LibraryID (Should fail): ";
@@ -220,8 +220,17 @@ Common::Thread_Utils::Thread * Create_NONE_UNSUPPORTED_Thread_Class()
                 // Make sure th is really NULL.
                 if (th != NULL)
                 {
-                        delete th;
-                        th = NULL;
+			std::cout << "Destroying thread object: ";
+			std::cout.flush();
+			if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+			{
+				// Success.
+				std::cout << "PASS\n";
+			}
+			else
+			{
+				std::cout << "FAIL\n";
+			}
                 }
 
                 // Exit function.
@@ -231,8 +240,17 @@ Common::Thread_Utils::Thread * Create_NONE_UNSUPPORTED_Thread_Class()
         // Make sure th is really NULL.
         if (th != NULL)
         {
-                delete th;
-                th = NULL;
+		std::cout << "Destroying thread object: ";
+		std::cout.flush();
+		if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+		{
+			// Success.
+			std::cout << "PASS\n";
+		}
+		else
+		{
+			std::cout << "FAIL\n";
+		}
         }
 
         // Because Thread_Utils::Create_Thread() will NOT create a None / Unsupported class, we must do it manually.
@@ -240,7 +258,7 @@ Common::Thread_Utils::Thread * Create_NONE_UNSUPPORTED_Thread_Class()
 
         // Just another reiteration, DO NOT CREATE THIS CLASS YOURSELF! It's only being done here for testing purposes.
         try{
-                th = new Common::Thread_Utils::Thread;
+                th = new TU_Thread;
         }
         catch(...)
         {
@@ -257,25 +275,57 @@ Common::Thread_Utils::Thread * Create_NONE_UNSUPPORTED_Thread_Class()
 void Output_All_Supported_Threading_Libraries()
 {
         // Init vars.
-        short ret = 0;
+        short count = 0;
+	TU_Library_Support_Status noRequires;
+	Common_LibraryID previousLib = TU_LibID_none;
+	Common_LibraryID currentLib = TU_LibID_none;
 
         // Get total number of supported threading libraries.
-        ret = Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries();
+        count = Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries();
 
-        // Output headers.
-        std::cout << "Library ID Number         Library Name\n";
+	// Make sure we actually have a real library and not just the dummy library.
+	if (count > 1)
+	{
+		// Init the noRequires structure.
+		Common::Thread_Utils::Init_Library_Support_Status(&noRequires);
 
-        // Output each supported library.
-        for (short x = 0; x < ret; x++)
-        {
-                // Output library ID number.
-                std::cout << Common::Thread_Utils::supportedThreadLibs[x].IDNum << "                         ";
-                std::cout << Common::Thread_Utils::supportedThreadLibs[x].Name << '\n';
-        }
+		// Output table headers.
+		std::cout << "Library Name\t\t\tType\t\n";
 
-        // Output total number of supported threading libraries.
-        std::cout << '\n';
-        std::cout << "Total number of supported threading libraries: " << ret << ".\n\n";
+		// Output each supported library.
+		for (size_t x = 0; x < count; x++)
+		{
+			// Get the next library.
+			previousLib = currentLib;
+			currentLib = Common::Thread_Utils::Select_Library(noRequires, previousLib);
+
+			// Check to see if we are trying to output the dummy library. (Skip it if we are.)
+			if ((strcmp(currentLib.Name, TU_LibID_none.Name) != 0) && (currentLib.bIsPlugin != TU_LibID_none.bIsPlugin))
+			{
+				// Output library name.
+				if (currentLib.Name != NULL)
+				{
+					// Output library name.
+					std::cout << currentLib.Name << "\t\t\t";
+
+					// Output whether or not the library is a loaded plugin or not.
+					if (currentLib.bIsPlugin)
+					{
+						std::cout << "(Plugin)";
+					}
+					else
+					{
+						std::cout << "(Internal)";
+					}
+					std::cout << '\n';
+				}
+			}
+		}
+
+		// Output total number of supported threading libraries.
+		std::cout << '\n';
+		std::cout << "Total number of supported threading libraries: " << (count - 1) << ".\n\n";
+	}
 
         // Exit function.
         return;
@@ -289,7 +339,7 @@ void Basic_Thread_Test()
         void * ret_from_thread = NULL;
 
         // Init Library_Support_Status Structure.
-        Common::Thread_Utils::Library_Support_Status our_requirements;
+        TU_Library_Support_Status our_requirements;
         Common::Thread_Utils::Init_Library_Support_Status(&our_requirements);
 
         // Set threading support flag.
@@ -302,7 +352,7 @@ void Basic_Thread_Test()
         std::cout << "Selecting a threading library for basic thread test, and creating the thread.\n";
 
         // Init thread object.
-        Common::Thread_Utils::Thread * th = NULL;
+        TU_Thread * th = NULL;
 
         th = Common::Thread_Utils::Create_Thread(Common::Thread_Utils::Select_Library(our_requirements));
 
@@ -340,8 +390,17 @@ void Basic_Thread_Test()
                 // Destroy object.
                 if (th != NULL)
                 {
-                        delete th;
-                        th = NULL;
+			std::cout << "Destroying thread object: ";
+			std::cout.flush();
+			if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+			{
+				// Success.
+				std::cout << "PASS\n";
+			}
+			else
+			{
+				std::cout << "FAIL\n";
+			}
                 }
 
                 // Output END OF TEST SECTION.
@@ -367,158 +426,309 @@ void Basic_Thread_Test()
         // Tell user the pointer address for the return value from the thread.
         std::cout << "Return value pointer address from thread is: " << ret_from_thread << ".\n";
 
-        // Output END OF TEST SECTION.
-        std::cout << END_TEST_SECTION;
-
         // Destroy objects.
         if (th != NULL)
         {
-                delete th;
-                th = NULL;
+		std::cout << "Destroying thread object: ";
+		std::cout.flush();
+		if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+		{
+			// Success.
+			std::cout << "PASS\n";
+		}
+		else
+		{
+			std::cout << "FAIL\n";
+		}
         }
 
+        // Output END OF TEST SECTION.
+        std::cout << END_TEST_SECTION;
+        
         // Exit function.
         return;
 }
 
 void Test_Select_Library_Perferred_Library_Setting()
 {
-        // Init vars.
-        Common::LibraryID Library_ID_Test;
-        const Common::LibraryID Library_ID_Fake = {99, "Non-existant Library"};
+	// Init vars.
+	Common_LibraryID firstLib = TU_LibID_none;
+	Common_LibraryID secondLib = TU_LibID_none;
+	const Common_LibraryID Library_ID_Fake = {true, "Non-existant Library"};
+	TU_Library_Support_Status our_requirements;
+	const TU_Library_Support_Status * checkSupport;
 
-        // Init Library_Support_Status Structure.
-        Common::Thread_Utils::Library_Support_Status our_requirements;
-        Common::Thread_Utils::Init_Library_Support_Status(&our_requirements);
+	// Init Library_Support_Status Structures.
+	Common::Thread_Utils::Init_Library_Support_Status(&our_requirements);
 
-        // Output START OF TEST SECTION.
-        std::cout << START_TEST_SECTION;
+	// Output START OF TEST SECTION.
+	std::cout << START_TEST_SECTION;
 
-        // Tell user that we are testing the perferred library options.
-        std::cout << "Testing perferred library support in Thread_Utils::Select_Library():\n";
-        std::cout << "Attempting to get library: " << Common::Thread_Utils::supportedThreadLibs[0].Name << " via perferred library setting: ";
+	// Tell user that we are testing the perferred library options.
+	std::cout << "Testing perferred library support in Thread_Utils::Select_Library():\n";
 
-        // Set perferred library.
-        our_requirements.lib = &Common::Thread_Utils::supportedThreadLibs[0];
+	// Get an inital library.
+	firstLib = Common::Thread_Utils::Select_Library(our_requirements);
+	std::cout << "Attempting to get Library ID: " << firstLib.Name << ' ';
+	if (firstLib.bIsPlugin)
+	{
+		std::cout << "(Plugin)";
+	}
+	else
+	{
+		std::cout << "(Internal)";
+	}
+	std::cout << " via perferred library setting: ";
 
-        // Get ID.
-        Library_ID_Test = Common::Thread_Utils::Select_Library(our_requirements);
+	// Set perferred library.
+	our_requirements.lib = &firstLib;
 
-        // Check result.
-        if ((Library_ID_Test.IDNum == Common::Thread_Utils::supportedThreadLibs[0].IDNum) && (strcmp(Library_ID_Test.Name, Common::Thread_Utils::supportedThreadLibs[0].Name) == 0))
-        {
-                std::cout << "PASS\n";
-        }
-        else
-        {
-                std::cout << "FAILED\n";
-        }
+	// Get ID.
+	secondLib = Common::Thread_Utils::Select_Library(our_requirements);
 
-        // Output result data from Select_Library().
-        std::cout << "Select_Library() returned Library ID Number: " << Library_ID_Test.IDNum << " and Library Name: " << Library_ID_Test.Name << ".\n";
+	// Check result.
+	if ((secondLib.bIsPlugin == our_requirements.lib->bIsPlugin) || (strcmp(secondLib.Name, our_requirements.lib->Name) == 0))
+	{
+		std::cout << "PASS\n";
+	}
+	else
+	{
+		std::cout << "FAILED\n";
+	}
 
-        // Attempt to test a skipped library.
-        std::cout << "Attempting to get library after skipping it. (Should fail.): ";
+	// Output result data from Select_Library().
+	std::cout << "Select_Library() returned Library ID: " << secondLib.Name << ' ';
+	if (secondLib.bIsPlugin)
+	{
+		std::cout << "(Plugin)";
+	}
+	else
+	{
+		std::cout << "(Internal)";
+	}
+	std::cout << '\n';
 
-        // Reset requirements, and set perferred library.
-        Common::Thread_Utils::Init_Library_Support_Status(&our_requirements);
-        our_requirements.lib = &Common::Thread_Utils::supportedThreadLibs[1];
+	// Attempt to test a skipped library.
+	std::cout << "Attempting to get library after skipping it. (Should fail.): ";
 
-        // Select new library, skipping the library we are trying to retrive.
-        Library_ID_Test = Common::Thread_Utils::Select_Library(our_requirements, Common::Thread_Utils::supportedThreadLibs[1]);
+	// Select new library, skipping the library we are trying to retrive.
+	secondLib = Common::Thread_Utils::Select_Library(our_requirements, *our_requirements.lib);
 
-        // Check result.
-        if ((Library_ID_Test.IDNum == Common::Thread_Utils::supportedThreadLibs[0].IDNum) && (strcmp(Library_ID_Test.Name, Common::Thread_Utils::supportedThreadLibs[0].Name) == 0))
-        {
-                std::cout << "PASS\n";
-        }
-        else
-        {
-                std::cout << "FAILED\n";
-        }
+	// Check result.
+	if ((secondLib.bIsPlugin != our_requirements.lib->bIsPlugin) || (strcmp(secondLib.Name, our_requirements.lib->Name) == 0))
+	{
+		std::cout << "PASS\n";
+	}
+	else
+	{
+		std::cout << "FAILED\n";
+	}
 
-        // Output result data from Select_Library().
-        std::cout << "Select_Library() returned Library ID Number: " << Library_ID_Test.IDNum << " and Library Name: " << Library_ID_Test.Name << ".\n";
+	// Output result data from Select_Library().
+	std::cout << "Select_Library() returned Library ID: " << secondLib.Name << ' ';
+	if (secondLib.bIsPlugin)
+	{
+		std::cout << "(Plugin)";
+	}
+	else
+	{
+		std::cout << "(Internal)";
+	}
+	std::cout << '\n';
 
-        // Tell user we are testing a non existant library.
-        std::cout << "Attempting to perferr a library that does not exist (Should Fail): ";
+	// Tell user we are testing a non existant library.
+	std::cout << "Attempting to perfer a library that does not exist (Should Fail): ";
 
-        // Reset requirements, and set perferred library.
-        Common::Thread_Utils::Init_Library_Support_Status(&our_requirements);
-        our_requirements.lib = &Library_ID_Fake;
+	// Reset requirements, and set perferred library.
+	Common::Thread_Utils::Init_Library_Support_Status(&our_requirements);
+	our_requirements.lib = &Library_ID_Fake;
 
-        // Select new library,
-        Library_ID_Test = Common::Thread_Utils::Select_Library(our_requirements);
+	// Select new library.
+	secondLib = Common::Thread_Utils::Select_Library(our_requirements);
 
-        // Check result.
-        if ((Library_ID_Test.IDNum == Common::Thread_Utils::supportedThreadLibs[0].IDNum) && (strcmp(Library_ID_Test.Name, Common::Thread_Utils::supportedThreadLibs[0].Name) == 0))
-        {
-                std::cout << "PASS\n";
-        }
-        else
-        {
-                std::cout << "FAILED\n";
-        }
+	// Check result.
+	if ((secondLib.bIsPlugin != Library_ID_Fake.bIsPlugin) || (strcmp(secondLib.Name, Library_ID_Fake.Name) != 0))
+	{
+		std::cout << "PASS\n";
+	}
+	else
+	{
+		std::cout << "FAILED\n";
+	}
 
-        // Output result data from Select_Library().
-        std::cout << "Select_Library() returned Library ID Number: " << Library_ID_Test.IDNum << " and Library Name: " << Library_ID_Test.Name << ".\n";
+	// Output result data from Select_Library().
+	std::cout << "Select_Library() returned Library ID: " << secondLib.Name << ' ';
+	if (secondLib.bIsPlugin)
+	{
+		std::cout << "(Plugin)";
+	}
+	else
+	{
+		std::cout << "(Internal)";
+	}
+	std::cout << '\n';
 
-        // Tell user we are trying to get a library that exists but does not support our requirements.
-        std::cout << "Attempting to get a perferred library that exists but does not meet our requirements. (Should fail, and return a different library.): ";
+	// Tell user we are trying to get a library that exists but does not support our requirements.
+	std::cout << "Attempting to get a perferred library that exists but does not meet our requirements. (Should fail, and return a different library.): ";
 
-        // Check to see if there is a supported library on the platform.
-        if (Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries() <= 1)
-        {
-                std::cout << "N/A\n";
-                std::cout << "There are no supported libraries on this system / arch. Therefore this test cannot be performed.\n\n";
-        }
-        else
-        {
-                // Reset requirements, and set perferred library.
-                Common::Thread_Utils::Init_Library_Support_Status(&our_requirements);
-                our_requirements.lib = &Common::Thread_Utils::supportedThreadLibs[0];       // None / Unsupported.
+	// Reset requirements, and get first library.
+	Common::Thread_Utils::Init_Library_Support_Status(&our_requirements);
+	firstLib = Common::Thread_Utils::Select_Library(our_requirements);
 
-                // Break the requirements.
-                our_requirements.bThreadsSupport = true;
+	/*
+	 * Break the requirements. 
+	 * 
+	 * First find out what it supports then break it, by requesting
+	 * something it does not support. 
+	 * 
+	 * Note: This test will fail if we can't find a library that 
+	 * does not support something.
+	 */
+	// For each supported library run tests on them.
+	for (short x = 0; ((x < Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries()) &&
+	     ((our_requirements.lib->bIsPlugin == TU_LibID_none.bIsPlugin) &&
+	      (strcmp(TU_LibID_none.Name, our_requirements.lib->Name) == 0))); x++)
+	{
+		// Get a new library.
+		if ((secondLib.bIsPlugin != TU_LibID_none.bIsPlugin) || (strcmp(secondLib.Name, TU_LibID_none.Name) != 0))
+		{
+			secondLib = firstLib;
+			firstLib = Common::Thread_Utils::Select_Library(our_requirements, secondLib);
+		}
 
-                // Select new library.
-                Library_ID_Test = Common::Thread_Utils::Select_Library(our_requirements);
+		// Get the library's TU_Library_Support_Status structure.
+		checkSupport = Common::Thread_Utils::Get_Library_Stats(firstLib);
 
-                // Check result.
-                if ((Library_ID_Test.IDNum != Common::Thread_Utils::supportedThreadLibs[0].IDNum) && (strcmp(Library_ID_Test.Name, Common::Thread_Utils::supportedThreadLibs[0].Name) != 0))
-                {
-                        std::cout << "PASS\n";
-                }
-                else
-                {
-                        std::cout << "FAILED\n";
-                }
+		// Check to see if the library does not support something.
+		if (checkSupport != NULL)
+		{
+			if (checkSupport->bThreadsSupport)
+			{
+				if (checkSupport->bJoinThreadSupport)
+				{
+					if (checkSupport->bDetachThreadSupport)
+					{
+						if (checkSupport->bLibraryRequiresSpecificFunctionSig)
+						{
+							if (checkSupport->bMutexesSupport)
+							{
+								if (checkSupport->bTryLockSupport)
+								{
+									if (checkSupport->bConditionVariableSupport)
+									{
+										if (!checkSupport->bConditionWaitTimeoutSupport)
+										{
+											// The library does not support Wait timeouts on condition variables.
+											our_requirements.lib = &firstLib;
+											our_requirements.bConditionWaitTimeoutSupport = true;
+										}
+									}
+									else
+									{
+										// The library does not support condition variables.
+										our_requirements.lib = &firstLib;
+										our_requirements.bConditionVariableSupport = true;
+									}
+								}
+								else
+								{
+									// The library does not support Non-Blocking mutex lock attempts.
+									our_requirements.lib = &firstLib;
+									our_requirements.bTryLockSupport = true;
+								}
+							}
+							else
+							{
+								// The library does not support mutexes.
+								our_requirements.lib = &firstLib;
+								our_requirements.bMutexesSupport = true;
+							}
+						}
+						else
+						{
+							// The library does not require specific thread function signatures.
+							our_requirements.lib = &firstLib;
+							our_requirements.bLibraryRequiresSpecificFunctionSig = true;
+						}
+					}
+					else
+					{
+						// The library does not support detaching threads.
+						our_requirements.lib = &firstLib;
+						our_requirements.bDetachThreadSupport = true;
+					}
+				}
+				else
+				{
+					// The library does not support joining threads.
+					our_requirements.lib = &firstLib;
+					our_requirements.bJoinThreadSupport = true;
+				}
+			}
+			else
+			{
+				// The library does not support threads.
+				our_requirements.lib = &firstLib;
+				our_requirements.bThreadsSupport = true;
+			}
+		}
+	}
 
-                // Output result data from Select_Library().
-                std::cout << "Select_Library() returned Library ID Number: " << Library_ID_Test.IDNum << " and Library Name: " << Library_ID_Test.Name << ".\n";
-        }
+	// Check and see if our_requirements.lib is not TU_LibID_none.
+	if ((TU_LibID_none.bIsPlugin != our_requirements.lib->bIsPlugin) || (strcmp(TU_LibID_none.Name, our_requirements.lib->Name) != 0))
+	{
+		// Select new library.
+		secondLib = Common::Thread_Utils::Select_Library(our_requirements);
 
-        // Output END OF TEST SECTION.
-        std::cout << END_TEST_SECTION;
+		// Check result.
+		if ((secondLib.bIsPlugin != our_requirements.lib->bIsPlugin) || (strcmp(secondLib.Name, our_requirements.lib->Name) != 0))
+		{
+			std::cout << "PASS\n";
+		}
+		else
+		{
+			std::cout << "FAILED\n";
+		}
 
-        // Exit function.
-        return;
+		// Output result data from Select_Library().
+		std::cout << "Select_Library() returned Library ID: " << secondLib.Name << ' ';
+		if (secondLib.bIsPlugin)
+		{
+			std::cout << "(Plugin)";
+		}
+		else
+		{
+			std::cout << "(Internal)";
+		}
+		std::cout << '\n';
+	}
+	else
+	{
+		std::cout << "N/A\n";
+		std::cout << "This test cannot be performed, as all of the supported libraries support everything.\n\n";
+	}
+
+	// Output END OF TEST SECTION.
+	std::cout << END_TEST_SECTION;
+
+	// Exit function.
+	return;
 }
 
-bool Test_Thread_Support(Common::Thread_Utils::Library_Support_Status & our_requirements, const Common::Thread_Utils::Library_Support_Status * lib_status)
+bool Test_Thread_Support(TU_Library_Support_Status & our_requirements, const TU_Library_Support_Status * lib_status)
 {
         // Init vars.
         bool bNoneUnsupportedlibrary = false;       // Whether or not we are testing the None / Unsupported library.
         short ret = 0;
         unsigned long int pid = 0;
         void * ret_from_thread = NULL;
-        Common::LibraryID Library_ID_Test;
+        Common_LibraryID Library_ID_Test;
 
         // Init thread object.
-        Common::Thread_Utils::Thread * th = NULL;
+        TU_Thread * th = NULL;
 
         // Check and see if we are testing the None / unsupported library.
-        if ((our_requirements.lib->IDNum == Common::Thread_Utils::supportedThreadLibs[0].IDNum) && (strcmp(our_requirements.lib->Name, Common::Thread_Utils::supportedThreadLibs[0].Name) == 0))
+        if ((our_requirements.lib->bIsPlugin == TU_LibID_none.bIsPlugin) && (strcmp(our_requirements.lib->Name, TU_LibID_none.Name) == 0))
         {
                 bNoneUnsupportedlibrary = true;
         }
@@ -526,9 +736,18 @@ bool Test_Thread_Support(Common::Thread_Utils::Library_Support_Status & our_requ
         // Check to see if we lack a lib_status struct.
         if ((!bNoneUnsupportedlibrary) && (lib_status == NULL))
         {
-                // We cannot test this library.
-                std::cout << "Error: Test_Mutex_Support() called without a Library_Support_Status structure, for Library ID Number: " << our_requirements.lib->IDNum;
-                std::cout << " Library Name: " << our_requirements.lib->Name << "\nWe need a Library_Support_Status structure to test the library, Skipping test.\n";
+		// We cannot test this library.
+		std::cout << "Error: Test_Mutex_Support() called without a TU_Library_Support_Status structure, for Library ID: ";
+		std::cout << our_requirements.lib->Name << ' ';
+		if (our_requirements.lib->bIsPlugin)
+		{
+			std::cout << "(Plugin)";
+		}
+		else
+		{
+			std::cout << "(Internal)";
+		}
+		std::cout << "\nWe need a TU_Library_Support_Status structure to test the library, Skipping test.\n";
         }
         else
         {
@@ -569,11 +788,20 @@ bool Test_Thread_Support(Common::Thread_Utils::Library_Support_Status & our_requ
                         Verify that the correct library was chosen.
                 */
                 Library_ID_Test = th->Get_Thread_Library();
-                if (Library_ID_Test.IDNum != our_requirements.lib->IDNum)
+                if ((Library_ID_Test.bIsPlugin != our_requirements.lib->bIsPlugin) || (strcmp(Library_ID_Test.Name, our_requirements.lib->Name) != 0))
                 {
                         std::cout << "FAILED\n";
-                        std::cout << "ERROR, could not select library: " << our_requirements.lib->Name << ".\n";
-                        std::cout << "Skipping library.\n\n";
+			std::cout << "ERROR, could not select library: " << our_requirements.lib->Name << ' ';
+			if (our_requirements.lib->bIsPlugin)
+			{
+				std::cout << "(Plugin)";
+			}
+			else
+			{
+				std::cout << "(Internal)";
+			}
+			std::cout << ".\n";
+			std::cout << "Skipping library.\n\n";
                 }
                 else
                 {
@@ -676,15 +904,24 @@ bool Test_Thread_Support(Common::Thread_Utils::Library_Support_Status & our_requ
                                 // Check for None / Unsupported.
                                 if (!bNoneUnsupportedlibrary)
                                 {
-                                        // Tell user we are creating a new thread for detachment.
-                                        std::cout << "Creating new thread for detachment test: ";
-
-                                        // Destroy objects.
+					// Destroy objects.
                                         if (th != NULL)
                                         {
-                                                delete th;
-                                                th = NULL;
+						std::cout << "Destroying thread object: ";
+						std::cout.flush();
+						if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+						{
+							// Success.
+							std::cout << "PASS\n";
+						}
+						else
+						{
+							std::cout << "FAIL\n";
+						}
                                         }
+				  
+                                        // Tell user we are creating a new thread for detachment.
+                                        std::cout << "Creating new thread for detachment test: ";
 
                                         // Create new object.
                                         th = Common::Thread_Utils::Create_Thread(Common::Thread_Utils::Select_Library(our_requirements));
@@ -708,10 +945,19 @@ bool Test_Thread_Support(Common::Thread_Utils::Library_Support_Status & our_requ
                                                 Verify that the correct library was chosen.
                                         */
                                         Library_ID_Test = th->Get_Thread_Library();
-                                        if (Library_ID_Test.IDNum != our_requirements.lib->IDNum)
+                                        if ((Library_ID_Test.bIsPlugin != our_requirements.lib->bIsPlugin) || (strcmp(Library_ID_Test.Name, our_requirements.lib->Name) != 0))
                                         {
                                                 std::cout << "FAILED\n";
-                                                std::cout << "ERROR, could not select library: " << our_requirements.lib->Name << ".\n";
+						std::cout << "ERROR, could not select library: " << our_requirements.lib->Name << ' ';
+						if (our_requirements.lib->bIsPlugin)
+						{
+							std::cout << "(Plugin)";
+						}
+						else
+						{
+							std::cout << "(Internal)";
+						}
+						std::cout << ".\n";
                                                 std::cout << "Test will most likely fail.\n\n";
                                         }
 
@@ -821,48 +1067,75 @@ bool Test_Thread_Support(Common::Thread_Utils::Library_Support_Status & our_requ
         // Destroy object.
         if (th != NULL)
         {
-                delete th;
-                th = NULL;
+		std::cout << "Destroying thread object: ";
+		std::cout.flush();
+		if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+		{
+			// Success.
+			std::cout << "PASS\n";
+		}
+		else
+		{
+			std::cout << "FAIL\n";
+		}
         }
 
         // Exit function.
         return true;
 }
 
-bool Test_Mutex_Support(Common::Thread_Utils::Library_Support_Status & our_requirements, const Common::Thread_Utils::Library_Support_Status * lib_status)
+bool Test_Mutex_Support(TU_Library_Support_Status & our_requirements, const TU_Library_Support_Status * lib_status)
 {
         // Init vars.
         bool bNoneUnsupportedlibrary = false;       // Whether or not we are testing the None / Unsupported library.
         short ret = 0;
         short hack_delay_count = 0;                 // Used to tell how long we have waited.
         unsigned long int pid = 0;
-        Common::LibraryID Library_ID_Test;
+        Common_LibraryID Library_ID_Test;
         return_me rm;
         rm.cont = false;
         rm.object = NULL;
         rm.rc = 0;
 
         // Init thread object.
-        Common::Thread_Utils::Thread * th = NULL;
+        TU_Thread * th = NULL;
 
         // Init mutex object.
-        Common::Thread_Utils::Mutex * mu = NULL;
+        TU_Mutex * mu = NULL;
 
         // Check and see if we are testing the None / unsupported library.
-        if ((our_requirements.lib->IDNum == Common::Thread_Utils::supportedThreadLibs[0].IDNum) && (strcmp(our_requirements.lib->Name, Common::Thread_Utils::supportedThreadLibs[0].Name) == 0))
+        if ((our_requirements.lib->bIsPlugin == TU_LibID_none.bIsPlugin) && (strcmp(our_requirements.lib->Name, TU_LibID_none.Name) == 0))
         {
-                // We cannot test this library.
-                std::cout << "Error: Test_Mutex_Support() called with the dummy library. ID Number: " << our_requirements.lib->IDNum;
-                std::cout << " Library Name: " << our_requirements.lib->Name << "\nWe cannot test this library as the base class for Thread_Utils::Mutex is virtual. Skipping test.\n";
+		// We cannot test this library.
+		std::cout << "Error: Test_Mutex_Support() called with the dummy library. " << our_requirements.lib->Name << ' ';
+		if (our_requirements.lib->bIsPlugin)
+		{
+			std::cout << "(Plugin)";
+		}
+		else
+		{
+			std::cout << "(Internal)";
+		}
+		std::cout << '\n';
+		std::cout << "We cannot test this library as the base class for TU_Mutex is virtual. Skipping test.\n";
         }
         else
         {
                 // Check to see if we lack a lib_status struct.
                 if (lib_status == NULL)
                 {
-                        // We cannot test this library.
-                        std::cout << "Error: Test_Mutex_Support() called without a Library_Support_Status structure, for Library ID Number: " << our_requirements.lib->IDNum;
-                        std::cout << " Library Name: " << our_requirements.lib->Name << "\nWe need a Library_Support_Status structure to test the library, Skipping test.\n";
+			// We cannot test this library.
+			std::cout << "Error: Test_Mutex_Support() called without a TU_Library_Support_Status structure, for Library ID: " << our_requirements.lib->Name << ' ';
+			if (our_requirements.lib->bIsPlugin)
+			{
+				std::cout << "(Plugin)";
+			}
+			else
+			{
+				std::cout << "(Internal)";
+			}
+			std::cout << '\n';
+			std::cout << "We need a TU_Library_Support_Status structure to test the library, Skipping test.\n";
                 }
                 else
                 {
@@ -882,15 +1155,24 @@ bool Test_Mutex_Support(Common::Thread_Utils::Library_Support_Status & our_requi
                                 std::cout << "FAILED\n";
                                 std::cout << "ERROR\nAn error occured while initing the mutex, aborting.\n";
 
-                                // Output END OF TEST SECTION.
-                                std::cout << END_TEST_SECTION;
-
                                 // Destroy Object.
                                 if (th != NULL)
                                 {
-                                        delete th;
-                                        th = NULL;
+					std::cout << "Destroying thread object: ";
+					std::cout.flush();
+					if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+					{
+						// Success.
+						std::cout << "PASS\n";
+					}
+					else
+					{
+						std::cout << "FAIL\n";
+					}
                                 }
+                                
+                                // Output END OF TEST SECTION.
+                                std::cout << END_TEST_SECTION;
                                 return false;
                         }
 
@@ -902,12 +1184,30 @@ bool Test_Mutex_Support(Common::Thread_Utils::Library_Support_Status & our_requi
                                 Verify that the correct library was chosen.
                         */
                         Library_ID_Test = mu->Get_Thread_Library();
-                        if (Library_ID_Test.IDNum != our_requirements.lib->IDNum)
+                        if ((Library_ID_Test.bIsPlugin != our_requirements.lib->bIsPlugin) || (strcmp(Library_ID_Test.Name, our_requirements.lib->Name) != 0))
                         {
-                                std::cout << "FAILED\n";
-                                std::cout << "ERROR, could not select library: " << our_requirements.lib->Name << ".\n";
-                                std::cout << "Returned library was: " << Library_ID_Test.Name << ".\n";
-                                std::cout << "Skipping library.\n\n";
+				std::cout << "FAILED\n";
+				std::cout << "ERROR, could not select library: " << our_requirements.lib->Name << ' ';
+				if (our_requirements.lib->bIsPlugin)
+				{
+					std::cout << "(Plugin)";
+				}
+				else
+				{
+					std::cout << "(Internal)";
+				}
+				std::cout << ".\n";
+                                std::cout << "Returned library was: " << Library_ID_Test.Name << ' ';
+				if (Library_ID_Test.bIsPlugin)
+				{
+					std::cout << "(Plugin)";
+				}
+				else
+				{
+					std::cout << "(Internal)";
+				}
+				std::cout << ".\n";
+				std::cout << "Skipping library.\n\n";
                         }
                         else
                         {
@@ -1088,8 +1388,17 @@ bool Test_Mutex_Support(Common::Thread_Utils::Library_Support_Status & our_requi
                                                 // Check to see if the thread exists.
                                                 if (th != NULL)
                                                 {
-                                                        delete th;
-                                                        th = NULL;
+							std::cout << "Destroying thread object: ";
+							std::cout.flush();
+							if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+							{
+								// Success.
+								std::cout << "PASS\n";
+							}
+							else
+							{
+								std::cout << "FAIL\n";
+							}
                                                 }
 
                                                 // Create new thread.
@@ -1261,53 +1570,89 @@ bool Test_Mutex_Support(Common::Thread_Utils::Library_Support_Status & our_requi
         // Destroy objects.
         if (th != NULL)
         {
-                delete th;
-                th = NULL;
+		std::cout << "Destroying thread object: ";
+		std::cout.flush();
+		if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+		{
+			// Success.
+			std::cout << "PASS\n";
+		}
+		else
+		{
+			std::cout << "FAIL\n";
+		}
         }
         if (mu != NULL)
         {
-                delete mu;
-                mu = NULL;
+		std::cout << "Destroying mutex object: ";
+		std::cout.flush();
+		if ((Common::Thread_Utils::Destroy_Mutex(&mu) == true) && (mu == NULL))
+		{
+			// Success.
+			std::cout << "PASS\n";
+		}
+		else
+		{
+			std::cout << "FAIL\n";
+		}
         }
 
         // Exit function.
         return true;
 }
 
-bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Status & our_requirements, const Common::Thread_Utils::Library_Support_Status * lib_status)
+bool Test_Condition_Variable_Support(TU_Library_Support_Status & our_requirements, const TU_Library_Support_Status * lib_status)
 {
         // Init vars.
         short ret = 0;
         short hack_delay_count = 0;
         unsigned long int pid = 0;
         void * ret_from_thread = NULL;
-        Common::LibraryID Library_ID_Test;
+        Common_LibraryID Library_ID_Test;
         return_me rm;
         rm.cont = false;
         rm.object = NULL;
         rm.rc = 0;
 
         // Init thread object.
-        Common::Thread_Utils::Thread * th = NULL;
+        TU_Thread * th = NULL;
 
         // Init condition variable object.
-        Common::Thread_Utils::Condition * cond = NULL;
+        TU_Condition * cond = NULL;
 
         // Check and see if we are testing the None / unsupported library.
-        if ((our_requirements.lib->IDNum == Common::Thread_Utils::supportedThreadLibs[0].IDNum) && (strcmp(our_requirements.lib->Name, Common::Thread_Utils::supportedThreadLibs[0].Name) == 0))
+        if ((our_requirements.lib->bIsPlugin == TU_LibID_none.bIsPlugin) && (strcmp(our_requirements.lib->Name, TU_LibID_none.Name) == 0))
         {
-                // We cannot test this library.
-                std::cout << "Error: Test_Condition_Variable_Support() called with the dummy library. ID Number: " << our_requirements.lib->IDNum;
-                std::cout << " Library Name: " << our_requirements.lib->Name << "\nWe cannot test this library as the base class for Thread_Utils::Condition is virtual. Skipping test.\n";
+		// We cannot test this library.
+		std::cout << "Error: Test_Condition_Variable_Support() called with the dummy library. " << our_requirements.lib->Name << ' ';
+		if (our_requirements.lib->bIsPlugin)
+		{
+			std::cout << "(Plugin)";
+		}
+		else
+		{
+			std::cout << "(Internal)";
+		}
+		std::cout << '\n';
+		std::cout << "We cannot test this library as the base class for TU_Condition is virtual. Skipping test.\n";
         }
         else
         {
                 // Check to see if we lack a lib_status struct.
                 if (lib_status == NULL)
                 {
-                        // We cannot test this library.
-                        std::cout << "Error: Test_Condition_Variable_Support() called without a Library_Support_Status structure, for Library ID Number: " << our_requirements.lib->IDNum;
-                        std::cout << " Library Name: " << our_requirements.lib->Name << "\nWe need a Library_Support_Status structure to test the library, Skipping test.\n";
+			// We cannot test this library.
+			std::cout << "Error: Test_Condition_Variable_Support() called without a TU_Library_Support_Status structure, for Library ID Number: " << our_requirements.lib->Name << ' ';
+			if (our_requirements.lib->bIsPlugin)
+			{
+				std::cout << "(Plugin)";
+			}
+			else
+			{
+				std::cout << "(Internal)";
+			}
+			std::cout << '\n';
+			std::cout << "We need a TU_Library_Support_Status structure to test the library, Skipping test.\n";
                 }
                 else
                 {
@@ -1342,12 +1687,30 @@ bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Statu
                                 Verify that the correct library was chosen.
                         */
                         Library_ID_Test = cond->Get_Thread_Library();
-                        if (Library_ID_Test.IDNum != our_requirements.lib->IDNum)
+                        if ((Library_ID_Test.bIsPlugin != our_requirements.lib->bIsPlugin) || (strcmp(Library_ID_Test.Name, our_requirements.lib->Name) != 0))
                         {
-                                std::cout << "FAILED\n";
-                                std::cout << "ERROR, could not select library: " << our_requirements.lib->Name << ".\n";
-                                std::cout << "Returned library was: " << Library_ID_Test.Name << ".\n";
-                                std::cout << "Skipping library.\n\n";
+				std::cout << "FAILED\n";
+				std::cout << "ERROR, could not select library: " << our_requirements.lib->Name << ' ';
+				if (our_requirements.lib->bIsPlugin)
+				{
+					std::cout << "(Plugin)";
+				}
+				else
+				{
+					std::cout << "(Internal)";
+				}
+				std::cout << '\n';
+				std::cout << "Returned library was: " << Library_ID_Test.Name << ' ';
+				if (Library_ID_Test.bIsPlugin)
+				{
+					std::cout << "(Plugin)";
+				}
+				else
+				{
+					std::cout << "(Internal)";
+				}
+				std::cout << '\n';
+				std::cout << "Skipping library.\n\n";
                         }
                         else
                         {
@@ -1379,8 +1742,17 @@ bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Statu
                                                 // Check to see if the thread exists.
                                                 if (th != NULL)
                                                 {
-                                                        delete th;
-                                                        th = NULL;
+							std::cout << "Destroying thread object: ";
+							std::cout.flush();
+							if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+							{
+								// Success.
+								std::cout << "PASS\n";
+							}
+							else
+							{
+								std::cout << "FAIL\n";
+							}
                                                 }
 
                                                 // Tell user we are creating a thread to test the condition variable.
@@ -1394,7 +1766,7 @@ bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Statu
                                                 {
                                                         // Could not create thread.
                                                         std::cout << "FAILED\n";
-                                                        std::cout << "Could not create thread to run condition thread.\n";
+                                                        std::cout << "Could not create thread to run condition test.\n";
                                                 }
                                                 else
                                                 {
@@ -1497,8 +1869,17 @@ bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Statu
                                                         // Check to see if the thread exists.
                                                         if (th != NULL)
                                                         {
-                                                                delete th;
-                                                                th = NULL;
+								std::cout << "Destroying thread object: ";
+								std::cout.flush();
+								if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+								{
+									// Success.
+									std::cout << "PASS\n";
+								}
+								else
+								{
+									std::cout << "FAIL\n";
+								}
                                                         }
 
                                                         // Tell user we are creating a thread to test the wait timeout condition variable.
@@ -1512,7 +1893,7 @@ bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Statu
                                                         {
                                                                 // Could not create thread.
                                                                 std::cout << "FAILED\n";
-                                                                std::cout << "Could not create thread to run condtiion thread.\n";
+                                                                std::cout << "Could not create thread to run condition test.\n";
                                                         }
                                                         else
                                                         {
@@ -1619,53 +2000,89 @@ bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Statu
         // Destroy objects.
         if (th != NULL)
         {
-                delete th;
-                th = NULL;
+		std::cout << "Destroying thread object: ";
+		std::cout.flush();
+		if ((Common::Thread_Utils::Destroy_Thread(&th) == true) && (th == NULL))
+		{
+			// Success.
+			std::cout << "PASS\n";
+		}
+		else
+		{
+			std::cout << "FAIL\n";
+		}
         }
         if (cond != NULL)
         {
-                delete cond;
-                cond = NULL;
+		std::cout << "Destroying condition variable object: ";
+		std::cout.flush();
+		if ((Common::Thread_Utils::Destroy_Condition(&cond) == true) && (cond == NULL))
+		{
+			// Success.
+			std::cout << "PASS\n";
+		}
+		else
+		{
+			std::cout << "FAIL\n";
+		}
         }
 
         // Exit function.
         return true;
 }
 
-void Library_Test(const Common::LibraryID & lib)
+void Library_Test(const Common_LibraryID & lib)
 {
         // Init vars.
         bool bNoneUnsupportedlibrary = false;       // Whether or not we are testing the None / Unsupported library.
 
         // Check and see if we are testing the None / unsupported library.
-        if ((lib.IDNum == Common::Thread_Utils::supportedThreadLibs[0].IDNum) && (strcmp(lib.Name, Common::Thread_Utils::supportedThreadLibs[0].Name) == 0))
+        if ((lib.bIsPlugin == TU_LibID_none.bIsPlugin) && (strcmp(lib.Name, TU_LibID_none.Name) == 0))
         {
                 bNoneUnsupportedlibrary = true;
         }
 
-        // Init Library_Support_Status Structures.
-        Common::Thread_Utils::Library_Support_Status our_requirements;
+        // Init TU_Library_Support_Status Structures.
+        TU_Library_Support_Status our_requirements;
         Common::Thread_Utils::Init_Library_Support_Status(&our_requirements);
-        const Common::Thread_Utils::Library_Support_Status * lib_status = NULL;
+        const TU_Library_Support_Status * lib_status = NULL;
 
         // Output START OF TEST SECTION.
         std::cout << START_TEST_SECTION;
 
         // Tell user what library we are testing.
-        std::cout << "Testing Library ID: " << lib.IDNum << '\n' << "Testing Library Name: " << lib.Name << ".\n";
+	std::cout << "Testing Library ID: " << lib.Name << ' ';
+	if (lib.bIsPlugin)
+	{
+		std::cout << "(Plugin)";
+	}
+	else
+	{
+		std::cout << "(Internal)";
+	}
+	std::cout << ".\n";
 
-        // Tell user that we are getting the Library_Support_Status object for the given library.
-        std::cout << "Retriving Library_Support_Status structure: ";
+        // Tell user that we are getting the TU_Library_Support_Status object for the given library.
+        std::cout << "Retriving TU_Library_Support_Status structure: ";
 
         // Check and see if we are testing None / Unsupported.
         if (bNoneUnsupportedlibrary)
         {
-                std::cout << "N/A\n";
-                std::cout << "Library " << lib.Name << " is a fake library so the support status structure is not needed.\n";
+		std::cout << "N/A\n";
+		std::cout << "Library " << lib.Name << ' ';
+		if (lib.bIsPlugin)
+		{
+			std::cout << "(Plugin)";
+		}
+		else
+		{
+			std::cout << "(Internal)";
+		}
+		std::cout << " is a fake library so the support status structure is not needed.\n";
         }
         else
         {
-                // Get Library_Support_Status structure for this library.
+                // Get TU_Library_Support_Status structure for this library.
                 lib_status = Common::Thread_Utils::Get_Library_Stats(lib);
 
                 // Make sure the support structure matches the library.
@@ -1674,30 +2091,38 @@ void Library_Test(const Common::LibraryID & lib)
                         if (lib_status->lib != NULL)
                         {
                                 // Check ID number and name.
-                                if ((lib_status->lib->IDNum == lib.IDNum) && (strcmp(lib_status->lib->Name, lib.Name) == 0))
+                                if ((lib_status->lib->bIsPlugin == lib.bIsPlugin) && (strcmp(lib_status->lib->Name, lib.Name) == 0))
                                 {
                                         std::cout << "PASS\n";
                                 }
                                 else
                                 {
-                                        // Error library IDs should match.
-                                        std::cout << "FAILED\n";
-                                        std::cout << "Incorrect Library_Support_Status structure was returned.\n";
-                                        std::cout << "Returned Library ID was: " << lib_status->lib->IDNum << " Returned Library Name was: " << lib_status->lib->Name << '\n';
-                                        std::cout << ".\nSkipping Library.\n";
+					// Error library IDs should match.
+					std::cout << "FAILED\n";
+					std::cout << "Incorrect TU_Library_Support_Status structure was returned.\n";
+					std::cout << "Returned Library ID was: " << lib_status->lib->Name << ' ';
+					if (our_requirements.lib->bIsPlugin)
+					{
+						std::cout << "(Plugin)";
+					}
+					else
+					{
+						std::cout << "(Internal)";
+					}
+					std::cout << ".\nSkipping Library.\n";
 
-                                        // Output END OF TEST SECTION.
-                                        std::cout << END_TEST_SECTION;
+					// Output END OF TEST SECTION.
+					std::cout << END_TEST_SECTION;
 
-                                        // Exit function.
-                                        return;
+					// Exit function.
+					return;
                                 }
                         }
                         else
                         {
-                                // Invalid Library_Support_Status structure, LibraryID variable is not defined.
+                                // Invalid TU_Library_Support_Status structure, LibraryID variable is not defined.
                                 std::cout << "FAILED\n";
-                                std::cout << "Invalid Library_Support_Status structure, LibraryID variable is not defined.\n";
+                                std::cout << "Invalid TU_Library_Support_Status structure, LibraryID variable is not defined.\n";
                                 std::cout << "Skipping Library.\n";
 
                                 // Output END OF TEST SECTION.
@@ -1709,9 +2134,9 @@ void Library_Test(const Common::LibraryID & lib)
                 }
                 else
                 {
-                        // Error, No Library_Support_Status structure was returned by Thread_Utils::Get_Library_Stats().
+                        // Error, No TU_Library_Support_Status structure was returned by TU_Get_Library_Stats().
                         std::cout << "FAILED\n";
-                        std::cout << "No Library_Support_Status structure was returned by Thread_Utils::Get_Library_Stats().\n";
+                        std::cout << "No TU_Library_Support_Status structure was returned by TU_Get_Library_Stats().\n";
                         std::cout << "Skipping Library.\n";
 
                         // Output END OF TEST SECTION.
@@ -1782,27 +2207,69 @@ void Library_Test(const Common::LibraryID & lib)
 
 int unit_test_thread_utils_main()
 {
-        // Init vars.
-        short ret = 0;
+	// Init vars.
+	size_t ret = 0;
+	Common_LibraryID previousLib = TU_LibID_none;
+	Common_LibraryID currentLib;
+	TU_Library_Support_Status noRequires;
 
-        // Output all supported threading libraries.
-        Output_All_Supported_Threading_Libraries();
+	// Register the error log callback.
+	Common::Register_Error_Log_Callback(Common_Error_Log_Callback);
 
-        // Call tests for perferred library setting in Thread_Utils::Select_Library().
-        Test_Select_Library_Perferred_Library_Setting();
+	// Set the log level.
+	Common::Set_Error_Log_Level(ERROR_VERBOSE);
 
-        // Get number of supported libraries.
-        ret = Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries();
+	// Init the noRequires structure.
+	Common::Thread_Utils::Init_Library_Support_Status(&noRequires);
 
-        // For each supported library run tests on them.
-        for (short x = 0; x < ret; x++)
-        {
-                Library_Test(Common::Thread_Utils::supportedThreadLibs[x]);
-        }
+	/*
+	 * Select first library.
+	 * 
+	 * Will also load the plugins if any are avaiable.
+	 * Do this first so that if only plugins are supported on this build,
+	 * the check for a library to test will succeed.
+	 * 
+	 * (Get_Number_of_Supported_Thread_Libraries() will only return the
+	 *  number of internaly supported libraries until the plugins are
+	 *  actually loaded by Select_Library().)
+	 */
+	currentLib = Common::Thread_Utils::Select_Library(noRequires);
 
-        // Run basic thread test.
-        Basic_Thread_Test();
+	// Get number of supported libraries.
+	ret = Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries();
 
-        // Exit test.
-        return 0;
+	// Check to see if we have any libraries to actually test with.
+	if (ret > 1)
+	{
+		// Output all supported threading libraries. (Will also output the plugins if applicable.)
+		Output_All_Supported_Threading_Libraries();
+
+		// Call tests for perferred library setting in Thread_Utils::Select_Library().
+		Test_Select_Library_Perferred_Library_Setting();
+
+		// Run basic thread test.
+		Basic_Thread_Test();
+
+		// For each supported library run tests on them.
+		for (size_t x = 0; (x < ret); x++)
+		{
+			// Run library test.
+			Library_Test(currentLib);
+
+			// Get a new library.
+			previousLib = currentLib;
+			currentLib = Common::Thread_Utils::Select_Library(noRequires, previousLib);
+		}
+	}
+	else
+	{
+		// There are no libraries to test with, so we cannot run tests on Thread_Utils.
+		std::cout << "Subsystem Test N/A: Unable to run tests on the Threading Subsystem as we do not have any libraries to test with.\n\n";
+	}
+
+	// Clear the error log callback.
+	Common::Register_Error_Log_Callback(NULL);
+
+	// Exit test.
+	return 0;
 }

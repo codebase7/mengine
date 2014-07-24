@@ -1,7 +1,7 @@
 /*!
     Multiverse Engine Project 21/8/2012 Unit Tests Unit_Tests.cpp
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
@@ -20,13 +20,26 @@
 
 #include "Unit_Tests.h"
 
+void Common_Error_Log_Callback(const unsigned int logLevel, const char * errorMsg)
+{
+	// Print to std::cout.
+	if (errorMsg != NULL)
+	{
+		std::cout << errorMsg;
+		std::cout.flush();
+	}
+
+	// Exit function.
+	return;
+}
+
 int main()
 {
 	// Delcare vars.
 	short error_code_data_object = 0;
 	short error_code_fileutills = 0;
 	short error_code_thread_utils = 0;
-  
+
         // Starting Unit tests.
         std::cout << "Multiverse_Engine_Project_Public Unit Tests Compiled on: " << TESTCOMPILEDATE << " " << TESTCOMPILETIME << "\n";
         std::cout << "Starting Unit tests for DataProcess::Data_Object. Please be pacent this can take some time.\n";
@@ -34,7 +47,7 @@ int main()
         
 	std::cout << "Starting FileUtills Tests.\n";
         error_code_fileutills = unit_test_fileutills_main();
-	
+
 	std::cout << "Starting Thread_Utils Tests.\n";
 	error_code_thread_utils = unit_test_thread_utils_main();
 	
@@ -63,7 +76,7 @@ int main()
 	{
 		std::cout << "PASS\n";
 	}
-	
+
 	std::cout << "Thread_Utils Tests: ";
 	if (error_code_thread_utils != 0)
 	{

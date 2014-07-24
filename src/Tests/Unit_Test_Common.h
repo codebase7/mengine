@@ -1,7 +1,7 @@
 /*!
     Multiverse Engine Project 04/9/2013 Unit Tests Unit_Test_Common.h
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
@@ -22,7 +22,7 @@
 #define COMMON_UNIT_TESTS_H
 
 // Include headers from Common.
-#include "../Common/Src/FileUtills.h"
+#include "../Common/Src/File_Management_Subsystem/FileUtills.h"
 #include "../Common/Src/Threading_Subsystem/Thread_Utils.h"
 
 // Define FileUtills error messages structs.
@@ -109,19 +109,27 @@ void *Test_Function_1(void * dummy);
 void *Test_Function_Mutex_Lock(void * dummy);
 void *Test_Function_Condition_Lock(void * dummy);
 void *Test_Function_Condition_Wait_Lock(void * dummy);
-Common::Thread_Utils::Thread * Create_NONE_UNSUPPORTED_Thread_Class();
+TU_Thread * Create_NONE_UNSUPPORTED_Thread_Class();
 void Output_All_Supported_Threading_Libraries();
 void Basic_Thread_Test();
 void Test_Select_Library_Perferred_Library_Setting();
-bool Test_Thread_Support(Common::Thread_Utils::Library_Support_Status & our_requirements,
-			 const Common::Thread_Utils::Library_Support_Status * lib_status);
-bool Test_Mutex_Support(Common::Thread_Utils::Library_Support_Status & our_requirements,
-			const Common::Thread_Utils::Library_Support_Status * lib_status);
-bool Test_Condition_Variable_Support(Common::Thread_Utils::Library_Support_Status & our_requirements,
-				     const Common::Thread_Utils::Library_Support_Status * lib_status);
-void Library_Test(const Common::LibraryID & lib);
+bool Test_Thread_Support(TU_Library_Support_Status & our_requirements,
+			 const TU_Library_Support_Status * lib_status);
+bool Test_Mutex_Support(TU_Library_Support_Status & our_requirements,
+			const TU_Library_Support_Status * lib_status);
+bool Test_Condition_Variable_Support(TU_Library_Support_Status & our_requirements,
+				     const TU_Library_Support_Status * lib_status);
+void Library_Test(const Common_LibraryID & lib);
 int unit_test_thread_utils_main();
 
-#endif
+/*!
+ * 	void Common_Error_Log_Callback(const unsigned int logLevel, const char * errorMsg)
+ * 
+ * 	Callback function for Common::Register_Error_Log_Callback().
+ * 	Displays given error message on standard output.
+ */
+void Common_Error_Log_Callback(const unsigned int logLevel, const char * errorMsg);
+
+#endif	// COMMON_UNIT_TESTS_H
 
 // End of Unit_Test_Common.h
