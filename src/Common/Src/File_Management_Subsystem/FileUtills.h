@@ -55,6 +55,30 @@ struct dirlist{
 };
 
 /*!
+ * 	int FileUtills::GetUserProfileDirectoryPath(std::string & path)
+ *
+ * 	Fetches the user's profile directory from the enviorment, and stores
+ * 	it in the given path argument. (Note: The given path argument will be
+ * 	erased when this function is called. So take care not to leave something
+ * 	in it you need.)
+ *
+ * 	If the function fails for any reason, path will be an empty string,
+ *	and Common::commonLastErrorCode will be set to the approiate error.
+ */
+int GetUserProfileDirectoryPath(std::string & path);
+
+/*!
+ * 	std::string FileUtills::GetExecDirectory()
+ *
+ * 	Returns a NULL terminated std::string the path to the directory where the
+ * 	executable is stored.
+ *
+ * 	If the function fails for any reason, the returned std::string will be empty,
+ * 	and Common::commonLastErrorCode will be set to the error.
+ */
+std::string GetExecDirectory();
+
+/*!
         FileUtills::dirlist * getDirectory(const std::string & path, const bool & cleanList)
 
         Lists the given directory's contents.
@@ -149,17 +173,6 @@ int CheckParent(const std::string & path, bool read = true, bool write = true);
         Returns an empty string otherwise.
 */
 std::string GetParent(const std::string & path);
-
-/*!
- * 	std::string FileUtills::GetExecDirectory()
- *
- * 	Returns a NULL terminated std::string the path to the directory where the
- * 	executable is stored.
- *
- * 	If the function fails for any reason, the returned std::string will be empty,
- * 	and Common::commonLastErrorCode will be set to the error.
- */
-std::string GetExecDirectory();
 
 /*!
         std::string FileUtills::CheckPathType(const std::string & path)

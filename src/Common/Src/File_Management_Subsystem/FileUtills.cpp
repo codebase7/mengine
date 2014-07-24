@@ -66,6 +66,77 @@ std::string RemoveTrailingSlash(const std::string & path)
 	return buffer;
 }
 
+int FileUtills::GetUserProfileDirectoryPath(std::string & path)
+{
+	// Reset Common::commonLastErrorCode.
+	Common::commonLastErrorCode = Common::COMMON_FUNCTION_NOT_IMPLEMENTED;
+#ifdef __linux__
+	// Init vars.
+	int errorg = 0;			// Used to hold the original state of errno so it can be restored after we finish.
+	int errcpy = 0;			// Used to store errno if needed.
+	char * pHD = NULL;		// Used to fetch the path from the system.
+
+	// Backup and clear errno.
+	errorg = errno;
+	errno = 0;
+
+	// Blank out the path value.
+	path.clear();
+
+	// Get the path to the user's profile directory.
+	try {
+		pHD = getenv("HOME");
+		if ((errno == 0) && (pHD != NULL))
+		{
+			// Copy the variable to the path.
+			path = pHD;
+
+			// Set success code.
+			Common::commonLastErrorCode = Common::COMMON_SUCCESS;
+		}
+		else
+		{
+			// Could not get user profile directory path variable.
+			errcpy = errno;
+			Common::commonLastErrorCode = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
+			COMMON_LOG_VERBOSE("GetUserProfileDirectoryPath(): ");
+			COMMON_LOG_VERBOSE(Common::Get_Error_Message(Common::commonLastErrorCode));
+			COMMON_LOG_VERBOSE(" Could not get user profile directory path from enviorment.\n");
+
+			// Reset path.
+			path.clear();
+		}
+	}
+	catch (exception ex)
+	{
+		// Exception thown.
+		Common::commonLastErrorCode = Common::COMMON_EXCEPTION_THROWN;
+		COMMON_LOG_VERBOSE("GetUserProfileDirectoryPath(): ");
+		COMMON_LOG_VERBOSE(Common::Get_Error_Message(Common::commonLastErrorCode));
+		COMMON_LOG_VERBOSE(" ");
+		COMMON_LOG_VERBOSE(ex.what());
+		COMMON_LOG_VERBOSE("\n");
+
+		// Reset path.
+		path.clear();
+	}
+
+	// Check for an allocated buffer.
+	if (pHD != NULL)
+	{
+		// Release the buffer.
+		free(pHD);
+		pHD = NULL;
+	}
+
+	// Restore errno.
+	errno = errorg;
+#endif	// __linux__
+
+	// Exit function.
+	return Common::commonLastErrorCode;
+}
+
 std::string FileUtills::GetExecDirectory()
 {
 	// Init vars.
