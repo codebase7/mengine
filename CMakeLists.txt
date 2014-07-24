@@ -16,4 +16,9 @@ set(B_OUTPUT_DIR ${T_OUTPUT_DIR} CACHE PATH "Build executable output directory")
 set(L_OUTPUT_DIR ${T_OUTPUT_DIR}/lib CACHE PATH "Build library output directory")
 set(O_OUTPUT_DIR ${T_OUTPUT_DIR}/obj CACHE PATH "Build object output directory")
 endif()
+
+# Option Defaults.
+option (BUILD_DYNAMIC_LIBRARY_SUBSYSTEM "Whether or not to build the Dynamic Library Subsystem. (Defaults to yes.)" ON)
+
+# Include src sub directory.
 add_subdirectory(src)
