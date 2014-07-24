@@ -1,7 +1,7 @@
 /*!
     Multiverse Engine Project 11/19/2010 Core FileStreams.cpp
         
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
