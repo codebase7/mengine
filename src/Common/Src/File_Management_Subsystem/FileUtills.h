@@ -151,6 +151,17 @@ int CheckParent(const std::string & path, bool read = true, bool write = true);
 std::string GetParent(const std::string & path);
 
 /*!
+ * 	std::string FileUtills::GetExecDirectory()
+ *
+ * 	Returns a NULL terminated std::string the path to the directory where the
+ * 	executable is stored.
+ *
+ * 	If the function fails for any reason, the returned std::string will be empty,
+ * 	and Common::commonLastErrorCode will be set to the error.
+ */
+std::string GetExecDirectory();
+
+/*!
         std::string FileUtills::CheckPathType(const std::string & path)
 
         Checks the path given, and converts it to a absolute path.

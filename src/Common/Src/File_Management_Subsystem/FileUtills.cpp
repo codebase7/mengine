@@ -66,6 +66,231 @@ std::string RemoveTrailingSlash(const std::string & path)
 	return buffer;
 }
 
+std::string FileUtills::GetExecDirectory()
+{
+	// Init vars.
+	std::string result = "";		// The string returned from this function.
+#ifdef __linux__
+	/*
+	 * 	Short version:
+	 * 	This is a cluster<explisitive>.
+	 * 
+	 * 	Long version:
+	 * 	The only reliable (guarrenteed to work) method for getting the executable
+	 * 	path in linux, is by using readlink() on /proc/self/exe.
+	 *
+	 * 	However, this has several issues. 
+	 * 	
+	 * 	First issue: readlink() expects a preallocated buffer to store the result.
+	 * 	If the preallocated buffer is too small for the full path, then readlink()
+	 * 	will silently truncate the remaining data and not tell us how much was
+	 * 	left over.
+	 * 
+	 * 	Second issue: The proc filesystem misbehaves and does not fill in the
+	 * 	st_size field of the stat structure. So as a result we can't easilly
+	 * 	tell how much memory to allocate for our buffer.
+	 * 
+	 * 	Third issue: Because some filesystems allow paths of unlimited size,
+	 * 	(i.e. the only restriction is having the space to store the path),
+	 * 	we can't use PATH_MAX (as it's possibly wrong), and we can't set a
+	 * 	limit on our memory allocation.
+	 * 
+	 * 	Because of these issues, the glibc MANUAL actually gives an indefinite
+	 * 	loop of memory allocation->readlink()->if(!got entire link)->Deallocate memory->Allocate memory.
+	 * 	for reading a symlink from the filesystem.
+	 * 
+	 * 	This loop is reimplimented here, but with two differences.
+	 * 	
+	 * 		- The loop will end once a certian amount of relocations (defined by GET_EXE_PATH_REALLOC)
+	 * 		  is reached. (This is to prevent some of the above issues.)
+	 * 
+	 * 		- The loop will also check to make sure that the returned string has not been altered. 
+	 * 		  (via memcmp).
+	 */
+
+	// Init vars.
+	int errcpy = 0;					// Used to copy errno if needed.
+	const size_t MAX_GET_EXE_PATH_REALLOC = 4;	// Maximum number of times to run the memory reallocation loop.
+	const size_t BASE_SIZE = 1000;			// Inital number of bytes to allocate. (This number is multiplied by the loop iteration value (x) after each loop iteration.)
+	size_t realBufferLength = 0;			// Unsigned value of how big the buffer is. (Used for accessing and allocating the buffer.)
+	ssize_t firstBufferLength = 0;			// Signed return value of the number of bytes written to the buffer by readlink(). (Just so they could return that -1 error code....)
+	ssize_t secondBufferLength = 0;			// Signed return value of the number of bytes written to the checkBuffer by readlink(). (Just so they could return that -1 error code....)
+	char * buffer = NULL;				// First buffer.
+	char * checkBuffer = NULL;			// Second buffer. (Both buffers must match exactly (memcmp) for this function to return a valid path.)
+	struct stat st;					// Used to make sure that PROC_PATH is actually a symlink.
+	const char * const PROC_PATH = "/proc/self/exe";// The actual path to the symlink that represents the executable in the /proc filesystem.
+
+	// Set Common::commonLastErrorCode to COMMON_UNKNOWN_ERROR.
+	Common::commonLastErrorCode = Common::COMMON_UNKNOWN_ERROR;
+
+	// OK this is dumb, but check it anyway....
+	errcpy = lstat(PROC_PATH, &st);
+	if (errcpy == 0)
+	{
+		// Make sure that PROC_PATH is a symlink.
+		if ((st.st_mode & S_IFMT) == S_IFLNK)	// S_IFMT is a bit mask for extracting the file type from st_mode. S_IFLNK is the file type for a symlink.
+		{
+			// Begin the devil's loop.
+			try {
+				for (size_t x = 0; ((x < MAX_GET_EXE_PATH_REALLOC) &&
+						    ((buffer == NULL) && (checkBuffer == NULL)) &&
+						    (Common::commonLastErrorCode == Common::COMMON_UNKNOWN_ERROR)); x++)
+				{
+					// Recalculate bufferLength.
+					realBufferLength = (BASE_SIZE * (x + 1));
+
+					// Allocate the memory.
+					buffer = (char*)malloc(realBufferLength);
+					checkBuffer = (char*)malloc(realBufferLength);
+
+					// Make sure it was allocated.
+					if ((buffer != NULL) && (checkBuffer != NULL))
+					{
+						// Blank out the allocated memory.
+						memset(buffer, '\0', realBufferLength);
+						memset(checkBuffer, '\0', realBufferLength);
+
+						// Call readlink() for the first buffer.
+						firstBufferLength = readlink(PROC_PATH, buffer, realBufferLength);
+
+						// Check bufferLength.
+						if (firstBufferLength >= 0)
+						{
+							// Check to see if we got the entire path.
+							if (firstBufferLength < realBufferLength)
+							{
+								// Call readlink() for the second buffer.
+								secondBufferLength = readlink(PROC_PATH, checkBuffer, realBufferLength);
+
+								// Check secondBufferLength.
+								if (secondBufferLength >= 0)
+								{
+									// Check to see if we got the entire path.
+									if (secondBufferLength == firstBufferLength)
+									{
+										// Call memcmp().
+										if (memcmp(buffer, checkBuffer, realBufferLength) == 0)
+										{
+											// Paths match, deallocate the second buffer.
+											if (checkBuffer != NULL)
+											{
+												free(checkBuffer);
+												checkBuffer = NULL;
+											}
+
+											// Copy the first buffer to the result.
+											result = buffer;
+
+											// Because the returned link is the actual executable, call GetParent().
+											result = FileUtills::GetParent(result);
+											if (result.size() > 0)
+											{
+												// Clear Common::commonLastErrorCode.
+												Common::commonLastErrorCode = Common::COMMON_SUCCESS;
+											}
+											else
+											{
+												// GetParent() failed.
+												Common::commonLastErrorCode = Common::COMMON_INTERNAL_ERROR;
+												COMMON_LOG_DEBUG("FileUtills::GetExecDirectory(): ");
+												COMMON_LOG_DEBUG(Common::Get_Error_Message(Common::commonLastErrorCode));
+												COMMON_LOG_DEBUG(" Call to GetParent() failed.\n");
+												result = "";
+											}
+										}
+									}
+								}
+								else
+								{
+									// Error.
+									errcpy = errno;
+									Common::commonLastErrorCode = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
+									COMMON_LOG_DEBUG("FileUtills::GetExecDirectory(): readlink() system call returned: ");
+									COMMON_LOG_DEBUG(Common::Get_Error_Message(Common::commonLastErrorCode));
+									COMMON_LOG_DEBUG("\n");
+									result = "";
+								}
+							}
+						}
+						else
+						{
+							// Error.
+							errcpy = errno;
+							Common::commonLastErrorCode = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
+							COMMON_LOG_DEBUG("FileUtills::GetExecDirectory(): readlink() system call returned: ");
+							COMMON_LOG_DEBUG(Common::Get_Error_Message(Common::commonLastErrorCode));
+							COMMON_LOG_DEBUG("\n");
+							result = "";
+						}
+					}
+
+					// Deallocate any remaining buffers.
+					if (buffer != NULL)
+					{
+						free(buffer);
+						buffer = NULL;
+					}
+					if (checkBuffer != NULL)
+					{
+						free(checkBuffer);
+						checkBuffer = NULL;
+					}
+				}
+
+				/*
+				 * 	If we reach here, and Common::commonLastErrorCode == Common::COMMON_UNKNOWN_ERROR,
+				 * 	then we have failed. (Most likely we ran out of reallocation attempts...)
+				 */
+				if (Common::commonLastErrorCode == Common::COMMON_UNKNOWN_ERROR)
+				{
+					/*
+					 * Set COMMON_INTERNAL_ERROR.
+					 * 
+					 * (The system most likely can fetch the link,
+					 *  but we need to limit the reallocation attempts
+					 *  to prevent issues. So it's not appropriate to use
+					 *  FILEUTILLS_PATH_LENGTH_INVALID.)
+					 */
+					Common::commonLastErrorCode = Common::COMMON_INTERNAL_ERROR;
+					COMMON_LOG_INFO("FileUtills::GetExecDirectory(): ");
+					COMMON_LOG_INFO(Common::Get_Error_Message(Common::commonLastErrorCode));
+					COMMON_LOG_INFO(" executable path is too long to retrive due to engine limitation.\n");
+					result = "";
+				}
+			}
+			catch(...)
+			{
+				// Exception thrown.
+				Common::commonLastErrorCode = Common::COMMON_EXCEPTION_THROWN;
+				COMMON_LOG_DEBUG("FileUtills::GetExecDirectory(): ");
+				COMMON_LOG_DEBUG(Common::Get_Error_Message(Common::commonLastErrorCode));
+				COMMON_LOG_DEBUG("\n");
+				result = "";
+			}
+		}
+		else
+		{
+			// Internal error. (PROC_PATH is NOT a symbolic link.)
+			Common::commonLastErrorCode = Common::COMMON_INTERNAL_ERROR;
+			COMMON_LOG_DEBUG("FileUtills::GetExecDirectory(): ");
+			COMMON_LOG_DEBUG(Common::Get_Error_Message(Common::commonLastErrorCode));
+			COMMON_LOG_DEBUG(" PROC_PATH is NOT a symbolic link.\n");
+		}
+	}
+	else
+	{
+		// lstat() Error.
+		errcpy = errno;
+		Common::commonLastErrorCode = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
+		COMMON_LOG_DEBUG("FileUtills::GetExecDirectory(): lstat() system call returned: ");
+		COMMON_LOG_DEBUG(Common::Get_Error_Message(Common::commonLastErrorCode));
+		COMMON_LOG_DEBUG("\n");
+	}
+#endif
+	// Return result.
+	return result;
+}
+
 std::string FileUtills::CheckPathType(const std::string & path)
 {
         // Init vars.
