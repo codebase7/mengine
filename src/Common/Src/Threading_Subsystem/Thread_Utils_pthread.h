@@ -1,21 +1,21 @@
 /*!
     Multiverse Engine Project 16/5/2013 Common Thread_Utils_pthread.h
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
-    you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
+    you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
     either version 2 of the License, or (at your option) any later version.
 
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along with this program; 
+    You should have received a copy of the GNU General Public License along with this program;
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
     Official source repository and project information can be found at
-    https://github.com/codebase7/mengine    
+    https://github.com/codebase7/mengine
 */
 
 // Only define things if the pthread support is enabled.
@@ -29,14 +29,23 @@
 #include <pthread.h>
 #include <cerrno>
 
-namespace Common
-{
-        namespace Thread_Utils
-        {
+// PThreads LibraryID structure.
+// If we are building a plugin, we need to set the plugin flag to true.
+#ifdef MSYS_PLUGIN_BUILD
+		// Building a plugin, so set the plugin flag to true.
+		const Common_LibraryID TU_LibID_pthreads = {true, "Pthreads"};
+
+// Also need to include the plugin header file.
+#include "Thread_Utils_Plugin.h"
+#else
+		// Not a plugin, so set the plugin flag to false.
+		const Common_LibraryID TU_LibID_pthreads = {false, "Pthreads"};
+#endif	// MSYS_PLUGIN_BUILD
+
                 // PThreads Library_Support_Status structure.
-                const Library_Support_Status LibSupport_pthreads =
+                const TU_Library_Support_Status TU_LibSupport_pthreads =
                 {
-                        &Common::Thread_Utils::supportedThreadLibs[1],          // {1, "Pthreads"}  (ID of the thread library that this struct is for.)
+			&TU_LibID_pthreads,          				// {false, "Pthreads"}  (ID of the thread library that this struct is for.)
                         true,                                                   // bThreadsSupport  (Do we support creating threads with this library.)
                         true,                                                   // bJoinThreadSupport   (Do we support joining threads with this library.)
                         true,                                                   // bDetachThreadSupport (Do we support detaching threads with this library.)
@@ -48,7 +57,7 @@ namespace Common
                 };
 
                 // Derived types.
-                class Thread_pthread : public Thread
+                class TU_Thread_pthread : public TU_Thread
                 {
                         private:
                             bool thread_init;               // Used to tell if the user has spawned a thread with this object.
@@ -60,20 +69,20 @@ namespace Common
                         protected:
 
                         public:
-                            Thread_pthread()
+                            TU_Thread_pthread()
                             {
-                                    lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
+                                    lib = TU_LibID_pthreads;      // {false, "Pthreads"}
                                     thread_init = false;
                                     attrib_init = false;
                                     user_attrib = false;
                             }
-                            ~Thread_pthread()
+                            ~TU_Thread_pthread()
                             {
                                     Destroy_Thread();
                             }
 
                             /*!
-                                    short Common::Thread_Utils::Thread_pthread::Create_Thread(void *(*real_funct_ptr)(void*), void * function_args = NULL, unsigned long int * thread_id = NULL)
+                                    short TU_Thread_pthread::Create_Thread(void *(*real_funct_ptr)(void*), void * function_args = NULL, unsigned long int * thread_id = NULL)
 
                                     This function is the real wrapper function for creating threads using the pthreads library.
 
@@ -86,7 +95,7 @@ namespace Common
                             virtual short Create_Thread(void *(*real_funct_ptr)(void*), void * function_args = NULL, unsigned long int * thread_id = NULL);
 
                             /*!
-                                    short Common::Thread_Utils::Thread_pthread::Destroy_Thread()
+                                    short TU_Thread_pthread::Destroy_Thread()
 
                                     This function is the real wrapper function for destroying threads using the pthreads library.
 
@@ -98,7 +107,7 @@ namespace Common
                             short Destroy_Thread();
 
                             /*!
-                                    short Common::Thread_Utils::Thread_pthread::Detach_Thread()
+                                    short TU_Thread_pthread::Detach_Thread()
 
                                     This function is the real wrapper function for detaching threads using the pthreads library.
 
@@ -110,7 +119,7 @@ namespace Common
                             short Detach_Thread();
 
                             /*!
-                                    short Common::Thread_Utils::Thread_pthread::Join_Thread(void ** ret_from_thread = NULL)
+                                    short TU_Thread_pthread::Join_Thread(void ** ret_from_thread = NULL)
 
                                     This function is the real wrapper function for joining threads using the pthreads library.
 
@@ -124,7 +133,7 @@ namespace Common
                             // Below is library specific functions.
 
                             /*!
-                                    short Common::Thread_Utils::Thread_pthread::Set_Attribs(pthread_attr_t * attr = NULL)
+                                    short TU_Thread_pthread::Set_Attribs(pthread_attr_t * attr = NULL)
 
                                     This function allows setting the attributes object for the created thread.
                                     Note: The attributes object must be set before calling Create_Thread(). Setting the attributes
@@ -141,7 +150,7 @@ namespace Common
                             short Set_Attribs(pthread_attr_t * attr = NULL);
                 };
 
-                class Mutex_pthread : public Mutex, public Generic_Wrapper
+                class TU_Mutex_pthread : public TU_Mutex, public Common_Generic_Wrapper
                 {
                         private:
                             int rc_from_prevOP;             // Return code from the actual thread library function.
@@ -154,25 +163,25 @@ namespace Common
                             pthread_mutexattr_t attribs;    // Attribs for the mutex.
 
                         public:
-                            Mutex_pthread()
+                            TU_Mutex_pthread()
                             {
-                                    lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
+                                    lib = TU_LibID_pthreads;      // {false, "Pthreads"}
                                     rc_from_prevOP = 0;
                                     mutex_init = false;
                                     attrib_init = false;
                                     user_attrib = false;
                             }
-                            ~Mutex_pthread()
+                            ~TU_Mutex_pthread()
                             {
                                     Destroy_Mutex();
                             }
 
                             // Accessor function for the lib.
-                            virtual const Common::LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
+                            virtual const Common_LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
                             virtual int Get_Return_Code() const;        // Used to get return code from the external library. (NOT Thread_Utils!)
 
                             /*!
-                                    short Common::Thread_Utils::Mutex_pthread::Init_Mutex()
+                                    short TU_Mutex_pthread::Init_Mutex()
 
                                     This function is the real wrapper function for creating mutexes using the pthreads library.
 
@@ -185,7 +194,7 @@ namespace Common
                             short Init_Mutex();
 
                             /*!
-                                    short Common::Thread_Utils::Mutex_pthread::Destroy_Mutex()
+                                    short TU_Mutex_pthread::Destroy_Mutex()
 
                                     This function is the real wrapper function for destroying mutexes using the pthreads library.
 
@@ -198,7 +207,7 @@ namespace Common
                             short Destroy_Mutex();
 
                             /*!
-                                    short Common::Thread_Utils::Mutex_pthread::Lock_Mutex()
+                                    short TU_Mutex_pthread::Lock_Mutex()
 
                                     This function is the real wrapper function for locking mutexes using the pthreads library.
 
@@ -212,7 +221,7 @@ namespace Common
                             short Lock_Mutex();
 
                             /*!
-                                    short Common::Thread_Utils::Mutex_pthread::Try_Lock_Mutex()
+                                    short TU_Mutex_pthread::Try_Lock_Mutex()
 
                                     This function is the real wrapper function for trying to lock a mutex using the pthreads library.
 
@@ -227,7 +236,7 @@ namespace Common
                             short Try_Lock_Mutex();
 
                             /*!
-                                    short Common::Thread_Utils::Mutex_pthread::Unlock_Mutex()
+                                    short TU_Mutex_pthread::Unlock_Mutex()
 
                                     This function is the real wrapper function for unlocking mutexes using the pthreads library.
 
@@ -242,7 +251,7 @@ namespace Common
                             // BELOW HERE IS LIBRARY SPECIFIC FUNCTIONS.
 
                             /*!
-                                    short Common::Thread_Utils::Mutex_pthread::Set_Attribs(pthread_mutexattr_t * attr)
+                                    short TU_Mutex_pthread::Set_Attribs(pthread_mutexattr_t * attr)
 
                                     This function allows you to set the pthread_mutexattr_t object used to init the mutex.
 
@@ -252,7 +261,7 @@ namespace Common
                             short Set_Attribs(pthread_mutexattr_t * attr = NULL);
 
                             /*!
-                                    short Common::Thread_Utils::Mutex_pthread::Destroy_Mutex_Only()
+                                    short TU_Mutex_pthread::Destroy_Mutex_Only()
 
                                     This function only destroys the mutex itself. Not the attribs object.
 
@@ -263,7 +272,7 @@ namespace Common
                             short Destroy_Mutex_Only();
                 };
 
-                class Condition_pthread : public Condition, public Mutex_pthread
+                class TU_Condition_pthread : public TU_Condition, public TU_Mutex_pthread
                 {
                         private:
                             int rc_from_prevOP;             // Return code from the actual thread library function.
@@ -278,9 +287,9 @@ namespace Common
                         protected:
 
                         public:
-                            Condition_pthread()
+                            TU_Condition_pthread()
                             {
-                                    lib = Common::Thread_Utils::supportedThreadLibs[1];      // {1, "Pthreads"}
+                                    lib = TU_LibID_pthreads;      // {false, "Pthreads"}
                                     rc_from_prevOP = 0;
                                     condition_init = false;
                                     attrib_init = false;
@@ -288,17 +297,17 @@ namespace Common
                                     cattrib_init = false;
                                     cuser_attrib = false;
                             }
-                            ~Condition_pthread()
+                            ~TU_Condition_pthread()
                             {
 
                             }
 
                             // Accessor function for the lib.
-                            virtual const Common::LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
+                            virtual const Common_LibraryID & Get_Thread_Library() const;   // Used to return the external LibraryID for this object.
                             virtual int Get_Return_Code() const;        // Used to get return code from the external library. (NOT Thread_Utils!)
 
                             /*!
-                                    short Common::Thread_Utils::Condition_pthread::Init_Condition()
+                                    short TU_Condition_pthread::Init_Condition()
 
                                     This function is the real wrapper function for creating condition variables using the pthreads library.
 
@@ -315,7 +324,7 @@ namespace Common
                             short Init_Condition();
 
                             /*!
-                                    short Common::Thread_Utils::Condition_pthread::Destroy_Condition()
+                                    short TU_Condition_pthread::Destroy_Condition()
 
                                     This function is the real wrapper function for destroying condition variables using the pthreads library.
 
@@ -328,7 +337,7 @@ namespace Common
                             short Destroy_Condition();
 
                             /*!
-                                    short Common::Thread_Utils::Condition_pthread::Wait()
+                                    short TU_Condition_pthread::Wait()
 
                                     This function will block the calling thread until a signal is received to continue.
 
@@ -348,7 +357,7 @@ namespace Common
                             short Wait();
 
                             /*!
-                                    short Common::Thread_Utils::Condition_pthread::Timed_Wait(const unsigned long & seconds_to_wait)
+                                    short TU_Condition_pthread::Timed_Wait(const unsigned long & seconds_to_wait)
 
                                     This function will block the calling thread until a signal is received to continue OR the requested amount of time
                                     in seconds has passed.
@@ -371,7 +380,7 @@ namespace Common
                             short Timed_Wait(const unsigned long & seconds_to_wait);
 
                             /*!
-                                    short Common::Thread_Utils::Condition_pthread::Signal()
+                                    short TU_Condition_pthread::Signal()
 
                                     This function tells a thread waiting on this condition object to continue.
 
@@ -385,7 +394,7 @@ namespace Common
                             // BELOW HERE IS LIBRARY SPECIFIC FUNCTIONS.
 
                             /*!
-                                    short Common::Thread_Utils::Condition_pthread::Set_Attribs(pthread_condattr_t * attr)
+                                    short TU_Condition_pthread::Set_Attribs(pthread_condattr_t * attr)
 
                                     This function allows you to set the pthread_condattr_t object used to init the condition variable.
 
@@ -394,10 +403,76 @@ namespace Common
                             */
                             short Set_Attribs(pthread_condattr_t * attr = NULL);
                 };
-        };
-};
 
-#endif
-#endif
+// Define the factories.
+/*!
+ * 	TU_Thread * TU_Create_Pthread_Thread_Object()
+ *
+ * 	Factory used by the Common::Thread_Utils::Create_Thread() function, to create a
+ * 	thread object.
+ * 	(Used for internal support. I.e. A library built into the engine.)
+ *
+ * 	Note: It's the caller's job to delete the thread variable out of memory when done with it.
+ *
+ * 	Returns a valid pointer on success, otherwise returns NULL.
+ */
+TU_Thread * TU_Create_Pthread_Thread_Object();
+
+/*!
+ * 	TU_Mutex * TU_Create_Pthread_Mutex_Object()
+ *
+ * 	Factory used by the Common::Thread_Utils::Create_Mutex() function, to create a
+ * 	mutex object.
+ * 	(Used for internal support. I.e. A library built into the engine.)
+ *
+ * 	Note: It's the caller's job to delete the mutex variable out of memory when done with it.
+ *
+ * 	Returns a valid pointer on success, otherwise returns NULL.
+ */
+TU_Mutex * TU_Create_Pthread_Mutex_Object();
+
+/*!
+ * 	TU_Condition * TU_Create_Pthread_Condition_Object()
+ *
+ * 	Factory used by the Common::Thread_Utils::Create_Condition() function, to create a
+ * 	condition variable object.
+ * 	(Used for internal support. I.e. A library built into the engine.)
+ *
+ * 	Note: It's the caller's job to delete the condition variable out of memory when done with it.
+ *
+ * 	Returns a valid pointer on success, otherwise returns NULL.
+ */
+TU_Condition * TU_Create_Pthread_Condition_Object();
+
+// Define destroyers.
+/*!
+ * 	void TU_Destroy_Pthread_Thread_Object(TU_Thread ** thread)
+ *
+ * 	Destroyer used by the Common::Thread_Utils::Destroy_Thread() function, to destroy a
+ * 	thread object.
+ * 	(Used for internal support. I.e. A library built into the engine.)
+ */
+void TU_Destroy_Pthread_Thread_Object(TU_Thread ** thread);
+
+/*!
+ * 	void TU_Destroy_Pthread_Mutex_Object(TU_Mutex ** mu)
+ *
+ * 	Destroyer used by the Common::Thread_Utils::Destroy_Mutex() function, to destroy a
+ * 	mutex object.
+ * 	(Used for internal support. I.e. A library built into the engine.)
+ */
+void TU_Destroy_Pthread_Mutex_Object(TU_Mutex ** mu);
+
+/*!
+ * 	void TU_Destroy_Pthread_Condition_Object(TU_Condition ** cond)
+ *
+ * 	Destroyer used by the Common::Thread_Utils::Destroy_Condition() function, to destroy a
+ * 	condition variable object.
+ * 	(Used for internal support. I.e. A library built into the engine.)
+ */
+void TU_Destroy_Pthread_Condition_Object(TU_Condition ** cond);
+
+#endif	// THREAD_UTILS_PTHREAD_H
+#endif	// TW_PTHREADS_SUPPORT
 
 // End of Thread_Utils_pthread.h

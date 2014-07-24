@@ -1,7 +1,7 @@
 /*!
     Multiverse Engine Project 31/7/2013 Common Generic_Wrapper.h 
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -23,41 +23,36 @@
 
 // Include LibraryID_Struct.h.
 #include "LibraryID_Struct.h"
+#include <stddef.h> // Defines NULL.
 
-namespace Common
-{
 	/*!
-	 * 	class Common::Generic_Wrapper
+	 * 	class Common_Generic_Wrapper
 	 * 
 	 * 	This class is a generic class for creating a library wrapper.
 	*/
-	class Generic_Wrapper
+	class Common_Generic_Wrapper
 	{
 		private:
 		
 		protected:
 			// Define LibraryID struct.
-			Common::LibraryID lib;		// Identifies the library in use.
-			
+			Common_LibraryID lib;		// Identifies the library in use.
+
 		public:
 			/*!
-			 * 	const char * Common::Generic_Wrapper::Get_Library_Name()
+			 * 	const char * Common_Generic_Wrapper::Get_Library_Name()
 			 * 
 			 * 	This function returns a c-string with the name of the library in use.
 			 */
 			const char * Get_Library_Name();
 			
 			/*!
-			 * 	short Common::Generic_Wrapper::Get_Library_ID()
+			 * 	bool Common_Generic_Wrapper::Is_Library_A_Plugin()
 			 * 
-			 * 	This function returns a short containing the library's ID number.
-			 * 
-			 * 	(Note: Library ID numbers are specific to the wrapper in use, and may not be
-			 * 	the same in all instances.)
+			 * 	This function returns whether or not the library is a loaded plugin.
 			 */
-			short Get_Library_ID();
+			bool Is_Library_A_Plugin();
 	};
-};
 #endif
 
 // End of Generic_Wrapper.h

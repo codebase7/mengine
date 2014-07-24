@@ -1,7 +1,7 @@
 /*!
     Multiverse Engine Project 01/7/2013 Common LibraryID_Struct.h
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -21,14 +21,11 @@
 #ifndef LIBRARYID_STRUCT_H
 #define LIBRARYID_STRUCT_H
 
-namespace Common
-{
-	struct LibraryID {
-	  short IDNum;
-	  const char * Name;
-	};
+struct Common_LibraryID {
+	bool bIsPlugin;
+	const char * Name;
 };
-		
+
 #endif
 
 // End of LibraryID_Struct.h

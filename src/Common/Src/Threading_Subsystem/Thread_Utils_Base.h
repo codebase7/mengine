@@ -1,7 +1,7 @@
 /*!
     Multiverse Engine Project 16/5/2013 Common Thread_Utils_Base.h
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -21,30 +21,12 @@
 #ifndef THREAD_UTILS_BASE_H
 #define THREAD_UTILS_BASE_H
 
-namespace Common
-{
-        namespace Thread_Utils
-        {
-                // Below is a instance of the Library_Support_Status struct for the none / unsupported library.
-                const Library_Support_Status LibSupport_none =
-                {
-                        &Common::Thread_Utils::supportedThreadLibs[0],           // idNum                                (ID of the thread library that this struct is for.)
-                        false,          // bThreadsSupport                      (Do we support creating threads with this library.)
-                        false,          // bJoinThreadSupport                   (Do we support joining threads with this library.)
-                        false,          // bDetachThreadSupport                 (Do we support detaching threads with this library.)
-                        false,          // bLibraryRequiresSpecificFunctionSig  (Do we require that the user use a specific function signature when creating threads?)
-                        false,          // bMutexesSupport                      (Do we support creating mutexes with this library. Also basic lock and unlock support.)
-                        false,          // bTryLockSupport                      (Do we support trying to lock mutexes with this library.)
-                        false,          // bConditionVariableSupport            (Do we support condition variables with this library.)
-                        false           // bConditionWaitTimeoutSupport         (Do we support a timeout limit when waiting on a condition variable with this library.)
-                };
-
                 /*!
-                        class Common::Thread_Utils::Thread
+                        class TU_Thread
 
                         This class is used to contain information about threads used with the thread wrapper.
                 */
-                class Thread : public Generic_Wrapper
+                class TU_Thread : public Common_Generic_Wrapper
                 {
                         private:
 
@@ -52,17 +34,17 @@ namespace Common
                             int rc_from_prevOP;             // Return code from the actual thread library function.
 
                         public:
-                            Thread()
+                            TU_Thread()
                             {
-                                    lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    lib = TU_LibID_none;      // None / Unsupported.
                                     rc_from_prevOP = -3;
                             }
-                            virtual ~Thread()
+                            virtual ~TU_Thread()
                             {
 
                             }
 
-                            const Common::LibraryID & Get_Thread_Library() const;
+                            const Common_LibraryID & Get_Thread_Library() const;
                             int Get_Return_Code() const;
 
                             virtual short Create_Thread(void *(*real_funct_ptr)(void*), void * function_args = NULL, unsigned long int * thread_id = NULL);
@@ -73,18 +55,18 @@ namespace Common
                 };
 
                 /*!
-                        class Common::Thread_Utils::Mutex
+                        class TU_Mutex
 
                         This class is a generic wrapper for mutexes.
 
                         Note: That this class does not contain the REAL mutex.
                         The mutex is defined in the wrapper, by deriving the actual class from this one.
                 */
-                class Mutex
+                class TU_Mutex
                 {
                         private:
                         /*
-                            Common::LibraryID thread_lib;   // Thread library used to create mutex.
+                            Common_LibraryID thread_lib;   // Thread library used to create mutex.
                             int rc_from_prevOP;             // Return code from the actual thread library function.
                             NOTE: The above is only here to show intent. A derived class should put the above in it's
                             private feild. (To allow other classes to deive from it.)
@@ -95,20 +77,20 @@ namespace Common
                         public:
                             /*
                             A basic constructor to show how the drived object should work. (I.e what vars to set at initilization.)
-                            Mutex()
+                            TU_Mutex()
                             {
-                                    lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    lib = TU_LibID_none;      // None / Unsupported.
                                     rc_from_prevOP = -3;
                             }
                             */
 
-                            virtual ~Mutex()
+                            virtual ~TU_Mutex()
                             {
 
                             }
 
                             // Accessor function for the thread_lib.
-                            virtual const Common::LibraryID & Get_Thread_Library() const = 0;  	// Used to return the external LibraryID for this object.
+                            virtual const Common_LibraryID & Get_Thread_Library() const = 0;  	// Used to return the external LibraryID for this object.
                             virtual int Get_Return_Code() const = 0;        // Used to get return code from the external library. (NOT Thread_Utils!)
 
                             virtual short Init_Mutex() = 0;
@@ -119,7 +101,7 @@ namespace Common
                 };
 
                 /*!
-                        class Common::Thread_Utils::Condition
+                        class TU_Condition
 
                         This class is a generic wrapper for condition variables.
 
@@ -130,11 +112,11 @@ namespace Common
                         Note: That this class does not contain the REAL condition variable.
                         The condition variable is defined in the wrapper, by deriving the actual class from this one.
                 */
-                class Condition
+                class TU_Condition
                 {
                         private:
                         /*
-                            Common::LibraryID thread_lib;   // Thread library used to create mutex.
+                            Common_LibraryID thread_lib;   // Thread library used to create mutex.
                             int rc_from_prevOP;             // Return code from the actual thread library function.
                             NOTE: The above is only here to show intent. A derived class should put the above in it's
                             private feild. (To allow other classes to deive from it.)
@@ -145,20 +127,20 @@ namespace Common
                         public:
                             /*
                             A basic constructor to show how the drived object should work. (I.e what vars to set at initilization.)
-                            Condition()
+                            TU_Condition()
                             {
-                                    lib = Common::Thread_Utils::supportedThreadLibs[0];      // None / Unsupported.
+                                    lib = TU_LibID_none;      // None / Unsupported.
                                     rc_from_prevOP = -3;
                             }
                             */
 
-                            virtual ~Condition()
+                            virtual ~TU_Condition()
                             {
 
                             }
 
                             // Accessor function for the thread_lib.
-                            virtual const Common::LibraryID & Get_Thread_Library() const = 0;   // Used to return the external LibraryID for this object.
+                            virtual const Common_LibraryID & Get_Thread_Library() const = 0;   // Used to return the external LibraryID for this object.
                             virtual int Get_Return_Code() const = 0;        // Used to get return code from the external library. (NOT Thread_Utils!)
 
                             virtual short Init_Condition() = 0;
@@ -167,8 +149,6 @@ namespace Common
                             virtual short Timed_Wait(const unsigned long & seconds_to_wait) = 0;
                             virtual short Signal() = 0;
                 };
-        };
-};
 
 #endif
 

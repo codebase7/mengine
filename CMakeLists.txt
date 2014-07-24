@@ -14,6 +14,7 @@ message(STATUS "Build output directories not set, defaulting to ./build")
 set(T_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/build/${CMAKE_BUILD_TYPE} CACHE PATH "Build top level output directory")
 set(B_OUTPUT_DIR ${T_OUTPUT_DIR} CACHE PATH "Build executable output directory")
 set(L_OUTPUT_DIR ${T_OUTPUT_DIR}/lib CACHE PATH "Build library output directory")
+set(PLUGIN_OUTPUT_DIR ${L_OUTPUT_DIR}/plugins CACHE PATH "Build plugin output directory")
 set(O_OUTPUT_DIR ${T_OUTPUT_DIR}/obj CACHE PATH "Build object output directory")
 endif()
 

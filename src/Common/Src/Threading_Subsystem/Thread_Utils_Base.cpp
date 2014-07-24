@@ -1,7 +1,7 @@
 /*!
     Multiverse Engine Project 20/5/2013 Common Thread_Utils_Base.cpp
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -20,31 +20,31 @@
 
 #include "Thread_Utils.h"
 
-const Common::LibraryID & Common::Thread_Utils::Thread::Get_Thread_Library() const
+const Common_LibraryID & TU_Thread::Get_Thread_Library() const
 {
         // Return thread library ID.
         return this->lib;
 }
 
-int Common::Thread_Utils::Thread::Get_Return_Code() const
+int TU_Thread::Get_Return_Code() const
 {
         // Return last library return code.
         return this->rc_from_prevOP;
 }
 
-short Common::Thread_Utils::Thread::Create_Thread(void *(*real_funct_ptr)(void*), void * function_args, unsigned long int * thread_id)
+short TU_Thread::Create_Thread(void *(*real_funct_ptr)(void*), void * function_args, unsigned long int * thread_id)
 {
         // Return not implimented. (This function is NOT implimented here as it's only a placeholder. The base class does not have a thread object.)
         return -3;
 }
 
-short Common::Thread_Utils::Thread::Detach_Thread()
+short TU_Thread::Detach_Thread()
 {
         // Return not implimented. (This function is NOT implimented here as it's only a placeholder. The base class does not have a thread object.)
         return -3;
 }
 
-short Common::Thread_Utils::Thread::Join_Thread(void ** ret_from_thread)
+short TU_Thread::Join_Thread(void ** ret_from_thread)
 {
         // Return not implimented. (This function is NOT implimented here as it's only a placeholder. The base class does not have a thread object.)
         return -3;

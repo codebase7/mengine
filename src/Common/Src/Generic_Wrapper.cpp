@@ -1,7 +1,7 @@
 /*!
     Multiverse Engine Project 31/7/2013 Common Generic_Wrapper.cpp
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
@@ -20,12 +20,14 @@
 
 #include "Generic_Wrapper.h"
 
-const char * Common::Generic_Wrapper::Get_Library_Name()
+const char * Common_Generic_Wrapper::Get_Library_Name()
 {
-	return this->lib.Name;
+	// Return result.
+	this->lib.Name;
 }
 
-short Common::Generic_Wrapper::Get_Library_ID()
+bool Common_Generic_Wrapper::Is_Library_A_Plugin()
 {
-	return this->lib.IDNum;
+	// Return result.
+	return this->lib.bIsPlugin;;
 }

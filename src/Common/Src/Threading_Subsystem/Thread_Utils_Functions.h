@@ -1,75 +1,114 @@
 /*!
     Multiverse Engine Project 18/5/2013 Common Thread_Utils_Functions.h
 
-    Copyright (C) 2013 Multiverse Engine Project
+    Copyright (C) 2014 Multiverse Engine Project
 
     This program is free software;
-    you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; 
+    you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
     either version 2 of the License, or (at your option) any later version.
 
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License along with this program; 
+    You should have received a copy of the GNU General Public License along with this program;
     if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
     Official source repository and project information can be found at
     https://github.com/codebase7/mengine
 */
 
+// Include guard.
 #ifndef THREAD_UTILS_FUNCTIONS_H
 #define THREAD_UTILS_FUNCTIONS_H
 
+// Check for THREAD_UTILS_H.
+#ifndef THREAD_UTILS_H
+#error "This header is included by Thread_Utils.h, do not include it directly."
+#endif
+
 namespace Common
 {
-        namespace Thread_Utils
-        {
+	namespace Thread_Utils
+	{
                 /*!
-                        short Common::Thread_Utils::Get_Number_of_Supported_Thread_Libraries()
+                        size_t TU_Get_Number_of_Supported_Thread_Libraries()
 
-                        This function is used internaly to get the total number of supported threading libraries at runtime.
+                        This function is used to get the total number of supported threading libraries at runtime.
                 */
-                short Get_Number_of_Supported_Thread_Libraries();
+                size_t Get_Number_of_Supported_Thread_Libraries();
 
                 /*!
-                        Common::Thread_Utils::Thread * Common::Thread_Utils::Create_Thread(const Common::LibraryID & lib)
+                        Common::Thread_Utils::Thread * Common::Thread_Utils::Create_Thread(const Common_LibraryID & lib)
 
                         This function creates a thread class object for use with the given thread library.
                         Note: This function uses new to allocate the new object.
                         When you are done with it you must use delete to release it's memory.
+                        (Call Common::Thread_Utils::Destroy_Thread() to release it.)
 
                         Returns a pointer to the created thread class object if successfull.
                         Otherwise returns NULL.
                 */
-                Thread * Create_Thread(const Common::LibraryID & lib);
+                TU_Thread * Create_Thread(const Common_LibraryID & lib);
 
                 /*!
-                        Common::Thread_Utils::Mutex * Common::Thread_Utils::Create_Mutex(const Common::LibraryID & lib)
+                        Common::Thread_Utils::Mutex * Common::Thread_Utils::Create_Mutex(const Common_LibraryID & lib)
 
                         This function creates a mutex class object for use with the given thread library.
                         Note: This function uses new to allocate the new object.
                         When you are done with it you must use delete to release it's memory.
+                        (Call Common::Thread_Utils::Destroy_Mutex() to release it.)
 
                         Returns a pointer to the created mutex class object if successfull.
                         Otherwise returns NULL.
                 */
-                Mutex * Create_Mutex(const Common::LibraryID & lib);
+                TU_Mutex * Create_Mutex(const Common_LibraryID & lib);
 
                 /*!
-                        Common::Thread_Utils::Condition * Common::Thread_Utils::Create_Condition(const Common::LibraryID & lib)
+                        Common::Thread_Utils::Condition * Common::Thread_Utils::Create_Condition(const Common_LibraryID & lib)
 
                         This function creates a condition class object for use with the given thread library.
                         Note: This function uses new to allocate the new object.
                         When you are done with it you must use delete to release it's memory.
+                        (Call Common::Thread_Utils::Destroy_Condition() to release it.)
 
                         Returns a pointer to the created condition class object if successfull.
                         Otherwise returns NULL.
                 */
-                Condition * Create_Condition(const Common::LibraryID & lib);
+                TU_Condition * Create_Condition(const Common_LibraryID & lib);
+
+		/*!
+                        bool Common::Thread_Utils::Destroy_Thread(TU_Thread ** thread)
+
+                        This function destroys a thread class object using it's thread library.
+
+                        Returns true if successful, (given pointer will be NULL.)
+                        Otherwise returns false.
+                */
+                bool Destroy_Thread(TU_Thread ** thread);
 
                 /*!
-                        void Common::Thread_Utils::Init_Library_Support_Status(Common::Thread_Utils::Library_Support_Status * str)
+                        bool Common::Thread_Utils::Destroy_Mutex(TU_Mutex ** mu)
+
+                        This function destroys a mutex class object using it's thread library.
+
+                        Returns true if successful, (given pointer will be NULL.)
+                        Otherwise returns false.
+                */
+                bool Destroy_Mutex(TU_Mutex ** mu);
+
+                /*!
+                        bool Common::Thread_Utils::Destroy_Condition(TU_Condition ** cond)
+
+                        This function destroys a condition class object using it's thread library.
+
+                        Returns true if successful, (given pointer will be NULL.)
+                        Otherwise returns false.
+                */
+                bool Destroy_Condition(TU_Condition ** cond);
+
+                /*!
+                        void TU_Init_Library_Support_Status(TU_Library_Support_Status * str)
 
                         This function initilizes a Library_Support_Status structure.
 
@@ -80,19 +119,19 @@ namespace Common
 
                         This function is to be used by users of the library only. (Mainly for creating structures to pass to Select_Library().)
                 */
-                void Init_Library_Support_Status(Library_Support_Status * str);
+                void Init_Library_Support_Status(TU_Library_Support_Status * str);
 
                 /*!
-                        const Common::Thread_Utils::Library_Support_Status * Common::Thread_Utils::Get_Library_Stats(const Common::LibraryID & lib)
+                        const TU_Library_Support_Status * TU_Get_Library_Stats(const Common_LibraryID & lib)
 
                         This function returns the support status of a given library.
                         (I.e What functions are supported by Thread_Utils.)
                 */
-                const Library_Support_Status * Get_Library_Stats(const Common::LibraryID & lib);
+                const TU_Library_Support_Status * Get_Library_Stats(const Common_LibraryID & lib);
 
                 /*!
-                        const Common::Thread_Utils::LibraryID & Common::Thread_Utils::Select_Library(const Common::Thread_Utils::Library_Support_Status & required_stats,
-                                                                                                     const Common::LibraryID & skip_past_this_lib)
+                        const Common_LibraryID & TU_Select_Library(const TU_Library_Support_Status & required_stats,
+                                                                   const Common_LibraryID & skip_past_this_lib)
 
                         This function accepts a library support status structure created by the user, plus an optional library ID to skip past (see below),
                         and returns the ID for a supported library that best matches that structure.
@@ -122,10 +161,23 @@ namespace Common
 
                         Otherwise the first library (after any skipped libraries) that supports all of the requested requirements is returned.
                 */
-                const Common::LibraryID & Select_Library(const Library_Support_Status & required_stats, const Common::LibraryID & skip_past_this_lib = Common::Thread_Utils::supportedThreadLibs[0]); // supportedThreadLibs[0] = {0, "None / Unsupported"}
-        };
-};
+                const Common_LibraryID & Select_Library(const TU_Library_Support_Status & required_stats, const Common_LibraryID & skip_past_this_lib = TU_LibID_none); // TU_LibID_none = {false, "None / Unsupported"}
 
-#endif
+#ifdef MSYS_PLUGIN_SUPPORT
+		// Only define the plugin loader function if plugin support is enabled.
+		/*
+		 * 	Note: A plugin cannot have the same LibraryID data structure as another loaded plugin.
+		 * 	If we attempt to load a plugin with the same LibraryID data structure as another plugin,
+		 * 	the first plugin will be kept and all remaining plugins will be unloaded from memory.
+		 * 
+		 * 	This function can only be run once. (It's called in Select_Library() if it's the first
+		 * 	time that function has been called. For that reason, this function is considered internal
+		 * 	to the engine and should not be called externally.)
+		 */
+		bool Load_Plugins(const char * pluginPath);
+#endif	// MSYS_PLUGIN_SUPPORT
+	}
+}
+#endif	// THREAD_UTILS_FUNCTIONS_H
 
 // End of Thread_Utils_Functions.h
