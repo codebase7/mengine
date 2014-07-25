@@ -275,96 +275,72 @@ int CheckPermissions(const std::string & path, Panic::ERROR & error, bool read =
 int CheckPermissions(const std::string & path, bool read = true, bool write = true);
 
 /*!
-          short FileUtills::GetFreespace(const std::string & path, size_t & result)
-          Returns the remaining disk space in Megabytes (SI Unit) on the given disk.
+	int FileUtills::GetGigaFreespace(const std::string & path, size_t & result)
 
-          Note if an error occurs, result will be set to zero, and an error code will be returned.
-          (Although result can also be set to zero if there really is no remaining disk space.)
+	Returns the remaining disk space in Gigabytes (SI Unit) on the given disk.
 
-          std::string path : volume / path to check.
-          Returns 0 if successfull, result will contain the remaining space.
-          Returns -1 if an input / output error occurs.
-          Returns -2 if a permission error is found.
-          Returns -3 if function is unimplemented on the target platform.
-          Returns -4 if too many symbolic links are encountered.
-          Returns -5 if the given path is too long for the filesystem to handle.
-          Returns -6 if the given path does not exist.
-          Returns -7 if the filesystem is unsupported.
-          Returns -8 if a part of the path is not a valid directory.
-          Returns -9 if some data was too big to returned.
-          Returns -10 if we run out of kernel memory.
-          Returns -11 for all other errors.
+	Note if an error occurs, result will be set to zero, and an error code will be returned.
+	(Although result can also be set to zero if there really is no remaining disk space.)
+
+	@pram const std::string & path : volume / path to check.
+	@pram size_t & result : The remaining space on the filesystem.
+
+	Returns Common::COMMON_SUCCESS if successfull, result will contain the remaining space.
+	Returns a Common namespace error if an error occurs. Size will be equal to zero in this
+	case. To obtain more detailed info register an error hander before calling this function.
 */
-short GetFreespace(const std::string & path, size_t & result);
+int GetGigaFreespace(const std::string & path, size_t & result);
 
 /*!
-          short FileUtills::GetKiloFreespace(const std::string & path, size_t & result)
-          Returns the remaining disk space in Kilobytes (SI Unit) on the given disk.
+	int FileUtills::GetFreespace(const std::string & path, size_t & result)
 
-          Note if an error occurs, result will be set to zero, and an error code will be returned.
-          (Although result can also be set to zero if there really is no remaining disk space.)
+	Returns the remaining disk space in Megabytes (SI Unit) on the given disk.
 
-          std::string path : volume / path to check.
-          Returns 0 if successfull, result will contain the remaining space.
-          Returns -1 if an input / output error occurs.
-          Returns -2 if a permission error is found.
-          Returns -3 if function is unimplemented on the target platform.
-          Returns -4 if too many symbolic links are encountered.
-          Returns -5 if the given path is too long for the filesystem to handle.
-          Returns -6 if the given path does not exist.
-          Returns -7 if the filesystem is unsupported.
-          Returns -8 if a part of the path is not a valid directory.
-          Returns -9 if some data was too big to returned.
-          Returns -10 if we run out of kernel memory.
-          Returns -11 for all other errors.
+	Note if an error occurs, result will be set to zero, and an error code will be returned.
+	(Although result can also be set to zero if there really is no remaining disk space.)
+
+	@pram const std::string & path : volume / path to check.
+	@pram size_t & result : The remaining space on the filesystem.
+
+	Returns Common::COMMON_SUCCESS if successfull, result will contain the remaining space.
+	Returns a Common namespace error if an error occurs. Size will be equal to zero in this
+	case. To obtain more detailed info register an error hander before calling this function.
 */
-short GetKiloFreespace(const std::string & path, size_t & result);
+int GetFreespace(const std::string & path, size_t & result);
 
 /*!
-          short FileUtills::GetByteFreespace(const std::string & path, size_t & result)
-          Returns the remaining disk space in Bytes (SI Unit) on the given disk.
+	int FileUtills::GetKiloFreespace(const std::string & path, size_t & result)
 
-          Note if an error occurs, result will be set to zero, and an error code will be returned.
-          (Although result can also be set to zero if there really is no remaining disk space.)
+	Returns the remaining disk space in Kilobytes (SI Unit) on the given disk.
 
-          std::string path : volume / path to check.
-          Returns 0 if successfull, result will contain the remaining space.
-          Returns -1 if an input / output error occurs.
-          Returns -2 if a permission error is found.
-          Returns -3 if function is unimplemented on the target platform.
-          Returns -4 if too many symbolic links are encountered.
-          Returns -5 if the given path is too long for the filesystem to handle.
-          Returns -6 if the given path does not exist.
-          Returns -7 if the filesystem is unsupported.
-          Returns -8 if a part of the path is not a valid directory.
-          Returns -9 if some data was too big to returned.
-          Returns -10 if we run out of kernel memory.
-          Returns -11 for all other errors.
+	Note if an error occurs, result will be set to zero, and an error code will be returned.
+	(Although result can also be set to zero if there really is no remaining disk space.)
+
+	@pram const std::string & path : volume / path to check.
+	@pram size_t & result : The remaining space on the filesystem.
+
+	Returns Common::COMMON_SUCCESS if successfull, result will contain the remaining space.
+	Returns a Common namespace error if an error occurs. Size will be equal to zero in this
+	case. To obtain more detailed info register an error hander before calling this function.
 */
-short GetByteFreespace(const std::string & path, size_t & result);
+int GetKiloFreespace(const std::string & path, size_t & result);
 
 /*!
-          short FileUtills::GetGigaFreespace(const std::string & path, size_t & result)
-          Returns the remaining disk space in Gigabytes (SI Unit) on the given disk.
+	int FileUtills::GetByteFreespace(const std::string & path, size_t & result)
 
-          Note if an error occurs, result will be set to zero, and an error code will be returned.
-          (Although result can also be set to zero if there really is no remaining disk space.)
+	Returns the remaining disk space in Bytes (SI Unit) on the given disk.
 
-          std::string path : volume / path to check.
-          Returns 0 if successfull, result will contain the remaining space.
-          Returns -1 if an input / output error occurs.
-          Returns -2 if a permission error is found.
-          Returns -3 if function is unimplemented on the target platform.
-          Returns -4 if too many symbolic links are encountered.
-          Returns -5 if the given path is too long for the filesystem to handle.
-          Returns -6 if the given path does not exist.
-          Returns -7 if the filesystem is unsupported.
-          Returns -8 if a part of the path is not a valid directory.
-          Returns -9 if some data was too big to returned.
-          Returns -10 if we run out of kernel memory.
-          Returns -11 for all other errors.
+	Note if an error occurs, result will be set to zero, and an error code will be returned.
+	(Although result can also be set to zero if there really is no remaining disk space.)
+
+	@pram const std::string & path : volume / path to check.
+	@pram size_t & result : The remaining space on the filesystem.
+
+	Returns Common::COMMON_SUCCESS if successfull, result will contain the remaining space.
+	Returns a Common namespace error if an error occurs. Size will be equal to zero in this
+	case. To obtain more detailed info register an error hander before calling this function.
 */
-short GetGigaFreespace(const std::string & path, size_t & result);
+int GetByteFreespace(const std::string & path, size_t & result);
 
 /*!
         short FileUtills::DeletePath(const std::string & path, const bool & recursive)

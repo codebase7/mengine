@@ -613,305 +613,140 @@ FileUtills::dirlist * FileUtills::getDirectory(const std::string & path, const b
 	return NULL;
 }
 
-short FileUtills::GetGigaFreespace(const std::string & path, size_t & result)
+int FileUtills::GetGigaFreespace(const std::string & path, size_t & result)
 {
-#ifdef POSIX_COMMON_H
-	// Init vars
-	int errorcode = 0;
-	size_t block_size = 0;
-	size_t free_blocks = 0;
-	struct statvfs * buffer;
+	// Init ret.
+	int ret = Common::COMMON_FUNCTION_NOT_IMPLEMENTED;	// The result of this function.
 
-    // Reset result.
-    result = 0;
+	// Call GetByteFreespace().
+	ret = FileUtills::GetByteFreespace(path, result);
 
-	// Create buffer
-	buffer = new struct statvfs;
-
-	// Call host's function
-	errorcode = statvfs(path.c_str(), buffer);
-
-	// Check if an error as thrown.
-	if (errorcode != 0)
+	// Check for success.
+	if (ret == Common::COMMON_SUCCESS)
 	{
-		// Figure out what the error we got back was.
-		switch (errno){
-		  case EACCES:		// Permission error.
-		    return -2;
-		    break;
-		  case EIO:		// I/O error.
-		    return -1;
-		    break;
-		  case ELOOP:		// Too many symbolic links.
-		    return -4;
-		    break;
-		  case ENAMETOOLONG:	// Path is too long for the filesystem to handle.
-		    return -5;
-		    break;
-		  case ENOENT:		// File or directory does not exist.
-		    return -6;
-		    break;
-		  case ENOSYS:		// Filesystem unsupported.
-		    return -7;
-		    break;
-		  case ENOTDIR:		// A part of the path is not a valid directory.
-		    return -8;
-		    break;
-		  case EOVERFLOW:	// Some data returned was too big for the struct.
-		    return -9;
-		    break;
-		  case ENOMEM:		// Out of kernel memory. Probably should kill the engine here.....
-		    return -10;
-		    break;
-		  default:		// We really don't care about the other errors.
-		    return -11;
-		    break;
-		}
+		// Byte conversion.
+		result = (result / ((double)1000000000));
 	}
 
-	// Read the remaining blocks from the filesystem.
-	free_blocks = buffer->f_bavail;
-
-	// Read the file system block size.
-	block_size = buffer->f_bsize;
-
-	// Determine gigabyte conversion.
-	result = (free_blocks * block_size) / ((double)1000000000);
-
-	// Delete the buffer
-	delete buffer;
-
-	// Return remaining space
-	return 0;
-#endif
-
-	// Default return for unimplemented function.
-	return -3;
+	// Return ret.
+	return ret;
 }
 
-short FileUtills::GetFreespace(const std::string & path, size_t & result)
+int FileUtills::GetFreespace(const std::string & path, size_t & result)
 {
-#ifdef POSIX_COMMON_H
-	// Init vars
-	int errorcode = 0;
-	size_t block_size = 0;
-	size_t free_blocks = 0;
-	struct statvfs * buffer;
+	// Init ret.
+	int ret = Common::COMMON_FUNCTION_NOT_IMPLEMENTED;	// The result of this function.
 
-    // Reset result.
-    result = 0;
+	// Call GetByteFreespace().
+	ret = FileUtills::GetByteFreespace(path, result);
 
-	// Create buffer
-	buffer = new struct statvfs;
-
-	// Call host's function
-	errorcode = statvfs(path.c_str(), buffer);
-
-	// Check if an error as thrown.
-	if (errorcode != 0)
+	// Check for success.
+	if (ret == Common::COMMON_SUCCESS)
 	{
-		// Figure out what the error we got back was.
-		switch (errno){
-		  case EACCES:		// Permission error.
-		    return -2;
-		    break;
-		  case EIO:		// I/O error.
-		    return -1;
-		    break;
-		  case ELOOP:		// Too many symbolic links.
-		    return -4;
-		    break;
-		  case ENAMETOOLONG:	// Path is too long for the filesystem to handle.
-		    return -5;
-		    break;
-		  case ENOENT:		// File or directory does not exist.
-		    return -6;
-		    break;
-		  case ENOSYS:		// Filesystem unsupported.
-		    return -7;
-		    break;
-		  case ENOTDIR:		// A part of the path is not a valid directory.
-		    return -8;
-		    break;
-		  case EOVERFLOW:	// Some data returned was too big for the struct.
-		    return -9;
-		    break;
-		  case ENOMEM:		// Out of kernel memory. Probably should kill the engine here.....
-		    return -10;
-		    break;
-		  default:		// We really don't care about the other errors.
-		    return -11;
-		    break;
-		}
+		// Byte conversion.
+		result = (result / ((double)1000000));
 	}
 
-	// Read the remaining blocks from the filesystem.
-	free_blocks = buffer->f_bavail;
-
-	// Read the file system block size.
-	block_size = buffer->f_bsize;
-
-	// Determine megabyte conversion.
-	result = (free_blocks * block_size) / ((double)(1000000));
-
-	// Delete the buffer
-	delete buffer;
-
-	// Return remaining space
-	return 0;
-#endif
-	// Default return for unimplemented function.
-	return -3;
+	// Return ret.
+	return ret;
 }
 
-short FileUtills::GetKiloFreespace(const std::string & path, size_t & result)
+int FileUtills::GetKiloFreespace(const std::string & path, size_t & result)
 {
-#ifdef POSIX_COMMON_H
-	// Init vars
-	int errorcode = 0;
-	size_t block_size = 0;
-	size_t free_blocks = 0;
-	struct statvfs * buffer;
+	// Init ret.
+	int ret = Common::COMMON_FUNCTION_NOT_IMPLEMENTED;	// The result of this function.
 
-    // Reset result.
-    result = 0;
+	// Call GetByteFreespace().
+	ret = FileUtills::GetByteFreespace(path, result);
 
-	// Create buffer
-	buffer = new struct statvfs;
-
-	// Call host's function
-	errorcode = statvfs(path.c_str(), buffer);
-
-	// Check if an error as thrown.
-	if (errorcode != 0)
+	// Check for success.
+	if (ret == Common::COMMON_SUCCESS)
 	{
-		// Figure out what the error we got back was.
-		switch (errno){
-		  case EACCES:		// Permission error.
-		    return -2;
-		    break;
-		  case EIO:		// I/O error.
-		    return -1;
-		    break;
-		  case ELOOP:		// Too many symbolic links.
-		    return -4;
-		    break;
-		  case ENAMETOOLONG:	// Path is too long for the filesystem to handle.
-		    return -5;
-		    break;
-		  case ENOENT:		// File or directory does not exist.
-		    return -6;
-		    break;
-		  case ENOSYS:		// Filesystem unsupported.
-		    return -7;
-		    break;
-		  case ENOTDIR:		// A part of the path is not a valid directory.
-		    return -8;
-		    break;
-		  case EOVERFLOW:	// Some data returned was too big for the struct.
-		    return -9;
-		    break;
-		  case ENOMEM:		// Out of kernel memory. Probably should kill the engine here.....
-		    return -10;
-		    break;
-		  default:		// We really don't care about the other errors.
-		    return -11;
-		    break;
-		}
+		// Byte conversion.
+		result = (result / ((double)1000));
 	}
 
-	// Read the remaining blocks from the filesystem.
-	free_blocks = buffer->f_bavail;
-
-	// Read the file system block size.
-	block_size = buffer->f_bsize;
-
-	// Determine byte conversion.
-	result = ((free_blocks * block_size) / ((double)(1000)));
-
-	// Delete the buffer
-	delete buffer;
-
-	// Return remaining space
-	return 0;
-#endif
-	// Default return for unimplemented function.
-	return -3;
+	// Return ret.
+	return ret;
 }
 
-short FileUtills::GetByteFreespace(const std::string & path, size_t & result)
+int FileUtills::GetByteFreespace(const std::string & path, size_t & result)
 {
+	// Init vars.
+	int ret = Common::COMMON_FUNCTION_NOT_IMPLEMENTED;			// Result of this function.
 #ifdef POSIX_COMMON_H
-	// Init vars
-	int errorcode = 0;
-	size_t block_size = 0;
-	size_t free_blocks = 0;
-	struct statvfs * buffer;
+	struct statvfs * buffer = NULL;						// Buffer used to get filesystem info from the OS.
 
-    // Reset result.
-    result = 0;
+	// Reset result.
+	result = 0;
 
-	// Create buffer
-	buffer = new struct statvfs;
+	// Begin try block.
+	try {
+		// Create buffer.
+		buffer = new struct statvfs;
+		if (buffer != NULL)
+		{
+			// Call host's function, and check for error.
+			if (statvfs(path.c_str(), buffer) == 0)
+			{
+				// Determine number of free bytes. (Number of avaiable blocks * block size)
+				result = (buffer->f_bavail * buffer->f_bsize);
 
-	// Call host's function
-	errorcode = statvfs(path.c_str(), buffer);
+				// Set success.
+				ret = Common::COMMON_SUCCESS;
+			}
+			else
+			{
+				// Figure out what the error we got back was.
+				ret = errno;
+				ret = Common::Translate_Posix_Errno_To_Common_Error_Code(ret);
 
-	// Check if an error as thrown.
-	if (errorcode != 0)
-	{
-		// Figure out what the error we got back was.
-		switch (errno){
-		  case EACCES:		// Permission error.
-		    return -2;
-		    break;
-		  case EIO:		// I/O error.
-		    return -1;
-		    break;
-		  case ELOOP:		// Too many symbolic links.
-		    return -4;
-		    break;
-		  case ENAMETOOLONG:	// Path is too long for the filesystem to handle.
-		    return -5;
-		    break;
-		  case ENOENT:		// File or directory does not exist.
-		    return -6;
-		    break;
-		  case ENOSYS:		// Filesystem unsupported.
-		    return -7;
-		    break;
-		  case ENOTDIR:		// A part of the path is not a valid directory.
-		    return -8;
-		    break;
-		  case EOVERFLOW:	// Some data returned was too big for the struct.
-		    return -9;
-		    break;
-		  case ENOMEM:		// Out of kernel memory. Probably should kill the engine here.....
-		    return -10;
-		    break;
-		  default:		// We really don't care about the other errors.
-		    return -11;
-		    break;
-		};
+				// Log the error.
+				COMMON_LOG_DEBUG("FileUtills::GetByteFreespace(): ");
+				COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
+				COMMON_LOG_DEBUG("\n");
+			}
+
+			// Delete the buffer
+			delete buffer;
+			buffer = NULL;
+		}
+		else
+		{
+			// Could not allocate memory.
+			ret = Common::COMMON_MEMORY_ERROR;
+
+			// Log the error.
+			COMMON_LOG_DEBUG("FileUtills::GetByteFreespace(): ");
+			COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
+			COMMON_LOG_DEBUG("\n");
+		}
 	}
+	catch (exception &ex)
+	{
+		// Exception thrown.
+		ret = Common::COMMON_EXCEPTION_THROWN;
 
-	// Read the remaining blocks from the filesystem.
-	free_blocks = buffer->f_bavail;
+		// Check for allocated buffer.
+		if (buffer != NULL)
+		{
+			delete buffer;
+			buffer = NULL;
+		}
 
-	// Read the file system block size.
-	block_size = buffer->f_bsize;
-
-	// Determine byte conversion.
-	result = (free_blocks * block_size);
-
-	// Delete the buffer
-	delete buffer;
-
-	// Return remaining space
-	return 0;
+		// Log the error.
+		COMMON_LOG_VERBOSE("FileUtills::GetByteFreespace(): ");
+		COMMON_LOG_VERBOSE(Common::Get_Error_Message(ret));
+		COMMON_LOG_VERBOSE(" ");
+		COMMON_LOG_VERBOSE(ex.what());
+		COMMON_LOG_VERBOSE("\n");
+	}
 #endif
-	// Default return for unimplemented function.
-	return -3;
+	// Copy ret to Common::commonLastErrorCode.
+	Common::commonLastErrorCode = ret;
+
+	// Return ret.
+	return ret;
 }
 
 short FileUtills::CreateDirectory(const std::string & directory, Panic::ERROR & error, const bool & createRecursive)
