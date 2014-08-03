@@ -29,7 +29,7 @@ const unsigned int Common::Get_Error_Table_Size()
 const char * Common::Get_Error_Message(const int & errorCode)
 {
 	// Init vars.
-	const char * result = NULL;					// Result of this function.
+	const char * result = Common::UNKNOWN_ERROR_MSG;		// Result of this function.
 	const size_t errorTableSize = Common::Get_Error_Table_Size();	// Size of the Common error lookup table.
 
 	// Begin lookup loop.
