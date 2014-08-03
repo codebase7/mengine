@@ -8,6 +8,18 @@ namespace Common {
 	// Error code table ABI version.
 	const unsigned int COMMON_ERROR_ABI_VER = 1; // Increment this if you alter the table.
 
+	/*!
+	 * 	const static char * Common::UNKNOWN_ERROR_MSG
+	 *
+	 * 	This is the definition for the generic unknown error
+	 * 	code.
+	 *
+	 * 	It is defined here to allow Common::Get_Error_Message()
+	 * 	to reference it without needing to use another for loop
+	 * 	to locate it's offset in the error message table.
+	 */
+	const static char * UNKNOWN_ERROR_MSG = "Unknown error code.";
+
 	// Error code table.
 	enum {
 		// Generic error codes.
@@ -44,6 +56,7 @@ namespace Common {
 		FILEUTILLS_FILESYSTEM_FULL = -67,
 		FILEUTILLS_FILESYSTEM_QUOTA_REACHED = -68,
 		FILEUTILLS_EMPTY_DIRECTORY = -69,
+		FILEUTILLS_NON_EMPTY_DIRECTORY = -70,
 	};
 
 	/*!
@@ -65,9 +78,9 @@ namespace Common {
 	 * 	between revisions.)
 	 */
 	const Common_Error_Object commonErrorTable[] = {
+		{COMMON_UNKNOWN_ERROR, UNKNOWN_ERROR_MSG},
 		{COMMON_SYSTEM_SPECIFIC, "System specific error code. Check log."},
 		{COMMON_SUCCESS, "Success."},
-		{COMMON_UNKNOWN_ERROR, "Unknown error code."},
 		{COMMON_INVALID_ARGUMENT, "Invalid argument."},
 		{COMMON_FUNCTION_NOT_IMPLEMENTED, "Function not implemented."},
 		{COMMON_ACCESS_DENIED, "Access Denied."},
@@ -97,7 +110,8 @@ namespace Common {
 		{FILEUTILLS_PATH_IS_A_DIRECTORY, "Given path is a directory."},
 		{FILEUTILLS_FILESYSTEM_FULL, "Given filesystem is full."},
 		{FILEUTILLS_FILESYSTEM_QUOTA_REACHED, "User's disk usage quota for the given filesystem has been reached."},
-		{FILEUTILLS_EMPTY_DIRECTORY, "The given directory is empty."},
+		{FILEUTILLS_EMPTY_DIRECTORY, "The given path is an empty directory."},
+		{FILEUTILLS_NON_EMPTY_DIRECTORY, "The given path is a non-empty directory."},
 		// TODO: Need to add the error codes from all common namespace functions.
 	};
 
