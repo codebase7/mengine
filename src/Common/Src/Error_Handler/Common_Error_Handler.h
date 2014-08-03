@@ -52,7 +52,7 @@ namespace Common
 	 * 	readable string describing the meaning of the given error code.
 	 * 
 	 * 	Returns a valid pointer if the given error code is in the common error table.
-	 * 	Returns a NULL pointer otherwise.
+	 * 	Returns the message for Common::COMMON_UNKNOWN_ERROR otherwise.
 	 */
 	const char * Get_Error_Message(const int & errorCode);
 
