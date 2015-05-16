@@ -18,14 +18,31 @@
     https://github.com/codebase7/mengine
 */
 
+// Include guard.
 #ifndef ERROR_STRUCT_H
 #define ERROR_STRUCT_H
 
-struct Common_Error_Object {
+// Enable C linkage if needed.
+#ifdef __cplusplus
+extern "C" {
+#endif	// __cplusplus
+
+/*!
+ * 	typedef struct Common_Error_Object_T
+ *
+ * 	Defines the data structure used by the Common Error Handler functions
+ * 	to look up human-readable strings and their assoicated error codes.
+ */
+typedef struct Common_Error_Object_T {
 	short errorCode;
 	const char * error;
-};
+} Common_Error_Object;
 
-#endif
+// End C Linkage if needed.
+#ifdef __cplusplus
+}
+#endif	// __cplusplus
+
+#endif	// ERROR_STRUCT_H
 
 // End of Error_Struct.h

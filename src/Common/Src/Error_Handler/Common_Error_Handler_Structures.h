@@ -1,128 +1,161 @@
+/*!
+    Multiverse Engine Project 04/7/2014 Common Common_Error_Handler_Structures.h
 
+    Copyright (C) 2014 Multiverse Engine Project
 
+    This program is free software;
+    you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
+    either version 2 of the License, or (at your option) any later version.
 
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along with this program;
+    if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+    Official source repository and project information can be found at
+    https://github.com/codebase7/mengine
+*/
+
+// Include guard.
+#ifndef COMMON_ERROR_ERROR_HANDLER_STRUCTURES_H
+#define COMMON_ERROR_ERROR_HANDLER_STRUCTURES_H
+
+// Internal includes.
 #include "Error_Struct.h"	// Structure used to create error lookup table.
 
-namespace Common {
-	// Common namespace error code definitions.
-	// Error code table ABI version.
-	const unsigned int COMMON_ERROR_ABI_VER = 1; // Increment this if you alter the table.
+// Define the Common unknown error message. (It has to be replicated in two places, once for the C code and once for the C++ bindings.)
+#define COMMON_UNKNOWN_ERROR_MSG_DEF "Unknown error code."
 
-	/*!
-	 * 	const static char * Common::UNKNOWN_ERROR_MSG
-	 *
-	 * 	This is the definition for the generic unknown error
-	 * 	code.
-	 *
-	 * 	It is defined here to allow Common::Get_Error_Message()
-	 * 	to reference it without needing to use another for loop
-	 * 	to locate it's offset in the error message table.
-	 */
-	const static char * UNKNOWN_ERROR_MSG = "Unknown error code.";
+// Error code table ABI version.
+#define COMMON_ERROR_TABLE_ABI_VER 2 // Increment this if you alter the table.
 
-	// Error code table.
+// Enable C linkage if needed.
+#ifdef __cplusplus
+extern "C" {
+#endif	// __cplusplus
+
+// Common namespace error code definitions. (Human-readable error message translation table is located in Common_Error_Handler_Structures.c)
 	enum {
 		// Generic error codes.
-		COMMON_SYSTEM_SPECIFIC = 99,
-		COMMON_SUCCESS = 0,
-		COMMON_UNKNOWN_ERROR = -1,
-		COMMON_INVALID_ARGUMENT = -2,
-		COMMON_FUNCTION_NOT_IMPLEMENTED = -3,
-		COMMON_ACCESS_DENIED = -4,
-		COMMON_EXCEPTION_THROWN = -5,
-		COMMON_INTERNAL_ERROR = -6,
-		COMMON_IO_ERROR = -7,
-		COMMON_RANGE_ERROR = -8,
-		COMMON_MEMORY_ERROR = -9,
+		COMMON_ERROR_SYSTEM_SPECIFIC = 99,
+		COMMON_ERROR_SUCCESS = 0,
+		COMMON_ERROR_UNKNOWN_ERROR = -1,
+		COMMON_ERROR_INVALID_ARGUMENT = -2,
+		COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED = -3,
+		COMMON_ERROR_ACCESS_DENIED = -4,
+		COMMON_ERROR_EXCEPTION_THROWN = -5,
+		COMMON_ERROR_INTERNAL_ERROR = -6,
+		COMMON_ERROR_IO_ERROR = -7,
+		COMMON_ERROR_RANGE_ERROR = -8,
+		COMMON_ERROR_MEMORY_ERROR = -9,
+		COMMON_ERROR_INVALID_LIBRARY_ID = -10,	// Formerly THREAD_UTILS_INVALID_LIBRARY_ID.
+		COMMON_ERROR_PEBKAC_INVALID_OPERATION_ORDER = -11,
+		COMMON_ERROR_CANNOT_GET_SYSTEM_TIME = -12,
+		COMMON_ERROR_SUBSYSTEM_OBJECT_NOT_INITED = -13,
+		COMMON_ERROR_SUBSYSTEM_OBJECT_ALREADY_INITED = -14,
+		
 		// Rendering Subsystem error codes.
-		RENDERER_UNABLE_TO_ALLOC_OI_BUF = -12,	// Overlay image buffer.
-		RENDERER_UNABLE_TO_ALLOC_TD_BUF = -13,	// Transparency data buffer.
-		RENDERER_MEM_BUF_ALLOC_EXCEPTION = -14, 
-		RENDERER_DUPE_OVERLAY_EXCEPTION = -15,
-		RENDERER_INVAL_OVERLAY_SELF_OVERWRITE = -16,
-		RENDERER_TRANSPARENCY_DISABLED = -17,
+		RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF = -21,	// Overlay image buffer.
+		RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF = -22,	// Transparency data buffer.
+		RENDERER_ERROR_MEM_BUF_ALLOC_EXCEPTION = -23, 
+		RENDERER_ERROR_DUPE_OVERLAY_EXCEPTION = -24,
+		RENDERER_ERROR_INVAL_OVERLAY_SELF_OVERWRITE = -25,
+		RENDERER_ERROR_TRANSPARENCY_DISABLED = -26,
 		// Threading Subsystem error codes.
-		THREAD_UTILS_EXCEPTION_THROWN = -31,
-		THREAD_UTILS_INVALID_LIBRARY_ID = -32,
-		THREAD_UTILS_PLUGIN_LOAD_FAILURE = -33,
+		THREAD_UTILS_ERROR_EXCEPTION_THROWN = -31,
+		THREAD_UTILS_ERROR_PLUGIN_LOAD_FAILURE = -32,
+		THREAD_UTILS_ERROR_THREAD_COULD_NOT_START = -33,
+		THREAD_UTILS_ERROR_THREAD_COULD_NOT_DETACH = -34,
+		THREAD_UTILS_ERROR_THREAD_COULD_NOT_JOIN = -35,
+		THREAD_UTILS_ERROR_MUTEX_ALREADY_LOCKED = -36,
+		THREAD_UTILS_ERROR_CONDITION_CANNOT_LOCK_MUTEX = -37,
+		THREAD_UTILS_ERROR_CONDITION_WAIT_TIMEOUT_REACHED = -38,
 		// FileUtills error codes.
-		FILEUTILLS_EXISTANT = -60,
-		FILEUTILLS_NON_EXISTANT = -61,
-		FILEUTILLS_READ_ONLY = -62,
-		FILEUTILLS_PATH_LENGTH_INVALID = -63,
-		FILEUTILLS_PATH_FILE_AS_DIRECTORY = -64,
-		FILEUTILLS_PATH_IS_A_FILE = -65,
-		FILEUTILLS_PATH_IS_A_DIRECTORY = -66,
-		FILEUTILLS_FILESYSTEM_FULL = -67,
-		FILEUTILLS_FILESYSTEM_QUOTA_REACHED = -68,
-		FILEUTILLS_EMPTY_DIRECTORY = -69,
-		FILEUTILLS_NON_EMPTY_DIRECTORY = -70,
+		FILEUTILLS_ERROR_EXISTANT = -60,
+		FILEUTILLS_ERROR_NON_EXISTANT = -61,
+		FILEUTILLS_ERROR_READ_ONLY = -62,
+		FILEUTILLS_ERROR_PATH_LENGTH_INVALID = -63,
+		FILEUTILLS_ERROR_PATH_FILE_AS_DIRECTORY = -64,
+		FILEUTILLS_ERROR_PATH_IS_A_FILE = -65,
+		FILEUTILLS_ERROR_PATH_IS_A_DIRECTORY = -66,
+		FILEUTILLS_ERROR_FILESYSTEM_FULL = -67,
+		FILEUTILLS_ERROR_FILESYSTEM_QUOTA_REACHED = -68,
+		FILEUTILLS_ERROR_EMPTY_DIRECTORY = -69,
+		FILEUTILLS_ERROR_NON_EMPTY_DIRECTORY = -70,
+		// UI Subsystem.
+		UI_SUBSYSTEM_ERROR_EXCEPTION_THROWN = -90,
 	};
 
+/*!
+ * 	const unsigned int Common_Get_Error_Table_API_Version()
+ *
+ * 	Returns the API version number of the common error table.
+ */
+const unsigned int Common_Get_Error_Table_API_Version();
+
+/*!
+ * 	const unsigned int Common_Get_Error_Table_Size()
+ *
+ * 	Returns the size of the common error table.
+ */
+const unsigned int Common_Get_Error_Table_Size();
+
+/*!
+ * 	const char * Common_Get_Error_Message(const int & errorCode)
+ * 
+ * 	This function takes the given error code and returns a pointer to a human
+ * 	readable string describing the meaning of the given error code.
+ * 
+ * 	Returns a valid pointer if the given error code is in the common error table.
+ * 	Returns the message for Common_COMMON_UNKNOWN_ERROR otherwise.
+ */
+const char * Common_Get_Error_Message(const int errorCode);
+
+// Define C++ Bindings.
+#ifdef __cplusplus
+// Define namespaces.
+namespace Common
+{
 	/*!
-	 * 	const Common_Error_Object Common::commonErrorTable[]
-	 * 
-	 * 	This array contains all of the error codes that a Common namespace
-	 * 	function may return, in addition to a human readable string describing
-	 * 	the error code's meaning. (This is a work in progress, some error codes
-	 * 	conflict with error codes in other functions, as such these are slowly
-	 * 	being corrected.)
-	 * 
-	 * 	The easiest way of fetching the human readable string from this table
-	 * 	is to call Common::GetErrorMessage().
-	 * 
-	 * 	Do not reuse an existing error code. (If the error is generic then use a
-	 * 	generic error code.)
-	 * 
-	 * 	Do not change an existing error code. (This is to keep the API stable
-	 * 	between revisions.)
+	 * 	const unsigned int Common::Get_Error_Table_API_Version()
+	 *
+	 * 	(C++ Binding)
+	 *
+	 * 	Returns the API version number of the common error table.
 	 */
-	const Common_Error_Object commonErrorTable[] = {
-		{COMMON_UNKNOWN_ERROR, UNKNOWN_ERROR_MSG},
-		{COMMON_SYSTEM_SPECIFIC, "System specific error code. Check log."},
-		{COMMON_SUCCESS, "Success."},
-		{COMMON_INVALID_ARGUMENT, "Invalid argument."},
-		{COMMON_FUNCTION_NOT_IMPLEMENTED, "Function not implemented."},
-		{COMMON_ACCESS_DENIED, "Access Denied."},
-		{COMMON_EXCEPTION_THROWN, "Execption thrown."},
-		{COMMON_INTERNAL_ERROR, "Internal error."},
-		{COMMON_IO_ERROR, "Input / Output error. (Normally this is a hardware issue.)"},
-		{COMMON_RANGE_ERROR, "Given range is invalid."},
-		{COMMON_MEMORY_ERROR, "Memory error (Could not allocate memory / Control loop out of bounds.)"},
-		// Rendering Subsystem error codes.
-		{RENDERER_UNABLE_TO_ALLOC_OI_BUF, "Could not allocate memory for overlay image buffer."},
-		{RENDERER_UNABLE_TO_ALLOC_TD_BUF, "Could not allocate memory for transparency data buffer."},
-		{RENDERER_MEM_BUF_ALLOC_EXCEPTION, "Exception thrown while attempting to allocate memory buffer(s)."},
-		{RENDERER_DUPE_OVERLAY_EXCEPTION, "Exception thrown while duplicating overlay, clearing dest overlay."},
-		{RENDERER_INVAL_OVERLAY_SELF_OVERWRITE, "Given overlays are the same. Cannot overwrite an overlay with itself."},
-		{RENDERER_TRANSPARENCY_DISABLED, "Transparency is disabled on given overlay."},
-		// Threading Subsystem (Thread_Utils) error codes.
-		{THREAD_UTILS_EXCEPTION_THROWN, "Exception thrown in threading subsystem."},
-		{THREAD_UTILS_INVALID_LIBRARY_ID, "Given LibraryID does not match a supported library or a loaded plugin."},
-		{THREAD_UTILS_PLUGIN_LOAD_FAILURE, "Unable to load plugin(s). Internal error."},
-		// FileUtills.
-		{FILEUTILLS_EXISTANT, "The path exists."},
-		{FILEUTILLS_NON_EXISTANT, "The path (or a component of the path) does not exist."},
-		{FILEUTILLS_READ_ONLY, "The path is read only."},
-		{FILEUTILLS_PATH_LENGTH_INVALID, "The path's length is beyond the filesystem's maximum length."},
-		{FILEUTILLS_PATH_FILE_AS_DIRECTORY, "The path has a file in it that is being treated as a directory."},
-		{FILEUTILLS_PATH_IS_A_FILE, "Given path is a file."},
-		{FILEUTILLS_PATH_IS_A_DIRECTORY, "Given path is a directory."},
-		{FILEUTILLS_FILESYSTEM_FULL, "Given filesystem is full."},
-		{FILEUTILLS_FILESYSTEM_QUOTA_REACHED, "User's disk usage quota for the given filesystem has been reached."},
-		{FILEUTILLS_EMPTY_DIRECTORY, "The given path is an empty directory."},
-		{FILEUTILLS_NON_EMPTY_DIRECTORY, "The given path is a non-empty directory."},
-		// TODO: Need to add the error codes from all common namespace functions.
-	};
+	const unsigned int Get_Error_Table_API_Version();
 
 	/*!
-	 * 	static int Common::commonLastErrorCode
-	 * 
-	 * 	Contains the last error code encountered by a Common namespace function.
-	 * 
-	 * 	Note: Calling Common::GetErrorMessage() or Common::GetErrorTableSize()
-	 * 	will NOT clear this variable.
-	 * 	Calling any other Common namespace function WILL clear this variable.
+	 * 	const unsigned int Common::Get_Error_Table_Size()
+	 *
+	 * 	(C++ Binding)
+	 *
+	 * 	Returns the size of the common error table.
 	 */
-	static int commonLastErrorCode = COMMON_SUCCESS;
-};
+	const unsigned int Get_Error_Table_Size();
+
+	/*!
+	 * 	const char * Common::Get_Error_Message(const int & errorCode)
+	 * 
+	 * 	(C++ Binding)
+	 * 
+	 * 	This function takes the given error code and returns a pointer to a human
+	 * 	readable string describing the meaning of the given error code.
+	 * 
+	 * 	Returns a valid pointer if the given error code is in the common error table.
+	 * 	Returns the message for Common_COMMON_UNKNOWN_ERROR otherwise.
+	 */
+	const char * Get_Error_Message(const int & errorCode);
+}
+#endif	// __cplusplus
+
+// End C Linkage if needed.
+#ifdef __cplusplus
+}
+#endif	// __cplusplus
+
+#endif	// COMMON_ERROR_ERROR_HANDLER_STRUCTURES_H
+
+// End of Common_Error_Handler_Structures.h

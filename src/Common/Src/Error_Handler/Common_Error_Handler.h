@@ -24,6 +24,9 @@
 
 // External includes.
 #include <stddef.h>		// Defines NULL.
+#ifndef __cplusplus
+#include <stdbool.h>		// Defines bool data type. (For C compilers.)
+#endif	// __cplusplus
 
 // Project includes.
 #ifdef __win32	// Needed for different path seperator in Windows.
@@ -35,30 +38,137 @@
 #include "Common_Error_Handler_Structures.h"		// Defines the error codes, error lookup table error lookup table version number, and Common::commonLastErrorCode.
 #include "Posix_Error_Translation_Table.h"		// Defines the POSIX errno to Common namespace error translation table and functions.
 
+// Enable C linkage if needed.
+#ifdef __cplusplus
+extern "C" {
+#endif	// __cplusplus
+
+// Define the C bindings for the error handler.
+
+/*!
+ * 	void Common_Set_Error_Log_Level(const unsigned int & logLevel)
+ * 
+ * 	Sets the error logging level for the Common namespace functions.
+ * 
+ * 	By default it sets the error logging level to ERROR_DISABLE.
+ * 	(Disables all logging. See Core/Src/Panic.h for a list of
+ * 	 valid logging levels.)
+ */
+void Common_Set_Error_Log_Level(const unsigned int logLevel);
+
+/*!
+ * 	unsigned int Common_Get_Error_Log_Level()
+ * 
+ * 	Returns the current error logging level for the Common namespace functions.
+ * 
+ * 	See Core/Src/Panic.h for a list of valid logging levels.
+ */
+unsigned int Common_Get_Error_Log_Level();
+
+/*!
+ * 	void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
+ *
+ * 	WARNING: The callback function MUST return control back to
+ * 	the caller, as the caller will be blocked until the callback
+ * 	function returns.
+ * 
+ * 	Sets the logging function to call when an error is generated
+ * 	by a Common namespace function.
+ * 
+ * 	For example, this function can be used to send the generated
+ * 	errors to the console in a multi-threaded enviroment.
+ * 
+ * 	Passing a NULL pointer to this function (the default) will
+ * 	disable calling another function when an error is generated.
+ * 	In addition the logging level will be reset to ERROR_DISABLE.
+ */
+void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg));
+#ifdef MSYS_BUILD_FATAL_ERROR_SUPPORT
+
+/*!
+ * 	typedef void(*Common_pErrorCallBackFunction)(void)
+ *
+ * 	Defines the function pointer type for use as arguments by the Common fatal error handler functions.
+ */
+typedef void(*Common_pErrorCallBackFunction)(void);
+
+/*!
+ * 	bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction)
+ *
+ * 	WARNING: The callback function MUST return control back to
+ * 	the caller, as the caller will be blocked until the callback
+ * 	function returns. This means any other registered callbacks
+ * 	will not be triggered, which may lead to data loss. The only exception
+ * 	to this is if the host system will kill the engine's process after a set
+ * 	amount of time. In this one specific instance, nothing can be done to
+ * 	prevent the host system from killing the engine. As such the function
+ * 	registered with this call should attempt to clean up and return as
+ * 	fast as possible.
+ *
+ * 	Registers a callback function for notification of an engine subsystem
+ * 	triggering the host system to kill the engine's process.
+ * 	
+ * 	Note: The registered callback is not guaranteed to be called at all prior to
+ * 	the engine process being terminated. (The host system reserves the right to
+ * 	kill the engine without warning it of the impending termination.)
+ * 	As such this should be considered an informal notification and not something
+ * 	to be relied on if data preservation / security or proper cleanup is required
+ * 	prior to engine shutdown.
+ *
+ * 	Returns true if the regisration completed successfully.
+ * 	Returns false otherwise.
+ */
+bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
+
+/*!
+ * 	bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction)
+ *
+ * 	Unregisters the given fatal error callback function from the list of fatal error
+ * 	callback functions to be triggered in the event of a fatal error being generated.
+ *
+ * 	(I.e. If unregistered, a given callback function will not be called if a fatal
+ * 	 error occurs.)
+ *
+ * 	The callback function pointer given to this function must match a function pointer
+ * 	given to Common_Register_Fatal_Error_Callback() (Or Common::Register_Fatal_Error_Callback()) previously,
+ * 	otherwise this function will fail.
+ *
+ * 	Returns true if the unregisration completed successfully.
+ * 	Returns false otherwise.
+ */
+bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
+
+/*!
+ * 	void Common_Fatal_Error_Notify()
+ *
+ * 	This function triggers the registered fatal error callback functions
+ * 	registered with Common_Register_Fatal_Error_Callback() (Or Common::Register_Fatal_Error_Callback()),
+ * 	in an attempt to notify all need to know sections of the engine, and application, that the engine is
+ * 	about to be terminated.
+ *
+ * 	When this function returns to it's caller, it is expected that the caller
+ * 	will terminate the engine's process if it does not happen automaticly.
+ *
+ * 	This function does not return any data to it's caller.
+ */
+void Common_Fatal_Error_Notify();
+#endif	// MSYS_BUILD_FATAL_ERROR_SUPPORT
+
+// End C Linkage if needed.
+#ifdef __cplusplus
+}
+#endif	// __cplusplus
+
+// Define C++ Bindings.
+#ifdef __cplusplus
 // Define namespaces.
 namespace Common
 {
 	/*!
-	 * 	const unsigned int Common::Get_Error_Table_Size()
-	 * 
-	 * 	Returns the size of the common error table.
-	 */
-	const unsigned int Get_Error_Table_Size();
-
-	/*!
-	 * 	const char * Common::Get_Error_Message(const int & errorCode)
-	 * 
-	 * 	This function takes the given error code and returns a pointer to a human
-	 * 	readable string describing the meaning of the given error code.
-	 * 
-	 * 	Returns a valid pointer if the given error code is in the common error table.
-	 * 	Returns the message for Common::COMMON_UNKNOWN_ERROR otherwise.
-	 */
-	const char * Get_Error_Message(const int & errorCode);
-
-	/*!
 	 * 	void Common::Set_Error_Log_Level(const unsigned int & logLevel)
-	 * 
+	 *
+	 * 	(C++ Binding)
+	 *
 	 * 	Sets the error logging level for the Common namespace functions.
 	 * 
 	 * 	By default it sets the error logging level to ERROR_DISABLE.
@@ -69,7 +179,9 @@ namespace Common
 
 	/*!
 	 * 	unsigned int Common::Get_Error_Log_Level()
-	 * 
+	 *
+	 * 	(C++ Binding)
+	 *
 	 * 	Returns the current error logging level for the Common namespace functions.
 	 * 
 	 * 	See Core/Src/Panic.h for a list of valid logging levels.
@@ -78,7 +190,9 @@ namespace Common
 
 	/*!
 	 * 	void Common::Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
-	 * 
+	 *
+	 * 	(C++ Binding)
+	 *
 	 * 	WARNING: The callback function MUST return control back to
 	 * 	the caller, as the caller will be blocked until the callback
 	 * 	function returns.
@@ -94,7 +208,77 @@ namespace Common
 	 * 	In addition the logging level will be reset to ERROR_DISABLE.
 	 */
 	void Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg) = NULL);
+
+#ifdef MSYS_BUILD_FATAL_ERROR_SUPPORT
+	/*!
+	 * 	bool Common::Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction)
+	 *
+	 * 	(C++ Binding)
+	 *
+	 * 	WARNING: The callback function MUST return control back to
+	 * 	the caller, as the caller will be blocked until the callback
+	 * 	function returns. This means any other registered callbacks
+	 * 	will not be triggered, which may lead to data loss. The only exception
+	 * 	to this is if the host system will kill the engine's process after a set
+	 * 	amount of time. In this one specific instance, nothing can be done to
+	 * 	prevent the host system from killing the engine. As such the function
+	 * 	registered with this call should attempt to clean up and return as
+	 * 	fast as possible.
+	 *
+	 * 	Registers a callback function for notification of an engine subsystem
+	 * 	triggering the host system to kill the engine's process.
+	 * 	
+	 * 	Note: The registered callback is not guaranteed to be called at all prior to
+	 * 	the engine process being terminated. (The host system reserves the right to
+	 * 	kill the engine without warning it of the impending termination.)
+	 * 	As such this should be considered an informal notification and not something
+	 * 	to be relied on if data preservation / security or proper cleanup is required
+	 * 	prior to engine shutdown.
+	 *
+	 * 	Returns true if the regisration completed successfully.
+	 * 	Returns false otherwise.
+	 */
+	bool Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
+
+	/*!
+	 * 	bool Common::Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction)
+	 *
+	 * 	(C++ Binding)
+	 *
+	 * 	Unregisters the given fatal error callback function from the list of fatal error
+	 * 	callback functions to be triggered in the event of a fatal error being generated.
+	 *
+	 * 	(I.e. If unregistered, a given callback function will not be called if a fatal
+	 * 	 error occurs.)
+	 *
+	 * 	The callback function pointer given to this function must match a function pointer
+	 * 	given to Common_Register_Fatal_Error_Callback() (Or Common::Register_Fatal_Error_Callback()) previously,
+	 * 	otherwise this function will fail.
+	 *
+	 * 	Returns true if the unregisration completed successfully.
+	 * 	Returns false otherwise.
+	 */
+	bool Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
+
+	/*!
+	 * 	void Common::Fatal_Error_Notify()
+	 *
+	 * 	(C++ Binding)
+	 *
+	 * 	This function triggers the registered fatal error callback functions
+	 * 	registered with Or Common_Register_Fatal_Error_Callback() (Common::Register_Fatal_Error_Callback()),
+	 * 	in an attempt to notify all need to know sections of the engine, and application, that the engine is
+	 * 	about to be terminated.
+	 *
+	 * 	When this function returns to it's caller, it is expected that the caller
+	 * 	will terminate the engine's process if it does not happen automaticly.
+	 *
+	 * 	This function does not return any data to it's caller.
+	 */
+	void Fatal_Error_Notify();
+#endif	// MSYS_BUILD_FATAL_ERROR_SUPPORT
 };
+#endif	// __cplusplus
 
 #endif // COMMON_ERROR_HANDLER_H
 

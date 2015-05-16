@@ -34,6 +34,11 @@
 //#error "This header is for internal engine use only. It should not be linked against, as it is NOT a part of the public API."
 //#endif // COMMON_ERROR_HANDLER_H
 
+// Enable C linkage if needed.
+#ifdef __cplusplus
+extern "C" {
+#endif	// __cplusplus
+
 /*
  * 	struct CommonErrorLogData
  *
@@ -57,7 +62,7 @@ struct CommonErrorLogData {
  * 
  * 	The actual data structure that contains the error
  * 	logging data for the Common namespace functions.
- * 
+ *
  * 	Once again, DO NOT USE THIS STRUCTURE DIRECTLY!
  * 	This structure is NOT a part of the public API, and
  * 	is subject to change at anytime.
@@ -136,6 +141,11 @@ void COMMON_LOG_DEBUG(const char * errorMsg);
  * 	is subject to change at anytime.
  */
 void COMMON_LOG_VERBOSE(const char * errorMsg);
+
+// End C Linkage if needed.
+#ifdef __cplusplus
+}
+#endif	// __cplusplus
 
 #endif // COMMON_ERROR_HANDLER_INTERNAL_H
 

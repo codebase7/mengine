@@ -1,7 +1,7 @@
 /*!
-    Multiverse Engine Project 05/7/2014 Common Posix_Error_Translation_Table.cpp
+    Multiverse Engine Project 15/5/2015 Common Posix_Error_Translation_Table_CPP_Bindings.cpp
 
-    Copyright (C) 2014 Multiverse Engine Project
+    Copyright (C) 2015 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
@@ -18,37 +18,28 @@
     https://github.com/codebase7/mengine
 */
 
+// C++ Bindings.
+#ifdef __cplusplus
+
 // Internal includes.
 #include "Common_Error_Handler_Structures.h"
 #include "Posix_Error_Translation_Table.h"
 
-unsigned int Common::Get_Posix_Error_Translation_Table_Size()
+// External includes.
+#include <exception>
+
+const unsigned int Common::Get_Posix_Error_Translation_Table_API_Version()
 {
-	return (sizeof(Common::posixErrorTranslationTable) / sizeof(Common::posixErrnoTableEntry));
+	return Common_Get_Posix_Error_Translation_Table_API_Version();
+}
+
+const unsigned int Common::Get_Posix_Error_Translation_Table_Size()
+{
+	return Common_Get_Posix_Error_Translation_Table_Size();
 }
 
 int Common::Translate_Posix_Errno_To_Common_Error_Code(const int & err)
 {
-	// Init result.
-	int ret = COMMON_SYSTEM_SPECIFIC;	/*
-						 * Default is COMMON_SYSTEM_SPECIFIC, as
-						 * not all POSIX errno(s) are / can be
-						 * reperesented in the Common namespace
-						 * error code table.
-						 */
-
-	// Run loop.
-	for (unsigned int x = 0; ((x < Common::Get_Posix_Error_Translation_Table_Size()) &&
-	     (ret == COMMON_SYSTEM_SPECIFIC)); x++)
-	{
-		// Check for a match in the error code translation table.
-		if (Common::posixErrorTranslationTable[x].posixErrorNo == err)
-		{
-			// Match found, return the Common namespace error code.
-			ret = Common::posixErrorTranslationTable[x].commonErrorCode;
-		}
-	}
-
-	// Return the result.
-	return ret;
+	return Common_Translate_Posix_Errno_To_Common_Error_Code(err);
 }
+#endif	// __cplusplus
