@@ -2,6 +2,9 @@
 set(LIBRARY_OUTPUT_PATH ${L_OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${O_OUTPUT_DIR})
 
+# Create the mutexes library.
+add_subdirectory(Mutexes)
+
 # Create the error handler.
 add_subdirectory(Error_Handler)
 
@@ -13,7 +16,6 @@ add_subdirectory(Dynamic_Library_Subsystem)
 
 # Create the Threading Subsystem.
 add_subdirectory(Threading_Subsystem)
-
 
 # Add library.
 add_library(Common_Multiverse_Engine SHARED Generic_Wrapper.cpp)

@@ -20,6 +20,9 @@ endif()
 
 # Option Defaults.
 option (BUILD_DYNAMIC_LIBRARY_SUBSYSTEM "Whether or not to build the Dynamic Library Subsystem. (Defaults to yes.)" ON)
+option (BUILD_INTERNAL_MUTEX_SUPPORT "Whether or not to build the internal mutex support library. (Defaults to yes.)" ON)
+option (BUILD_INTERNAL_MUTEX_THREAD_SUBSYS_WRAPPER "Whether or not the Threading Subsystem library will have Internal Mutex Support built in. (Defaults to yes, but is disabled currently due to changes to Thread_Utils that have not been commited yet.)" OFF)
+option (BUILD_INTERNAL_MUTEX_THREAD_SUBSYS_WRAPPER_PLUGIN "Whether or not to build the Threading Subsystem plugin for Internal Mutex Support. (Defaults to yes, but is disabled currently due to changes to Thread_Utils that have not been commited yet.)" OFF)
 
 # Include src sub directory.
 add_subdirectory(src)
