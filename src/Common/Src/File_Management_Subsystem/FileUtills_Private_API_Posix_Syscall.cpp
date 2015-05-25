@@ -22,7 +22,7 @@
 #include "FileUtills_Private_API.h"
 #include "FileUtills_Private_API_Posix_Syscall.h"
 
-int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_t pathSize, char ** resolvedPath, size_t * resolvedPathSize)
+int FileUtills::ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize)
 {
 	// Init vars.
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;			// The result of this function.
@@ -37,10 +37,10 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 	struct stat st;						// POSIX Stat structure for retriving the status of the given path. (Whether or not it's a symlink and it's length.)
 
 	// Make sure we got a valid path.
-	if (pathSize > 0)
-	{
+	if ((path != NULL) && ((*path) != NULL) && (pathSize != NULL) && ((*pathSize) > 0))
+	{ 
 		// Call lstat.
-		if (lstat(path, &st) == 0)
+		if (lstat((*path), &st) == 0)
 		{
 			// Check and see if the given path is a symbolic link.
 			if (S_ISLNK((st.st_mode)))
@@ -53,7 +53,7 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 					if (readLinkBuf != NULL)
 					{
 						// Call readlink.
-						firstBufferLength = readlink(path, readLinkBuf, st.st_size);
+						firstBufferLength = readlink((*path), readLinkBuf, st.st_size);
 
 						// Check and see if the result from readlink is not -1 and if it equals st.st_size.
 						if (firstBufferLength != -1)
@@ -63,8 +63,8 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 								// Insert a NULL character after the end of the string.
 								readLinkBuf[st.st_size] = '\0';
 
-								// Copy the result to the resolvedPath buffer.
-								resolvedPath = readLinkBuf;
+								// Copy the result to the path buffer.
+								(*path) = readLinkBuf;
 
 								// Set success.
 								ret = COMMON_ERROR_SUCCESS;
@@ -108,7 +108,8 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 					 * 	(Copied from the original FileUtills::GetExecDirectory_Syscall() implemetation for POSIX.)
 					 *
 					 * 	We do this to avoid a runaway reallocation loop which could be considered a resource starvation
-					 * 	issue. (See below for the original rant....)
+					 * 	issue. (See below for the original rant, just ignore the /proc file system issues for symlinks
+					 * 	in general. (Only issues 1 and 3 apply to ALL symlinks.))
 					 *
 					 * 	(Begin original rant.)
 					 *
@@ -120,7 +121,7 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 					 * 	path in linux, is by using readlink() on /proc/self/exe.
 					 *
 					 * 	However, this has several issues. 
-					 * 	
+					 *
 					 * 	First issue: readlink() expects a preallocated buffer to store the result.
 					 * 	If the preallocated buffer is too small for the full path, then readlink()
 					 * 	will silently truncate the remaining data and not tell us how much was
@@ -139,15 +140,18 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 					 * 	loop of memory allocation->readlink()->if(!got entire link)->Deallocate memory->Allocate memory.
 					 * 	for reading a symlink from the filesystem.
 					 * 
-					 * 	This loop is reimplimented here, but with two differences.
+					 * 	This loop is reimplimented here, but with three differences.
 					 * 	
 					 * 		- The loop will end once a certian amount of reallocations (defined by MAX_GET_EXE_PATH_REALLOC)
 					 * 		  is reached. (This is to prevent some of the above issues.)
 					 * 
 					 * 		- The loop will also check to make sure that the returned string has not been altered. 
 					 * 		  (via memcmp). (Attempt to prevent a compromised system from mallissously changing the
-					 * 		   symlink's destionation as a result of our multiple accesses to /proc/self/path.)
+					 * 		   symlink's destionation as a result of our multiple accesses to the link itself.)
 					 *
+					 * 		- The loop will reallocate the buffer after the link is fully read so that ONLY the
+					 * 		  needed memory to store it is allocated for it. (Prevent unnessacarry memory usage.)
+					 * 
 					 * 	(End of original rant.)
 					 */
 					// Begin the devil's loop.
@@ -170,7 +174,7 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 							memset(checkBuffer, '\0', realBufferLength);
 
 							// Call readlink() for the first buffer.
-							firstBufferLength = readlink(PROC_PATH, readLinkBuf, realBufferLength);
+							firstBufferLength = readlink((*path), readLinkBuf, realBufferLength);
 
 							// Check bufferLength.
 							if (firstBufferLength >= 0)
@@ -179,7 +183,7 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 								if (firstBufferLength < realBufferLength)
 								{
 									// Call readlink() for the second buffer.
-									secondBufferLength = readlink(PROC_PATH, checkBuffer, realBufferLength);
+									secondBufferLength = readlink((*path), checkBuffer, realBufferLength);
 
 									// Check secondBufferLength.
 									if (secondBufferLength >= 0)
@@ -193,29 +197,39 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 												// Paths match, deallocate the second buffer.
 												if (checkBuffer != NULL)
 												{
+													memset(checkBuffer, '\0', realBufferLength);
 													free(checkBuffer);
 													checkBuffer = NULL;
 												}
 
-												// Copy the first buffer to the resolvedPath buffer.
-												resolvedPath = readLinkBuf;
-
-												// Because the returned link is the actual executable, call GetParent().
-												resolvedPath = FileUtills::GetParent(resolvedPath);
-												if (resolvedPath.size() > 0)
+												// Reallocate the buffer. (Free unneeded memory.)
+												ret = FileUtills_Reallocate_CString_Buffer(readLinkBuf, realBufferLength, firstBufferLength);
+												if (ret == COMMON_ERROR_SUCCESS)
 												{
-													// Clear Common::commonLastErrorCode.
-													ret = COMMON_ERROR_SUCCESS;
+													// Copy the first buffer pointer to the path buffer pointer.
+													(*path) = readLinkBuf;
 												}
 												else
 												{
-													// GetParent() failed.
-													ret = COMMON_ERROR_INTERNAL_ERROR;
-													COMMON_LOG_DEBUG("FileUtills_ResolveSystemSymoblicLink(): ");
-													COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-													COMMON_LOG_DEBUG(" Call to FileUtills_GetParent() failed.");
+													// Could not free the unneeded memory.
+													COMMON_LOG_DEBUG("FileUtills_ResolveSystemSymoblicLink(): Call to FileUtills_Reallocate_CString_Buffer() failed: ");
+													COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
 												}
 											}
+											else
+											{
+												// Something is screwing with us...abort.
+												ret = COMMON_ERROR_INTERNAL_ERROR;
+												COMMON_LOG_DEBUG("FileUtills_ResolveSystemSymoblicLink(): ");
+												COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+											}
+										}
+										else
+										{
+											// Something is screwing with us...abort.
+											ret = COMMON_ERROR_INTERNAL_ERROR;
+											COMMON_LOG_DEBUG("FileUtills_ResolveSystemSymoblicLink(): ");
+											COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
 										}
 									}
 									else
@@ -225,6 +239,22 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 										ret = Common_Translate_Posix_Errno_To_Common_Error_Code(errcpy);
 										COMMON_LOG_DEBUG("FileUtills_ResolveSystemSymoblicLink(): readlink() system call returned: ");
 										COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
+									}
+								}
+								else
+								{
+									// We did not get the entire link, so we need to deallocate it for the next loop.
+									if (readLinkBuf != NULL)
+									{
+										memset(readLinkBuf, '\0', realBufferLength);
+										free(readLinkBuf);
+										readLinkBuf = NULL;
+									}
+									if (checkBuffer != NULL)
+									{
+										memset(checkBuffer, '\0', realBufferLength);
+										free(checkBuffer);
+										checkBuffer = NULL;
 									}
 								}
 							}
@@ -257,6 +287,23 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 						COMMON_LOG_INFO("FileUtills_ResolveSystemSymoblicLink(): ");
 						COMMON_LOG_INFO(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
 						COMMON_LOG_INFO(" Unable to resolve the symbolic link due to engine limitation. (Length of the resolved path is too long.)");
+					}
+
+					// If unsuccessful, make sure both buffers are deallocated.
+					if (ret != COMMON_ERROR_SUCCESS)
+					{
+						if (readLinkBuf != NULL)
+						{
+							memset(readLinkBuf, '\0', realBufferLength);
+							free(readLinkBuf);
+							readLinkBuf = NULL;
+						}
+						if (checkBuffer != NULL)
+						{
+							memset(checkBuffer, '\0', realBufferLength);
+							free(checkBuffer);
+							checkBuffer = NULL;
+						}
 					}
 				}
 			}
@@ -293,27 +340,6 @@ int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_
 		COMMON_LOG_DEBUG("FileUtills_ResolveSystemSymoblicLink(): ");
 		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 		COMMON_LOG_DEBUG(" Given path argument is invalid.");
-	}
-
-	// Deallocate the used memory if needed.
-	if (readLinkBuf != NULL)
-	{
-		// Deallocate the memory.
-		free(readLinkBuf);
-		readLinkBuf = NULL;
-	}
-	if (checkBuffer != NULL)
-	{
-		// Deallocate the memory.
-		free(checkBuffer);
-		checkBuffer = NULL;
-	}
-
-	// Reset resolvedPath if needed.
-	if (ret != COMMON_ERROR_SUCCESS)
-	{
-		// Reset resolvedPath.
-		resolvedPath.clear();
 	}
 
 	// Return the result.

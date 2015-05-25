@@ -304,7 +304,7 @@ size_t Get_Max_Symlink_Depth()
 int ResolvePath_Helper(char * retStr, size_t * retStrSize);
 
 /*!
- * 	int FileUtills::ResolveSystemSymoblicLink_Syscall(const char * path, const size_t pathSize, char ** resolvedPath, size_t * resolvedPathSize)
+ * 	int FileUtills::ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize)
  *
  * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY OUTSIDE OF THE
  * 	FILEUTILLS NAMESPACE. THIS FUNCTION EXPECTS ANY AND ALL OTHER
@@ -323,8 +323,10 @@ int ResolvePath_Helper(char * retStr, size_t * retStrSize);
  * 	called public FileUtills function had it's disableSymLinkResolution boolean argument set to true
  * 	explisitly.)
  *
- * 	Returns COMMON_ERROR_SUCCESS if successful. (resolvedPath with have it's contents reset and the resolved
- * 	path stored in it.)
+ * 	Returns COMMON_ERROR_SUCCESS if successful. (path with have it's contents reset and the resolved
+ * 	path stored in it. pathSize will be reset and have the correct size in it for the resolved path.
+ * 	Note: No deallocation is performed on either pointer, so if you need to keep the existing pointer
+ * 	you should copy it elsewhere before calling this function.)
  *
  * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given path argument is empty, or if the given path string is
  * 	not a symbolic link as defined by the host system.
@@ -335,8 +337,7 @@ int ResolvePath_Helper(char * retStr, size_t * retStrSize);
  * 	may be returned by the syscall into a Common namespace
  * 	error code.
  *
- * 	The result of this function is returned to the caller, (The requested path will be stored in
- * 	given path argument.)
+ * 	In the case of ANY error, the pointer arguments will NOT be altered.
  *
  * 	This function is permitted to perform any nessacarry allocations or
  * 	modifications needed by the host's syscall to perform the task, however
@@ -345,7 +346,7 @@ int ResolvePath_Helper(char * retStr, size_t * retStrSize);
  * 	exception created by itself or the host's syscall. (In that instance
  * 	COMMON_ERROR_EXCEPTION_THROWN must be returned, regardless of result.)
  */
-int ResolveSystemSymoblicLink_Syscall(const char * path, const size_t pathSize, char ** resolvedPath, size_t * resolvedPathSize);
+int ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize);
 
 /*!
  * 	int FileUtills::GetUserProfileDirectoryPath_Syscall(std::string & path)
@@ -404,7 +405,7 @@ int GetUserProfileDirectoryPath_Syscall(std::string & path);
 int GetCurrentWorkingDirectoryPath_Syscall(std::string & path);
 
 /*!
- * 	int FileUtills::GetExecDirectory_Syscall(std::string & retStr)
+ * 	int FileUtills::GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
  *
  * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY OUTSIDE OF THE
  * 	FILEUTILLS NAMESPACE. THIS FUNCTION EXPECTS ANY AND ALL OTHER
@@ -417,9 +418,9 @@ int GetCurrentWorkingDirectoryPath_Syscall(std::string & path);
  * 	may be returned by the syscall into a Common namespace
  * 	error code.
  *
- * 	The result of this function is returned to the caller,
- * 	and the std::string argument retStr is altered with the result.
- * 	(In case of error the std::string argument is NOT altered.)
+ * 	The result code of this function is returned to the caller,
+ * 	and the argument retStr is altered with the result.
+ * 	(In case of error the arguments are NOT altered.)
  *
  * 	This function is permitted to perform any nessacarry allocations or
  * 	modifications needed by the host's syscall to perform the task, however
@@ -428,7 +429,7 @@ int GetCurrentWorkingDirectoryPath_Syscall(std::string & path);
  * 	exception created by itself or the host's syscall. (In that instance
  * 	COMMON_ERROR_EXCEPTION_THROWN must be returned, regardless of result.)
  */
-int GetExecDirectory_Syscall(std::string & retStr);
+int GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize);
 
 /*!
  * 	FileUtills::dirlist * FileUtills::getDirectory_Helper(const std::string & absPath, const bool & cleanList)
