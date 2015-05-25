@@ -441,7 +441,7 @@ int FileUtills::ResolvePath(const char * path, const size_t pathSize, char * ret
 															if (ret == COMMON_ERROR_SUCCESS)
 															{
 																// Reallocate the buffer to store the relative path.
-																ret = FileUtills_Reallocate_CString_Buffer(outputStr, outputStrSize, (outputStrSize + tempLinkBufSize));
+																ret = FileUtills_Reallocate_CString_Buffer(&outputStr, outputStrSize, (outputStrSize + tempLinkBufSize));
 																if (ret == COMMON_ERROR_SUCCESS)
 																{
 																	// Reset ret.
