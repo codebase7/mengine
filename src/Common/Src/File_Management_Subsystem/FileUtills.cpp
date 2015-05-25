@@ -437,7 +437,7 @@ int FileUtills::ResolvePath(const char * path, const size_t pathSize, char * ret
 														if (ret == FILEUTILLS_ERROR_PATH_IS_RELATIVE)
 														{
 															// Remove the symlink from the outputStr.
-															ret = FileUtills::RemoveLastPathSegment(outputStr, outputStrSize);
+															ret = FileUtills::RemoveLastPathSegment(&outputStr, &outputStrSize);
 															if (ret == COMMON_ERROR_SUCCESS)
 															{
 																// Reallocate the buffer to store the relative path.

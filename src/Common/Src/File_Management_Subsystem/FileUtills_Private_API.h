@@ -142,7 +142,7 @@ int GetPathSegment(const std::string & path, const size_t & currentPathPos, std:
 int GetLastPathSegment(const std::string & path, std::string & pathSegment, const bool & blankPathSegment = true);
 
 /*!
- * 	int FileUtills::RemoveLastPathSegment(std::string & path, size_t & currentPathPos)
+ * 	int FileUtills::RemoveLastPathSegment(char ** path, size_t * currentPathPos)
  *
  * 	This function removes a path segment from the given path, and updates the
  * 	given currentPathPos variable to point to the location in the string
@@ -189,21 +189,26 @@ int GetLastPathSegment(const std::string & path, std::string & pathSegment, cons
  * 	This function will return the COMMON_ERROR_SUCCESS error code if it is successfull,
  * 	the results will be stored in the given arguments.
  *
+ * 	NOTE: This function will NOT deallocate a pre-existing pointer, but it WILL OVERWRITE IT.
+ * 	(So if you need to use or deallocate it later, make sure to copy the pointer before calling
+ * 	 this function.)
+ *
  * 	If an error occurs, the error will be returned, and the given arguments will NOT
  * 	be altered.
- *
- * 	In any case, the returned error code will also be written to Common::commonLastErrorCode.
  */
-int RemoveLastPathSegment(std::string & path, size_t & currentPathPos);
+int RemoveLastPathSegment(char ** path, size_t * pathSize, size_t * currentPathPos);
 
 /*!
- * 	int FileUtills::RemoveLastPathSegment(std::string & path)
+ * 	int FileUtills::RemoveLastPathSegment(char ** path, size_t * pathSize)
  *
- * 	This function acts as a wrapper to FileUtills::RemoveLastPathSegment(std::string &, size_t &)
+ * 	This function acts as a wrapper to FileUtills::RemoveLastPathSegment(char **, size_t *, size_t *)
  * 	with the assumption that the path segment you want to remove is at the end of the
  * 	string. (end of the given string is determined by the string's size.)
+ *
+ * 	See the function comment for FileUtills::RemoveLastPathSegment(char **, size_t *, size_t *)
+ * 	the expected behavior of this wrapper function.
  */
-int RemoveLastPathSegment(std::string & path);
+int RemoveLastPathSegment(char ** path, size_t * pathSize);
 
 /*!
  * 	size_t FileUtills::Get_Max_Symlink_Depth()
