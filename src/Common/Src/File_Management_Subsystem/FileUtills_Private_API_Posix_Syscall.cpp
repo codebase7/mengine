@@ -503,38 +503,59 @@ int FileUtills::GetCurrentWorkingDirectoryPath_Syscall(std::string & path)
 	return ret;
 }
 
-int FileUtills::GetExecDirectory_Syscall(std::string & retStr)
+int FileUtills::GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
 {
 	// Init vars.
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;	// The result code returned from this function.
-	std::string result = "";		// The string returned from this function.
-#ifdef __linux__
+	char * result = NULL;			// The string returned from this function.
+	size_t resultSize = 0;			// The size of the result string.
 
-	// Call FileUtills::ResolveSystemSymoblicLink_Syscall(). (Make sure it's the real path not a symlink. (PROC_PATH is a symlink, and a weird one at that.))
-	ret = FileUtills::ResolveSystemSymoblicLink_Syscall(PROC_PATH, result);
-	if (ret == COMMON_ERROR_SUCCESS)
+	// Check for valid arguments.
+	if ((retStr != NULL) && (retStrSize != NULL))
 	{
-		// Copy the result string to retStr.
-		retStr = result;
-	}
-	else
-	{
-		// Check for an invalid argument error.
-		if (ret == COMMON_ERROR_INVALID_ARGUMENT)
+#ifdef __linux__
+		// Copy the pointer.
+		result = PROC_PATH;
+		resultSize = PROC_PATH_SIZE;
+
+		// Call FileUtills::ResolveSystemSymoblicLink_Syscall(). (Make sure it's the real path not a symlink. (PROC_PATH is a symlink, and a weird one at that.))
+		ret = FileUtills::ResolveSystemSymoblicLink_Syscall(&result, &resultSize);
+		if (ret == COMMON_ERROR_SUCCESS)
+		{
+			// The resulting path is actually the exe itself, so we need to call RemoveLastPathSegment().
+			ret = FileUtills::RemoveLastPathSegment(&result, &resultSize);
+			if (ret == COMMON_ERROR_SUCCESS)
+			{
+				// Copy the result string to retStr.
+				(*retStr) = result;
+				(*retStrSize) = resultSize;
+			}
+			else
+			{
+				// Could not remove exe from path.
+				COMMON_LOG_DEBUG("FileUtills_GetExecDirectory_Syscall(): Could not remove exe from it's path, call to FileUtills_RemoveLastPathSegment() failed: ");
+				COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
+			}
+		}
+		else
 		{
 			// This is an internal engine error.
 			ret = COMMON_ERROR_INTERNAL_ERROR;
 
 			// Report it.
-			COMMON_LOG_WARNING("FileUtills::GetExecDirectory(): ");
-			COMMON_LOG_WARNING(Common::Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-			COMMON_LOG_WARNING(" Getting the executable path failed. (Call to an internal engine function failed.) Please report this bug.\n");
+			COMMON_LOG_WARNING("FileUtills_GetExecDirectory(): ");
+			COMMON_LOG_WARNING(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+			COMMON_LOG_WARNING(" Getting the executable path failed. (Call to an internal engine function failed.) Please report this bug.");
 		}
-	}
-
 #endif
-	// Clear the result string.
-	result.clear();
+	}
+	else
+	{
+		// Invalid arguments.
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+		COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
+		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+	}
 
 	// Return result.
 	return ret;
