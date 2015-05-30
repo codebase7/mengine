@@ -1,5 +1,5 @@
 /*!
-    Multiverse Engine Project 10/4/2015 Common MSYS_Mutexes_Linux.h
+    Multiverse Engine Project 29/5/2015 Common MSYS_Mutexes_Windows.h
 
     Copyright (C) 2015 Multiverse Engine Project
 
@@ -18,28 +18,32 @@
     https://github.com/codebase7/mengine
 */
 
-// Check for defined MSYS_MUTEXES_H.
+/* Check for defined MSYS_MUTEXES_H. */
 #ifndef MSYS_MUTEXES_H
-#error "You should not inlcude MSYS_Mutexes_Linux.h directly. Use MSYS_Mutexes.h instead. Aborting build."
-#endif	// MSYS_MUTEXES_H
+#error "You should not inlcude MSYS_Mutexes_Windows.h directly. Use MSYS_Mutexes.h instead. Aborting build."
+#endif	/* MSYS_MUTEXES_H */
 
-// Include guard.
-#ifndef MSYS_MUTEXES_LINUX
+/* Include guard. */
+#ifndef MSYS_MUTEXES_WINDOWS
+#define MSYS_MUTEXES_WINDOWS
 
-// Check for linux declaration.
-#ifdef __linux__
+/* Check for win32 declaration. */
+#ifdef _WIN32
 
-// Define the invalid thread ID to use.
+/* Define the invalid thread ID to use. */
 #define MSYS_INVALID_TID 0
 
-// Define the needed function calls.
+/* Define true and false values for the fake boolean implementation. */
+#define MSYS_LONG_TRUE 1L
+#define MSYS_LONG_FALSE 0L
+
+/* Define the needed function calls. */
 long MSYS_Get_Thread_ID();
 
 void MSYS_Sync_Memory();
 
-#endif	// __linux__
+#endif	/* _WIN32 */
 
-#endif	// MSYS_MUTEXES_LINUX
+#endif	/* MSYS_MUTEXES_WINDOWS */
 
-// End of MSYS_Mutexes_Linux.h
-
+/* End of MSYS_Mutexes_Windows.h */

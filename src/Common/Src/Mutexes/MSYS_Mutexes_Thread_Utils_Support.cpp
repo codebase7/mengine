@@ -137,7 +137,7 @@ short TU_Mutex_MSYS::Lock_Mutex()
 	{
 		// Lock the mutex.
 		retFromFunct = MSYS_Lock_Mutex(this->mu);
-		if (retFromFunct != NULL)
+		if (retFromFunct == MSYS_MU_SUCCESS)
 		{
 			// Success.
 			ret = COMMON_ERROR_SUCCESS;
@@ -167,22 +167,22 @@ short TU_Mutex_MSYS::Lock_Mutex()
 short TU_Mutex_MSYS::Try_Lock_Mutex()
 {
 	// Init vars.
-	short ret = COMMON_ERROR_UNKNOWN_ERROR;	// The result of this function.
-	short retFromFunct = -1;			// The result of the call to MSYS_Try_Lock_Mutex().
+	short ret = COMMON_ERROR_UNKNOWN_ERROR;		// The result of this function.
+	short retFromFunct = MSYS_MU_UNKNOWN_ERROR;	// The result of the call to MSYS_Try_Lock_Mutex().
 
 	// Check for a mutex from our library.
 	if (this->lib == TU_LibID_MSYS_Mutex)
 	{
 		// Call try lock function.
 		retFromFunct = MSYS_Try_Lock_Mutex(this->mu);
-		if (retFromFunct == 0)
+		if (retFromFunct == MSYS_MU_SUCCESS)
 		{
 			// Success.
 			ret = COMMON_ERROR_SUCCESS;
 		}
 		else
 		{
-			if (retFromFunct == 1)
+			if (retFromFunct == MSYS_MU_ALREADY_LOCKED)
 			{
 				// Lock already active.
 				ret = THREAD_UTILS_ERROR_MUTEX_ALREADY_LOCKED;
@@ -213,15 +213,15 @@ short TU_Mutex_MSYS::Try_Lock_Mutex()
 short TU_Mutex_MSYS::Unlock_Mutex()
 {
 	// Init vars.
-	short ret = COMMON_ERROR_UNKNOWN_ERROR;	// The result of this function.
-	short retFromFunct = -1;			// The result from MSYS_Unlock_Mutex().
+	short ret = COMMON_ERROR_UNKNOWN_ERROR;			// The result of this function.
+	short retFromFunct = MSYS_MU_UNKNOWN_ERROR;		// The result from MSYS_Unlock_Mutex().
 
 	// Check for a mutex from our library.
 	if (this->lib == TU_LibID_MSYS_Mutex)
 	{
 		// Unlock the mutex.
 		retFromFunct = MSYS_Unlock_Mutex(this->mu);
-		if (retFromFunct == 0)
+		if (retFromFunct == MSYS_MU_SUCCESS)
 		{
 			// Success.
 			ret = COMMON_ERROR_SUCCESS;
@@ -229,7 +229,7 @@ short TU_Mutex_MSYS::Unlock_Mutex()
 		else
 		{
 			// Check for ownership error.
-			if (retFromFunct == 1)
+			if (retFromFunct == MSYS_MU_ALREADY_LOCKED)
 			{
 				// The calling thread does not own the mutex.
 				ret = COMMON_ERROR_ACCESS_DENIED;

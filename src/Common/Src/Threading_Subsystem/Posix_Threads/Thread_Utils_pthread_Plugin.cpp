@@ -18,7 +18,11 @@
     https://github.com/codebase7/mengine
 */
 
-#include "Thread_Utils.h"
+#ifdef _WIN32
+#include "..\Thread_Utils.h"
+#else
+#include "../Thread_Utils.h"
+#endif	/* _WIN32 */
 
 // Only define things if pthread support is enabled.
 #ifdef TW_PTHREADS_SUPPORT

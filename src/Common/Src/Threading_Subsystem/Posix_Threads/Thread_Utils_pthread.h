@@ -36,7 +36,12 @@
 		const Common_LibraryID TU_LibID_pthreads = {true, "Pthreads"};
 
 // Also need to include the plugin header file.
-#include "Thread_Utils_Plugin.h"
+#ifdef _WIN32
+#include "..\Thread_Utils_Plugin.h"
+#else
+#include "../Thread_Utils_Plugin.h"
+#endif	/* _WIN32 */
+
 #else
 		// Not a plugin, so set the plugin flag to false.
 		const Common_LibraryID TU_LibID_pthreads = {false, "Pthreads"};

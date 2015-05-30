@@ -9,7 +9,10 @@ set(CMAKE_THREAD_PREFER_PTHREAD 1)
 find_package(Threads REQUIRED)
 if (Threads_FOUND)
     # Check for pthread.
-    if (NOT CMAKE_USE_PTHREADS_INIT)
+    if (CMAKE_USE_PTHREADS_INIT)
+		set (PTHREADS_ENABLED TRUE)
+	else(CMAKE_USE_PTHREADS_INIT)
+		set (PTHREADS_ENABLED FALSE)
 	  # We need the pthreads library abort.
 	  message(FATAL_ERROR "No pthreads library found. We need the Posix Thread Library, not a win32, sparc, hp, etc. version. Aborting.")
     endif(NOT CMAKE_USE_PTHREADS_INIT)
@@ -28,13 +31,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(THREAD_UTILS_INCLUDES ..\Generic_Wrapper.cpp 
 	    Thread_Utils_Base.cpp 
 	    Thread_Utils_Functions.cpp 
-	    Thread_Utils_pthread.cpp)
+	    Posix_Threads\Thread_Utils_pthread.cpp)
 	
 	# Create the Pthreads Plugin.
 	set(PTHREADS_PLUGIN_INCLUDES ..\Generic_Wrapper.cpp 
 	    Thread_Utils_Base.cpp 
 	    Thread_Utils_pthread.cpp
-	    Thread_Utils_pthread_Plugin.cpp)
+	    Posix_Threads\Thread_Utils_pthread_Plugin.cpp)
 	
 	ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	    # Building on Linux.
@@ -42,13 +45,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	    set(THREAD_UTILS_INCLUDES ../Generic_Wrapper.cpp 
 		Thread_Utils_Base.cpp 
 		Thread_Utils_Functions.cpp 
-		Thread_Utils_pthread.cpp)
+		Posix_Threads/Thread_Utils_pthread.cpp)
 
 	    # Create the Pthreads Plugin.
 	    set(PTHREADS_PLUGIN_INCLUDES ../Generic_Wrapper.cpp 
 		Thread_Utils_Base.cpp 
 		Thread_Utils_pthread.cpp
-		Thread_Utils_pthread_Plugin.cpp)
+		Posix_Threads/Thread_Utils_pthread_Plugin.cpp)
 
 	ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	    # We don't have a match against a known system.
