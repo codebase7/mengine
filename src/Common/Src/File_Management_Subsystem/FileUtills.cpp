@@ -210,43 +210,113 @@ int FileUtills::GetCurrentWorkingDirectoryPath(std::string & path)
 	return ret;
 }
 
-int FileUtills::GetExecDirectory(std::string & retStr)
+int FileUtills::GetExecDirectory(char ** retStr, size_t * retStrSize)
 {
 	// Init vars.
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;	// The result code of this function.
-	std::string result = "";		// The result string from GetExecDirectory_Syscall().
+	size_t resultSize = 0;			// The size of the result string.
+	char * result = NULL;			// The result string from GetExecDirectory_Syscall().
 
-	// Call the syscall.
-	ret = FileUtills::GetExecDirectory_Syscall(result);
-	if (ret == COMMON_ERROR_SUCCESS)
+	// Check for valid arguments.
+	if ((retStr != NULL) && (retStrSize != NULL))
 	{
-		// Copy result to retStr.
-		retStr = result;
-	}
-	else
-	{
-		// Check for a INVALID_ARGUMENT.
-		if (ret == COMMON_ERROR_INVALID_ARGUMENT)
+		// Call the syscall.
+		ret = FileUtills::GetExecDirectory_Syscall(&result, &resultSize);
+
+		// Check the error code.
+		switch(ret)
 		{
-			// This is an internal error.
-			ret = COMMON_ERROR_INTERNAL_ERROR;
+			// VALID ERROR CODES.
+			COMMON_ERROR_SUCCESS:
+			COMMON_ERROR_INVALID_ARGUMENT:
+			COMMON_ERROR_MEMORY_ERROR:
+				break;
+			default:	// INVALID ERROR CODE.
+				ret = COMMON_ERROR_UNKNOWN_ERROR;
+				COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): Called Syscall Function returned an invalid Common error code, and should be rewritten to return VALID Common error codes.");
+				break;
+		};
 
-			// Log this error.
-			COMMON_LOG_WARNING("FileUtills::GetExecDirectory(): Syscall returned an invalid argument error. Please report this bug.\n");
+		// If we were successful, copy the pointers.
+		if (ret == COMMON_ERROR_SUCCESS)
+		{
+			(*retStr) = result;
+			(*retStrSize) = resultSize;
 		}
 		else
 		{
 			// Log the error.
-			COMMON_LOG_DEBUG("FileUtills::GetExecDirectory(): ");
-			COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-			COMMON_LOG_DEBUG("\n");
+			COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
+			COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
 		}
 	}
-
-	// Blank result.
-	result.clear();
+	else
+	{
+		// Invalid argument error.
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+		COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
+		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(" Invalid string or string size given.");
+	}
 
 	// Return ret.
+	return ret;
+}
+
+/*!
+ * 	int FileUtills_Copy_CString(const char * src, const size_t srcSize, char ** dest)
+ *
+ * 	Allocates a new c-string and copies the given source string to it.
+ * 	The copied c-string is identical to the source, and is allocated
+ * 	with the same size.
+ *
+ * 	Returns COMMON_ERROR_SUCCESS if successful. (The dest pointer will point
+ * 	to the copied c-string in this case.)
+ *
+ * 	Otherwise returns the appropriate error. (The dest pointer will NOT be
+ * 	altered in this case.)
+ */
+int FileUtills_Copy_CString(const char * src, const size_t srcSize, char ** dest)
+{
+	// Init vars.
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		// The result of this function.
+	char * tempBuf = NULL;				// Temporary variable to copy the src with.
+
+	// Check for valid arguments.
+	if ((src != NULL) && (srcSize > 0) && (dest != NULL))
+	{
+		// Allocate tempBuf.
+		tempBuf = (char*)malloc(srcSize);
+		if (tempBuf != NULL)
+		{
+			// Copy the string.
+			for (size_t x = 0; (x < srcSize); x++)
+			{
+				tempBuf[x] = src[x];
+			}
+
+			// Set the dest pointer.
+			(*dest) = tempBuf;
+
+			// Done.
+			ret = COMMON_ERROR_SUCCESS;
+		}
+		else
+		{
+			// Could not allocate memory.
+			ret = COMMON_ERROR_MEMORY_ERROR;
+		}
+	}
+	else
+	{
+		// Invalid argument error.
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+		COMMON_LOG_DEBUG("FileUtills_Copy_CString(): ");
+		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(" Invalid string, string size, or destionation pointer given.");
+	}
+
+	// Return the result.
 	return ret;
 }
 
