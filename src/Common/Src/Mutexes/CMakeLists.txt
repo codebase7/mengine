@@ -10,7 +10,11 @@ if (BUILD_INTERNAL_MUTEX_SUPPORT)
 	# Figure out what system we are building on so we can include the correct headers.
 	IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		# Building on Linux.
-		set(COMMON_MUTEXES_INCLUDES ${COMMON_MUTEXES_BASE_INCLUDES} MSYS_Mutexes_Linux.c)
+		set(COMMON_MUTEXES_INCLUDES ${COMMON_MUTEXES_BASE_INCLUDES} Linux/MSYS_Mutexes_Linux.c)
+
+	ELSEIF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+		# Building on Windows.
+		set(COMMON_MUTEXES_INCLUDES ${COMMON_MUTEXES_BASE_INCLUDES} Windows\MSYS_Mutexes_Windows.c)
 
 	ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		message(FATAL_ERROR "Internal Mutex Support is unsupported on this system. Please consider adding support! Aborting.")

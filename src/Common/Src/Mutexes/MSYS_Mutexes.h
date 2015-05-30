@@ -18,25 +18,42 @@
     https://github.com/codebase7/mengine
 */
 
-// Include guard.
+/* Include guard. */
 #ifndef MSYS_MUTEXES_H
 #define MSYS_MUTEXES_H
 
-// External includes.
-#include <stdbool.h>	// (Defines bool data type.)
-#include <stdlib.h>	// Defines malloc(), free().
+/* Define extern C. */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
 
-// Internal host specific includes.
+/* Define error codes. */
+#define MSYS_MU_SUCCESS 0
+#define MSYS_MU_ALREADY_LOCKED 1
+#define MSYS_MU_INVALID -1
+#define MSYS_MU_UNKNOWN_ERROR -2
+
+/* External includes. */
+#include <stdlib.h>	/* Defines malloc(), free(). */
+
+/* Internal host specific includes. */
 #ifdef __linux__
-#include "MSYS_Mutexes_Linux.h"
-#endif	// __linux__
+#include "Linux/MSYS_Mutexes_Linux.h"
+#elif _WIN32
+#include "Windows\MSYS_Mutexes_Windows.h"
+#endif	/*  __linux__ */
 
-// Define the mutex type.
-typedef struct {
-	void * lock;	// The mutex itself.
+/* Define the mutex type. */
+typedef struct MSYS_Mutex_T {
+	void * lock;	/* The mutex itself. */
 } MSYS_Mutex;
 
-// Define the functions.
+/* We have to use a different header for MSVC due to it's crap support of the C standard. */
+#ifdef _MSC_FULL_VER
+#include "Windows\MSYS_Mutexes_MSVC.h"
+#else
+
+/* Define the functions. */
 
 /*!
  * 	MSYS_Mutex * MSYS_Create_Mutex()
@@ -184,6 +201,12 @@ bool MSYS_Compare_And_Swap(bool * address, const bool oldValToCheckFor, const bo
  */
 bool MSYS_Compare_And_Swap_Long(long * address, const long oldValToCheckFor, const long newValToWrite);
 
-#endif	// MSYS_MUTEXES_H
+#endif	/* _MSC_FULL_VER */
 
-// End of MSYS_Mutexes.h
+#ifdef __cplusplus
+}	/* extern C */
+#endif /* __cplusplus */
+
+#endif	/* MSYS_MUTEXES_H */
+
+/* End of MSYS_Mutexes.h */
