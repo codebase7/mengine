@@ -18,28 +18,37 @@
     https://github.com/codebase7/mengine
 */
 
-// Check for defined MSYS_MUTEXES_H.
+/* Include guard. */
+#ifndef MSYS_MUTEXES_LINUX_H
+#define MSYS_MUTEXES_LINUX_H
+
+/* Check for defined MSYS_MUTEXES_H. */
 #ifndef MSYS_MUTEXES_H
 #error "You should not inlcude MSYS_Mutexes_Linux.h directly. Use MSYS_Mutexes.h instead. Aborting build."
-#endif	// MSYS_MUTEXES_H
+#endif	/* MSYS_MUTEXES_H */
 
-// Include guard.
-#ifndef MSYS_MUTEXES_LINUX
-
-// Check for linux declaration.
+/* Check for linux declaration. */
 #ifdef __linux__
 
-// Define the invalid thread ID to use.
+/* Define extern C */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
+
+/* Define the invalid thread ID to use. */
 #define MSYS_INVALID_TID 0
 
-// Define the needed function calls.
+/* Define the needed function calls. */
 long MSYS_Get_Thread_ID();
 
 void MSYS_Sync_Memory();
 
-#endif	// __linux__
+#ifdef __cplusplus
+}	/* extern C */
+#endif	/* __cplusplus */
 
-#endif	// MSYS_MUTEXES_LINUX
+#endif	/* __linux__ */
 
-// End of MSYS_Mutexes_Linux.h
+#endif	/* MSYS_MUTEXES_LINUX_H */
 
+/* End of MSYS_Mutexes_Linux.h */
