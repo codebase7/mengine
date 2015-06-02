@@ -2,25 +2,44 @@
 set(LIBRARY_OUTPUT_PATH ${L_OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${O_OUTPUT_DIR})
 
+
 # Create the mutexes library.
-add_subdirectory(Mutexes)
+if (BUILD_INTERNAL_MUTEX_SUPPORT)
+	add_subdirectory(Mutexes)
+	set (COMMON_BUILT_STATIC_LIBRARY_LIST ${COMMON_BUILT_STATIC_LIBRARY_LIST} Common_Mutexes_Multiverse_Engine_Static)
+endif(BUILD_INTERNAL_MUTEX_SUPPORT)
+
 
 # Create the error handler.
-add_subdirectory(Error_Handler)
+if (BUILD_COMMON_ERROR_HANDLER)
+	add_subdirectory(Error_Handler)
+	set (COMMON_BUILT_STATIC_LIBRARY_LIST ${COMMON_BUILT_STATIC_LIBRARY_LIST} Common_Error_Handler_Multiverse_Engine_Static)
+endif(BUILD_COMMON_ERROR_HANDLER)
+
 
 # Create FileUtills.
-add_subdirectory(File_Management_Subsystem)
+if (BUILD_FILE_MANAGEMENT_SUBSYSTEM)
+	add_subdirectory(File_Management_Subsystem)
+	set (COMMON_BUILT_STATIC_LIBRARY_LIST ${COMMON_BUILT_STATIC_LIBRARY_LIST} File_Management_Multiverse_Engine_Static)
+endif (BUILD_FILE_MANAGEMENT_SUBSYSTEM)
+
 
 # Create the Dynamic_Library_Subsystem.
-add_subdirectory(Dynamic_Library_Subsystem)
+if(BUILD_DYNAMIC_LIBRARY_SUBSYSTEM)
+	add_subdirectory(Dynamic_Library_Subsystem)
+	set (COMMON_BUILT_STATIC_LIBRARY_LIST ${COMMON_BUILT_STATIC_LIBRARY_LIST} Dynamic_Library_Subsystem_Multiverse_Engine_Static)
+endif(BUILD_DYNAMIC_LIBRARY_SUBSYSTEM)
+
 
 # Create the Threading Subsystem.
-add_subdirectory(Threading_Subsystem)
+if (BUILD_THREADING_SUBSYSTEM)
+	add_subdirectory(Threading_Subsystem)
+	set (COMMON_BUILT_STATIC_LIBRARY_LIST ${COMMON_BUILT_STATIC_LIBRARY_LIST} Threading_Subsystem_Multiverse_Engine_Static)
+endif (BUILD_THREADING_SUBSYSTEM)
+
 
 # Add library.
 add_library(Common_Multiverse_Engine SHARED Generic_Wrapper.cpp)
 
-target_link_libraries(Common_Multiverse_Engine Core_Multiverse_Engine
-Panic_Handler_Multiverse_Engine
-File_Management_Multiverse_Engine
-Threading_Subsystem_Multiverse_Engine)
+target_link_libraries(Common_Multiverse_Engine Core_Multiverse_Engine_Static
+${COMMON_BUILT_STATIC_LIBRARY_LIST})
