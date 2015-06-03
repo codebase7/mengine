@@ -23,103 +23,158 @@
 #include "FileUtills_Private_API.h"
 
 /*!
-    std::string RemoveTrailingSlash(const std::string & path)
-
-    Removes a DIR_SEP on the end of the given path string (if it exists)
-    Will not do anything and return the original string if there is only 1 charater in the given path string.
-    Will also return the original string if a memory error occurs.
-*/
-std::string RemoveTrailingSlash(const std::string & path)
+ *		int FileUtills_RemoveTrailingSlash(char ** retStr, size_t * retStrSize)
+ *
+ *		Removes a DIR_SEP (Either a '\\' or '/' character) on the end of the given NULL terminated path string.
+ *
+ * 		WARNING: This function will DEALLOCATE the original string if it finds a character to remove. As such,
+ * 		if this call returns COMMON_ERROR_SUCCESS, any pointer to the original string will be INVALID. The
+ * 		result of attempting to dereference such a pointer is undefined.
+ *
+ * 		Returns COMMON_ERROR_SUCCESS if the removal was successful, or if there was not a character to remove.
+ * 		(The character at the end of the string was NOT a '\\' or '/' character.)
+ *
+ * 		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointers are NULL, or if the given size is less
+ * 		than 3.
+ *
+ * 		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *
+ * 		Otherwise returns the appropriate error code.
+ *
+ * 		In case of error, (the return code is NOT COMMON_ERROR_SUCCESS), this function will NOT alter any given
+ * 		arguments.
+ */
+int FileUtills_RemoveTrailingSlash(char ** retStr, size_t * retStrSize)
 {
-	// Init vars.
-	size_t size = 0;
-	std::string buffer = "";
+		/* Init vars. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code for this function. */
+		char * tempBuffer = NULL;				/* Temporary buffer to alter the string with. */
 
-	// Get size of the Directory string.
-	size = path.size();
-
-	// Check the length of the string see if it is only 1 charater.
-	if (size <= 1)
-	{
-		// We can't remove anything, if we do the return would be empty.
-		return path;
-	}
-
-	// Copy the directory string to buffer
-	buffer = path;
-
-	// Check and see if a directory seperator is on the end of the string.
-	if ((path.find_last_of(DIR_SEP)) == (size - 1))
-	{
-		// Remove the trailing Directory seperator so we don't screw up the next check.
-		// Note: substr CAN throw an exception so we must put it in a try catch block.
-		try{
-			buffer = path.substr(0, (size - 1));
-		}
-		catch(exception ex)
+		/* Check for invalid arguments. */
+		if ((retStr != NULL) && ((*retStr) != NULL) && (retStrSize != NULL) && ((*retStrSize) > 2))
 		{
-			// We can't return an error so we will silently fail.
-			return path;
-		}
-	}
+				/* Check and see if the last character in the string is either '/' or '\\'. */
+				/* String should be NULL terminated. */
+				if (((*retStr)[((*retStrSize) - 2)] == '\\') || ((*retStr)[((*retStrSize) - 2)] == '/'))
+				{
+						/* OK, allocate a new string. */
+						tempBuffer = (char*)malloc(((*retStrSize) - 1));
+						if (tempBuffer != NULL)
+						{
+								/* NULL out the buffer. */
+								memset(tempBuffer, '\0', ((*retStrSize) - 1));
 
-	// Return new path.
-	return buffer;
-}
+								/* Copy the data. */
+								memcpy(tempBuffer, retStr, ((*retStrSize) - 2));
 
-int CheckPathType(const std::string & path, bool & bIsDosStylePath)
-{
-	// Init vars.
-	short ret = COMMON_ERROR_INTERNAL_ERROR;		// Result of this function.
+								/* Deallocate the original string. */
+								free((*retStr));
 
-	// Check for valid path string.
-	if (path.size() > 0)
-	{
-		// Check for a DOS style absolute path reference.
-		if ((path.size() > 3) && (path[1] == ':') && (path[2] == '\\')) 
-		{
-			// This is DOS style absolute path.
-			bIsDosStylePath = true;
+								/* Copy the new pointer. */
+								(*retStr) = tempBuffer;
+
+								/* Copy the new size. */
+								(*retStrSize) = ((*retStrSize) - 1);
+
+								/* Done! */
+								ret = COMMON_ERROR_SUCCESS;
+						}
+						else
+						{
+								/* Could not allocate memory for new string. */
+								ret = COMMON_ERROR_MEMORY_ERROR;
+						}
+				}
+				else
+				{
+						/* There is no DIR_SEP character ('\\' or '/') to remove. */
+						ret = COMMON_ERROR_SUCCESS;
+				}
 		}
 		else
 		{
-			// Set bIsDosStylePath.
-			bIsDosStylePath = true;
-
-			/*
-			* 	We are assuming that if a '/' character is found
-			* 	in the path, it is a POSIX style path.
-			*
-			* 	(Probably a dangerous assumption, but there is not
-			* 	much of a way to determine the path type short of
-			* 	determining the OS in use. (And even then it's a
-			* 	problem if the target is different than the host.))
-			*
-			* 	Hopefully the target OS will complain if it gets an
-			* 	invalid path......
-			*/
-			for (size_t x = 0; ((x < path.size()) && (bIsDosStylePath)); x++)
-			{
-				// Check for a '/' character.
-				if (path[x] == '/')
-				{
-					// OK this is a reserved character on windows, so assume the path is a POSIX style path.
-					bIsDosStylePath = false;
-				}
-			}
+				/* We can't remove anything, if we do the return would be empty. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
 		}
 
-		// Done.
-		ret = COMMON_ERROR_SUCCESS;
-	}
-	else
-	{
-		// Invalid path.
-		ret = COMMON_ERROR_INVALID_ARGUMENT;
-	}
+		/* Exit function. */
+		return ret;
+}
 
-	// Return the result.
-	return ret;
+/*!
+ * 		int FileUtills_CheckPathType(const char * path, const size_t pathSize, bool * bIsDosStylePath)
+ *
+ * 		Checks the given path to see if it matches the DOS / Windows path format.
+ * 		(I.e. <Drive Letter>:\<some path> OR <some relative path>\<some other path>).
+ *		The assumption being that if a '/' is found then it's a POSIX style path.
+ *
+ * 		Returns COMMON_ERROR_SUCCESS if the check was performed.
+ * 		(Result will be stored in the given bIsDosStylePath argument.)
+ *
+ * 		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointers are NULL, or the
+ * 		given path size is less than 1.
+ *
+ * 		Otherwise returns the appropriate error code.
+ *
+ * 		In case of error, (the return code is NOT COMMON_ERROR_SUCCESS), this function will NOT
+ * 		alter any given arguments.
+ *
+ * 		Under NO circumstance is the given path or pathSize argument altered in any way.
+ */
+int FileUtills_CheckPathType(const char * path, const size_t pathSize, bool * bIsDosStylePath)
+{
+		/* Init vars. */
+		short ret = COMMON_ERROR_INTERNAL_ERROR;		/* Result of this function. */
+		size_t x = 0;									/* Counter used in check loop. */
+
+		/* Check for valid arguments. */
+		if ((path != NULL) && (pathSize > 0) && (bIsDosStylePath != NULL))
+		{
+				/* Check for a DOS style absolute path reference. */
+				if ((pathSize > 3) && (path[1] == ':') && (path[2] == '\\')) 
+				{
+						/* This is DOS style absolute path. */
+						(*bIsDosStylePath) = true;
+				}
+				else
+				{
+						/* Set bIsDosStylePath. */
+						(*bIsDosStylePath) = true;
+
+						/*
+						 * 	We are assuming that if a '/' character is found
+						 * 	in the path, it is a POSIX style path.
+						 *
+						 * 	(Probably a dangerous assumption, but there is not
+						 * 	much of a way to determine the path type short of
+						 * 	determining the OS in use. (And even then it's a
+						 * 	problem if the target is different than the host.))
+						 *
+						 * 	Hopefully the target OS will complain if it gets an
+						 * 	invalid path......
+						 */
+						for (x = 0; ((x < pathSize) && ((*bIsDosStylePath) == true)); x++)
+						{
+								/* Check for a '/' character. */
+								if (path[x] == '/')
+								{
+										/* OK this is a reserved character on windows, so assume the path is a POSIX style path. */
+										(*bIsDosStylePath) = false;
+								}
+						}
+				}
+
+				/* Done. */
+				ret = COMMON_ERROR_SUCCESS;
+		}
+		else
+		{
+				/* Invalid path. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+		}
+
+		/* Return the result. */
+		return ret;
 }
 
 int FileUtills::GetUserProfileDirectoryPath(std::string & path)
