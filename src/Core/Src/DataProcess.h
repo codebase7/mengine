@@ -26,6 +26,53 @@
 
 namespace DataProcess{
 
+/* Define Endianness Result Values. */
+#define MSYS_BIG_ENDIAN 0
+#define MSYS_LITTLE_ENDIAN 1
+#define MSYS_UNKNOWN_ENDIANNESS 2
+
+/*!
+ *		template<typename T>
+ *		int DataProcess_Endianness_Check(T & a)
+ *
+ *		Template function which checks the host's endianness for the
+ *		given argument's data type.
+ *
+ *		Note: The given argument is not altered or used by the function.
+ *		It's only used to exploit the C++ template generator.
+ *
+ *		Returns MSYS_BIG_ENDIAN if the given data type is stored as big 
+ *		endian on the host machine.
+ *
+ *		Returns MSYS_LITTLE_ENDIAN if the given data type stored as little
+ *		endian on the host machine.
+ *
+ *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
+ *		is unknown for the given host.
+ */
+template<typename T>
+int DataProcess_Endianness_Check(const T & a)
+{
+		/* Init vars. */
+		int ret = MSYS_UNKNOWN_ENDIANNESS;	/* The result of this function. */
+		T t = 1;							/* Variable to check. */
+
+		/* Cast i to a char string and see if the result is 1. */
+		if (((char*)&t)[0])
+		{
+				/* The first byte is 1 so it's little endian. */
+				ret = MSYS_LITTLE_ENDIAN;
+		}
+		else
+		{
+				/* The first byte is 0 so it's big endian. */
+				ret = MSYS_BIG_ENDIAN;
+		}
+
+		/* Return the result. */
+		return ret;
+}
+
 class Data_Object{
     private:
         char * data;        // Pointer to data.
