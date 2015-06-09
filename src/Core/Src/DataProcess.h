@@ -57,7 +57,7 @@ int DataProcess_Endianness_Check(const T & a)
 		int ret = MSYS_UNKNOWN_ENDIANNESS;	/* The result of this function. */
 		T t = 1;							/* Variable to check. */
 
-		/* Cast i to a char string and see if the result is 1. */
+		/* Cast t to a char string and see if the result is 1. */
 		if (((char*)&t)[0])
 		{
 				/* The first byte is 1 so it's little endian. */
@@ -65,8 +65,19 @@ int DataProcess_Endianness_Check(const T & a)
 		}
 		else
 		{
-				/* The first byte is 0 so it's big endian. */
-				ret = MSYS_BIG_ENDIAN;
+				/*
+				 *	The first byte is 0 so, check and see if the last byte is non-zero.
+				 *	If it is, then the host is big endian.
+				 *
+				 *	Otherwise the host is using something like middle-endian to store
+				 *	the value, but we would need more checks to determine what exact
+				 *	kind of endianness the host is using.
+				 */
+				if (((char*)&t)[((sizeof(t)) - 1)])
+				{
+						/* It's big endian. */
+						ret = MSYS_BIG_ENDIAN;
+				}
 		}
 
 		/* Return the result. */
