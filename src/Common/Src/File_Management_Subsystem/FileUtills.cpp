@@ -177,6 +177,55 @@ int FileUtills_CheckPathType(const char * path, const size_t pathSize, bool * bI
 		return ret;
 }
 
+int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
+{
+		/* Init vars. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of this function. */
+		int retFromC = 0;						/* The result of C calls. */
+		size_t x = 0;							/* Counter used in output loop. */
+
+		/* Check for invalid arguments. */
+		if ((OUT != NULL) && (ferror(OUT) == 0) && (data != NULL) && (dataLength > 0))
+		{
+				/* Begin output loop. */
+				for (x = 0; ((x < dataLength) && (retFromC == 0) && (ferror(OUT) == 0)); x++)
+				{
+						/* Write out the data. */
+						retFromC = fputc(data[x], OUT);
+				}
+
+				/* Check for good file stream. */
+				if ((retFromC == 0) && (ferror(OUT) == 0))
+				{
+						/* Flush the buffer. */
+						retFromC = fflush(OUT);
+						if ((retFromC == 0) && (ferror(OUT) == 0))
+						{
+								/* Done! */
+								ret = COMMON_ERROR_SUCCESS;
+						}
+						else
+						{
+								/* Bad file stream. */
+								ret = COMMON_ERROR_IO_ERROR;
+						}
+				}
+				else
+				{
+						/* Bad file stream. */
+						ret = COMMON_ERROR_IO_ERROR;
+				}
+		}
+		else
+		{
+				/* Invalid arguments. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+		}
+
+		/* Exit function. */
+		return ret;
+}
+
 int FileUtills::GetUserProfileDirectoryPath(std::string & path)
 {
 	// Init vars.
