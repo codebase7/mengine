@@ -73,47 +73,64 @@ struct dirlist{
 };
 
 /*!
- * 	int FileUtills::GetUserProfileDirectoryPath(std::string & path)
+ *		int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
  *
- * 	Fetches the user's profile directory from the enviorment, and stores
- * 	it in the given path argument. (Note: The given path argument will be
- * 	erased when this function is called. So take care not to leave something
- * 	in it you need.)
+ *		Writes out the given data in memory to the given output file.
  *
- * 	If the function fails for any reason, path will be an empty string,
- * 	the returned error code and Common::commonLastErrorCode will be set
- * 	to the approiate error.
+ *		NOTE: This function expects that the given output file is already open and not errored out when called.
+ *		The output file will remain open after the function returns. (It will still be usable if the returned error code is SUCCESS.)
+ *		
+ *		The output position of the file will NOT be restored in ANY instance after this function returns.
+ *		If you need the current position for something, copy it elsewhere before calling this function.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the data is written to the output file successfully.
+ *
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given output file pointer is NULL,
+ *		the given output file has errored out prior to the function call,
+ *		data is NULL, or dataLength is less than 1.
+ *
+ *		Returns COMMON_ERROR_IO_ERROR on all f*() errors.
+ *
+ *		Otherwise returns the appropriate error code.
  */
-int GetUserProfileDirectoryPath(std::string & path);
+int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength);
 
 /*!
- * 	int FileUtills::GetCurrentWorkingDirectoryPath(std::string & path)
+ * 	int FileUtills::GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize)
  *
- * 	Fetches the current working directory from the enviorment, and stores
- * 	it in the given path argument. (Note: The given path argument will be
- * 	erased when this function is called. So take care not to leave something
- * 	in it you need.)
+ * 	Fetches the user's profile directory from the environment, and stores
+ * 	it in the given path argument.
  *
- * 	If the function fails for any reason, path will be an empty string,
- * 	the returned error code and Common::commonLastErrorCode will be set
- * 	to the approiate error.
- */
-int GetCurrentWorkingDirectoryPath(std::string & path);
-
-/*!
- * 	int FileUtills::GetExecDirectory(std::string & retStr)
- *
- * 	Replaces the contents of the given retStr argument with a NULL
- * 	terminated std::string that contains the path to the directory where the
- * 	executable is stored.
- *
- * 	If the function fails for any reason, the retStr argument will NOT be altered,
+ * 	If the function fails for any reason, the arguments will NOT be altered,
  * 	and the appropriate error will be returned to the caller.
  */
-int GetExecDirectory(std::string & retStr);
+int GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize);
 
 /*!
-        int getDirectory(const std::string & path, FileUtills::dirlist ** dirTree, const bool & cleanList)
+ * 	int FileUtills::GetCurrentWorkingDirectoryPath(char ** path, size_t * pathSize)
+ *
+ * 	Fetches the current working directory from the environment, and stores
+ * 	it in the given retStr argument.
+ *
+ *	If the function fails for any reason, the arguments will NOT be altered,
+ * 	and the appropriate error will be returned to the caller.
+ */
+int GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSize);
+
+/*!
+ * 	int FileUtills::GetExecDirectory(char ** path, size_t * pathSize)
+ *
+ * 	Replaces the contents of the given retStr argument with a NULL
+ * 	terminated C-String that contains the path to the directory where the
+ * 	executable is stored.
+ *
+ * 	If the function fails for any reason, the arguments will NOT be altered,
+ * 	and the appropriate error will be returned to the caller.
+ */
+int GetExecDirectory(char ** retStr, size_t * retStrSize);
+
+/*!
+        int getDirectory(const char * path, const size_t pathSize, FileUtills::dirlist ** dirTree, const bool & cleanList)
 
         Lists the given directory's contents.
 
@@ -123,7 +140,7 @@ int GetExecDirectory(std::string & retStr);
         FileUtills::dirlist structure that will contain the resulting
         directory listing if successful. If the structure is already
         allocated when passed to this function and this function succeeds,
-	the pre-existing structure will be deallocated.
+		the pre-existing structure will be deallocated.
 
         Pram: cleanList, If this is true then, the generated list will be sorted
         (via decrementing sort), and the list will have the entries for the current
@@ -138,39 +155,35 @@ int GetExecDirectory(std::string & retStr);
         set cleanList to true when calling this function.
 
         Returns COMMON_ERROR_SUCCESS if successfull, dirTree's pointer will point to a valid
-	FileUtills::dirlist structure with the given path's contents in this case.
-	(Any previous structure pointed to by the dirTree pointer will be deallocated.)
+		FileUtills::dirlist structure with the given path's contents in this case.
+		(Any previous structure pointed to by the dirTree pointer will be deallocated.)
 
         Otherwise this function will return the appropriate error, and dirTree's pointer will
         not be modified.
 */
-int getDirectory(const std::string & path, dirlist ** dirTree, const bool & cleanList = false);
+int getDirectory(const char * path, const size_t pathSize, dirlist ** dirTree, const bool cleanList);
 
 /*!
-	int FileUtills::DoesExist(const std::string & path)
+	int FileUtills::DoesExist(const char * path, const size_t pathSize)
 
-	Prams: @std::string path, path to check for existance on the filesystem.
+	Prams: @std::string path, path to check for existence on the filesystem.
 
 	This function checks to see if given file or directory exists.
 
-	This function is called by FileUtills::CheckPermissions() before runing permission checks.
-
-	The returned error code is always copied to Common::commonLastErrorCode.
+	This function is called by FileUtills::CheckPermissions() before running permission checks.
 
 	Returns FILEUTILLS_ERROR_EXISTANT if file or directory exists on the system.
 	Returns FILEUTILLS_ERROR_NON_EXISTANT if file or directory does not exist on the system.
 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given path is empty.
 	Returns COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED if the given system is unsupported.
-	Returns the approiate error in all other instances.
+	Returns the appropriate error in all other instances.
 */
-int DoesExist(const std::string & path);
+int DoesExist(const char * path, const size_t pathSize);
 
 /*!
-	FileUtills::IsFileOrDirectory(const std::string & path)
+	FileUtills::IsFileOrDirectory(const char * path, const size_t pathSize)
 
 	Checks to see if a given path is a file or directory.
-
-	The returned error code is always copied to Common::commonLastErrorCode.
 
 	Returns COMMON_ERROR_SUCCESS if the path exists but it is not a file or directory.
 	Returns FILEUTILLS_ERROR_PATH_IS_A_FILE if the path is a file.
@@ -178,24 +191,24 @@ int DoesExist(const std::string & path);
 	Returns COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED if the given system is unsupported.
 	Returns COMMON_ERROR_ACCESS_DENIED if a permissions error occurs.
 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given path is empty.
-	Returns FILEUTILLS_ERROR_NON_EXISTANT if a path componet does not exist.
+	Returns FILEUTILLS_ERROR_NON_EXISTANT if a path component does not exist.
 	Returns FILEUTILLS_ERROR_ if the path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
-	Returns the approiate error in all other instances.
+	Returns the appropriate error in all other instances.
 */
-int IsFileOrDirectory(const std::string & path);
+int IsFileOrDirectory(const char * path, const size_t pathSize);
 
 /*!
-	int FileUtills::CheckParent(const std::string & path, const bool & read, const bool & write, const bool & exec)
+	int FileUtills::CheckParent(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec)
 
 	Acts as a wrapper to DoesExist and CheckPermissions
-	Checks for the parent directory's existance in the path given.
+	Checks for the parent directory's existence in the path given.
 	Also Checks to see if it is accessible. By default it checks for Read and Write access.
-	(Optionaly it can check for execute permissions, and any combonation of the three. This
+	(Optionally it can check for execute permissions, and any combination of the three. This
 	function will return a COMMON_ERROR_INVALID_ARGUMENT error however if all of the permissions to check
 	are false.)
 
 	Ex. If this path is given: "/home/user/Homework.txt", this function will check and see if the "/home/user" parent
-	directory exists, and if it is accessable.
+	directory exists, and if it is accessible.
 
 	The returned error code is always copied to Common::commonLastErrorCode.
 
@@ -207,25 +220,27 @@ int IsFileOrDirectory(const std::string & path);
 	Returns COMMON_ERROR_INTERNAL_ERROR if an engine error occurs.
 	Returns COMMON_ERROR_UNKNOWN_ERROR if an unknown error occurs.
 	Returns COMMON_ERROR_EXCEPTION_THROWN if an exception is thrown.
-	Returns the approiate error in all other cases.
+	Returns the appropriate error in all other cases.
 */
-int CheckParent(const std::string & path, const bool & read = true, const bool & write = true, const bool & exec = false);
+int CheckParent(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec);
 
 /*!
-	std::string FileUtills::GetParent(const std::string & path)
+	int FileUtills::GetParent(char ** retStr, size_t * retStrSize)
 
 	Returns the parent directory for the given file.
 
 	Gets the path exactly like FileUtills::CheckParent().
 
-	Returns std::string with parent directory path if successful.
-	Returns an empty string otherwise, and sets
-	Common::commonLastErrorCode to the approiate error code.
+	Returns COMMON_ERROR_SUCCESS with parent directory path set in retStr if successful.
+	(retStr's size will be set in retStrSize.)
+	
+	Returns the appropriate error code otherwise.
+	(retStr and retStrSize will NOT be altered in this case.)
 */
-std::string GetParent(const std::string & path);
+int GetParent(char ** retStr, size_t * retStrSize);
 
 /*!
-	int FileUtills::ResolvePath(const char * path, const size_t pathSize, char * retStr, size_t * retStrSize, const bool disableSymLinkResolution)
+	int FileUtills::ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution)
 
 	Checks the path given, and converts it to a absolute path.
 
@@ -234,48 +249,44 @@ std::string GetParent(const std::string & path);
 	disableSymLinkResolution to false will make this function resolve any
 	symbolic link(s) that are encountered while resolving the given path(s).
 
-	Returns COMMON_ERROR_SUCCESS if successfull, retStr and retStrSize will be altered in this
+	Returns COMMON_ERROR_SUCCESS if successful, retStr and retStrSize will be altered in this
 	case. (Any pre-existing c-string given to this function as retStr will be deallocated.)
 
-	Otherwise the approiate error code is returned. (retStr and retStrSize will be unaltered in
+	Otherwise the appropriate error code is returned. (retStr and retStrSize will be unaltered in
 	this instance.)
 */
-int ResolvePath(const char * path, const size_t pathSize, char * retStr, size_t * retStrSize, const bool disableSymLinkResolution);
+int ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution);
 
 /*!
-	int FileUtills::CreateDirectory(const std::string & directory, const bool & createRecursive)
+	int FileUtills::CreateDirectory(const char * directory, const size_t directorySize, const bool createRecursive)
 	@pram : directory, path to create.
 	@pram : createRecursive, if this is set to true, then this function will try to create the 
 	parent directories of the given directory if they do not exist.
 
 	This function attempts to create the given directory on the filesystem.
 
-	The returned error code is always copied to Common::commonLastErrorCode.
-
 	Returns COMMON_ERROR_SUCCESS if directory creation was successful.
 	Returns COMMON_ERROR_ACCESS_DENIED if permission is denied.
 	Returns COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED if this function is unsupported.
 	Returns FILEUTILLS_ERROR_FILESYSTEM_FULL if the disk is full.
 	Returns FILEUTILLS_ERROR_EXISTANT if the directory already exists.
-	Returns the approiate error or COMMON_ERROR_UNKNOWN_ERROR if another error is encountered.
+	Returns the appropriate error or COMMON_ERROR_UNKNOWN_ERROR if another error is encountered.
 */
-int CreateDirectory(const std::string & directory, const bool & createRecursive = false);
+int CreateDirectory(const char * directory, const size_t directorySize, const bool createRecursive);
 
 /*!
-	int FileUtills::CheckPermissions(const std::string & path, const bool & read, const bool & write, const bool & exec)
+	int FileUtills::CheckPermissions(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec)
 
 	Checks Permissions on the given file or directory. Also checks if the given file or directory
-	actully exists first before checking other permissions. By default it will check for both read and
-	write permissions. (Optionaly it can check for execute permissions, and any combonation of the three. This
+	actually exists first before checking other permissions. By default it will check for both read and
+	write permissions. (Optionally it can check for execute permissions, and any combination of the three. This
 	function will return a COMMON_ERROR_INVALID_ARGUMENT error however if all of the permissions to check
 	are false.)
 
 	Pram: path to directory or file to check.
 	Pram: check for read permission. default is true.
-	Pram: check for wrtie permission. default is true.
+	Pram: check for write permission. default is true.
 	Pram: check for execute permission. default is false.
-
-	The returned error code is always copied to Common::commonLastErrorCode.
 
 	Returns COMMON_ERROR_SUCCESS if the directory exists and is accessible with the requested permissions.
 	Returns COMMON_ERROR_ACCESS_DENIED if A permission error occurs.
@@ -285,88 +296,84 @@ int CreateDirectory(const std::string & directory, const bool & createRecursive 
 	Returns COMMON_ERROR_INTERNAL_ERROR if an engine error occurs.
 	Returns COMMON_ERROR_UNKNOWN_ERROR if an unknown error occurs.
 	Returns COMMON_ERROR_EXCEPTION_THROWN if an exception is thrown.
-	Returns the approiate error in all other cases.
+	Returns the appropriate error in all other cases.
 */
-int CheckPermissions(const std::string & path, const bool & read = true, const bool & write = true, const bool & exec = false);
+int CheckPermissions(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec);
 
 /*!
-	int FileUtills::GetGigaFreespace(const std::string & path, size_t & result)
+	int FileUtills::GetGigaFreespace(const char * path, const size_t pathSize, size_t * result)
 
 	Returns the remaining disk space in Gigabytes (SI Unit) on the given disk.
 
 	Note if an error occurs, result will be set to zero, and an error code will be returned.
 	(Although result can also be set to zero if there really is no remaining disk space.)
 
-	@pram const std::string & path : volume / path to check.
+	@pram const char * path : string that contains the volume / path to check.
+	@pram const size_t pathSize: length of the path string.
 	@pram size_t & result : The remaining space on the filesystem.
 
-	The returned error code is always copied to Common::commonLastErrorCode.
-
-	Returns COMMON_ERROR_SUCCESS if successfull, result will contain the remaining space.
-	Returns a Common namespace error if an error occurs. Size will be equal to zero in this
+	Returns COMMON_ERROR_SUCCESS if successful, result will contain the remaining space.
+	Returns a Common name-space error if an error occurs. result will not be altered in this
 	case. To obtain more detailed info register an error hander before calling this function.
 */
-int GetGigaFreespace(const std::string & path, size_t & result);
+int GetGigaFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
-	int FileUtills::GetFreespace(const std::string & path, size_t & result)
+	int FileUtills::GetFreespace(const char * path, const size_t pathSize, size_t * result)
 
 	Returns the remaining disk space in Megabytes (SI Unit) on the given disk.
 
 	Note if an error occurs, result will be set to zero, and an error code will be returned.
 	(Although result can also be set to zero if there really is no remaining disk space.)
 
-	@pram const std::string & path : volume / path to check.
+	@pram const char * path : string that contains the volume / path to check.
+	@pram const size_t pathSize: length of the path string.
 	@pram size_t & result : The remaining space on the filesystem.
 
-	The returned error code is always copied to Common::commonLastErrorCode.
-
-	Returns COMMON_ERROR_SUCCESS if successfull, result will contain the remaining space.
-	Returns a Common namespace error if an error occurs. Size will be equal to zero in this
+	Returns COMMON_ERROR_SUCCESS if successful, result will contain the remaining space.
+	Returns a Common name-space error if an error occurs. Size will be equal to zero in this
 	case. To obtain more detailed info register an error hander before calling this function.
 */
-int GetFreespace(const std::string & path, size_t & result);
+int GetFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
-	int FileUtills::GetKiloFreespace(const std::string & path, size_t & result)
+	int FileUtills::GetKiloFreespace(const char * path, const size_t pathSize, size_t * result)
 
 	Returns the remaining disk space in Kilobytes (SI Unit) on the given disk.
 
 	Note if an error occurs, result will be set to zero, and an error code will be returned.
 	(Although result can also be set to zero if there really is no remaining disk space.)
 
-	@pram const std::string & path : volume / path to check.
+	@pram const char * path : string that contains the volume / path to check.
+	@pram const size_t pathSize: length of the path string.
 	@pram size_t & result : The remaining space on the filesystem.
 
-	The returned error code is always copied to Common::commonLastErrorCode.
-
-	Returns COMMON_ERROR_SUCCESS if successfull, result will contain the remaining space.
-	Returns a Common namespace error if an error occurs. Size will be equal to zero in this
+	Returns COMMON_ERROR_SUCCESS if successful, result will contain the remaining space.
+	Returns a Common name-space error if an error occurs. Size will be equal to zero in this
 	case. To obtain more detailed info register an error hander before calling this function.
 */
-int GetKiloFreespace(const std::string & path, size_t & result);
+int GetKiloFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
-	int FileUtills::GetByteFreespace(const std::string & path, size_t & result)
+	int FileUtills::GetByteFreespace(const char * path, const size_t pathSize, size_t * result)
 
 	Returns the remaining disk space in Bytes (SI Unit) on the given disk.
 
 	Note if an error occurs, result will be set to zero, and an error code will be returned.
 	(Although result can also be set to zero if there really is no remaining disk space.)
 
-	@pram const std::string & path : volume / path to check.
+	@pram const char * path : string that contains the volume / path to check.
+	@pram const size_t pathSize: length of the path string.
 	@pram size_t & result : The remaining space on the filesystem.
 
-	The returned error code is always copied to Common::commonLastErrorCode.
-
-	Returns COMMON_ERROR_SUCCESS if successfull, result will contain the remaining space.
-	Returns a Common namespace error if an error occurs. Size will be equal to zero in this
+	Returns COMMON_ERROR_SUCCESS if successful, result will contain the remaining space.
+	Returns a Common name-space error if an error occurs. Size will be equal to zero in this
 	case. To obtain more detailed info register an error hander before calling this function.
 */
-int GetByteFreespace(const std::string & path, size_t & result);
+int GetByteFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
-	int FileUtills::DeletePath(const std::string & path, const bool & recursive)
+	int FileUtills::DeletePath(const char * path, const size_t pathSize, const bool recursive)
 
 	This function attempts to delete the given file or directory from the filesystem.
 
@@ -374,26 +381,24 @@ int GetByteFreespace(const std::string & path, size_t & result);
 	If the given path is a non-empty directory, by default this function will throw an error.
 	If the given path is an empty directory, however by default this function WILL delete it.
 
-	Note: If while deleting rescursively, a file or subdirectory can't be deleted, this function will try to continue
-	deleting any other files and subdirectories that can be deleted, but it will throw an error apon exit.
+	Note: If while deleting recursively, a file or subdirectory can't be deleted, this function will try to continue
+	deleting any other files and subdirectories that can be deleted, but it will throw an error upon exit.
 
-	The returned error code is always copied to Common::commonLastErrorCode.
-
-	Returns 0 if successful.
-	-1 if the user lacks permission to delete the path. (Or if recursively deleting a directory, a file or subdirectory could not be deleted.)
-	-2 if the path does not exist. (Or if recursively deleting a directory, a file or subdirectory does not exist.)
-	-3 if the function is not supported.
-	-4 if a memory error occurs.
-	-5 if an unknown error occurs. (An error other than a permissions error occured while deleting something.)
-	-6 if the path is a non empty directory and recursive is set to false.
-	-7 if while deleting recursively, the parent directory of a deleted directory could not be obtained. (I.e could not "go up a level in the directory tree.")
-	-8 if while deleting recursively, there were files and or subdirectories that could not be deleted. (Some files may have been deleted however.)
+	Returns COMMON_ERROR_SUCCESS if successful.
+	COMMON_ERROR_ACCESS_DENIED if the user lacks permission to delete the path. (Or if recursively deleting a directory, a file or subdirectory could not be deleted.)
+	FILEUTILLS_ERROR_NON_EXISTANT if the path does not exist. (Or if recursively deleting a directory, a file or subdirectory does not exist.)
+	COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED if the function is not supported.
+	COMMON_ERROR_MEMORY_ERROR if a memory error occurs.
+	COMMON_ERROR_UNKNOWN_ERROR if an unknown error occurs. (An error other than a permissions error occured while deleting something.)
+	FILEUTILLS_ERROR_PATH_IS_A_DIRECTORY if the path is a non empty directory and recursive is set to false.
+	COMMON_ERROR_IO_ERROR if while deleting recursively, the parent directory of a deleted directory could not be obtained. (I.e could not "go up a level in the directory tree.")
+	COMMON_ERROR_IO_ERROR if while deleting recursively, there were files and or subdirectories that could not be deleted. (Some files may have been deleted however.)
 */
-int DeletePath(const std::string & path, const bool & recursive = false);
+int DeletePath(const char * path, const size_t pathSize, const bool recursive);
 
 /*!
-        int FileUtills::CopyFile(const std::string & src, const std::string & dest, const bool & append,
-                                   const streamsize & begOffset, const streamsize & endOffset)
+        int FileUtills::CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, 
+								 const bool append, const size_t begOffset, const size_t endOffset)
 
         Copies endOffset bytes starting at begOffset, from source file to dest file.
 
@@ -431,9 +436,9 @@ int DeletePath(const std::string & path, const bool & recursive = false);
 
         By default the entire file is copied and the dest file is overwritten.
 
-        Note: This function does NOT make any attempt to preserve the destionation file if it already exists.
+        Note: This function does NOT make any attempt to preserve the destination file if it already exists.
 
-        Note: This function can return ANY error in the Common namespace error list, below is only an example
+        Note: This function can return ANY error in the Common name-space error list, below is only an example
         of what errors this function itself may generate. (I.e. This function calls other FileUtills functions
         and as such can return the errors generated by them.) If you need a more detailed error message, you
         should register a callback function for the Common error handler (via Common::Register_Error_Log_Callback())
@@ -445,22 +450,20 @@ int DeletePath(const std::string & path, const bool & recursive = false);
         Returns COMMON_ERROR_MEMORY_ERROR if the memory buffer could not be allocated.
         Returns COMMON_ERROR_INVALID_ARGUMENT if the source file was not given.
         Returns COMMON_ERROR_IO_ERROR if the source file could not be opened.
-        Returns COMMON_ERROR_IO_ERROR if an I/O error occured while reading the source file.
+        Returns COMMON_ERROR_IO_ERROR if an I/O error occurred while reading the source file.
         Returns COMMON::FILEUTILLS_PATH_IS_A_DIRECTORY if the given source file was a directory.
         Returns COMMON_ERROR_INVALID_ARGUMENT if the dest file was not given.
         Returns COMMON_ERROR_IO_ERROR if dest file could not be opened.
-        Returns COMMON_ERROR_IO_ERROR if an I/O error occured while writing to the dest file.
+        Returns COMMON_ERROR_IO_ERROR if an I/O error occurred while writing to the dest file.
         Returns FILEUTILLS_ERROR_PATH_IS_A_DIRECTORY if the given dest file was a directory.
         Returns COMMON_ERROR_EXCEPTION_THROWN if an exception is thrown while copying data.
 */
-int CopyFile(const std::string & src, const std::string & dest, const bool & append = false,
-               const streamsize & begOffset = 0, const streamsize & endOffset = 0);
+int CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool append,
+             const size_t begOffset, const size_t endOffset);
 
 /*!
-	int FileUtills::CopyPath(const std::string & src, const std::string & dest, const bool & recursive,
-				    const bool & rename, const bool & abort_on_failure,
-				    const bool & append, const streamsize & begOffset,
-				    const streamsize & endOffset)
+	int FileUtills::CopyPath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool recursive,
+	       const bool rename, const bool abort_on_failure, const bool append, const size_t begOffset, const size_t endOffset)
 
 	This function takes a given source path and copies it to the given dest path.
 
@@ -471,7 +474,7 @@ int CopyFile(const std::string & src, const std::string & dest, const bool & app
 	error codes.
 
 	If the given src is a directory, then this function will copy the entire directory to the given dest, creating dest if
-	nessacarry. If recursive is set to true, then the entire directory AND it's subdirectories will be copied.
+	necessary. If recursive is set to true, then the entire directory AND it's subdirectories will be copied.
 	(The subdirectories will be created as needed, if a subdirectory already exists, then the data from src will be merged.)
 
 	@pram recursive, if this is true, then this function will recursively copy all subdirectories from src. Merging / creating
@@ -480,7 +483,7 @@ int CopyFile(const std::string & src, const std::string & dest, const bool & app
 
 	@pram rename, if this is set to true, then this function will try to rename the file rather than copy it.
 	otherwise a copy will be performed (Default).
-	It should be noted that a rename is equivelent to calling CopyFile(), and then DeletePath() on the same source.
+	It should be noted that a rename is equivalent to calling CopyFile(), and then DeletePath() on the same source.
 	(Minus the overhead and extra disk space use of actually copying the source first.) And that renaming a
 	src will only work if the dest is on the same filesystem.
 	In the event that rename fails, then a copy will be performed UNLESS abort_on_failure is set to true. In that case
@@ -505,40 +508,39 @@ int CopyFile(const std::string & src, const std::string & dest, const bool & app
 	Below are return codes for when src is a directory, if src is a file, then the return codes for this function are identical to
 	FileUtills::CopyFile(). Please see FileUtills::CopyFile() for it's return codes.
 
-	Returns 0 on success.
+	Returns COMMON_ERROR_SUCCESS on success.
 	Returns -1 if the function was unable to create top level dest path and top level dest path does not exist.
 	Returns -2 if the top level dest path exists and is a file or some other filesystem entry.
-	Returns -3 if the host OS / Arch is unsupported.
+	Returns COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED if the host OS / Arch is unsupported.
 	Returns -4 if the function could not get a directory listing.
 	Returns -5 if the function could not get parent directory string.
 	Returns -6 if the function was unable to copy all files. (Some files may have been copied however.)
 	Returns -13 if FileUtills::IsFileOrDirectory() returns -3. (OS / Arch not supported.)
-	Returns -14 if FileUtills::IsFileOrDirectory() returns -4. (A permissions error occured.)
+	Returns -14 if FileUtills::IsFileOrDirectory() returns -4. (A permissions error occurred.)
 	Returns -15 if FileUtills::IsFileOrDirectory() returns -5. (The given path is empty.)
-	Returns -16 if FileUtills::IsFileOrDirectory() returns -6. (A path componet does not exist.)
+	Returns -16 if FileUtills::IsFileOrDirectory() returns -6. (A path component does not exist.)
 	Returns -17 if FileUtills::IsFileOrDirectory() returns -7. (The path has a file in it and is not at the end. (I.e you are treating a file as a directory.))
-	Returns -19 if FileUtills::IsFileOrDirectory() returns -9. (All other errors.)
+	Returns COMMON_ERROR_UNKNOWN_ERROR if FileUtills::IsFileOrDirectory() returns -9. (All other errors.)
 */
-int CopyPath(const std::string & src, const std::string & dest, const bool & recursive = false,
-	       const bool & rename = false, const bool & abort_on_failure = false,
-	       const bool & append = false, const streamsize & begOffset = 0, const streamsize & endOffset = 0);
+int CopyPath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool recursive,
+			 const bool rename, const bool abort_on_failure, const bool append, const size_t begOffset, const size_t endOffset);
 
 /*!
-        int FileUtills::MovePath(const std::string & src, const std::string & dest, const bool & overwrite)
+        int FileUtills::MovePath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool overwrite)
 
         Acts as a wrapper for a call to CopyPath and DeletePath.
-        The src file is copied to the dest file and then the src file is deleted.
+        The srcPath is copied to the destPath and then the srcPath is deleted.
 
-        Returns 0 on success.
+        Returns COMMON_ERROR_SUCCESS on success.
         Returns -10 If an error occurs while accessing the src file.
         Returns -20 If dest already exists and overwriting is disabled.
         Returns -21 If dest already exists and can't be deleted. (overwrite = true)
         Returns -22 If an error occurs while accessing the dest file.
-        Returns -3 If an Implementation does not exist for your system.
-        Returns -4 If an error occurs while moving data.
-        Returns -5 If an argument to the function is bad.
+        Returns COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED If an Implementation does not exist for your system.
+        Returns COMMON_ERROR_IO_ERROR If an error occurs while moving data.
+        Returns COMMON_ERROR_INVALID_ARGUMENT If an argument to the function is bad.
 */
-int MovePath(const std::string & src, const std::string & dest, const bool & overwrite = false);
+int MovePath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool overwrite);
 
 }
 
