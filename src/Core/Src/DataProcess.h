@@ -41,6 +41,9 @@ namespace DataProcess{
  *		Note: The given argument is not altered or used by the function.
  *		It's only used to exploit the C++ template generator.
  *
+ * 		The specializations for float and double are required as floating
+ * 		point data types must be detected differently from integers.
+ *
  *		Returns MSYS_BIG_ENDIAN if the given data type is stored as big 
  *		endian on the host machine.
  *
@@ -77,6 +80,74 @@ int DataProcess_Endianness_Check(const T & a)
 				{
 						/* It's big endian. */
 						ret = MSYS_BIG_ENDIAN;
+				}
+		}
+
+		/* Return the result. */
+		return ret;
+}
+
+template<>
+int DataProcess_Endianness_Check<float>(const float & a)
+{
+		/* Init vars. */
+		int ret = MSYS_UNKNOWN_ENDIANNESS;	/* The result of this function. */
+		float t = 1.0;						/* Variable to check. */
+
+		/* Cast t to a char string and see if the first 2 values are 0x3F80. */
+		if ((((char*)&t)[0] == 0x3F) && ((((char*)&t)[1] == 0x80)))
+		{
+				/* The first 2 bytes are 0x3F80 so it's big endian. */
+				ret = MSYS_BIG_ENDIAN;
+		}
+		else
+		{
+				/*
+				 *	The first check did not pass, so check and see if the last 2 bytes are 0x803F.
+				 *	If they are, then the host is little endian.
+				 *
+				 *	Otherwise the host is using something like middle-endian to store
+				 *	the value, but we would need more checks to determine what exact
+				 *	kind of endianness the host is using.
+				 */
+				if ((((char*)&t)[(sizeof (float) - 1)] == 0x80) && ((((char*)&t)[(sizeof (float) - 2)] == 0x3F)))
+				{
+						/* It's little endian. */
+						ret = MSYS_LITTLE_ENDIAN;
+				}
+		}
+
+		/* Return the result. */
+		return ret;
+}
+
+template<>
+int DataProcess_Endianness_Check<double>(const double & a)
+{
+		/* Init vars. */
+		int ret = MSYS_UNKNOWN_ENDIANNESS;	/* The result of this function. */
+		double t = 1.0;						/* Variable to check. */
+
+		/* Cast t to a char string and see if the first 2 values are 0x3FF0. */
+		if ((((char*)&t)[0] == 0x3F) && ((((char*)&t)[1] == 0xF0)))
+		{
+				/* The first 2 bytes are 0x3F80 so it's big endian. */
+				ret = MSYS_BIG_ENDIAN;
+		}
+		else
+		{
+				/*
+				 *	The first check did not pass, so check and see if the last 2 bytes are 0xF03F.
+				 *	If they are, then the host is little endian.
+				 *
+				 *	Otherwise the host is using something like middle-endian to store
+				 *	the value, but we would need more checks to determine what exact
+				 *	kind of endianness the host is using.
+				 */
+				if ((((char*)&t)[(sizeof (double) - 1)] == 0xF0) && ((((char*)&t)[(sizeof (double) - 2)] == 0x3F)))
+				{
+						/* It's little endian. */
+						ret = MSYS_LITTLE_ENDIAN;
 				}
 		}
 
