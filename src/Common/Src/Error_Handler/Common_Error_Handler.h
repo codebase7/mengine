@@ -25,8 +25,12 @@
 // External includes.
 #include <stddef.h>		// Defines NULL.
 #ifndef __cplusplus
-#include <stdbool.h>		// Defines bool data type. (For C compilers.)
-#endif	// __cplusplus
+#ifdef _MSC_FULL_VER		/* VC is special. */
+#include "..\stdbool.h"		/* Defines bool data type. (For C compilers.) */
+#else
+#include <stdbool.h>
+#endif	/* _MSC_FULL_VER */
+#endif	/* __cplusplus */
 
 // Project includes.
 #ifdef _WIN32	// Needed for different path seperator in Windows.
