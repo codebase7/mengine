@@ -122,12 +122,13 @@ const char * Common_Get_Error_Message(const int errorCode)
 	// Init vars.
 	const char * result = COMMON_ERROR_UNKNOWN_ERROR_MSG;		// Result of this function.
 	const size_t errorTableSize = Common_Get_Error_Table_Size();	// Size of the Common error lookup table.
+	size_t x = 0;													/* Counter used in for loop. */
 
 	// Check for COMMON_UNKNOWN_ERROR.
 	if (errorCode != COMMON_ERROR_UNKNOWN_ERROR)
 	{
 		// Begin lookup loop.
-		for (size_t x = 0; ((x < errorTableSize) && (result == COMMON_ERROR_UNKNOWN_ERROR_MSG)); x++)
+		for (x = 0; ((x < errorTableSize) && (result == COMMON_ERROR_UNKNOWN_ERROR_MSG)); x++)
 		{
 			// Check for the correct error code.
 			if (Common_commonErrorTable[x].errorCode == errorCode)
