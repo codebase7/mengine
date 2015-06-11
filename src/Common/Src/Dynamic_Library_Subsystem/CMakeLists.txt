@@ -2,9 +2,6 @@
 set(LIBRARY_OUTPUT_PATH ${L_OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${O_OUTPUT_DIR})
 
-# Build the Dynamic_Library_Subsystem if needed.
-if (BUILD_DYNAMIC_LIBRARY_SUBSYSTEM)
-
     # Create the Dynamic_Library_Subsystem library.
     # Figure out what OS to use...
     IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -29,5 +26,3 @@ if (BUILD_DYNAMIC_LIBRARY_SUBSYSTEM)
     add_library(Dynamic_Library_Subsystem_Multiverse_Engine SHARED ${DYNAMIC_LIBRARY_SUBSYSTEM_INCLUDES})
     target_link_libraries(Dynamic_Library_Subsystem_Multiverse_Engine ${DYNAMIC_LIBRARY_SUBSYSTEM_LINK_LIBS} 
     Common_Error_Handler_Multiverse_Engine)
-
-endif(BUILD_DYNAMIC_LIBRARY_SUBSYSTEM)
