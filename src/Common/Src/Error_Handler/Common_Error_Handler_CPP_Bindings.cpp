@@ -105,7 +105,7 @@ void Common::Fatal_Error_Notify()
 		// Call real function.
 		Common_Fatal_Error_Notify();
 	}
-	catch (std::exception & ex)
+	catch (...)
 	{
 		// Well, not much to do here, we are terminating anyway.
 		COMMON_LOG_CRITICAL("Common::Fatal_Error_Notify(): Exception occured while notifying engine subsystems / application that a fatal error occured.");
