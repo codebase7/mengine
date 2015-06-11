@@ -84,11 +84,11 @@ void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned i
 // Build the Fatal Error Handler if needed.
 #ifdef MSYS_BUILD_FATAL_ERROR_SUPPORT
 /*!
- * 	static unsigned int registeredFatalErrorCallbackFunctionsSize
+ * 	static size_t registeredFatalErrorCallbackFunctionsSize
  *
- * 	This unsigned int is used to remember the allocated size of the registeredFatalErrorCallbackFunctions array.
+ * 	This size_t is used to remember the allocated size of the registeredFatalErrorCallbackFunctions array.
  */
-static unsigned int registeredFatalErrorCallbackFunctionsSize = 0;
+static size_t registeredFatalErrorCallbackFunctionsSize = 0;
 
 /*
  * 	static Common_pErrorCallBackFunction * registeredFatalErrorCallbackFunctions
@@ -113,6 +113,7 @@ bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fa
 	bool ret = false;										// The result of this function.
 	size_t previousErrorListSize = registeredFatalErrorCallbackFunctionsSize;			// The size of the previous error list.
 	size_t newErrorListSize = 0;									// The size of the new error list we are creating.
+	size_t x = 0;											/* Counter used in for loops. */
 	Common_pErrorCallBackFunction * previousErrorList = registeredFatalErrorCallbackFunctions;	// The previous error list.
 	Common_pErrorCallBackFunction * newErrorList = NULL;						// The new error list we are creating.
 	MSYS_Mutex * retFromLockMutex = NULL;								// The result from the call to MSYS_Lock_Mutex().
@@ -142,7 +143,7 @@ bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fa
 					newErrorListSize = (previousErrorListSize + 1);
 
 					// Copy the data.
-					for (size_t x = 0; x < previousErrorListSize; x++)
+					for (x = 0; x < previousErrorListSize; x++)
 					{
 						newErrorList[x] = previousErrorList[x];
 					}
@@ -173,7 +174,7 @@ bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fa
 				if ((previousErrorList != NULL) && (previousErrorList != newErrorList) && (previousErrorListSize > 0))
 				{
 					// Null out the old pointer list.
-					for (size_t x = 0; x < previousErrorListSize; x++)
+					for (x = 0; x < previousErrorListSize; x++)
 					{
 						previousErrorList[x] = NULL;
 					}
@@ -203,6 +204,8 @@ bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction 
 	bool ret = false;										// The result of this function.
 	size_t previousErrorListSize = registeredFatalErrorCallbackFunctionsSize;			// The size of the previous error list.
 	size_t newErrorListSize = 0;									// The size of the new error list we are creating.
+	size_t x = 0;													/* Counter used in top level for loops. */
+	size_t y = 0;													/* Counter used in sub level 1 for loops. */
 	Common_pErrorCallBackFunction * previousErrorList = registeredFatalErrorCallbackFunctions;	// The previous error list.
 	Common_pErrorCallBackFunction * newErrorList = NULL;						// The new error list we are creating.
 	MSYS_Mutex * retFromLockMutex = NULL;								// The result from the call to MSYS_Lock_Mutex().
@@ -218,7 +221,7 @@ bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction 
 			if ((previousErrorList != NULL) && (previousErrorListSize > 0))
 			{
 				// Check the existing list for that function.
-				for (size_t x = 0; ((newErrorList == NULL) && (x < previousErrorListSize)); x++)
+				for (x = 0; ((newErrorList == NULL) && (x < previousErrorListSize)); x++)
 				{
 					// Check for the correct function, to see if the function was registered previously.
 					if (previousErrorList[x] == fatalErrorNotifyFunction)
@@ -237,7 +240,7 @@ bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction 
 				if ((newErrorList != NULL) && (newErrorListSize == (previousErrorListSize - 1)))
 				{
 					// Copy the data.
-					for (size_t x = 0, y = 0; ((x < previousErrorListSize) && (y < newErrorListSize)); x++)
+					for (x = 0, y = 0; ((x < previousErrorListSize) && (y < newErrorListSize)); x++)
 					{
 						// Make sure we don't copy the pointer we are removing.
 						if (previousErrorList[x] != fatalErrorNotifyFunction)
@@ -256,7 +259,7 @@ bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction 
 					if ((previousErrorList != NULL) && (previousErrorList != newErrorList) && (previousErrorListSize > 0))
 					{
 						// Null out the old pointer list.
-						for (size_t x = 0; x < previousErrorListSize; x++)
+						for (x = 0; x < previousErrorListSize; x++)
 						{
 							previousErrorList[x] = NULL;
 						}
@@ -284,6 +287,7 @@ void Common_Fatal_Error_Notify()
 {
 	// Init vars.
 	MSYS_Mutex * retFromLockMutex = NULL;						// The result from the call to MSYS_Lock_Mutex().
+	size_t x = 0;												/* Counter used in loops. */
 
 	// Lock the error handler mutex.
 	retFromLockMutex = MSYS_Lock_Mutex(fatalErrorHandlerMutex);
@@ -293,7 +297,7 @@ void Common_Fatal_Error_Notify()
 		if (registeredFatalErrorCallbackFunctionsSize > 0)
 		{
 			// Begin vector iteration loop.
-			for (size_t x = 0; (x < registeredFatalErrorCallbackFunctionsSize); x++)
+			for (x = 0; (x < registeredFatalErrorCallbackFunctionsSize); x++)
 			{
 				// Trigger each function.
 				if (registeredFatalErrorCallbackFunctions[x] != NULL)
