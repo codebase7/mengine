@@ -25,7 +25,7 @@
 // Define extern C.
 extern "C" {
 #endif
-		int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary, Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib)
+		int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary, Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
 				// Init vars.
 				int result = 0;				// The result of this function.
@@ -109,7 +109,7 @@ extern "C" {
 				return result;
 		}
 
-		int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib)
+		int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
 				// Init vars.
 				int result = 0;				// The result of this function.
@@ -157,7 +157,7 @@ extern "C" {
 				return result;
 		}
 
-		void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char * symbolName)
+		void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName)
 		{
 				// Init vars.
 				void * result = NULL;				// The result of this function.
