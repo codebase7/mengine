@@ -1,7 +1,7 @@
 /*!
-    Multiverse Engine Project 04/7/2014 Common Common_Error_Handler_Structures.h
+    Multiverse Engine Project 23/6/2014 Common Common_Error_Handler_Structures.h
 
-    Copyright (C) 2014 Multiverse Engine Project
+    Copyright (C) 2015 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
@@ -18,27 +18,27 @@
     https://github.com/codebase7/mengine
 */
 
-// Include guard.
-#ifndef COMMON_ERROR_ERROR_HANDLER_STRUCTURES_H
-#define COMMON_ERROR_ERROR_HANDLER_STRUCTURES_H
+/* Include guard. */
+#ifndef COMMON_ERROR_HANDLER_STRUCTURES_H
+#define COMMON_ERROR_HANDLER_STRUCTURES_H
 
-// Internal includes.
-#include "Error_Struct.h"	// Structure used to create error lookup table.
+/* Internal Includes. */
+#include "Error_Struct.h"	/* Structure used to create error lookup table. */
 
-// Define the Common unknown error message. (It has to be replicated in two places, once for the C code and once for the C++ bindings.)
+/* Define the Common unknown error message. (It has to be replicated in two places, once for the C code and once for the C++ bindings.) */
 #define COMMON_UNKNOWN_ERROR_MSG_DEF "Unknown error code."
 
-// Error code table ABI version.
-#define COMMON_ERROR_TABLE_ABI_VER 2 // Increment this if you alter the table.
+/* Error code table ABI version. */
+#define COMMON_ERROR_TABLE_ABI_VER 2	/* Increment this if you alter the table. */
 
-// Enable C linkage if needed.
+/* Enable C linkage if needed. */
 #ifdef __cplusplus
 extern "C" {
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
-// Common namespace error code definitions. (Human-readable error message translation table is located in Common_Error_Handler_Structures.c)
+/* Common namespace error code definitions. (Human-readable error message translation table is located in Common_Error_Handler_Structures.c) */
 	enum {
-		// Generic error codes.
+		/* Generic error codes. */
 		COMMON_ERROR_SYSTEM_SPECIFIC = 99,
 		COMMON_ERROR_SUCCESS = 0,
 		COMMON_ERROR_UNKNOWN_ERROR = -1,
@@ -50,20 +50,20 @@ extern "C" {
 		COMMON_ERROR_IO_ERROR = -7,
 		COMMON_ERROR_RANGE_ERROR = -8,
 		COMMON_ERROR_MEMORY_ERROR = -9,
-		COMMON_ERROR_INVALID_LIBRARY_ID = -10,	// Formerly THREAD_UTILS_INVALID_LIBRARY_ID.
+		COMMON_ERROR_INVALID_LIBRARY_ID = -10,	/* Formerly THREAD_UTILS_INVALID_LIBRARY_ID. */
 		COMMON_ERROR_PEBKAC_INVALID_OPERATION_ORDER = -11,
 		COMMON_ERROR_CANNOT_GET_SYSTEM_TIME = -12,
 		COMMON_ERROR_SUBSYSTEM_OBJECT_NOT_INITED = -13,
 		COMMON_ERROR_SUBSYSTEM_OBJECT_ALREADY_INITED = -14,
 		
-		// Rendering Subsystem error codes.
-		RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF = -21,	// Overlay image buffer.
-		RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF = -22,	// Transparency data buffer.
+		/* Rendering Subsystem error codes. */
+		RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF = -21,	/* Overlay image buffer. */
+		RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF = -22,	/* Transparency data buffer. */
 		RENDERER_ERROR_MEM_BUF_ALLOC_EXCEPTION = -23, 
 		RENDERER_ERROR_DUPE_OVERLAY_EXCEPTION = -24,
 		RENDERER_ERROR_INVAL_OVERLAY_SELF_OVERWRITE = -25,
 		RENDERER_ERROR_TRANSPARENCY_DISABLED = -26,
-		// Threading Subsystem error codes.
+		/* Threading Subsystem error codes. */
 		THREAD_UTILS_ERROR_EXCEPTION_THROWN = -31,
 		THREAD_UTILS_ERROR_PLUGIN_LOAD_FAILURE = -32,
 		THREAD_UTILS_ERROR_THREAD_COULD_NOT_START = -33,
@@ -72,7 +72,7 @@ extern "C" {
 		THREAD_UTILS_ERROR_MUTEX_ALREADY_LOCKED = -36,
 		THREAD_UTILS_ERROR_CONDITION_CANNOT_LOCK_MUTEX = -37,
 		THREAD_UTILS_ERROR_CONDITION_WAIT_TIMEOUT_REACHED = -38,
-		// FileUtills error codes.
+		/* FileUtills error codes. */
 		FILEUTILLS_ERROR_EXISTANT = -60,
 		FILEUTILLS_ERROR_NON_EXISTANT = -61,
 		FILEUTILLS_ERROR_READ_ONLY = -62,
@@ -88,7 +88,7 @@ extern "C" {
 		FILEUTILLS_ERROR_EMPTY_DIRECTORY = -72,
 		FILEUTILLS_ERROR_NON_EMPTY_DIRECTORY = -73,
 		FILEUTILLS_ERROR_SYMLINK_CHAIN_TOO_DEEP = -74,
-		// UI Subsystem.
+		/* UI Subsystem. */
 		UI_SUBSYSTEM_ERROR_EXCEPTION_THROWN = -90,
 	};
 
@@ -117,9 +117,14 @@ const unsigned int Common_Get_Error_Table_Size();
  */
 const char * Common_Get_Error_Message(const int errorCode);
 
-// Define C++ Bindings.
+/* End C Linkage if needed. */
 #ifdef __cplusplus
-// Define namespaces.
+}	/* extern C */
+#endif	/* __cplusplus */
+
+/* Define C++ Bindings. */
+#ifdef __cplusplus
+/* Define namespaces. */
 namespace Common
 {
 	/*!
@@ -152,14 +157,9 @@ namespace Common
 	 * 	Returns the message for Common_COMMON_UNKNOWN_ERROR otherwise.
 	 */
 	const char * Get_Error_Message(const int & errorCode);
-}
-#endif	// __cplusplus
+};
+#endif	/* __cplusplus */
 
-// End C Linkage if needed.
-#ifdef __cplusplus
-}
-#endif	// __cplusplus
+#endif	/* COMMON_ERROR_HANDLER_STRUCTURES_H */
 
-#endif	// COMMON_ERROR_ERROR_HANDLER_STRUCTURES_H
-
-// End of Common_Error_Handler_Structures.h
+/* End of Common_Error_Handler_Structures.h */

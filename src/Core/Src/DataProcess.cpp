@@ -18,8 +18,12 @@
     https://github.com/codebase7/mengine
 */
 
+/* Internal includes. */
 #include "DataProcess.h"
 #include "FileStreams.h"
+
+/* External includes. */
+#include <ctime>
 
 size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
 {

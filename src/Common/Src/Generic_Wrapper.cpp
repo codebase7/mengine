@@ -23,7 +23,7 @@
 const char * Common_Generic_Wrapper::Get_Library_Name()
 {
 	// Return result.
-	this->lib.Name;
+	return this->lib.Name;
 }
 
 bool Common_Generic_Wrapper::Is_Library_A_Plugin()

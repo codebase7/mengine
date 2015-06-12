@@ -25,18 +25,22 @@
 // External includes.
 #include <stddef.h>		// Defines NULL.
 #ifndef __cplusplus
-#include <stdbool.h>		// Defines bool data type. (For C compilers.)
-#endif	// __cplusplus
+#ifdef _MSC_FULL_VER		/* VC is special. */
+#include "..\stdbool.h"		/* Defines bool data type. (For C compilers.) */
+#else
+#include <stdbool.h>
+#endif	/* _MSC_FULL_VER */
+#endif	/* __cplusplus */
 
 // Project includes.
-#ifdef __win32	// Needed for different path seperator in Windows.
+#ifdef _WIN32	// Needed for different path seperator in Windows.
 #include "..\..\..\Core\Src\Panic_Error_Levels.h"	// Defines the log levels.
 #else
 #include "../../../Core/Src/Panic_Error_Levels.h"	// Defines the log levels.
-#endif // __win32
+#include "Posix_Error_Translation_Table.h"			// Defines the POSIX errno to Common namespace error translation table and functions.
+#endif // _WIN32
 
 #include "Common_Error_Handler_Structures.h"		// Defines the error codes, error lookup table error lookup table version number, and Common::commonLastErrorCode.
-#include "Posix_Error_Translation_Table.h"		// Defines the POSIX errno to Common namespace error translation table and functions.
 
 // Enable C linkage if needed.
 #ifdef __cplusplus

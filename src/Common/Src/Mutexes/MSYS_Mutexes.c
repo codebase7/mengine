@@ -18,8 +18,13 @@
     https://github.com/codebase7/mengine
 */
 
-// Internal includes.
+/* Internal includes. */
 #include "MSYS_Mutexes.h"
+
+/* Define extern C */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
 
 /*!
  * 	typedef struct MSYS_Mutex_Private
@@ -31,7 +36,7 @@
  * 	so that we can hide the real implmentation.
  */
 typedef struct {
-	// Define the lock.
+	/* Define the lock. */
 /*!
  * 	MSYS_INSUFFIENCT_BITS_LONG_LOCK
  *
@@ -66,17 +71,17 @@ typedef struct {
  * 	from prying eyes, to help prevent that.......
  */
 #ifdef MSYS_INSUFFIENCT_BITS_LONG_LOCK
-	bool lock;		/*
-				 *  Whether or not the lock is aquired or in the process of being acquired.
-				 *
-				 *  This value is declared when the host system cannot support reading and
-				 *  writing tidLock atomicly.
-				 *
-				 *  It is used as a memory barrior for checking the tidLock value for ownership,
-				 *  along with any possible modifications, and is released apon completion of
-				 *  the check and after any possible modifications have been flushed to memory.
-				 */
-#endif	// MSYS_INSUFFIENCT_BITS_LONG_LOCK
+	bool lock;												/*
+															 *  Whether or not the lock is aquired or in the process of being acquired.
+															 *
+															 *  This value is declared when the host system cannot support reading and
+															 *  writing tidLock atomicly.
+															 *
+															 *  It is used as a memory barrior for checking the tidLock value for ownership,
+															 *  along with any possible modifications, and is released apon completion of
+															 *  the check and after any possible modifications have been flushed to memory.
+															 */
+#endif	/* MSYS_INSUFFIENCT_BITS_LONG_LOCK */
 	long tidLock;		/*
 				 *  The owner of the lock. (Set to zero if there is no owner.)
 				 *
@@ -93,45 +98,45 @@ typedef struct {
 
 MSYS_Mutex * MSYS_Create_Mutex()
 {
-	// Init vars.
-	MSYS_Mutex * ret = NULL;		// The result of this function.
-	MSYS_Mutex_Private * temp = NULL;	// Temporary pointer to allocate the mutex.
+	/* Init vars. */
+	MSYS_Mutex * ret = NULL;			/* The result of this function. */
+	MSYS_Mutex_Private * temp = NULL;	/* Temporary pointer to allocate the mutex. */
 
-	// Allocate memory.
+	/* Allocate memory. */
 	ret = (MSYS_Mutex *)malloc((sizeof(MSYS_Mutex)));
 	if (ret != NULL)
 	{
-		// Allocate the real data structure.
+		/* Allocate the real data structure. */
 		temp = (MSYS_Mutex_Private *)malloc((sizeof(MSYS_Mutex_Private)));
 		if (temp != NULL)
 		{
-			// Set initial data.
+			/* Set initial data. */
 #ifdef MSYS_INSUFFIENCT_BITS_LONG_LOCK
-			temp->lock = false;	// Only defined when the host system does not support reading / writing to tidLock atomicly.
-#endif	// MSYS_INSUFFIENCT_BITS_LONG_LOCK
+			temp->lock = false;	/* Only defined when the host system does not support reading / writing to tidLock atomicly. */
+#endif	/* MSYS_INSUFFIENCT_BITS_LONG_LOCK */
 			temp->tidLock = MSYS_INVALID_TID;
 
-			// Copy the pointer.
+			/* Copy the pointer. */
 			ret->lock = (void *)temp;
 		}
 		else
 		{
-			// Deallocate ret.
+			/* Deallocate ret. */
 			free(ret);
 			ret = NULL;
 		}
 	}
 
-	// Return the result.
+	/* Return the result. */
 	return ret;
 }
 
 void MSYS_Destroy_Mutex(MSYS_Mutex ** mu)
 {
-	// Check for valid pointers.
+	/* Check for valid pointers. */
 	if ((mu != NULL) && (*mu != NULL))
 	{
-		// Check for valid real structure.
+		/* Check for valid real structure. */
 		if ((*mu)->lock != NULL)
 		{
 			free((*mu)->lock);
@@ -141,7 +146,7 @@ void MSYS_Destroy_Mutex(MSYS_Mutex ** mu)
 		*mu = NULL;
 	}
 
-	// Exit function.
+	/* Exit function. */
 	return;
 }
 
@@ -154,25 +159,25 @@ MSYS_Mutex * MSYS_Lock_Mutex(MSYS_Mutex * mu)
 	 * 	2. Call MSYS_Try_Lock_Mutex() until the lock succeeds.
 	 */
 
-	// Init vars.
-	bool retFromLOCK = false;	// result from MSYS_Compare_And_Swap().
-	MSYS_Mutex * ret = NULL;	// result from this function.
+	/* Init vars. */
+	int retFromLOCK = MSYS_MU_UNKNOWN_ERROR;		/* Result from MSYS_Compare_And_Swap(). */
+	MSYS_Mutex * ret = NULL;						/* Result from this function. */
 
-	// Make sure mu and mu->lock are valid pointers.
+	/* Make sure mu and mu->lock are valid pointers. */
 	if ((mu != NULL) && (mu->lock != NULL))
 	{
-		// Begin loop.
-		while (!retFromLOCK)
+		/* Begin loop. */
+		while (retFromLOCK != MSYS_MU_SUCCESS)
 		{
-			// Attempt to lock the mutex.
+			/* Attempt to lock the mutex. */
 			retFromLOCK = MSYS_Try_Lock_Mutex(mu);
 		}
 
-		// Successfull.
+		/* Successfull. */
 		ret = mu;
 	}
 
-	// Exit function.
+	/* Exit function. */
 	return ret;
 }
 
@@ -205,52 +210,52 @@ short MSYS_Try_Lock_Mutex(MSYS_Mutex * mu)
 	 * 	4. Return the result of the call to MSYS_Compare_And_Swap() as the result of the function.
 	 */
   
-	// Init vars.
-	bool retFromCAS = false;	// result from MSYS_Compare_And_Swap().
-	short ret = -1;			// The result of this function.
-	long tid = MSYS_INVALID_TID;	// result from MSYS_Get_Thread_ID().
+	/* Init vars. */
+	bool retFromCAS = false;			/* Result from MSYS_Compare_And_Swap(). */
+	short ret = MSYS_MU_UNKNOWN_ERROR;	/* The result of this function. */
+	long tid = MSYS_INVALID_TID;		/* Result from MSYS_Get_Thread_ID(). */
 
-	// Make sure mu and mu->lock are valid pointers.
+	/* Make sure mu and mu->lock are valid pointers. */
 	if ((mu != NULL) && (mu->lock != NULL))
 	{
-		// Get the thread ID.
+		/* Get the thread ID. */
 		tid = MSYS_Get_Thread_ID();
 
 #ifdef MSYS_INSUFFIENCT_BITS_LONG_LOCK
-		// Call compiler specific function for compare and swap.
+		/* Call compiler specific function for compare and swap. */
 		while (!retFromCAS)
 		{
-			// Indefinite wait.....
+			/* Indefinite wait..... */
 			retFromCAS = MSYS_Compare_And_Swap((&((MSYS_Mutex_Private *)mu->lock)->lock), FALSE, TRUE);
 		}
 
-		// Check for ownership.
+		/* Check for ownership. */
 		if (((MSYS_Mutex_Private *)mu->lock)->tidLock == MSYS_INVALID_TID)
 		{
-			// Lock the mutex with the calling thread's thread ID.
+			/* Lock the mutex with the calling thread's thread ID. */
 			((MSYS_Mutex_Private *)mu->lock)->tidLock = tid;
 
-			// Set ret.
-			ret = 0;
+			/* Set ret. */
+			ret = MSYS_MU_SUCCESS;
 
-			// Flush memory changes.
+			/* Flush memory changes. */
 			MSYS_Sync_Memory();
 		}
 		else
 		{
-			// Lock is already active.
-			ret = 1;
+			/* Lock is already active. */
+			ret = MSYS_MU_ALREADY_LOCKED;
 		}
 
-		// Release the lock.
+		/* Release the lock. */
 		MSYS_Compare_And_Swap((&((MSYS_Mutex_Private *)mu->lock)->lock), TRUE, FALSE);
 #else
-		// Attempt to lock the mutex.
+		/* Attempt to lock the mutex. */
 		ret = MSYS_Compare_And_Swap_Long((&((MSYS_Mutex_Private *)mu->lock)->tidLock), MSYS_INVALID_TID, tid);
-#endif	// MSYS_INSUFFIENCT_BITS_LONG_LOCK
+#endif	/* MSYS_INSUFFIENCT_BITS_LONG_LOCK */
 	}
 
-	// Return the result.
+	/* Return the result. */
 	return ret;
 }
 
@@ -276,15 +281,15 @@ short MSYS_Unlock_Mutex(MSYS_Mutex * mu)
 	 * 	with the calling thread's thread ID as the check value, and MSYS_INVALID_TID as the value to write if the check succeeds.
 	 */
 
-	// Init vars.
-	bool retFromCAS = false;			// result from MSYS_Compare_And_Swap().
-	short ret = -1;					// result from this function.
-	long tid = MSYS_INVALID_TID;			// result from MSYS_Get_Thread_ID().
+	/* Init vars. */
+	bool retFromCAS = false;			/* Result from MSYS_Compare_And_Swap(). */
+	short ret = MSYS_MU_UNKNOWN_ERROR;	/* Result from this function. */
+	long tid = MSYS_INVALID_TID;		/* Result from MSYS_Get_Thread_ID(). */
 
-	// Make sure mu and mu->lock are valid pointers.
+	/* Make sure mu and mu->lock are valid pointers. */
 	if ((mu != NULL) && (mu->lock != NULL))
 	{
-		// Get the thread ID.
+		/* Get the thread ID. */
 		tid = MSYS_Get_Thread_ID();
 
 		/*
@@ -298,52 +303,56 @@ short MSYS_Unlock_Mutex(MSYS_Mutex * mu)
 		 *	For other threads, the initial compare and swap to gain hold over the lock variable, prevents another thread
 		 *	from attempting to access tidLock while it is being accessed in our thread.
 		 */
-		// Call compiler specific function for compare and swap.
+		/* Call compiler specific function for compare and swap. */
 #ifdef MSYS_INSUFFIENCT_BITS_LONG_LOCK
-		// Begin waiting loop.
+		/* Begin waiting loop. */
 		while (!retFromCAS)
 		{
-			// Wait until we get the lock we need to check the tidLock value.
+			/* Wait until we get the lock we need to check the tidLock value. */
 			retFromCAS = MSYS_Compare_And_Swap((&((MSYS_Mutex_Private *)mu->lock)->lock), FALSE, TRUE);
 		}
 
-		// Perform ownership check on tidLock.
+		/* Perform ownership check on tidLock. */
 		if (((MSYS_Mutex_Private *)mu->lock)->tidLock == tid)
 		{
-			// This mutex is locked by us, so release the lock.
+			/* This mutex is locked by us, so release the lock. */
 			((MSYS_Mutex_Private *)mu->lock)->tidLock = MSYS_INVALID_TID;
 
-			// Resync memory.
+			/* Resync memory. */
 			MSYS_Sync_Memory();
 
-			// Successfull.
-			ret = 0;
+			/* Successfull. */
+			ret = MSYS_MU_SUCCESS;
 		}
 		else
 		{
-			// Lock is owned by another thread, or is unowned.
-			ret = 1;
+			/* Lock is owned by another thread, or is unowned. */
+			ret = MSYS_MU_ALREADY_LOCKED;
 		}
 
-		// Release the lock.
+		/* Release the lock. */
 		MSYS_Compare_And_Swap((&((MSYS_Mutex_Private *)mu->lock)->lock), TRUE, FALSE);
 #else
 		retFromCAS = MSYS_Compare_And_Swap_Long((&((MSYS_Mutex_Private *)mu->lock)->tidLock), tid, MSYS_INVALID_TID);
 		if (retFromCAS)
 		{
-			// Successfull.
-			ret = 0;
+			/* Successfull. */
+			ret = MSYS_MU_SUCCESS;
 		}
 		else
 		{
-			// Lock is owned by another thread, or is unowned.
-			ret = 1;
+			/* Lock is owned by another thread, or is unowned. */
+			ret = MSYS_MU_ALREADY_LOCKED;
 		}
-#endif	// MSYS_INSUFFIENCT_BITS_LONG_LOCK
+#endif	/* MSYS_INSUFFIENCT_BITS_LONG_LOCK */
 	}
 
-	// Exit function.
+	/* Exit function. */
 	return ret;
 }
 
-// End of MSYS_Mutexes.c
+#ifdef __cplusplus
+}	/* extern C */
+#endif	/* __cplusplus */
+
+/* End of MSYS_Mutexes.c */

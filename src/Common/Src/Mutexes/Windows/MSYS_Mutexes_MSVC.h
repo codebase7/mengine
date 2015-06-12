@@ -1,5 +1,5 @@
 /*!
-    Multiverse Engine Project 17/3/2015 Common MSYS_Mutexes.h
+    Multiverse Engine Project 17/3/2015 Common MSYS_Mutexes_MSVC.h
 
     Copyright (C) 2015 Multiverse Engine Project
 
@@ -19,39 +19,23 @@
 */
 
 /* Include guard. */
-#ifndef MSYS_MUTEXES_H
-#define MSYS_MUTEXES_H
+#ifndef MSYS_MUTEXES_MSVC_H
+#define MSYS_MUTEXES_MSVC_H
+
+/* Only build this header on MSVC. */
+#ifdef _MSC_FULL_VER
+
+/* MSVC Does not support C99. (Actually Visual C 2013 and newer supports _Bool,
+but we are not using it as there is no reason to do so. Because the syscall requires the use of long for atomics.) */
+#undef MSYS_INSUFFIENCT_BITS_LONG_LOCK
 
 /* Define extern C. */
 #ifdef __cplusplus
 extern "C" {
 #endif	/* __cplusplus */
 
-/* Define error codes. */
-#define MSYS_MU_SUCCESS 0
-#define MSYS_MU_ALREADY_LOCKED 1
-#define MSYS_MU_INVALID -1
-#define MSYS_MU_UNKNOWN_ERROR -2
-
-/* External includes. */
-#include <stdlib.h>	/* Defines malloc(), free(). */
-
-/* Internal host specific includes. */
-#ifdef __linux__
-#include "Linux/MSYS_Mutexes_Linux.h"
-#elif _WIN32
-#include "Windows\MSYS_Mutexes_Windows.h"
-#endif	/*  __linux__ */
-
-/* Define the mutex type. */
-typedef struct MSYS_Mutex_T {
-	void * lock;	/* The mutex itself. */
-} MSYS_Mutex;
-
-/* We have to use a different header for MSVC due to it's crap support of the C standard. */
-#ifdef _MSC_FULL_VER
-#include "Windows\MSYS_Mutexes_MSVC.h"
-#else
+/* Define stdbool. */
+#include "..\..\stdbool.h"
 
 /* Define the functions. */
 
@@ -72,7 +56,7 @@ MSYS_Mutex * MSYS_Create_Mutex();
  *
  * 	This function does not have a return.
  */
-void MSYS_Destroy_Mutex(MSYS_Mutex ** mu);
+void MSYS_Destroy_Mutex();
 
 /*!
  * 	MSYS_Mutex * MSYS_Lock_Mutex(MSYS_Mutex * mu)
@@ -96,7 +80,7 @@ void MSYS_Destroy_Mutex(MSYS_Mutex ** mu);
  * 	Therefore the lock guarantee is only valid if the given pointers
  * 	are valid.
  */
-MSYS_Mutex * MSYS_Lock_Mutex(MSYS_Mutex * mu);
+MSYS_Mutex * MSYS_Lock_Mutex();
 
 /*!
  * 	short MSYS_Try_Lock_Mutex(MSYS_Mutex ** mu)
@@ -112,7 +96,7 @@ MSYS_Mutex * MSYS_Lock_Mutex(MSYS_Mutex * mu);
  *
  * 	Returns -1 if the given mutex pointer is invalid.
  */
-short MSYS_Try_Lock_Mutex(MSYS_Mutex * mu);
+short MSYS_Try_Lock_Mutex();
 
 /*!
  * 	short MSYS_Unlock_Mutex(MSYS_Mutex * mu)
@@ -127,7 +111,7 @@ short MSYS_Try_Lock_Mutex(MSYS_Mutex * mu);
  *
  * 	Returns -1 if the given mutex pointer is invalid.
  */
-short MSYS_Unlock_Mutex(MSYS_Mutex * mu);
+short MSYS_Unlock_Mutex();
 
 /*!
  * 	bool MSYS_Compare_And_Swap(bool * address, const bool oldValToCheckFor, const bool newValToWrite)
@@ -163,7 +147,7 @@ short MSYS_Unlock_Mutex(MSYS_Mutex * mu);
  * 		  attempts to compile the code by a different compiler. (Allow the preprocessor error to
  * 		  be thrown in this instance.)
  */
-bool MSYS_Compare_And_Swap(bool * address, const bool oldValToCheckFor, const bool newValToWrite);
+bool MSYS_Compare_And_Swap();
 
 /*!
  * 	bool MSYS_Compare_And_Swap(long * address, const long oldValToCheckFor, const long newValToWrite)
@@ -199,14 +183,14 @@ bool MSYS_Compare_And_Swap(bool * address, const bool oldValToCheckFor, const bo
  * 		  attempts to compile the code by a different compiler. (Allow the preprocessor error to
  * 		  be thrown in this instance.)
  */
-bool MSYS_Compare_And_Swap_Long(long * address, const long oldValToCheckFor, const long newValToWrite);
-
-#endif	/* _MSC_FULL_VER */
+bool MSYS_Compare_And_Swap_Long();
 
 #ifdef __cplusplus
 }	/* extern C */
 #endif /* __cplusplus */
 
-#endif	/* MSYS_MUTEXES_H */
+#endif	/* _MSC_FULL_VER */
 
-/* End of MSYS_Mutexes.h */
+#endif	/* MSYS_MUTEXES_MSVC_H */
+
+/* End of MSYS_Mutexes_MSVC.h */
