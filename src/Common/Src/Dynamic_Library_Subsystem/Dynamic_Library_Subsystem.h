@@ -22,7 +22,12 @@
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H
 
+/* Check for MSVC. */
+#ifdef _MSC_FULL_VER
+#include "..\stdbool.h"	/* bool. (MSVC is special.) */
+#else
 #include <stdbool.h>	// bool.
+#endif	/* _MSC_FULL_VER */
 #include <stddef.h>	// NULL.
 #include <stdlib.h>	// Malloc.
 
