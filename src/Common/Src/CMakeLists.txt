@@ -2,6 +2,11 @@
 set(LIBRARY_OUTPUT_PATH ${L_OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${O_OUTPUT_DIR})
 
+# Create the Byte_Order library.
+if (BUILD_BYTE_ORDER)
+	add_subdirectory(Byte_Order)
+	set (COMMON_BUILT_STATIC_LIBRARY_LIST ${COMMON_BUILT_STATIC_LIBRARY_LIST} Common_Byte_Order_Multiverse_Engine_Static)
+endif (BUILD_BYTE_ORDER)
 
 # Create the mutexes library.
 if (BUILD_INTERNAL_MUTEX_SUPPORT)
