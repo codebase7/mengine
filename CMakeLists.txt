@@ -19,6 +19,7 @@ set(O_OUTPUT_DIR ${T_OUTPUT_DIR}/obj CACHE PATH "Build object output directory")
 endif()
 
 # Option Defaults.
+option (BUILD_BYTE_ORDER "Whether or not to build the Byte Ordering code. (Defaults to yes, but is disabled currently due to changes to the Common error handler (error code changes) that have not been commited yet.)" OFF)
 option (BUILD_DYNAMIC_LIBRARY_SUBSYSTEM "Whether or not to build the Dynamic Library Subsystem. (Defaults to yes.)" ON)
 option (BUILD_INTERNAL_MUTEX_SUPPORT "Whether or not to build the internal mutex support library. (Defaults to yes.)" ON)
 option (BUILD_COMMON_ERROR_HANDLER "Whether or not to build the common error handler. (Defaults to yes.)" ON)
