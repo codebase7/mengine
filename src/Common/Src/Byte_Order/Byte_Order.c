@@ -18,7 +18,7 @@
     https://github.com/codebase7/mengine    
 */
 
-/* Include header */
+/* Internal includes. */
 #include "Byte_Order.h"
 
 /* Check for C++ compiler. */
