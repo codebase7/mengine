@@ -80,7 +80,7 @@ static struct CommonErrorLogData commonErrorLoggingData = {ERROR_DISABLE, NULL};
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg);
 
 /*
  * 	COMMON_LOG_CRITICAL(const char * errorMsg)
@@ -92,7 +92,7 @@ void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg);
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-void COMMON_LOG_CRITICAL(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_CRITICAL(const char * errorMsg);
 
 /*
  * 	COMMON_LOG_WARNING(const char * errorMsg)
@@ -104,7 +104,7 @@ void COMMON_LOG_CRITICAL(const char * errorMsg);
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-void COMMON_LOG_WARNING(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_WARNING(const char * errorMsg);
 
 /*
  * 	COMMON_LOG_INFO(const char * errorMsg)
@@ -116,7 +116,7 @@ void COMMON_LOG_WARNING(const char * errorMsg);
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-void COMMON_LOG_INFO(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_INFO(const char * errorMsg);
 
 /*
  * 	COMMON_LOG_DEBUG(const char * errorMsg)
@@ -128,7 +128,7 @@ void COMMON_LOG_INFO(const char * errorMsg);
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-void COMMON_LOG_DEBUG(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_DEBUG(const char * errorMsg);
 
 /*
  * 	COMMON_LOG_VERBOSE(const char * errorMsg)
@@ -140,7 +140,7 @@ void COMMON_LOG_DEBUG(const char * errorMsg);
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-void COMMON_LOG_VERBOSE(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_VERBOSE(const char * errorMsg);
 
 // End C Linkage if needed.
 #ifdef __cplusplus
