@@ -65,7 +65,7 @@ extern "C" {
 		 * 	Returns a pointer to a Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library data structure if successful.
 		 * 	Otherwise returns NULL.
 		 */
-		Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library();
+		MSYS_DLL_EXPORT Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library();
 
 		/*!
 		 * 	void Common_Dynamic_Library_Subsystem_Destroy_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib)
@@ -77,7 +77,7 @@ extern "C" {
 		 *
 		 * 	This function has no return.
 		 */
-		void Common_Dynamic_Library_Subsystem_Destroy_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib);
+		MSYS_DLL_EXPORT void Common_Dynamic_Library_Subsystem_Destroy_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib);
 #ifdef __cplusplus
 }		// End of extern C.
 #endif
