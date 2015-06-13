@@ -43,7 +43,9 @@ endif(${CMAKE_COMPILER_IS_GNUCC})
 # Create the static library.
 add_library(Common_Error_Handler_Multiverse_Engine_Static STATIC ${COMMON_ERROR_HANDLER_C_INCLUDES} ${COMMON_ERROR_HANDLER_CXX_INCLUDES})
 set_property(TARGET Common_Error_Handler_Multiverse_Engine_Static APPEND PROPERTY COMPILE_DEFINITIONS ${COMMON_ERROR_HANDLER_DEFINES})
+target_link_libraries(Common_Error_Handler_Multiverse_Engine_Static ${COMMON_ERROR_HANDLER_STATIC_LINK_LIBS})
 
 # Now the shared library.
 add_library(Common_Error_Handler_Multiverse_Engine SHARED ${COMMON_ERROR_HANDLER_C_INCLUDES} ${COMMON_ERROR_HANDLER_CXX_INCLUDES})
 set_property(TARGET Common_Error_Handler_Multiverse_Engine_Static APPEND PROPERTY COMPILE_DEFINITIONS ${COMMON_ERROR_HANDLER_DEFINES})
+target_link_libraries(Common_Error_Handler_Multiverse_Engine ${COMMON_ERROR_HANDLER_LINK_LIBS})
