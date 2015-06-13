@@ -22,6 +22,9 @@
 #ifndef COMMON_ERROR_HANDLER_H
 #define COMMON_ERROR_HANDLER_H
 
+/* Pull in DLL_PORT.h */
+#include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
+
 // External includes.
 #include <stddef.h>		// Defines NULL.
 
@@ -43,7 +46,7 @@ namespace Common
 	 * 
 	 * 	Returns the size of the common error table.
 	 */
-	const unsigned int Get_Error_Table_Size();
+	MSYS_DLL_EXPORT const unsigned int Get_Error_Table_Size();
 
 	/*!
 	 * 	const char * Common::Get_Error_Message(const int & errorCode)
@@ -54,7 +57,7 @@ namespace Common
 	 * 	Returns a valid pointer if the given error code is in the common error table.
 	 * 	Returns the message for Common::COMMON_UNKNOWN_ERROR otherwise.
 	 */
-	const char * Get_Error_Message(const int & errorCode);
+	MSYS_DLL_EXPORT const char * Get_Error_Message(const int & errorCode);
 
 	/*!
 	 * 	void Common::Set_Error_Log_Level(const unsigned int & logLevel)
@@ -65,7 +68,7 @@ namespace Common
 	 * 	(Disables all logging. See Core/Src/Panic.h for a list of
 	 * 	 valid logging levels.)
 	 */
-	void Set_Error_Log_Level(const unsigned int & logLevel = ERROR_DISABLE);
+	MSYS_DLL_EXPORT void Set_Error_Log_Level(const unsigned int & logLevel = ERROR_DISABLE);
 
 	/*!
 	 * 	unsigned int Common::Get_Error_Log_Level()
@@ -74,7 +77,7 @@ namespace Common
 	 * 
 	 * 	See Core/Src/Panic.h for a list of valid logging levels.
 	 */
-	unsigned int Get_Error_Log_Level();
+	MSYS_DLL_EXPORT unsigned int Get_Error_Log_Level();
 
 	/*!
 	 * 	void Common::Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
@@ -93,7 +96,7 @@ namespace Common
 	 * 	disable calling another function when an error is generated.
 	 * 	In addition the logging level will be reset to ERROR_DISABLE.
 	 */
-	void Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg) = NULL);
+	MSYS_DLL_EXPORT void Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg) = NULL);
 };
 
 #endif // COMMON_ERROR_HANDLER_H
