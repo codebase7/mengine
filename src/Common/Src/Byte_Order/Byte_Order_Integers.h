@@ -51,7 +51,7 @@ extern "C" {
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_UChar(unsigned char * uc);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_UChar(unsigned char * uc);
 
 /*!
  * 		int Common_Big_Endian_To_Host_UChar(unsigned char * uc)
@@ -72,7 +72,7 @@ int Common_Host_To_Big_Endian_UChar(unsigned char * uc);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_UChar(unsigned char * uc);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_UChar(unsigned char * uc);
 
 /*!
  * 		int Common_Host_To_Big_Endian_Char(char * c)
@@ -93,7 +93,7 @@ int Common_Big_Endian_To_Host_UChar(unsigned char * uc);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_Char(char * c);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_Char(char * c);
 
 /*!
  * 		int Common_Big_Endian_To_Host_Char(char * c)
@@ -114,7 +114,7 @@ int Common_Host_To_Big_Endian_Char(char * c);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_Char(char * c);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_Char(char * c);
 
 /*!
  * 		int Common_Host_To_Big_Endian_UShort(unsigned short * us)
@@ -135,7 +135,7 @@ int Common_Big_Endian_To_Host_Char(char * c);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_UShort(unsigned short * us);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_UShort(unsigned short * us);
 
 /*!
  * 		int Common_Big_Endian_To_Host_UShort(unsigned short * us)
@@ -156,7 +156,7 @@ int Common_Host_To_Big_Endian_UShort(unsigned short * us);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_UShort(unsigned short * us);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_UShort(unsigned short * us);
 
 /*!
  * 		int Common_Host_To_Big_Endian_Short(short * s)
@@ -177,7 +177,7 @@ int Common_Big_Endian_To_Host_UShort(unsigned short * us);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_Short(short * s);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_Short(short * s);
 
 /*!
  * 		int Common_Big_Endian_To_Host_Short(short * s)
@@ -198,7 +198,7 @@ int Common_Host_To_Big_Endian_Short(short * s);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_Short(short * s);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_Short(short * s);
 
 /*!
  * 		int Common_Host_To_Big_Endian_UInt(unsigned int * ui)
@@ -219,7 +219,7 @@ int Common_Big_Endian_To_Host_Short(short * s);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_UInt(unsigned int * ui);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_UInt(unsigned int * ui);
 
 /*!
  * 		int Common_Big_Endian_To_Host_UInt(unsigned int * ui)
@@ -240,7 +240,7 @@ int Common_Host_To_Big_Endian_UInt(unsigned int * ui);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_UInt(unsigned int * ui);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_UInt(unsigned int * ui);
 
 /*!
  * 		int Common_Host_To_Big_Endian_Int(int * i)
@@ -261,7 +261,7 @@ int Common_Big_Endian_To_Host_UInt(unsigned int * ui);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_Int(int * i);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_Int(int * i);
 
 /*!
  * 		int Common_Big_Endian_To_Host_Int(int * i)
@@ -282,7 +282,7 @@ int Common_Host_To_Big_Endian_Int(int * i);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_Int(int * i);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_Int(int * i);
 
 /*!
  * 		int Common_Host_To_Big_Endian_ULong(unsigned long * ul)
@@ -303,7 +303,7 @@ int Common_Big_Endian_To_Host_Int(int * i);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_ULong(unsigned long * ul);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_ULong(unsigned long * ul);
 
 /*!
  * 		int Common_Big_Endian_To_Host_ULong(unsigned long * ul)
@@ -324,7 +324,7 @@ int Common_Host_To_Big_Endian_ULong(unsigned long * ul);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_ULong(unsigned long * ul);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_ULong(unsigned long * ul);
 
 /*!
  * 		int Common_Host_To_Big_Endian_Long(long * l)
@@ -345,7 +345,7 @@ int Common_Big_Endian_To_Host_ULong(unsigned long * ul);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_Long(long * l);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_Long(long * l);
 
 /*!
  * 		int Common_Big_Endian_To_Host_Long(long * l)
@@ -366,7 +366,7 @@ int Common_Host_To_Big_Endian_Long(long * l);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_Long(long * l);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_Long(long * l);
 
 /*!
  * 		int Common_Host_To_Big_Endian_ULong_Long(unsigned long long * ull)
@@ -387,7 +387,7 @@ int Common_Big_Endian_To_Host_Long(long * l);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_ULong_Long(unsigned long long * ull);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_ULong_Long(unsigned long long * ull);
 
 /*!
  * 		int Common_Big_Endian_To_Host_ULong_Long(unsigned long long * ull)
@@ -408,7 +408,7 @@ int Common_Host_To_Big_Endian_ULong_Long(unsigned long long * ull);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_ULong_Long(unsigned long long * ull);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_ULong_Long(unsigned long long * ull);
 
 /*!
  * 		int Common_Host_To_Big_Endian_Long_Long(long long * ull)
@@ -429,7 +429,7 @@ int Common_Big_Endian_To_Host_ULong_Long(unsigned long long * ull);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_Long_Long(long long * ll);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_Long_Long(long long * ll);
 
 /*!
  * 		int Common_Big_Endian_To_Host_Long_Long(long long * ll)
@@ -450,7 +450,7 @@ int Common_Host_To_Big_Endian_Long_Long(long long * ll);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_Long_Long(long long * ll);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_Long_Long(long long * ll);
 
 /*!
  * 		int Common_Host_To_Big_Endian_Size_T(size_t * st)
@@ -471,7 +471,7 @@ int Common_Big_Endian_To_Host_Long_Long(long long * ll);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_Size_T(size_t * st);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_Size_T(size_t * st);
 
 /*!
  * 		int Common_Big_Endian_To_Host_Size_T(size_t * st)
@@ -492,7 +492,7 @@ int Common_Host_To_Big_Endian_Size_T(size_t * st);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_Size_T(size_t * st);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_Size_T(size_t * st);
 
 /*!
  * 		General Definitions for the Common_*_Endianness_Check() functions:
@@ -521,7 +521,7 @@ int Common_Big_Endian_To_Host_Size_T(size_t * st);
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_UCHAR_Endianness_Check();
+MSYS_DLL_EXPORT int Common_UCHAR_Endianness_Check();
 
 /*!
  *		int Common_CHAR_Endianness_Check()
@@ -543,7 +543,7 @@ int Common_UCHAR_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_CHAR_Endianness_Check();
+MSYS_DLL_EXPORT int Common_CHAR_Endianness_Check();
 
 /*!
  *		int Common_USHORT_Endianness_Check()
@@ -565,7 +565,7 @@ int Common_CHAR_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_USHORT_Endianness_Check();
+MSYS_DLL_EXPORT int Common_USHORT_Endianness_Check();
 
 /*!
  *		int Common_SHORT_Endianness_Check()
@@ -587,7 +587,7 @@ int Common_USHORT_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_SHORT_Endianness_Check();
+MSYS_DLL_EXPORT int Common_SHORT_Endianness_Check();
 
 /*!
  *		int Common_UINT_Endianness_Check()
@@ -609,7 +609,7 @@ int Common_SHORT_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_UINT_Endianness_Check();
+MSYS_DLL_EXPORT int Common_UINT_Endianness_Check();
 
 /*!
  *		int Common_INT_Endianness_Check()
@@ -631,7 +631,7 @@ int Common_UINT_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_INT_Endianness_Check();
+MSYS_DLL_EXPORT int Common_INT_Endianness_Check();
 
 /*!
  *		int Common_ULONG_Endianness_Check()
@@ -653,7 +653,7 @@ int Common_INT_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_ULONG_Endianness_Check();
+MSYS_DLL_EXPORT int Common_ULONG_Endianness_Check();
 
 /*!
  *		int Common_LONG_Endianness_Check()
@@ -675,7 +675,7 @@ int Common_ULONG_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_LONG_Endianness_Check();
+MSYS_DLL_EXPORT int Common_LONG_Endianness_Check();
 
 /*!
  *		int Common_ULONG_LONG_Endianness_Check()
@@ -697,7 +697,7 @@ int Common_LONG_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_ULONG_LONG_Endianness_Check();
+MSYS_DLL_EXPORT int Common_ULONG_LONG_Endianness_Check();
 
 /*!
  *		int Common_LONG_LONG_Endianness_Check()
@@ -719,7 +719,7 @@ int Common_ULONG_LONG_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_LONG_LONG_Endianness_Check();
+MSYS_DLL_EXPORT int Common_LONG_LONG_Endianness_Check();
 
 /*!
  *		int Common_SIZE_T_Endianness_Check()
@@ -741,7 +741,7 @@ int Common_LONG_LONG_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_SIZE_T_Endianness_Check();
+MSYS_DLL_EXPORT int Common_SIZE_T_Endianness_Check();
 
 #ifdef __cplusplus
 }	/* extern "C" */

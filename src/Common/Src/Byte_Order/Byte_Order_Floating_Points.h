@@ -51,7 +51,7 @@ extern "C" {
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_Float(float * f);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_Float(float * f);
 
 /*!
  * 		int Common_Big_Endian_To_Host_Float(float * f)
@@ -72,7 +72,7 @@ int Common_Host_To_Big_Endian_Float(float * f);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_Float(float * f);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_Float(float * f);
 
 /*!
  * 		int Common_Host_To_Big_Endian_DOUBLE(double * d)
@@ -93,7 +93,7 @@ int Common_Big_Endian_To_Host_Float(float * f);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Host_To_Big_Endian_Double(double * d);
+MSYS_DLL_EXPORT int Common_Host_To_Big_Endian_Double(double * d);
 
 /*!
  * 		int Common_Big_Endian_To_Host_Double(double * d)
@@ -114,7 +114,7 @@ int Common_Host_To_Big_Endian_Double(double * d);
  * 		In case of error, (returned error code is not COMMON_ERROR_SUCCESS),
  * 		all arguments will be left unaltered.
  */
-int Common_Big_Endian_To_Host_Double(double * d);
+MSYS_DLL_EXPORT int Common_Big_Endian_To_Host_Double(double * d);
 
 /*!
  * 		General Definitions for the Common_*_Endianness_Check() functions:
@@ -143,7 +143,7 @@ int Common_Big_Endian_To_Host_Double(double * d);
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_FLOAT_Endianness_Check();
+MSYS_DLL_EXPORT int Common_FLOAT_Endianness_Check();
 
 /*!
  *		int Common_DOUBLE_Endianness_Check()
@@ -165,7 +165,7 @@ int Common_FLOAT_Endianness_Check();
  *		Returns MSYS_UNKNOWN_ENDIANNESS if the given data type's byte ordering
  *		is unknown for the given host.
  */
-int Common_DOUBLE_Endianness_Check();
+MSYS_DLL_EXPORT int Common_DOUBLE_Endianness_Check();
 
 #ifdef __cplusplus
 }	/* extern "C" */

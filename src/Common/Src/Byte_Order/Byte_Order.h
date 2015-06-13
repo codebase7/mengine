@@ -32,6 +32,9 @@ extern "C" {
 #define MSYS_LITTLE_ENDIAN 1
 #define MSYS_UNKNOWN_ENDIANNESS 2
 
+/* Pull in DLL_PORT.h */
+#include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
+
 /* Internal headers. */
 #include "Byte_Order_Integers.h"
 #include "Byte_Order_Floating_Points.h"
@@ -57,7 +60,7 @@ extern "C" {
  *
  *		Otherwise returns the appropriate error code.
  */
-int Common_Byte_Swap(char * data, const size_t dataLength);
+MSYS_DLL_EXPORT int Common_Byte_Swap(char * data, const size_t dataLength);
 
 /*!
  * 		int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const size_t base,
@@ -92,7 +95,7 @@ int Common_Byte_Swap(char * data, const size_t dataLength);
  *
  * 		In case of error, (the returned error code is not COMMON_ERROR_SUCCESS, then the given arguments will NOT be altered by this function.
  */
-int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const size_t base, const size_t width, const char fillValue, const bool spaceBetweenBytes);
+MSYS_DLL_EXPORT int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const size_t base, const size_t width, const char fillValue, const bool spaceBetweenBytes);
 
 /*!
  * 		void Common_Deallocate_Print_Bytes_CString(char ** str)
@@ -104,7 +107,7 @@ int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, ch
  *
  * 		This function has no return. If a given pointer is NULL, this function will silently fail.
  */
-void Common_Deallocate_Print_Bytes_CString(char ** str);
+MSYS_DLL_EXPORT void Common_Deallocate_Print_Bytes_CString(char ** str);
 
 /*!
  * 		int Common_Print_Bytes_In_Hex(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes)
@@ -117,7 +120,7 @@ void Common_Deallocate_Print_Bytes_CString(char ** str);
  * 		All arguments and return values are identical to their Common_Print_Bytes_To_CString() counterparts. See Common_Print_Bytes_To_CString()
  * 		for their descriptions.
  */
-int Common_Print_Bytes_In_Hex(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes);
+MSYS_DLL_EXPORT int Common_Print_Bytes_In_Hex(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes);
 
 /*!
  * 		int Common_Print_Bytes_In_Binary(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize,
@@ -131,7 +134,7 @@ int Common_Print_Bytes_In_Hex(const char * data, const size_t dataLength, char *
  * 		All arguments and return values are identical to their Common_Print_Bytes_To_CString() counterparts. See Common_Print_Bytes_To_CString()
  * 		for their descriptions.
  */
-int Common_Print_Bytes_In_Binary(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes);
+MSYS_DLL_EXPORT int Common_Print_Bytes_In_Binary(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes);
 
 #ifdef __cplusplus
 }	/* extern "C" */
