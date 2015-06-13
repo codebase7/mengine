@@ -47,7 +47,7 @@ extern "C" {
  * 	Returns a pointer to the created object if successful.
  * 	Returns NULL otherwise.
  */
-MSYS_Mutex * MSYS_Create_Mutex();
+MSYS_DLL_EXPORT MSYS_Mutex * MSYS_Create_Mutex();
 
 /*!
  * 	void MSYS_Destroy_Mutex(MSYS_Mutex * mu)
@@ -56,7 +56,7 @@ MSYS_Mutex * MSYS_Create_Mutex();
  *
  * 	This function does not have a return.
  */
-void MSYS_Destroy_Mutex();
+MSYS_DLL_EXPORT void MSYS_Destroy_Mutex();
 
 /*!
  * 	MSYS_Mutex * MSYS_Lock_Mutex(MSYS_Mutex * mu)
@@ -80,7 +80,7 @@ void MSYS_Destroy_Mutex();
  * 	Therefore the lock guarantee is only valid if the given pointers
  * 	are valid.
  */
-MSYS_Mutex * MSYS_Lock_Mutex();
+MSYS_DLL_EXPORT MSYS_Mutex * MSYS_Lock_Mutex();
 
 /*!
  * 	short MSYS_Try_Lock_Mutex(MSYS_Mutex ** mu)
@@ -96,7 +96,7 @@ MSYS_Mutex * MSYS_Lock_Mutex();
  *
  * 	Returns -1 if the given mutex pointer is invalid.
  */
-short MSYS_Try_Lock_Mutex();
+MSYS_DLL_EXPORT short MSYS_Try_Lock_Mutex();
 
 /*!
  * 	short MSYS_Unlock_Mutex(MSYS_Mutex * mu)
@@ -111,7 +111,7 @@ short MSYS_Try_Lock_Mutex();
  *
  * 	Returns -1 if the given mutex pointer is invalid.
  */
-short MSYS_Unlock_Mutex();
+MSYS_DLL_EXPORT short MSYS_Unlock_Mutex();
 
 /*!
  * 	bool MSYS_Compare_And_Swap(bool * address, const bool oldValToCheckFor, const bool newValToWrite)
