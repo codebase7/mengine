@@ -1,4 +1,6 @@
 /*!
+	Multiverse Engine Project 5/5/2013 Core BaseHeader.h
+
     Copyright (C) 2013 Multiverse Engine Project
 
     This program is free software;
@@ -16,6 +18,10 @@
     https://github.com/codebase7/mengine
 */
 
+/* Internal includes. */
+#include "../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
+
+/* External includes. */
 #include <iostream>
 #include <string.h>
 #include <fstream>
