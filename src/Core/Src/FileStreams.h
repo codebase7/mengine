@@ -36,7 +36,7 @@ namespace FileStreams
   Pram: Path to file.
   Return: returns OK if successful. Otherwise an error is given.
 */
-std::string configCreate(std::string path, Panic::ERROR & error);
+MSYS_DLL_EXPORT std::string configCreate(std::string path, Panic::ERROR & error);
 
 
 /*!
@@ -48,7 +48,7 @@ std::string configCreate(std::string path, Panic::ERROR & error);
   @pram varaible name to find in given config file.
   returns string with requested varaible if found otherwise returns error.
 */
-std::string configParser(std::string path, std::string key, Panic::ERROR & Error);
+MSYS_DLL_EXPORT std::string configParser(std::string path, std::string key, Panic::ERROR & Error);
 
 /*!
   configWriter(std::string path, std::string key, std::string value, Panic::ERROR & error, bool createkey)
@@ -63,9 +63,9 @@ std::string configParser(std::string path, std::string key, Panic::ERROR & Error
 
   @return Retuns OK if successful, otherwise an error is given.
 */
-std::string configWriter(std::string path, std::string key, std::string value, Panic::ERROR & error, bool createkey = false);
+MSYS_DLL_EXPORT std::string configWriter(std::string path, std::string key, std::string value, Panic::ERROR & error, bool createkey = false);
 
-std::string Filechange();
+MSYS_DLL_EXPORT std::string Filechange();
 
 /*!
   UserFileWrite(std::string file_name, int mode, std::string data)
@@ -77,7 +77,7 @@ std::string Filechange();
   The return value is 0 if the operation is successful, 1 if the file did not open correctly,
   or 2 if the file writing mode was invalid.
 */
-int UserFileWrite(std::string file_name, int mode, std::string data);
+MSYS_DLL_EXPORT int UserFileWrite(std::string file_name, int mode, std::string data);
 
 
 //extern std::string readFile(std::string file_name, int indexNumber);
@@ -90,7 +90,7 @@ int UserFileWrite(std::string file_name, int mode, std::string data);
    occurs in which case the error will be printed to the screen / stdout.
 */
 
-std::string readEntireFile(std::string filename, Panic::ERROR & error);
+MSYS_DLL_EXPORT std::string readEntireFile(std::string filename, Panic::ERROR & error);
 
 /*!
   FileSearch(std::string filename, std::string key, Panic::ERROR & error)
@@ -101,7 +101,7 @@ std::string readEntireFile(std::string filename, Panic::ERROR & error);
   @pram string to search for in file.
   returns string if found in file otherwise an error is given.
 */
-std::string FileSearch(std::string filename, std::string key, Panic::ERROR & error);
+MSYS_DLL_EXPORT std::string FileSearch(std::string filename, std::string key, Panic::ERROR & error);
 
 }
 #endif

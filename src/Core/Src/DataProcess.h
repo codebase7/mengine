@@ -33,13 +33,13 @@ class Data_Object{
         size_t capacity;    // Length of data we can store.
 
     public:
-        Data_Object()
+        MSYS_DLL_EXPORT Data_Object()
         {
                 data = NULL;
                 length = 0;
                 capacity = 0;
         }
-        ~Data_Object()
+        MSYS_DLL_EXPORT ~Data_Object()
         {
                 if (data != NULL)
                 {
@@ -49,17 +49,17 @@ class Data_Object{
                 length = 0;
                 capacity = 0;
         }
-        Data_Object(const Data_Object & source);
-        Data_Object(const std::string & source);
-        Data_Object(const char * source, size_t str_length);
-        Data_Object(const char & source);
-        Data_Object & operator= (const Data_Object &source);
-        Data_Object & operator= (const std::string &source);
-        Data_Object & operator= (const char &source);
-        Data_Object & operator+= (const char &source);
-        Data_Object & operator+= (const std::string source);
-        Data_Object & operator+= (const Data_Object & source);
-        char * substr(size_t offset, size_t endpoint) const;
+        MSYS_DLL_EXPORT Data_Object(const Data_Object & source);
+        MSYS_DLL_EXPORT Data_Object(const std::string & source);
+        MSYS_DLL_EXPORT Data_Object(const char * source, size_t str_length);
+        MSYS_DLL_EXPORT Data_Object(const char & source);
+        MSYS_DLL_EXPORT Data_Object & operator= (const Data_Object &source);
+        MSYS_DLL_EXPORT Data_Object & operator= (const std::string &source);
+        MSYS_DLL_EXPORT Data_Object & operator= (const char &source);
+        MSYS_DLL_EXPORT Data_Object & operator+= (const char &source);
+        MSYS_DLL_EXPORT Data_Object & operator+= (const std::string source);
+        MSYS_DLL_EXPORT Data_Object & operator+= (const Data_Object & source);
+        MSYS_DLL_EXPORT char * substr(size_t offset, size_t endpoint) const;
 
         /*!
             int DataProcess::Data_Object::Buffer_Copy(const DataProcess::Data_Object & source, size_t copy_offset, size_t copy_length)
@@ -78,7 +78,7 @@ class Data_Object{
                         The source buffer's data length is less than the requested offset plus the requested length.
             Returns -9 on a memory error, (Note You may need to re check the buffer to make sure that the data_object was not reallocated.)
         */
-        int Buffer_Copy(const DataProcess::Data_Object & source, size_t copy_offset = 0, size_t copy_length = 0);
+        MSYS_DLL_EXPORT int Buffer_Copy(const DataProcess::Data_Object & source, size_t copy_offset = 0, size_t copy_length = 0);
 
         /*!
                 const char * DataProcess::Data_Object::get_Pointer() const
@@ -87,7 +87,7 @@ class Data_Object{
 
                 If the Data_Object has no allocated memory, capacity equals zero (0), this function returns NULL.
         */
-        const char * get_Pointer() const;
+        MSYS_DLL_EXPORT const char * get_Pointer() const;
 
         /*!
                 char * DataProcess::Data_Object::get_Copy() const
@@ -99,11 +99,8 @@ class Data_Object{
 
                 If this function fails to allocate memory, it will return NULL.
         */
-        char * get_Copy() const;
-        size_t get_length() const
-        {
-                return this->length;
-        }
+        MSYS_DLL_EXPORT char * get_Copy() const;
+        MSYS_DLL_EXPORT size_t get_length() const;
 
         /*!
                 size_t DataProcess::Data_Object::get_Capacity() const
@@ -113,10 +110,7 @@ class Data_Object{
 
                 If no memory has been allocated this function returns zero (0).
         */
-        size_t get_Capacity() const
-        {
-                return this->capacity;
-        }
+        MSYS_DLL_EXPORT size_t get_Capacity() const;
 
         /*!
                 size_t DataProcess::Data_Object::size() const
@@ -126,22 +120,19 @@ class Data_Object{
 
                 If no data is present zero (0) is returned.
         */
-        size_t size() const
-        {
-                return this->length;
-        }
+        MSYS_DLL_EXPORT size_t size() const;
 
-	/*!
-		void DataProcess::Data_Object::set(const char * source, const size_t & source_length)
+		/*!
+			void DataProcess::Data_Object::set(const char * source, const size_t & source_length)
 
-		This function clears the Data_Object's buffer, and then copies
-		source_length amount of data from source to the Data_Object's buffer.
+			This function clears the Data_Object's buffer, and then copies
+			source_length amount of data from source to the Data_Object's buffer.
 
-		If this function encounters an error, (i.e. NULL source, bad source_length,
-		an exception, etc.) then this function will silently fail and the Data_Object
-		will be cleared.
-	*/
-	void set(const char * source, const size_t & source_length);
+			If this function encounters an error, (i.e. NULL source, bad source_length,
+			an exception, etc.) then this function will silently fail and the Data_Object
+			will be cleared.
+		*/
+		MSYS_DLL_EXPORT void set(const char * source, const size_t & source_length);
 
         /*!
                 void DataProcess::Data_Object::clear()
@@ -149,7 +140,7 @@ class Data_Object{
                 This function deallocates (frees) the Data_Object's memory, and resets
                 length and capacity to zero (0).
         */
-        void clear();
+        MSYS_DLL_EXPORT void clear();
 
         /*!
                 void DataProcess::Data_Object::reset()
@@ -157,7 +148,7 @@ class Data_Object{
                 This function erases all data in the Data_Object, (Sets all bytes to NULL)
                 and sets length to zero (0). The capacity is left unchanged.
         */
-        void reset();
+        MSYS_DLL_EXPORT void reset();
 
         /*!
                 void DataProcess::Data_Object::reserve(size_t new_length)
@@ -180,9 +171,9 @@ class Data_Object{
                 the Data_Object will contain the data that was successfully copied prior to the failure.
                 All other data will be lost.
         */
-        void reserve(size_t new_length);
-        bool Compare(const Data_Object &source) const;
-        bool NCompare(const Data_Object &source) const;
+        MSYS_DLL_EXPORT void reserve(size_t new_length);
+        MSYS_DLL_EXPORT bool Compare(const Data_Object &source) const;
+        MSYS_DLL_EXPORT bool NCompare(const Data_Object &source) const;
 
         /*!
                 bool DataProcess::Data_Object::Data_Compare(const DataProcess::Data_Object & source) const
@@ -196,7 +187,7 @@ class Data_Object{
                 Returns true if both the length and data of the two Data_Objects are equal.
                 Returns false if etheir the length or data does not match.
         */
-        bool Data_Compare(const DataProcess::Data_Object & source) const;
+        MSYS_DLL_EXPORT bool Data_Compare(const DataProcess::Data_Object & source) const;
 
         /*!
                 bool DataProcess::Data_Object::Data_NCompare(const DataProcess::Data_Object & source) const
@@ -210,7 +201,7 @@ class Data_Object{
                 Returns false if both the length and data of the two Data_Objects are equal.
                 Returns true if etheir the length or data does not match.
         */
-        bool Data_NCompare(const DataProcess::Data_Object & source) const;
+        MSYS_DLL_EXPORT bool Data_NCompare(const DataProcess::Data_Object & source) const;
 
         /*!
                 size_t DataProcess::Data_Object::insert(size_t offset, const char source)
@@ -222,7 +213,7 @@ class Data_Object{
                 Returns amount of inserted data if successfull. (In this case one (1).)
                 Returns zero (0) if an error occurs or if no data was copied.
         */
-        size_t insert(size_t offset, const char source);
+        MSYS_DLL_EXPORT size_t insert(size_t offset, const char source);
 
         /*!
                 size_t DataProcess::Data_Object::insert(size_t offset, const std::string & source)
@@ -236,7 +227,7 @@ class Data_Object{
                 Returns amount of inserted data if successfull.
                 Returns zero (0) if an error occurs or if no data was copied.
         */
-        size_t insert(size_t offset, const std::string & source);
+        MSYS_DLL_EXPORT size_t insert(size_t offset, const std::string & source);
 
         /*!
                 size_t DataProcess::Data_Object::insert(size_t offset, const Data_Object & source)
@@ -250,7 +241,7 @@ class Data_Object{
                 Returns amount of inserted data if successfull.
                 Returns zero (0) if an error occurs or if no data was copied.
         */
-        size_t insert(size_t offset, const Data_Object & source);
+        MSYS_DLL_EXPORT size_t insert(size_t offset, const Data_Object & source);
 };
 
 /*!
@@ -270,7 +261,7 @@ class Data_Object{
 
 	Returns the generated psudo-random number.
 */
-size_t Trivial_Random_Number_Generator(const size_t & min_value = 0, const size_t & max_value = 255, const bool & reset_rand = false);
+MSYS_DLL_EXPORT size_t Trivial_Random_Number_Generator(const size_t & min_value = 0, const size_t & max_value = 255, const bool & reset_rand = false);
 
 /*!
         short DataProcess::IncrementingSort(std::vector<std::string> & sort)
@@ -284,7 +275,7 @@ size_t Trivial_Random_Number_Generator(const size_t & min_value = 0, const size_
          Returns 0 on success.
          Returns -9 if an exception is thrown.
 */
-short IncrementingSort(std::vector<std::string> & sort);
+MSYS_DLL_EXPORT short IncrementingSort(std::vector<std::string> & sort);
 
 /*!
         short DataProcess::DecrementingSort(std::vector<std::string> & sort)
@@ -298,7 +289,7 @@ short IncrementingSort(std::vector<std::string> & sort);
          Returns 0 on success.
          Returns -9 if an exception is thrown.
 */
-short DecrementingSort(std::vector<std::string> & sort);
+MSYS_DLL_EXPORT short DecrementingSort(std::vector<std::string> & sort);
 
 /*!
     bool DataProcess::CheckForEOF(fstream & source)
@@ -311,7 +302,7 @@ short DecrementingSort(std::vector<std::string> & sort);
     Returns true if the fstream is at EOF. (End of File)
     Returns false otherwise. (Note: This function will return false if the fstream has failed. (i.e source.fail() == true).)
 */
-bool CheckForEOF(fstream & source);
+MSYS_DLL_EXPORT bool CheckForEOF(fstream & source);
 
 /*!
     GenerateUID(long int length)
@@ -321,7 +312,7 @@ bool CheckForEOF(fstream & source);
 
     Returns string of given length.
 */
-std::string GenerateUID(long int length = 25);
+MSYS_DLL_EXPORT std::string GenerateUID(long int length = 25);
 
 /*!
         getnumberFromString(std::string source, std::string varName, std::string limiter , bool isdecimal, Panic::ERROR & error)
@@ -331,7 +322,7 @@ std::string GenerateUID(long int length = 25);
         Returns number if successful.
         Otherwise returns 0.
 */
-double getnumberFromString(std::string source, std::string varName, std::string limiter , bool isdecimal, Panic::ERROR & error);
+MSYS_DLL_EXPORT double getnumberFromString(std::string source, std::string varName, std::string limiter , bool isdecimal, Panic::ERROR & error);
 
 /*!
         getIntFromInput()
@@ -342,7 +333,7 @@ double getnumberFromString(std::string source, std::string varName, std::string 
         Returns integer from console if successful,
         Otherwise returns 0.
 */
-int getIntFromInput();
+MSYS_DLL_EXPORT int getIntFromInput();
 
 /*!
         bool DataProcess::yesNoConsolePrompt()
@@ -352,15 +343,15 @@ int getIntFromInput();
         Returns true if the user said YES.
         Otherwise returns false. (Defaults to NO.)
 */
-bool yesNoConsolePrompt();
+MSYS_DLL_EXPORT bool yesNoConsolePrompt();
 
-bool getboolFromstring(std::string source, std::string varName, char delimiter, Panic::ERROR & error);
+MSYS_DLL_EXPORT bool getboolFromstring(std::string source, std::string varName, char delimiter, Panic::ERROR & error);
 // Reads input string for a true or false statement then returns the result.
 // if no varible statement is found it returns the following string "ERROR: NO VAR."
 
 // Takes a pointer to an integer and converts the integer back to a binary number.
 // Return value is the binary equilvent to the given integer. Which is wrote back into the pointer.
-long ConvertToBinary(int input);
+MSYS_DLL_EXPORT long ConvertToBinary(int input);
 
 /*!
         getnumberFromString(const char * string, size_t string_size)
@@ -376,7 +367,7 @@ long ConvertToBinary(int input);
         Returns the extracted number on success.
         Returns zero (0) otherwise.
 */
-long int getnumberFromString(const char * string, size_t string_size);
+MSYS_DLL_EXPORT long int getnumberFromString(const char * string, size_t string_size);
 
 /*!
         size_t DataProcess::getSize_TFromString(const char * string, size_t string_size)
@@ -392,7 +383,7 @@ long int getnumberFromString(const char * string, size_t string_size);
         Returns the extracted number on success.
         Returns zero (0) otherwise.
 */
-size_t getSize_TFromString(const char * string, size_t string_size);
+MSYS_DLL_EXPORT size_t getSize_TFromString(const char * string, size_t string_size);
 
 /*!
         getnumberFromString(char input)
@@ -402,7 +393,7 @@ size_t getSize_TFromString(const char * string, size_t string_size);
         If the character given is not a number, then zero (0) is returned.
         Otherwise the number is returned.
 */
-short getnumberFromString(char input);
+MSYS_DLL_EXPORT short getnumberFromString(char input);
 
 /*!
         dumpDataToConsole(const char * data, size_t length, size_t offset, bool print_bad_chars, bool memory_format)
@@ -421,7 +412,7 @@ short getnumberFromString(char input);
         clearly numbered as an offset from the addess given. (This is off by
                                                               default.)
 */
-void dumpDataToConsole(const char * data, size_t length, size_t offset = 0, bool print_bad_chars = false, bool memory_format = false);
+MSYS_DLL_EXPORT void dumpDataToConsole(const char * data, size_t length, size_t offset = 0, bool print_bad_chars = false, bool memory_format = false);
 
 /*!
         DataProcess::Data_Object DataProcess::getStringFromSizeT(const size_t & number)
@@ -431,7 +422,7 @@ void dumpDataToConsole(const char * data, size_t length, size_t offset = 0, bool
         Returns: DataProcess::Data_Object with string equilvent to number if successful.
         Returns: empty DataProcess::Data_Object if this function fails.
 */
-DataProcess::Data_Object getStringFromSizeT(const size_t & number);
+MSYS_DLL_EXPORT DataProcess::Data_Object getStringFromSizeT(const size_t & number);
 
 /*!
         std::string DataProcess::getStdStringFromSizeT(const size_t & number)
@@ -441,7 +432,7 @@ DataProcess::Data_Object getStringFromSizeT(const size_t & number);
         Returns: std::string with string equilvent to number if successful.
         Returns: empty std::string if this function fails.
 */
-std::string getStdStringFromSizeT(const size_t & number);
+MSYS_DLL_EXPORT std::string getStdStringFromSizeT(const size_t & number);
 
 /*!
         DataProcess::Data_Object DataProcess::getStringFromInt(long int number)
@@ -453,7 +444,7 @@ std::string getStdStringFromSizeT(const size_t & number);
         Returns: DataProcess::Data_Object with string equilvent to number if successful.
         Returns: empty DataProcess::Data_Object if this function fails.
 */
-DataProcess::Data_Object getStringFromInt(long int number);
+MSYS_DLL_EXPORT DataProcess::Data_Object getStringFromInt(long int number);
 
 /*!
  * 	template<typename T>
@@ -508,7 +499,7 @@ void removeFromVector(std::vector<T> & container, const size_t & offset)
         Returns -5 on an argument error. (Lack of string(s), or a syntax error in the expression string.)
         Returns -9 on control loop out of bounds, or a memory error.
 */
-short RegularExpressionParser(const std::string & expression, const std::string & input, Panic::ERROR * error = NULL);
+MSYS_DLL_EXPORT short RegularExpressionParser(const std::string & expression, const std::string & input, Panic::ERROR * error = NULL);
 
 /*!
         short DataProcess::RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::ERROR * error)
@@ -525,7 +516,7 @@ short RegularExpressionParser(const std::string & expression, const std::string 
         Returns -5 on an argument error. (Lack of string(s), or a syntax error in the expression string.)
         Returns -9 on control loop out of bounds, or a memory error.
 */
-short RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::ERROR * error = NULL);
+MSYS_DLL_EXPORT short RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::ERROR * error = NULL);
 }
 
 #endif

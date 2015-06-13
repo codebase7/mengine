@@ -22,6 +22,9 @@
 #ifndef MSYS_MUTEXES_H
 #define MSYS_MUTEXES_H
 
+/* Pull in DLL_PORT.h */
+#include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
+
 /* Define extern C. */
 #ifdef __cplusplus
 extern "C" {

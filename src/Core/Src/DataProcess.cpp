@@ -2040,6 +2040,21 @@ void DataProcess::Data_Object::clear()
         return;
 }
 
+size_t DataProcess::Data_Object::get_length() const
+{
+		return this->length;
+}
+
+size_t DataProcess::Data_Object::get_Capacity() const
+{
+		return this->capacity;
+}
+
+size_t DataProcess::Data_Object::size() const
+{
+		return this->length;
+}
+
 void DataProcess::Data_Object::set(const char * source, const size_t & source_length)
 {
         // Clear the old data.
