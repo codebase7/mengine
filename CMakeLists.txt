@@ -19,7 +19,7 @@ set(O_OUTPUT_DIR ${T_OUTPUT_DIR}/obj CACHE PATH "Build object output directory")
 endif()
 
 # Option Defaults.
-option (BUILD_BYTE_ORDER "Whether or not to build the Byte Ordering code. (Defaults to yes, but is disabled currently due to changes to the Common error handler (error code changes) that have not been commited yet.)" OFF)
+option (BUILD_BYTE_ORDER "Whether or not to build the Byte Ordering code. (Defaults to yes.)" ON)
 option (BUILD_DYNAMIC_LIBRARY_SUBSYSTEM "Whether or not to build the Dynamic Library Subsystem. (Defaults to yes.)" ON)
 option (BUILD_COMMON_ERROR_HANDLER "Whether or not to build the Common Error Handler. (Defaults to yes.)" ON)
 option (BUILD_FATAL_ERROR_NOTIFY_SUPPORT "Whether or not to build the Common Error Handler's fatal error notification support. (Defaults to yes.)" ON)
