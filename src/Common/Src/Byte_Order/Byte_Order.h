@@ -36,6 +36,7 @@ extern "C" {
 #include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
 
 /* Internal headers. */
+#include "../Error_Handler/Common_Error_Handler_Structures.h"	/* Defines the error codes. */
 #include "Byte_Order_Integers.h"
 #include "Byte_Order_Floating_Points.h"
 
