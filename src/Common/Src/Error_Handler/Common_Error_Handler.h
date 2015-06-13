@@ -22,6 +22,9 @@
 #ifndef COMMON_ERROR_HANDLER_H
 #define COMMON_ERROR_HANDLER_H
 
+/* Pull in DLL_PORT.h */
+#include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
+
 // External includes.
 #include <stddef.h>		// Defines NULL.
 #ifndef __cplusplus
@@ -58,7 +61,7 @@ extern "C" {
  * 	(Disables all logging. See Core/Src/Panic.h for a list of
  * 	 valid logging levels.)
  */
-void Common_Set_Error_Log_Level(const unsigned int logLevel);
+MSYS_DLL_EXPORT void Common_Set_Error_Log_Level(const unsigned int logLevel);
 
 /*!
  * 	unsigned int Common_Get_Error_Log_Level()
@@ -67,7 +70,7 @@ void Common_Set_Error_Log_Level(const unsigned int logLevel);
  * 
  * 	See Core/Src/Panic.h for a list of valid logging levels.
  */
-unsigned int Common_Get_Error_Log_Level();
+MSYS_DLL_EXPORT unsigned int Common_Get_Error_Log_Level();
 
 /*!
  * 	void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
@@ -86,7 +89,7 @@ unsigned int Common_Get_Error_Log_Level();
  * 	disable calling another function when an error is generated.
  * 	In addition the logging level will be reset to ERROR_DISABLE.
  */
-void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg));
+MSYS_DLL_EXPORT void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg));
 #ifdef MSYS_BUILD_FATAL_ERROR_SUPPORT
 
 /*!
@@ -122,7 +125,7 @@ typedef void(*Common_pErrorCallBackFunction)(void);
  * 	Returns true if the regisration completed successfully.
  * 	Returns false otherwise.
  */
-bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
+MSYS_DLL_EXPORT bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
 
 /*!
  * 	bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction)
@@ -140,7 +143,7 @@ bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fa
  * 	Returns true if the unregisration completed successfully.
  * 	Returns false otherwise.
  */
-bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
+MSYS_DLL_EXPORT bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
 
 /*!
  * 	void Common_Fatal_Error_Notify()
@@ -155,7 +158,7 @@ bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction 
  *
  * 	This function does not return any data to it's caller.
  */
-void Common_Fatal_Error_Notify();
+MSYS_DLL_EXPORT void Common_Fatal_Error_Notify();
 #endif	// MSYS_BUILD_FATAL_ERROR_SUPPORT
 
 // End C Linkage if needed.
@@ -179,7 +182,7 @@ namespace Common
 	 * 	(Disables all logging. See Core/Src/Panic.h for a list of
 	 * 	 valid logging levels.)
 	 */
-	void Set_Error_Log_Level(const unsigned int & logLevel = ERROR_DISABLE);
+	MSYS_DLL_EXPORT void Set_Error_Log_Level(const unsigned int & logLevel = ERROR_DISABLE);
 
 	/*!
 	 * 	unsigned int Common::Get_Error_Log_Level()
@@ -190,7 +193,7 @@ namespace Common
 	 * 
 	 * 	See Core/Src/Panic.h for a list of valid logging levels.
 	 */
-	unsigned int Get_Error_Log_Level();
+	MSYS_DLL_EXPORT unsigned int Get_Error_Log_Level();
 
 	/*!
 	 * 	void Common::Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
@@ -211,7 +214,7 @@ namespace Common
 	 * 	disable calling another function when an error is generated.
 	 * 	In addition the logging level will be reset to ERROR_DISABLE.
 	 */
-	void Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg) = NULL);
+	MSYS_DLL_EXPORT void Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg) = NULL);
 
 #ifdef MSYS_BUILD_FATAL_ERROR_SUPPORT
 	/*!
@@ -242,7 +245,7 @@ namespace Common
 	 * 	Returns true if the regisration completed successfully.
 	 * 	Returns false otherwise.
 	 */
-	bool Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
+	MSYS_DLL_EXPORT bool Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
 
 	/*!
 	 * 	bool Common::Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction)
@@ -262,7 +265,7 @@ namespace Common
 	 * 	Returns true if the unregisration completed successfully.
 	 * 	Returns false otherwise.
 	 */
-	bool Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
+	MSYS_DLL_EXPORT bool Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction);
 
 	/*!
 	 * 	void Common::Fatal_Error_Notify()
@@ -279,7 +282,7 @@ namespace Common
 	 *
 	 * 	This function does not return any data to it's caller.
 	 */
-	void Fatal_Error_Notify();
+	MSYS_DLL_EXPORT void Fatal_Error_Notify();
 #endif	// MSYS_BUILD_FATAL_ERROR_SUPPORT
 };
 #endif	// __cplusplus
