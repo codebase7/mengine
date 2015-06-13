@@ -23,6 +23,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 # Actually build it.
+add_library(Dynamic_Library_Subsystem_Multiverse_Engine_Static STATIC ${DYNAMIC_LIBRARY_SUBSYSTEM_INCLUDES})
+target_link_libraries(Dynamic_Library_Subsystem_Multiverse_Engine_Static ${DYNAMIC_LIBRARY_SUBSYSTEM_LINK_LIBS} 
+Common_Error_Handler_Multiverse_Engine_Static)
+
 add_library(Dynamic_Library_Subsystem_Multiverse_Engine SHARED ${DYNAMIC_LIBRARY_SUBSYSTEM_INCLUDES})
 target_link_libraries(Dynamic_Library_Subsystem_Multiverse_Engine ${DYNAMIC_LIBRARY_SUBSYSTEM_LINK_LIBS} 
-Common_Error_Handler_Multiverse_Engine_Static)
+Common_Error_Handler_Multiverse_Engine)
