@@ -22,6 +22,9 @@
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H
 
+/* Internal includes. */
+#include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
+
 /* Check for MSVC. */
 #ifdef _MSC_FULL_VER
 #include "..\stdbool.h"	/* bool. (MSVC is special.) */
@@ -72,8 +75,8 @@ extern "C" {
 		 * 	Returns -4 if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
 		 *	Returns 1 if the library was already loaded. (Only possible if reloadLibrary is false.) (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
 		 */
-		int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary,
-								  Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary,
+																		 Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
 
 		/*!
 		 * 	int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
@@ -101,7 +104,7 @@ extern "C" {
 		 * 	Returns -2 if the library unload call returned unsuccessful.
 		 *	Returns -4 if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
 		 */
-		int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
 
 		/*!
 		 * 	void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib,
@@ -126,7 +129,7 @@ extern "C" {
 		 * 	Returns a NULL pointer if the lookup failed for some reason. (The value of lib.bLastCallEncounteredAnError will be true in this case.)
 		 *	Returns a NULL pointer if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
 		 */
-		void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName);
+		MSYS_DLL_EXPORT void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName);
 #ifdef __cplusplus
 }		// End of extern C.
 #endif
