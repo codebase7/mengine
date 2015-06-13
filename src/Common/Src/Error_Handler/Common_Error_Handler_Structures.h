@@ -93,14 +93,14 @@ extern "C" {
  *
  * 	Returns the API version number of the common error table.
  */
-const unsigned int Common_Get_Error_Table_API_Version();
+MSYS_DLL_EXPORT const unsigned int Common_Get_Error_Table_API_Version();
 
 /*!
  * 	const unsigned int Common_Get_Error_Table_Size()
  *
  * 	Returns the size of the common error table.
  */
-const unsigned int Common_Get_Error_Table_Size();
+MSYS_DLL_EXPORT const unsigned int Common_Get_Error_Table_Size();
 
 /*!
  * 	const char * Common_Get_Error_Message(const int & errorCode)
@@ -111,7 +111,7 @@ const unsigned int Common_Get_Error_Table_Size();
  * 	Returns a valid pointer if the given error code is in the common error table.
  * 	Returns the message for Common_COMMON_UNKNOWN_ERROR otherwise.
  */
-const char * Common_Get_Error_Message(const int errorCode);
+MSYS_DLL_EXPORT const char * Common_Get_Error_Message(const int errorCode);
 
 /* End C Linkage if needed. */
 #ifdef __cplusplus
@@ -130,7 +130,7 @@ namespace Common
 	 *
 	 * 	Returns the API version number of the common error table.
 	 */
-	const unsigned int Get_Error_Table_API_Version();
+	MSYS_DLL_EXPORT const unsigned int Get_Error_Table_API_Version();
 
 	/*!
 	 * 	const unsigned int Common::Get_Error_Table_Size()
@@ -139,7 +139,7 @@ namespace Common
 	 *
 	 * 	Returns the size of the common error table.
 	 */
-	const unsigned int Get_Error_Table_Size();
+	MSYS_DLL_EXPORT const unsigned int Get_Error_Table_Size();
 
 	/*!
 	 * 	const char * Common::Get_Error_Message(const int & errorCode)
@@ -152,7 +152,7 @@ namespace Common
 	 * 	Returns a valid pointer if the given error code is in the common error table.
 	 * 	Returns the message for Common_COMMON_UNKNOWN_ERROR otherwise.
 	 */
-	const char * Get_Error_Message(const int & errorCode);
+	MSYS_DLL_EXPORT const char * Get_Error_Message(const int & errorCode);
 };
 #endif	/* __cplusplus */
 
