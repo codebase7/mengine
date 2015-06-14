@@ -28,7 +28,7 @@ Mode Values are
 */
 #include "FileStreams.h"
 
-std::string FileStreams::configCreate(std::string path, Panic::ERROR & error)
+std::string FileStreams::configCreate(std::string path, Panic::Panic_ERROR & error)
 {
 	// init vars
 	ofstream Ini;
@@ -52,7 +52,7 @@ std::string FileStreams::configCreate(std::string path, Panic::ERROR & error)
 	return "OK";
 }
 
-std::string FileStreams::configParser(string path, string key, Panic::ERROR & Error)
+std::string FileStreams::configParser(string path, string key, Panic::Panic_ERROR & Error)
 {
 	// init vars
 
@@ -145,7 +145,7 @@ std::string FileStreams::configParser(string path, string key, Panic::ERROR & Er
 
 }
 
-string FileStreams::configWriter(string path, string key, string value, Panic::ERROR & error , bool createkey)
+string FileStreams::configWriter(string path, string key, string value, Panic::Panic_ERROR & error , bool createkey)
 {
 	// Init vars.
 	fstream OUT;			// Output File stream
@@ -367,7 +367,7 @@ int FileStreams::UserFileWrite(std::string file_name, int mode, std::string data
 	return errorCode;
 }
 
-string FileStreams::readEntireFile(std::string filename, Panic::ERROR & error)
+string FileStreams::readEntireFile(std::string filename, Panic::Panic_ERROR & error)
 {
 	// init vars
 	std::string output = "";
@@ -413,7 +413,7 @@ string FileStreams::readEntireFile(std::string filename, Panic::ERROR & error)
 	return output;
 }
 
-string FileStreams::FileSearch(std::string filename, std::string key, Panic::ERROR & error)
+string FileStreams::FileSearch(std::string filename, std::string key, Panic::Panic_ERROR & error)
 {
 	// init vars
 
