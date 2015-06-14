@@ -373,7 +373,7 @@ std::string DataProcess::GenerateUID(long int length)
         return output;
 }
 
-double DataProcess::getnumberFromString(std::string source, std::string varName, std::string limiter , bool isdecimal, Panic::ERROR & error)
+double DataProcess::getnumberFromString(std::string source, std::string varName, std::string limiter , bool isdecimal, Panic::Panic_ERROR & error)
 {
 	// Initlize vars.
 	double output = 0;
@@ -570,7 +570,7 @@ bool DataProcess::yesNoConsolePrompt()
         return false;
 }
 
-bool DataProcess::getboolFromstring(std::string source, std::string varName, char delimiter, Panic::ERROR & error)
+bool DataProcess::getboolFromstring(std::string source, std::string varName, char delimiter, Panic::Panic_ERROR & error)
 {
 	// Initlize the vars. Used to determine if we hit someting or not.
 	int foundTrue = -1;
@@ -2513,7 +2513,7 @@ size_t DataProcess::Data_Object::insert(size_t offset, const DataProcess::Data_O
         return 0;
 }
 
-short DataProcess::RegularExpressionParser(const std::string & expression, const std::string & input, Panic::ERROR * error)
+short DataProcess::RegularExpressionParser(const std::string & expression, const std::string & input, Panic::Panic_ERROR * error)
 {
 	// Dumb check.
 	if (expression.size() <= 0)
@@ -3043,7 +3043,7 @@ short DataProcess::RegularExpressionParser(const std::string & expression, const
 	return -2;
 }
 
-short DataProcess::RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::ERROR * error)
+short DataProcess::RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::Panic_ERROR * error)
 {
 	// Dumb check.
 	if (expression.size() <= 0)

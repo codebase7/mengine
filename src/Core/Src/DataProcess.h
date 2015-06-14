@@ -444,14 +444,14 @@ MSYS_DLL_EXPORT bool CheckForEOF(fstream & source);
 MSYS_DLL_EXPORT std::string GenerateUID(long int length = 25);
 
 /*!
-        getnumberFromString(std::string source, std::string varName, std::string limiter , bool isdecimal, Panic::ERROR & error)
+        getnumberFromString(std::string source, std::string varName, std::string limiter , bool isdecimal, Panic::Panic_ERROR & error)
 
         Gets number(s) from a string.
 
         Returns number if successful.
         Otherwise returns 0.
 */
-MSYS_DLL_EXPORT double getnumberFromString(std::string source, std::string varName, std::string limiter , bool isdecimal, Panic::ERROR & error);
+MSYS_DLL_EXPORT double getnumberFromString(std::string source, std::string varName, std::string limiter , bool isdecimal, Panic::Panic_ERROR & error);
 
 /*!
         getIntFromInput()
@@ -474,7 +474,7 @@ MSYS_DLL_EXPORT int getIntFromInput();
 */
 MSYS_DLL_EXPORT bool yesNoConsolePrompt();
 
-MSYS_DLL_EXPORT bool getboolFromstring(std::string source, std::string varName, char delimiter, Panic::ERROR & error);
+MSYS_DLL_EXPORT bool getboolFromstring(std::string source, std::string varName, char delimiter, Panic::Panic_ERROR & error);
 // Reads input string for a true or false statement then returns the result.
 // if no varible statement is found it returns the following string "ERROR: NO VAR."
 
@@ -614,7 +614,7 @@ void removeFromVector(std::vector<T> & container, const size_t & offset)
 }
 
 /*!
-        short DataProcess::RegularExpressionParser(const std::string & expression, const std::string & input, Panic::ERROR * error)
+        short DataProcess::RegularExpressionParser(const std::string & expression, const std::string & input, Panic::Panic_ERROR * error)
 
         This function takes a input string and an expression string, compares them, then returns the result.
         This is the std::string version.
@@ -628,10 +628,10 @@ void removeFromVector(std::vector<T> & container, const size_t & offset)
         Returns -5 on an argument error. (Lack of string(s), or a syntax error in the expression string.)
         Returns -9 on control loop out of bounds, or a memory error.
 */
-MSYS_DLL_EXPORT short RegularExpressionParser(const std::string & expression, const std::string & input, Panic::ERROR * error = NULL);
+MSYS_DLL_EXPORT short RegularExpressionParser(const std::string & expression, const std::string & input, Panic::Panic_ERROR * error = NULL);
 
 /*!
-        short DataProcess::RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::ERROR * error)
+        short DataProcess::RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::Panic_ERROR * error)
 
         This function takes a input string and an expression string, compares them, then returns the result.
         This is the DataProcess::Data_Object version.
@@ -645,7 +645,7 @@ MSYS_DLL_EXPORT short RegularExpressionParser(const std::string & expression, co
         Returns -5 on an argument error. (Lack of string(s), or a syntax error in the expression string.)
         Returns -9 on control loop out of bounds, or a memory error.
 */
-MSYS_DLL_EXPORT short RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::ERROR * error = NULL);
+MSYS_DLL_EXPORT short RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::Panic_ERROR * error = NULL);
 }
 
 #endif

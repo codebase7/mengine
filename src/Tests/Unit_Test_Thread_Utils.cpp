@@ -26,7 +26,7 @@ void Hacky_Delay()
         const int delay = 5;
 
         // Yeah this is a hack......
-        sleep(delay);
+        Msys_Sleep(delay);
 
         // Exit function.
         return;
@@ -2213,11 +2213,13 @@ int unit_test_thread_utils_main()
 	Common_LibraryID currentLib;
 	TU_Library_Support_Status noRequires;
 
-	// Register the error log callback.
+	/* Register the error log callback. (If we can.) */
+#ifdef MSYS_HAVE_COMMON_ERROR_HANDLER
 	Common::Register_Error_Log_Callback(Common_Error_Log_Callback);
 
 	// Set the log level.
 	Common::Set_Error_Log_Level(ERROR_VERBOSE);
+#endif	/* MSYS_HAVE_COMMON_ERROR_HANDLER */
 
 	// Init the noRequires structure.
 	Common::Thread_Utils::Init_Library_Support_Status(&noRequires);
@@ -2267,8 +2269,10 @@ int unit_test_thread_utils_main()
 		std::cout << "Subsystem Test N/A: Unable to run tests on the Threading Subsystem as we do not have any libraries to test with.\n\n";
 	}
 
-	// Clear the error log callback.
+	/* Clear the error log callback. */
+#ifdef MSYS_HAVE_COMMON_ERROR_HANDLER
 	Common::Register_Error_Log_Callback(NULL);
+#endif	/* MSYS_HAVE_COMMON_ERROR_HANDLER */
 
 	// Exit test.
 	return 0;

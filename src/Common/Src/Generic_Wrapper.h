@@ -21,9 +21,15 @@
 #ifndef GENERIC_WRAPPER_H
 #define GENERIC_WRAPPER_H
 
+/* Import DLL_PORT.h */
+#include "../../DLL_PORT.h"		/* Defines MSYS_DLL_EXPORT and MSYS_DLL_IMPORT_TEMPLATE. */
+
 // Include LibraryID_Struct.h.
 #include "LibraryID_Struct.h"
+
+/* External includes. */
 #include <stddef.h> // Defines NULL.
+
 
 	/*!
 	 * 	class Common_Generic_Wrapper
@@ -44,14 +50,14 @@
 			 * 
 			 * 	This function returns a c-string with the name of the library in use.
 			 */
-			const char * Get_Library_Name();
+			MSYS_DLL_EXPORT const char * Get_Library_Name();
 			
 			/*!
 			 * 	bool Common_Generic_Wrapper::Is_Library_A_Plugin()
 			 * 
 			 * 	This function returns whether or not the library is a loaded plugin.
 			 */
-			bool Is_Library_A_Plugin();
+			MSYS_DLL_EXPORT bool Is_Library_A_Plugin();
 	};
 #endif
 
