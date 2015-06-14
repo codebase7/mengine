@@ -1,7 +1,7 @@
 /*!
-    Multiverse Engine Project 04/9/2013 Unit Tests Unit_Test_Common.h
+    Multiverse Engine Project 13/6/2015 Unit Tests Unit_Tests_Common_Error_Handler.cpp
 
-    Copyright (C) 2014 Multiverse Engine Project
+    Copyright (C) 2015 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
@@ -18,23 +18,21 @@
     https://github.com/codebase7/mengine
 */
 
-/* Include guard. */
-#ifndef COMMON_UNIT_TESTS_H
-#define COMMON_UNIT_TESTS_H
-
-/* Include headers from Common. (If needed.) */
-#ifdef MSYS_HAVE_FILEUTILLS
-#include "Unit_Tests_FileUtills.h"
-#endif	/* MSYS_HAVE_FILEUTILLS */
-
-#ifdef MSYS_HAVE_THREAD_UTILS
-#include "Unit_Tests_Thread_Utils.h"
-#endif	/* MSYS_HAVE_THREAD_UTILS */
-
-#ifdef MSYS_HAVE_COMMON_ERROR_HANDLER
+/* Internal includes. */
 #include "Unit_Tests_Common_Error_Handler.h"
-#endif	/* MSYS_HAVE_COMMON_ERROR_HANDLER */
 
-#endif	/* COMMON_UNIT_TESTS_H */
+/* External includes. */
+#include <iostream>
 
-/* End of Unit_Test_Common.h */
+void Common_Error_Log_Callback(const unsigned int logLevel, const char * errorMsg)
+{
+	// Print to std::cout.
+	if (errorMsg != NULL)
+	{
+		std::cout << errorMsg;
+		std::cout.flush();
+	}
+
+	// Exit function.
+	return;
+}

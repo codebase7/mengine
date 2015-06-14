@@ -18,20 +18,8 @@
     https://github.com/codebase7/mengine
 */
 
+/* Internal includes. */
 #include "Unit_Tests.h"
-
-void Common_Error_Log_Callback(const unsigned int logLevel, const char * errorMsg)
-{
-	// Print to std::cout.
-	if (errorMsg != NULL)
-	{
-		std::cout << errorMsg;
-		std::cout.flush();
-	}
-
-	// Exit function.
-	return;
-}
 
 int main()
 {
@@ -40,17 +28,27 @@ int main()
 	short error_code_fileutills = 0;
 	short error_code_thread_utils = 0;
 
-        // Starting Unit tests.
-        std::cout << "Multiverse_Engine_Project_Public Unit Tests Compiled on: " << TESTCOMPILEDATE << " " << TESTCOMPILETIME << "\n";
-        std::cout << "Starting Unit tests for DataProcess::Data_Object. Please be pacent this can take some time.\n";
-        error_code_data_object = Unit_Test_Data_Object();
-        
-	std::cout << "Starting FileUtills Tests.\n";
-        error_code_fileutills = unit_test_fileutills_main();
+    // Starting Unit tests.
+    std::cout << "Multiverse_Engine_Project_Public Unit Tests Compiled on: " << TESTCOMPILEDATE << " " << TESTCOMPILETIME << "\n";
+    std::cout << "Starting Unit tests for DataProcess::Data_Object. Please be pacent this can take some time.\n";
+    error_code_data_object = Unit_Test_Data_Object();
 
+/* Only call FileUtills tests if FileUtills was built. */
+#ifdef MSYS_HAVE_FILEUTILLS
+	std::cout << "Starting FileUtills Tests.\n";
+	error_code_fileutills = unit_test_fileutills_main();
+#else
+	std::cout << "FileUtills was disabled at build time. Skipping FileUtills tests.\n";
+#endif	/* MSYS_HAVE_FILEUTILLS */
+
+/* Only call Thread_Utils tests if Thread_Utils was built. */
+#ifdef MSYS_HAVE_THREAD_UTILS
 	std::cout << "Starting Thread_Utils Tests.\n";
 	error_code_thread_utils = unit_test_thread_utils_main();
-	
+#else
+	std::cout << "Thread_Utils was disabled at build time. Skipping Thread_Utils tests.\n";
+#endif	/* MSYS_HAVE_THREAD_UTILS */
+
 	// Output overall test results.
 	std::cout << "Overall Test Results:\n\n";
 	
@@ -65,7 +63,9 @@ int main()
 	{
 		std::cout << "PASS\n";
 	}
-	
+
+	/* Only output a result if we ran the tests. */
+#ifdef MSYS_HAVE_FILEUTILLS
 	std::cout << "FileUtills Tests: ";
 	if (error_code_fileutills != 0)
 	{
@@ -76,7 +76,9 @@ int main()
 	{
 		std::cout << "PASS\n";
 	}
+#endif	/* MSYS_HAVE_FILEUTILLS */
 
+#ifdef MSYS_HAVE_THREAD_UTILS
 	std::cout << "Thread_Utils Tests: ";
 	if (error_code_thread_utils != 0)
 	{
@@ -87,6 +89,8 @@ int main()
 	{
 		std::cout << "PASS\n";
 	}
-	
-        return 0;
+#endif	/* MSYS_HAVE_THREAD_UTILS */
+
+	/* Exit test program. */
+	return 0;
 }
