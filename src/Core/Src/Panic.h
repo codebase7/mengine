@@ -48,7 +48,7 @@
 #include "Panic_Error_Levels.h"		// Defines the error / log levels.
 
 namespace Panic{
-class ERROR {
+class Panic_ERROR {
 
   private:
         std::string PreviousErrors[5];		// Used to contain older errors.
@@ -67,14 +67,14 @@ class ERROR {
             We don't want the descriptor copied.
         */
         // Copy Constructor.
-        ERROR(const ERROR &source);
+        Panic_ERROR(const Panic_ERROR &source);
 
         // Assignment Operator.
-        ERROR & operator= (const ERROR & source);
+        Panic_ERROR & operator= (const Panic_ERROR & source);
 
   public:
         // Initalizer
-        MSYS_DLL_EXPORT ERROR()
+        MSYS_DLL_EXPORT Panic_ERROR()
         {
                 LastError = "";
                 pathToLogFile = "";
@@ -85,7 +85,7 @@ class ERROR {
         }
 
         // Destructor.
-        MSYS_DLL_EXPORT ~ERROR()
+        MSYS_DLL_EXPORT ~Panic_ERROR()
         {
                 // If the file is still open, flush it and close it.
                 if (this->logfile.is_open() == true)
@@ -214,7 +214,7 @@ class ERROR {
 
             Gets the status for a given file stream, and outputs that status to the given error handler with the given log_level.
     */
-	MSYS_DLL_EXPORT void FileStream_Status(Panic::ERROR & error, fstream & stream, const unsigned int & log_level);
+	MSYS_DLL_EXPORT void FileStream_Status(Panic::Panic_ERROR & error, fstream & stream, const unsigned int & log_level);
     
     /*!
             const char * Panic::Get_Library_Version()

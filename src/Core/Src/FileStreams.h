@@ -29,18 +29,18 @@ namespace FileStreams
 {
 
 /*!
-  configCreate(std::string path, Panic::ERROR & error)
+  configCreate(std::string path, Panic::Panic_ERROR & error)
 
   Creates a new config file for use with the other config* functions.
 
   Pram: Path to file.
   Return: returns OK if successful. Otherwise an error is given.
 */
-MSYS_DLL_EXPORT std::string configCreate(std::string path, Panic::ERROR & error);
+MSYS_DLL_EXPORT std::string configCreate(std::string path, Panic::Panic_ERROR & error);
 
 
 /*!
-  configParser(std::string path, std::string key, Panic::ERROR & Error)
+  configParser(std::string path, std::string key, Panic::Panic_ERROR & Error)
 
   Reads a given config file for a varaible.
 
@@ -48,10 +48,10 @@ MSYS_DLL_EXPORT std::string configCreate(std::string path, Panic::ERROR & error)
   @pram varaible name to find in given config file.
   returns string with requested varaible if found otherwise returns error.
 */
-MSYS_DLL_EXPORT std::string configParser(std::string path, std::string key, Panic::ERROR & Error);
+MSYS_DLL_EXPORT std::string configParser(std::string path, std::string key, Panic::Panic_ERROR & Error);
 
 /*!
-  configWriter(std::string path, std::string key, std::string value, Panic::ERROR & error, bool createkey)
+  configWriter(std::string path, std::string key, std::string value, Panic::Panic_ERROR & error, bool createkey)
 
   Writes a configfile value to disk.
 
@@ -63,7 +63,7 @@ MSYS_DLL_EXPORT std::string configParser(std::string path, std::string key, Pani
 
   @return Retuns OK if successful, otherwise an error is given.
 */
-MSYS_DLL_EXPORT std::string configWriter(std::string path, std::string key, std::string value, Panic::ERROR & error, bool createkey = false);
+MSYS_DLL_EXPORT std::string configWriter(std::string path, std::string key, std::string value, Panic::Panic_ERROR & error, bool createkey = false);
 
 MSYS_DLL_EXPORT std::string Filechange();
 
@@ -90,10 +90,10 @@ MSYS_DLL_EXPORT int UserFileWrite(std::string file_name, int mode, std::string d
    occurs in which case the error will be printed to the screen / stdout.
 */
 
-MSYS_DLL_EXPORT std::string readEntireFile(std::string filename, Panic::ERROR & error);
+MSYS_DLL_EXPORT std::string readEntireFile(std::string filename, Panic::Panic_ERROR & error);
 
 /*!
-  FileSearch(std::string filename, std::string key, Panic::ERROR & error)
+  FileSearch(std::string filename, std::string key, Panic::Panic_ERROR & error)
 
   Looks in given file for data returns data found.
 
@@ -101,7 +101,7 @@ MSYS_DLL_EXPORT std::string readEntireFile(std::string filename, Panic::ERROR & 
   @pram string to search for in file.
   returns string if found in file otherwise an error is given.
 */
-MSYS_DLL_EXPORT std::string FileSearch(std::string filename, std::string key, Panic::ERROR & error);
+MSYS_DLL_EXPORT std::string FileSearch(std::string filename, std::string key, Panic::Panic_ERROR & error);
 
 }
 #endif

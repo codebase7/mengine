@@ -1,7 +1,7 @@
 /*!
-    Multiverse Engine Project 04/9/2013 Unit Tests Unit_Test_Common.h
+    Multiverse Engine Project 13/6/2015 Unit Tests Test_Base_Header.cpp
 
-    Copyright (C) 2014 Multiverse Engine Project
+    Copyright (C) 2015 Multiverse Engine Project
 
     This program is free software;
     you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation;
@@ -18,23 +18,24 @@
     https://github.com/codebase7/mengine
 */
 
-/* Include guard. */
-#ifndef COMMON_UNIT_TESTS_H
-#define COMMON_UNIT_TESTS_H
+/* Internal includes. */
+#include "Test_Base_Header.h"
 
-/* Include headers from Common. (If needed.) */
-#ifdef MSYS_HAVE_FILEUTILLS
-#include "Unit_Tests_FileUtills.h"
-#endif	/* MSYS_HAVE_FILEUTILLS */
+void Msys_Sleep(const unsigned int secondsToSleep)
+{
+		/* Check for valid time to sleep. */
+		if (secondsToSleep > 0)
+		{
+				/* System specific sleep calls below. */
+#ifdef _WIN32
+				/* Windows SleepEx() takes milliseconds, instead of seconds. */
+				SleepEx((secondsToSleep * 1000), false);
+#else
+				/* Posix sleep(). */
+				sleep(secondsToSleep);
+#endif	/* _WIN32 */
+		}
 
-#ifdef MSYS_HAVE_THREAD_UTILS
-#include "Unit_Tests_Thread_Utils.h"
-#endif	/* MSYS_HAVE_THREAD_UTILS */
-
-#ifdef MSYS_HAVE_COMMON_ERROR_HANDLER
-#include "Unit_Tests_Common_Error_Handler.h"
-#endif	/* MSYS_HAVE_COMMON_ERROR_HANDLER */
-
-#endif	/* COMMON_UNIT_TESTS_H */
-
-/* End of Unit_Test_Common.h */
+		/* Exit function. */
+		return;
+}

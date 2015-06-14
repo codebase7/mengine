@@ -24,7 +24,11 @@
 // External Includes.
 #include <iostream>     // For std::cout / NULL macro.
 #include <string.h>     // For strcmp.
-#include <unistd.h>     // For sleep.
+#ifdef _WIN32
+#include <Windows.h>	/* For SleepEx(). */
+#else	/* _WIN32 */
+#include <unistd.h>     /* For sleep. */
+#endif	/* _WIN32 */
 #include <time.h>	// For time().
 #include <stdlib.h>	// For rand() / srand().
 
@@ -59,6 +63,16 @@ struct Error_Messages{
 	short error_code;
 	const char * message;
 };
+
+/*!
+ * 		void Msys_Sleep(const unsigned int secondsToSleep)
+ *
+ *		Sleeps the thread for the given number of seconds, unless a system defined
+ *		condition forces an early wake up.
+ *
+ * 		This function does not have a return.
+ */
+void Msys_Sleep(const unsigned int secondsToSleep);
 
 #endif
 

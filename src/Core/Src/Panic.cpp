@@ -22,12 +22,12 @@
 
 #include "Panic.h"
 
-std::string Panic::ERROR::ReturnLastError() const
+std::string Panic::Panic_ERROR::ReturnLastError() const
 {
         return this->LastError;
 }
 
-std::string Panic::ERROR::PanicHandler(const std::string & message, const int & moduleID, const unsigned int & log_level, const bool & killengine)
+std::string Panic::Panic_ERROR::PanicHandler(const std::string & message, const int & moduleID, const unsigned int & log_level, const bool & killengine)
 {
         // Init vars.
         fstream old_log_file;
@@ -177,7 +177,7 @@ std::string Panic::ERROR::PanicHandler(const std::string & message, const int & 
         return "OK";
 }
 
-short Panic::ERROR::enable_logging(const std::string & path_to_logfile, const unsigned int & log_level, const unsigned int & max_lines)
+short Panic::Panic_ERROR::enable_logging(const std::string & path_to_logfile, const unsigned int & log_level, const unsigned int & max_lines)
 {
         // Dumb check.
         if (path_to_logfile.size() <= 0)
@@ -228,7 +228,7 @@ short Panic::ERROR::enable_logging(const std::string & path_to_logfile, const un
         return 0;
 }
 
-void Panic::ERROR::disable_logging()
+void Panic::Panic_ERROR::disable_logging()
 {
         // Check and see if the file handler is open.
         if ((this->logfile.is_open() == false) && (this->logfile_enabled == false))
@@ -257,37 +257,37 @@ void Panic::ERROR::disable_logging()
         return;
 }
 
-unsigned int Panic::ERROR::get_log_level() const
+unsigned int Panic::Panic_ERROR::get_log_level() const
 {
         // Return the set log level.
         return this->logLevel;
 }
 
-bool Panic::ERROR::is_logging_enabled() const
+bool Panic::Panic_ERROR::is_logging_enabled() const
 {
         // Return whether or not logging is enabled.
         return this->logfile_enabled;
 }
 
-std::string Panic::ERROR::get_log_file_path() const
+std::string Panic::Panic_ERROR::get_log_file_path() const
 {
         // Return the log file path.
         return this->pathToLogFile;
 }
 
-unsigned int Panic::ERROR::get_max_log_lines() const
+unsigned int Panic::Panic_ERROR::get_max_log_lines() const
 {
         // Return the maximum number of log lines.
         return this->maxLogLines;
 }
 
-unsigned int Panic::ERROR::get_current_log_line() const
+unsigned int Panic::Panic_ERROR::get_current_log_line() const
 {
         // Return current log line.
         return this->currentLogLine;
 }
 
-void Panic::FileStream_Status(Panic::ERROR & error, fstream & stream, const unsigned int & log_level)
+void Panic::FileStream_Status(Panic::Panic_ERROR & error, fstream & stream, const unsigned int & log_level)
 {
         // Output status header.
         error.PanicHandler("FileStream_Status:", ERROR_ID, log_level);
