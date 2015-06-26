@@ -96,7 +96,7 @@ struct dirlist{
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength);
 
 /*!
- * 	int FileUtills::GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize)
+ * 	int FileUtills_GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize)
  *
  * 	Fetches the user's profile directory from the environment, and stores
  * 	it in the given path argument.
@@ -107,7 +107,7 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
 int GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize);
 
 /*!
- * 	int FileUtills::GetCurrentWorkingDirectoryPath(char ** path, size_t * pathSize)
+ * 	int FileUtills_GetCurrentWorkingDirectoryPath(char ** path, size_t * pathSize)
  *
  * 	Fetches the current working directory from the environment, and stores
  * 	it in the given retStr argument.
@@ -118,7 +118,7 @@ int GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize);
 int GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSize);
 
 /*!
- * 	int FileUtills::GetExecDirectory(char ** path, size_t * pathSize)
+ * 	int FileUtills_GetExecDirectory(char ** path, size_t * pathSize)
  *
  * 	Replaces the contents of the given retStr argument with a NULL
  * 	terminated C-String that contains the path to the directory where the
@@ -130,14 +130,14 @@ int GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSize);
 int GetExecDirectory(char ** retStr, size_t * retStrSize);
 
 /*!
-        int getDirectory(const char * path, const size_t pathSize, FileUtills::dirlist ** dirTree, const bool & cleanList)
+        int getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist ** dirTree, const bool & cleanList)
 
         Lists the given directory's contents.
 
         Pram: path, path of directory to check.
 
-        Pram: FileUtills::dirlist ** dirTree, pointer to a pointer to a
-        FileUtills::dirlist structure that will contain the resulting
+        Pram: FileUtills_dirlist ** dirTree, pointer to a pointer to a
+        FileUtills_dirlist structure that will contain the resulting
         directory listing if successful. If the structure is already
         allocated when passed to this function and this function succeeds,
 		the pre-existing structure will be deallocated.
@@ -155,22 +155,22 @@ int GetExecDirectory(char ** retStr, size_t * retStrSize);
         set cleanList to true when calling this function.
 
         Returns COMMON_ERROR_SUCCESS if successfull, dirTree's pointer will point to a valid
-		FileUtills::dirlist structure with the given path's contents in this case.
+		FileUtills_dirlist structure with the given path's contents in this case.
 		(Any previous structure pointed to by the dirTree pointer will be deallocated.)
 
         Otherwise this function will return the appropriate error, and dirTree's pointer will
         not be modified.
 */
-int getDirectory(const char * path, const size_t pathSize, dirlist ** dirTree, const bool cleanList);
+int getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist ** dirTree, const bool cleanList);
 
 /*!
-	int FileUtills::DoesExist(const char * path, const size_t pathSize)
+	int FileUtills_DoesExist(const char * path, const size_t pathSize)
 
 	Prams: @std::string path, path to check for existence on the filesystem.
 
 	This function checks to see if given file or directory exists.
 
-	This function is called by FileUtills::CheckPermissions() before running permission checks.
+	This function is called by FileUtills_CheckPermissions() before running permission checks.
 
 	Returns FILEUTILLS_ERROR_EXISTANT if file or directory exists on the system.
 	Returns FILEUTILLS_ERROR_NON_EXISTANT if file or directory does not exist on the system.
@@ -181,7 +181,7 @@ int getDirectory(const char * path, const size_t pathSize, dirlist ** dirTree, c
 int DoesExist(const char * path, const size_t pathSize);
 
 /*!
-	FileUtills::IsFileOrDirectory(const char * path, const size_t pathSize)
+	FileUtills_IsFileOrDirectory(const char * path, const size_t pathSize)
 
 	Checks to see if a given path is a file or directory.
 
@@ -198,7 +198,7 @@ int DoesExist(const char * path, const size_t pathSize);
 int IsFileOrDirectory(const char * path, const size_t pathSize);
 
 /*!
-	int FileUtills::CheckParent(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec)
+	int FileUtills_CheckParent(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec)
 
 	Acts as a wrapper to DoesExist and CheckPermissions
 	Checks for the parent directory's existence in the path given.
@@ -225,11 +225,11 @@ int IsFileOrDirectory(const char * path, const size_t pathSize);
 int CheckParent(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec);
 
 /*!
-	int FileUtills::GetParent(char ** retStr, size_t * retStrSize)
+	int FileUtills_GetParent(char ** retStr, size_t * retStrSize)
 
 	Returns the parent directory for the given file.
 
-	Gets the path exactly like FileUtills::CheckParent().
+	Gets the path exactly like FileUtills_CheckParent().
 
 	Returns COMMON_ERROR_SUCCESS with parent directory path set in retStr if successful.
 	(retStr's size will be set in retStrSize.)
@@ -240,7 +240,7 @@ int CheckParent(const char * path, const size_t pathSize, const bool read, const
 int GetParent(char ** retStr, size_t * retStrSize);
 
 /*!
-	int FileUtills::ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution)
+	int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution)
 
 	Checks the path given, and converts it to a absolute path.
 
@@ -258,7 +258,7 @@ int GetParent(char ** retStr, size_t * retStrSize);
 int ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution);
 
 /*!
-	int FileUtills::CreateDirectory(const char * directory, const size_t directorySize, const bool createRecursive)
+	int FileUtills_CreateDirectory(const char * directory, const size_t directorySize, const bool createRecursive)
 	@pram : directory, path to create.
 	@pram : createRecursive, if this is set to true, then this function will try to create the 
 	parent directories of the given directory if they do not exist.
@@ -275,7 +275,7 @@ int ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t
 int CreateDirectory(const char * directory, const size_t directorySize, const bool createRecursive);
 
 /*!
-	int FileUtills::CheckPermissions(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec)
+	int FileUtills_CheckPermissions(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec)
 
 	Checks Permissions on the given file or directory. Also checks if the given file or directory
 	actually exists first before checking other permissions. By default it will check for both read and
@@ -301,7 +301,7 @@ int CreateDirectory(const char * directory, const size_t directorySize, const bo
 int CheckPermissions(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec);
 
 /*!
-	int FileUtills::GetGigaFreespace(const char * path, const size_t pathSize, size_t * result)
+	int FileUtills_GetGigaFreespace(const char * path, const size_t pathSize, size_t * result)
 
 	Returns the remaining disk space in Gigabytes (SI Unit) on the given disk.
 
@@ -319,7 +319,7 @@ int CheckPermissions(const char * path, const size_t pathSize, const bool read, 
 int GetGigaFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
-	int FileUtills::GetFreespace(const char * path, const size_t pathSize, size_t * result)
+	int FileUtills_GetFreespace(const char * path, const size_t pathSize, size_t * result)
 
 	Returns the remaining disk space in Megabytes (SI Unit) on the given disk.
 
@@ -337,7 +337,7 @@ int GetGigaFreespace(const char * path, const size_t pathSize, size_t * result);
 int GetFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
-	int FileUtills::GetKiloFreespace(const char * path, const size_t pathSize, size_t * result)
+	int FileUtills_GetKiloFreespace(const char * path, const size_t pathSize, size_t * result)
 
 	Returns the remaining disk space in Kilobytes (SI Unit) on the given disk.
 
@@ -355,7 +355,7 @@ int GetFreespace(const char * path, const size_t pathSize, size_t * result);
 int GetKiloFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
-	int FileUtills::GetByteFreespace(const char * path, const size_t pathSize, size_t * result)
+	int FileUtills_GetByteFreespace(const char * path, const size_t pathSize, size_t * result)
 
 	Returns the remaining disk space in Bytes (SI Unit) on the given disk.
 
@@ -373,7 +373,7 @@ int GetKiloFreespace(const char * path, const size_t pathSize, size_t * result);
 int GetByteFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
-	int FileUtills::DeletePath(const char * path, const size_t pathSize, const bool recursive)
+	int FileUtills_DeletePath(const char * path, const size_t pathSize, const bool recursive)
 
 	This function attempts to delete the given file or directory from the filesystem.
 
@@ -397,7 +397,7 @@ int GetByteFreespace(const char * path, const size_t pathSize, size_t * result);
 int DeletePath(const char * path, const size_t pathSize, const bool recursive);
 
 /*!
-        int FileUtills::CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, 
+        int FileUtills_CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, 
 								 const bool append, const size_t begOffset, const size_t endOffset)
 
         Copies endOffset bytes starting at begOffset, from source file to dest file.
@@ -423,7 +423,7 @@ int DeletePath(const char * path, const size_t pathSize, const bool recursive);
 	 (This allows for some insurance if the source file's size is known before
 	 calling this function.)
 
-        This function only works on FILES. Not directories. To copy a directory, call FileUtills::CopyPath().
+        This function only works on FILES. Not directories. To copy a directory, call FileUtills_CopyPath().
 
         @pram src, path to the source file.
         @pram dest, path to the dest file.
@@ -462,7 +462,7 @@ int CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPa
              const size_t begOffset, const size_t endOffset);
 
 /*!
-	int FileUtills::CopyPath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool recursive,
+	int FileUtills_CopyPath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool recursive,
 	       const bool rename, const bool abort_on_failure, const bool append, const size_t begOffset, const size_t endOffset)
 
 	This function takes a given source path and copies it to the given dest path.
@@ -470,7 +470,7 @@ int CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPa
 	This function supports files and directories.
 	If you give a file as src and a directory as dest, the function WILL return an error.
 
-	If the given src is a file, then this function acts as a wrapper to FileUtills::CopyFile(), and returns all of it's
+	If the given src is a file, then this function acts as a wrapper to FileUtills_CopyFile(), and returns all of it's
 	error codes.
 
 	If the given src is a directory, then this function will copy the entire directory to the given dest, creating dest if
@@ -494,19 +494,19 @@ int CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPa
 	otherwise this function will try to continue with the remaining list of files and subdirectories. (Default)
 
 	@pram append, this is only used if src is a file. (As this function acts as a wrapper to CopyFile() in that case,
-	see FileUtills::CopyFile() for it's description. This function provides the same default value for this pram as CopyFile().)
+	see FileUtills_CopyFile() for it's description. This function provides the same default value for this pram as CopyFile().)
 	If src is a directory, this pram has no effect.
 
 	@pram begOffset, this is only used if src is a file. (As this function acts as a wrapper to CopyFile() in that case,
-	see FileUtills::CopyFile() for it's description. This function provides the same default value for this pram as CopyFile().)
+	see FileUtills_CopyFile() for it's description. This function provides the same default value for this pram as CopyFile().)
 	If src is a directory, this pram has no effect.
 
 	@pram endOffset, this is only used if src is a file. (As this function acts as a wrapper to CopyFile() in that case,
-	see FileUtills::CopyFile() for it's description. This function provides the same default value for this pram as CopyFile().)
+	see FileUtills_CopyFile() for it's description. This function provides the same default value for this pram as CopyFile().)
 	If src is a directory, this pram has no effect.
 
 	Below are return codes for when src is a directory, if src is a file, then the return codes for this function are identical to
-	FileUtills::CopyFile(). Please see FileUtills::CopyFile() for it's return codes.
+	FileUtills_CopyFile(). Please see FileUtills_CopyFile() for it's return codes.
 
 	Returns COMMON_ERROR_SUCCESS on success.
 	Returns -1 if the function was unable to create top level dest path and top level dest path does not exist.
@@ -515,18 +515,18 @@ int CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPa
 	Returns -4 if the function could not get a directory listing.
 	Returns -5 if the function could not get parent directory string.
 	Returns -6 if the function was unable to copy all files. (Some files may have been copied however.)
-	Returns -13 if FileUtills::IsFileOrDirectory() returns -3. (OS / Arch not supported.)
-	Returns -14 if FileUtills::IsFileOrDirectory() returns -4. (A permissions error occurred.)
-	Returns -15 if FileUtills::IsFileOrDirectory() returns -5. (The given path is empty.)
-	Returns -16 if FileUtills::IsFileOrDirectory() returns -6. (A path component does not exist.)
-	Returns -17 if FileUtills::IsFileOrDirectory() returns -7. (The path has a file in it and is not at the end. (I.e you are treating a file as a directory.))
-	Returns COMMON_ERROR_UNKNOWN_ERROR if FileUtills::IsFileOrDirectory() returns -9. (All other errors.)
+	Returns -13 if FileUtills_IsFileOrDirectory() returns -3. (OS / Arch not supported.)
+	Returns -14 if FileUtills_IsFileOrDirectory() returns -4. (A permissions error occurred.)
+	Returns -15 if FileUtills_IsFileOrDirectory() returns -5. (The given path is empty.)
+	Returns -16 if FileUtills_IsFileOrDirectory() returns -6. (A path component does not exist.)
+	Returns -17 if FileUtills_IsFileOrDirectory() returns -7. (The path has a file in it and is not at the end. (I.e you are treating a file as a directory.))
+	Returns COMMON_ERROR_UNKNOWN_ERROR if FileUtills_IsFileOrDirectory() returns -9. (All other errors.)
 */
 int CopyPath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool recursive,
 			 const bool rename, const bool abort_on_failure, const bool append, const size_t begOffset, const size_t endOffset);
 
 /*!
-        int FileUtills::MovePath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool overwrite)
+        int FileUtills_MovePath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool overwrite)
 
         Acts as a wrapper for a call to CopyPath and DeletePath.
         The srcPath is copied to the destPath and then the srcPath is deleted.
