@@ -33,8 +33,6 @@
 #include "../Error_Handler/Common_Error_Handler_Internal.h"
 #endif
 
-namespace FileUtills{
-
 #ifdef _WIN32
 // Define the Windows Directory seperator
 #define DIR_SEP '\\'
@@ -65,12 +63,13 @@ namespace FileUtills{
 #endif
 #endif
 
-// Define the directory list structure
-struct dirlist{
-    size_t numOfEntries;		// Used to store the number of entries in the list array.
-    std::vector<std::string> list;	// Used to store the directory's entry data.
-    std::string path;			// Used to store the path of the directory that the entry list is about.
-};
+/* Define the directory list structure. */
+typedef struct FileUtills_dirlist {
+    size_t numOfEntries;		/* Used to store the number of entries in the list array. */
+    std::vector<std::string> list;	/* Used to store the directory's entry data. */
+    char * path;			/* Used to store the path of the directory that the entry list is about. */
+    size_t pathSize;			/* Length of the path string. */
+} FileUtills_dirlist_T;
 
 /*!
  *		int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
@@ -104,7 +103,7 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
  * 	If the function fails for any reason, the arguments will NOT be altered,
  * 	and the appropriate error will be returned to the caller.
  */
-int GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize);
+int FileUtills_GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize);
 
 /*!
  * 	int FileUtills_GetCurrentWorkingDirectoryPath(char ** path, size_t * pathSize)
@@ -115,7 +114,7 @@ int GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize);
  *	If the function fails for any reason, the arguments will NOT be altered,
  * 	and the appropriate error will be returned to the caller.
  */
-int GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSize);
+int FileUtills_GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSize);
 
 /*!
  * 	int FileUtills_GetExecDirectory(char ** path, size_t * pathSize)
@@ -127,7 +126,7 @@ int GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSize);
  * 	If the function fails for any reason, the arguments will NOT be altered,
  * 	and the appropriate error will be returned to the caller.
  */
-int GetExecDirectory(char ** retStr, size_t * retStrSize);
+int FileUtills_GetExecDirectory(char ** retStr, size_t * retStrSize);
 
 /*!
         int getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist ** dirTree, const bool & cleanList)
@@ -161,7 +160,7 @@ int GetExecDirectory(char ** retStr, size_t * retStrSize);
         Otherwise this function will return the appropriate error, and dirTree's pointer will
         not be modified.
 */
-int getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist ** dirTree, const bool cleanList);
+int FileUtills_getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist ** dirTree, const bool cleanList);
 
 /*!
 	int FileUtills_DoesExist(const char * path, const size_t pathSize)
@@ -178,7 +177,7 @@ int getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist **
 	Returns COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED if the given system is unsupported.
 	Returns the appropriate error in all other instances.
 */
-int DoesExist(const char * path, const size_t pathSize);
+int FileUtills_DoesExist(const char * path, const size_t pathSize);
 
 /*!
 	FileUtills_IsFileOrDirectory(const char * path, const size_t pathSize)
@@ -195,7 +194,7 @@ int DoesExist(const char * path, const size_t pathSize);
 	Returns FILEUTILLS_ERROR_ if the path has a file in it and is not at the end. (I.e you are treating a file as a directory.)
 	Returns the appropriate error in all other instances.
 */
-int IsFileOrDirectory(const char * path, const size_t pathSize);
+int FileUtills_IsFileOrDirectory(const char * path, const size_t pathSize);
 
 /*!
 	int FileUtills_CheckParent(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec)
@@ -222,7 +221,7 @@ int IsFileOrDirectory(const char * path, const size_t pathSize);
 	Returns COMMON_ERROR_EXCEPTION_THROWN if an exception is thrown.
 	Returns the appropriate error in all other cases.
 */
-int CheckParent(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec);
+int FileUtills_CheckParent(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec);
 
 /*!
 	int FileUtills_GetParent(char ** retStr, size_t * retStrSize)
@@ -237,7 +236,7 @@ int CheckParent(const char * path, const size_t pathSize, const bool read, const
 	Returns the appropriate error code otherwise.
 	(retStr and retStrSize will NOT be altered in this case.)
 */
-int GetParent(char ** retStr, size_t * retStrSize);
+int FileUtills_GetParent(char ** retStr, size_t * retStrSize);
 
 /*!
 	int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution)
@@ -255,7 +254,7 @@ int GetParent(char ** retStr, size_t * retStrSize);
 	Otherwise the appropriate error code is returned. (retStr and retStrSize will be unaltered in
 	this instance.)
 */
-int ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution);
+int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution);
 
 /*!
 	int FileUtills_CreateDirectory(const char * directory, const size_t directorySize, const bool createRecursive)
@@ -272,7 +271,7 @@ int ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t
 	Returns FILEUTILLS_ERROR_EXISTANT if the directory already exists.
 	Returns the appropriate error or COMMON_ERROR_UNKNOWN_ERROR if another error is encountered.
 */
-int CreateDirectory(const char * directory, const size_t directorySize, const bool createRecursive);
+int FileUtills_CreateDirectory(const char * directory, const size_t directorySize, const bool createRecursive);
 
 /*!
 	int FileUtills_CheckPermissions(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec)
@@ -298,7 +297,7 @@ int CreateDirectory(const char * directory, const size_t directorySize, const bo
 	Returns COMMON_ERROR_EXCEPTION_THROWN if an exception is thrown.
 	Returns the appropriate error in all other cases.
 */
-int CheckPermissions(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec);
+int FileUtills_CheckPermissions(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec);
 
 /*!
 	int FileUtills_GetGigaFreespace(const char * path, const size_t pathSize, size_t * result)
@@ -316,7 +315,7 @@ int CheckPermissions(const char * path, const size_t pathSize, const bool read, 
 	Returns a Common name-space error if an error occurs. result will not be altered in this
 	case. To obtain more detailed info register an error hander before calling this function.
 */
-int GetGigaFreespace(const char * path, const size_t pathSize, size_t * result);
+int FileUtills_GetGigaFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
 	int FileUtills_GetFreespace(const char * path, const size_t pathSize, size_t * result)
@@ -334,7 +333,7 @@ int GetGigaFreespace(const char * path, const size_t pathSize, size_t * result);
 	Returns a Common name-space error if an error occurs. Size will be equal to zero in this
 	case. To obtain more detailed info register an error hander before calling this function.
 */
-int GetFreespace(const char * path, const size_t pathSize, size_t * result);
+int FileUtills_GetFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
 	int FileUtills_GetKiloFreespace(const char * path, const size_t pathSize, size_t * result)
@@ -352,7 +351,7 @@ int GetFreespace(const char * path, const size_t pathSize, size_t * result);
 	Returns a Common name-space error if an error occurs. Size will be equal to zero in this
 	case. To obtain more detailed info register an error hander before calling this function.
 */
-int GetKiloFreespace(const char * path, const size_t pathSize, size_t * result);
+int FileUtills_GetKiloFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
 	int FileUtills_GetByteFreespace(const char * path, const size_t pathSize, size_t * result)
@@ -370,7 +369,7 @@ int GetKiloFreespace(const char * path, const size_t pathSize, size_t * result);
 	Returns a Common name-space error if an error occurs. Size will be equal to zero in this
 	case. To obtain more detailed info register an error hander before calling this function.
 */
-int GetByteFreespace(const char * path, const size_t pathSize, size_t * result);
+int FileUtills_GetByteFreespace(const char * path, const size_t pathSize, size_t * result);
 
 /*!
 	int FileUtills_DeletePath(const char * path, const size_t pathSize, const bool recursive)
@@ -394,7 +393,7 @@ int GetByteFreespace(const char * path, const size_t pathSize, size_t * result);
 	COMMON_ERROR_IO_ERROR if while deleting recursively, the parent directory of a deleted directory could not be obtained. (I.e could not "go up a level in the directory tree.")
 	COMMON_ERROR_IO_ERROR if while deleting recursively, there were files and or subdirectories that could not be deleted. (Some files may have been deleted however.)
 */
-int DeletePath(const char * path, const size_t pathSize, const bool recursive);
+int FileUtills_DeletePath(const char * path, const size_t pathSize, const bool recursive);
 
 /*!
         int FileUtills_CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, 
@@ -458,7 +457,7 @@ int DeletePath(const char * path, const size_t pathSize, const bool recursive);
         Returns FILEUTILLS_ERROR_PATH_IS_A_DIRECTORY if the given dest file was a directory.
         Returns COMMON_ERROR_EXCEPTION_THROWN if an exception is thrown while copying data.
 */
-int CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool append,
+int FileUtills_CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool append,
              const size_t begOffset, const size_t endOffset);
 
 /*!
@@ -522,7 +521,7 @@ int CopyFile(const char * srcPath, const size_t srcPathSize, const char * destPa
 	Returns -17 if FileUtills_IsFileOrDirectory() returns -7. (The path has a file in it and is not at the end. (I.e you are treating a file as a directory.))
 	Returns COMMON_ERROR_UNKNOWN_ERROR if FileUtills_IsFileOrDirectory() returns -9. (All other errors.)
 */
-int CopyPath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool recursive,
+int FileUtills_CopyPath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool recursive,
 			 const bool rename, const bool abort_on_failure, const bool append, const size_t begOffset, const size_t endOffset);
 
 /*!
@@ -540,10 +539,7 @@ int CopyPath(const char * srcPath, const size_t srcPathSize, const char * destPa
         Returns COMMON_ERROR_IO_ERROR If an error occurs while moving data.
         Returns COMMON_ERROR_INVALID_ARGUMENT If an argument to the function is bad.
 */
-int MovePath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool overwrite);
-
-}
-
+int FileUtills_MovePath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool overwrite);
 
 #endif
 
