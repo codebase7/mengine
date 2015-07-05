@@ -40,9 +40,10 @@
 #include "..\..\..\Core\Src\Panic_Error_Levels.h"	// Defines the log levels.
 #else
 #include "../../../Core/Src/Panic_Error_Levels.h"	// Defines the log levels.
-#include "Posix_Error_Translation_Table.h"			// Defines the POSIX errno to Common namespace error translation table and functions.
+#include "Posix_Error_Translation_Table.h"		// Defines the POSIX errno to Common namespace error translation table and functions.
 #endif // _WIN32
 
+#include "Common_Error_Handler_Error_Codes.h"		/* Defines error codes. */
 #include "Common_Error_Handler_Structures.h"		// Defines the error codes, error lookup table error lookup table version number, and Common::commonLastErrorCode.
 
 // Enable C linkage if needed.
