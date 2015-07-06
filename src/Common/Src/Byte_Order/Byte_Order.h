@@ -36,9 +36,21 @@ extern "C" {
 #include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
 
 /* Internal headers. */
-#include "../Error_Handler/Common_Error_Handler_Structures.h"	/* Defines the error codes. */
+#include "../Error_Handler/Common_Error_Handler_Error_Codes.h"	/* Defines the error codes. */
 #include "Byte_Order_Integers.h"
 #include "Byte_Order_Floating_Points.h"
+
+/* Define bool. */
+#if _MSC_FULL_VER && _MSC_FULL_VER < 180031101
+#include "../stdbool.h"	/* Older versions of Visual C don't support the C99 stdbool header. So we have to fake one. */
+#else
+#include <stdbool.h>
+#endif
+
+/* External headers. */
+#include <stddef.h>	/* Defines NULL. */
+#include <stdlib.h>	/* Defines malloc(), free(). */
+#include <string.h>	/* Defines memset(), memcpy(). */
 
 /*!
  *		int Common_Byte_Swap(char * data, const size_t dataLength)
