@@ -72,6 +72,49 @@ typedef struct FileUtills_dirlist {
 } FileUtills_dirlist_T;
 
 /*!
+ * 		int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, size_t * fileLength)
+ *
+ * 		Returns the length of the given file.
+ * 		(This is just a wrapper around Get_File_Length().)
+ *
+ * 		Returns COMMON_ERROR_SUCCESS if the length is read in successfuly. (fileLength will be set to the named file's length in this case.)
+ * 		Otherwise returns the approperate error code.
+ *
+ * 		In case of error, (the returned error code is not COMMON_ERROR_SUCCESS), the fileLength argument will NOT be altered.
+ */
+int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, size_t * fileLength);
+
+/*!
+ * 		int FileUtills_Get_File_Length(FILE * fp, size_t * fileLength)
+ *
+ * 		Gets the length of the given open file.
+ *
+ * 		This function expects the file stream to be in a good state, (I.e. It's error flag is not set), and that the file
+ * 		stream was opened in binary mode. (If the stream is not already open, use Get_File_Length_By_Filename() instead,
+ * 		it will ensure that these requirements are met.)
+ *
+ * 		This function calculates the size of the file by starting at the begining and working it's way to the end by calling
+ * 		fgetc(), and then checking the state flags (error and eof) after each call to fgetc(). When the eof flag is set,
+ * 		(and the error flag is not set), the function will call ftello() to get the offset and check it for error. Finally
+ * 		regardless if an error has occured or not, the function will attempt to restore the previous position in the file
+ * 		that the file was at when the call to this function was made.
+ *
+ * 		Returns COMMON_ERROR_SUCCESS if the file length is determined. (fileLength will be set to the determined length in this case.)
+ *
+ * 		Returns COMMON_ERROR_INVALID_ARGUMENT if the given file pointer or fileLength pointer is NULL.
+ *
+ * 		Returns COMMON_ERROR_IO_ERROR if one of the f*() functions fails.
+ *
+ * 		Returns COMMON_ERROR_MEMORY_ERROR if the file length was determined, but could not be retrived from the file stream because the
+ * 		value could not be converted and stored. (Blame the C standard in this case.....)
+ *
+ * 		Otherwise returns the approperate error code.
+ *
+ * 		In case of error, (the returned error code is not SUCCESS), the fileLength argument will NOT be altered.
+ */
+int FileUtills_Get_File_Length(FILE * fp, size_t * fileLength);
+
+/*!
  *		int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
  *
  *		Writes out the given data in memory to the given output file.

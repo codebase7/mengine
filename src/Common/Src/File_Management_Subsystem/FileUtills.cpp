@@ -177,6 +177,194 @@ int FileUtills_CheckPathType(const char * path, const size_t pathSize, bool * bI
 		return ret;
 }
 
+#ifdef _MSC_VER
+int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, __int64 * fileLength)
+#else
+int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, off_t * fileLength)
+#endif	/* _MSC_VER */
+{
+		/* Init vars. */
+		int retFromC = 0;							/* The result from C calls. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
+		FILE * fp = NULL;							/* Pointer to the file. */
+#ifdef _MSC_VER
+		__int64 fileSize = 0;						/* Returned size from Get_File_Length(). (VC is special.) */
+#else
+		off_t fileSize = 0;							/* Returned size from Get_File_Length(). */
+#endif	/* _MSC_VER */
+
+		/* Check for invalid arguments. */
+		if ((filename != NULL) && (filenameSize > 0) && (fileLength != NULL))
+		{
+				/* Open the file. */
+				fp = fopen(filename, "rb");
+				if (fp != NULL)
+				{
+						/* Call correct function. */
+						ret = FileUtills_Get_File_Length(fp, &fileSize);
+						if (ret == COMMON_ERROR_SUCCESS)
+						{
+								/* Close the file. */
+								retFromC = fclose(fp);
+								if (retFromC == 0)
+								{
+										/* Copy the size. */
+										(*fileLength) = fileSize;
+
+										/* SUCCESS. */
+										ret = COMMON_ERROR_SUCCESS;
+								}
+								else
+								{
+										/* Could not close the file. */
+										ret = COMMON_ERROR_IO_ERROR;
+								}
+						}
+						else
+						{
+								/* Close the file. */
+								retFromC = fclose(fp);
+								if (retFromC != 0)
+								{
+										/* Could not close the file. */
+										ret = COMMON_ERROR_IO_ERROR;
+								}
+						}
+				}
+				else
+				{
+						/* Could not open file. */
+						ret = COMMON_ERROR_IO_ERROR;
+				}
+		}
+		else
+		{
+				/* Invalid arguments. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+		}
+
+		/* Exit function. */
+		return ret;
+}
+
+#ifdef _MSC_VER
+int FileUtills_Get_File_Length(FILE * fp, __int64 * fileLength)
+#else
+int FileUtills_Get_File_Length(FILE * fp, off_t  * fileLength)
+#endif	/* _MSC_VER */
+{
+		/* Init vars. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
+		int retFromC = 0;							/* The result of C calls. */
+		fpos_t * previousLocation = NULL;			/* The location to restore us to at the end of the function. */
+#ifdef _MSC_VER
+		long long length = 0;						/* The size of the file. (Visual C is special.) */
+#else
+		off_t length = 0;							/* The size of the file. */
+#endif	/* _MSC_VER */
+
+		/* Check for invalid arguments. */
+		if ((fp != NULL) && (fileLength != NULL))
+		{
+				/* Check for errors. */
+				if (ferror(fp) != 0)
+				{
+						/* Get the current position. */
+						retFromC = fgetpos(fp, previousLocation);
+						if (retFromC == 0)
+						{
+								/* Go back to the beginining of the file. */
+								rewind(fp);
+
+								/* Begin loop to find the end of the file. */
+								while ((ferror(fp) == 0) && (feof(fp) == 0))
+								{
+										/* Get next char. */
+										retFromC = fgetc(fp);
+								}
+
+								/* OK, now figure out if we hit the end of the file or if we hit an error. */
+								retFromC = ferror(fp);
+								if (retFromC == 0)		/* No error. */
+								{
+										/* Check for eof. */
+										retFromC = feof(fp);
+										if (retFromC != 0)		/* Hit EOF. */
+										{
+												/* Get the end of file position. */
+#ifdef _MSC_VER
+												length = _ftelli64(fp);	/* Visual C is special. */
+#else
+												length = ftello(fp);
+#endif	/* _MSC_VER */
+												if ((length != -1) && (length >= 0))
+												{
+														/* Set success. */
+														ret = COMMON_ERROR_SUCCESS;
+												}  
+												else
+												{
+														/* Check and see if the error is EOVERFLOW. */
+														if ((ret == -1) && (errno == EOVERFLOW))
+														{
+																/* This is a memory error, as we can't store the result. */
+																ret = COMMON_ERROR_MEMORY_ERROR;
+														}
+														else
+														{
+																/* OK, yet another IO_ERROR. */
+																ret = COMMON_ERROR_IO_ERROR;
+														}
+												}
+										}
+										else
+										{
+												/* We hit a file stream error. */
+												ret = COMMON_ERROR_IO_ERROR;
+										}
+								}
+								else
+								{
+										/* We hit a file stream error. */
+										ret = COMMON_ERROR_IO_ERROR;
+								}
+
+								/* Clear the error status, and reset the file position. */
+								clearerr(fp);
+								retFromC = fsetpos(fp, previousLocation);
+								if ((retFromC == 0) && (length >= 0) && (ret == COMMON_ERROR_SUCCESS))
+								{
+										/* Copy the length to the size_t value. */
+										(*fileLength) = length;
+								}
+								else
+								{
+										/* File stream error. */
+										ret = COMMON_ERROR_IO_ERROR;
+								}
+						}
+						else
+						{
+								/* Could not get current file position. */
+								ret = COMMON_ERROR_IO_ERROR;
+						}
+				}
+				else
+				{
+						/* File stream has errored out. */
+						ret = COMMON_ERROR_IO_ERROR;
+				}
+		}
+		else 
+		{
+				/* Invalid arguments. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+		}
+
+		/* Exit function. */
+		return ret;
+}
+
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
 {
 		/* Init vars. */
