@@ -365,6 +365,52 @@ int FileUtills_Get_File_Length(FILE * fp, off_t  * fileLength)
 		return ret;
 }
 
+int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * dataBuf, const size_t dataBufLength, const size_t destStaringOffset, const bool blankDataBuf)
+{
+		/* Init vars. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
+		int retFromC = 0;							/* The result of C calls. */
+		size_t x = 0;								/* Counter in for loop. */
+
+		/* Check for invalid arguments. */
+		if ((IN != NULL) && (ferror(IN) == 0) && (feof(IN) == 0) && (dataBuf != NULL) && (dataBufLength > 0) && (dataLength > 0) && ((destStaringOffset + dataLength) < dataBufLength))
+		{
+				/* Blank out dataBuf with NULL bytes if needed. */
+				if (blankDataBuf)
+				{
+						memset(dataBuf, '\0', dataBufLength);
+				}
+
+				/* Begin data input loop. */
+				for (x = 0; ((x < dataLength) && ((destStaringOffset + x) < dataBufLength) && (ferror(IN) == 0) && (feof(IN) == 0) && (retFromC == 0)); x++)
+				{
+						/* Get the data. */
+						retFromC = fgetc(IN);
+						dataBuf[(destStaringOffset + x)] = retFromC;
+				}
+
+				/* Check for success. */
+				if ((ferror(IN) == 0) && (feof(IN) == 0) && (retFromC == 0))
+				{
+						/* Data read successfully. */
+						ret = COMMON_ERROR_SUCCESS;
+				}
+				else
+				{
+						/* Bad file stream. */
+						ret = COMMON_ERROR_IO_ERROR;
+				}
+		}
+		else
+		{
+				/* Invalid arguments. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+		}
+
+		/* Exit function. */
+		return ret;
+}
+
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
 {
 		/* Init vars. */

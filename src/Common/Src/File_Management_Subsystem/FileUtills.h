@@ -115,6 +115,43 @@ int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t f
 int FileUtills_Get_File_Length(FILE * fp, size_t * fileLength);
 
 /*!
+ *		int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * dataBuf, const size_t dataBufLength, const size_t destStaringOffset, const bool blankDataBuf)
+ *
+ *		Reads the given amount of bytes from the given input file and copies them
+ *		to the given memory buffer.
+ *
+ * 		WARNING: This function expects a pre-allocated memory buffer as big as the
+ *		given data length. If the buffer is smaller than this a memory access violation
+ *		WILL HAPPEN.
+ *
+ *		NOTE: This function expects that the given input file is already open and not errored out when called.
+ *		The input file will remain open after the function returns. (It will still be usable if the returned error code is SUCCESS.)
+ *
+ *		The input position of the file will NOT be restored in ANY instance after this function returns.
+ *		If you need the current position for something, copy it elsewhere before calling this function.
+ *
+ * 		@pram IN: C FILE structure that points to a pre-opened file that data will be read from. (Cannot be in an error state, data will be read from the file's current offset.)
+ * 		@pram dataLength: The amount of data to read from the file.
+ * 		@pram dataBuf: Preallocated C-String where the data read from the file will be stored. (Will not be reallocated if too small.)
+ * 		@pram dataBufLength: The total length of the pre-allocated dataBuf string.
+ * 		@pram destStaringOffset: Position in the dataBuf string where read data from the file will start at.
+ * 		@pram blankDataBuf: Whether or not to blank out the dataBuf with NULL bytes.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the data is read into the memory buffer successfully.
+ *
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is NULL,
+ *		the given input file has errored out prior to the function call,
+ *		dataLength or dataBufLength is less than 1, or destStaringOffset plus dataLength
+ * 		is greater than or equal to dataBufLength.
+ *
+ * 		Returns COMMON_ERROR_IO_ERROR on all f*() errors, or if the end of the file is hit prior to reading
+ *		the amount of requested data.
+ *
+ *		Otherwise returns the appropriate error code.
+ */
+int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * dataBuf, const size_t dataBufLength, const size_t destStaringOffset, const bool blankDataBuf);
+
+/*!
  *		int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
  *
  *		Writes out the given data in memory to the given output file.
