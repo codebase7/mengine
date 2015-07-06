@@ -8,5 +8,5 @@ add_library(Panic_Handler_Multiverse_Engine_Static STATIC Panic.cpp)
 
 add_library(Core_Multiverse_Engine SHARED DataProcess.cpp FileStreams.cpp)
 add_library(Core_Multiverse_Engine_Static STATIC DataProcess.cpp FileStreams.cpp)
-target_link_libraries(Core_Multiverse_Engine Panic_Handler_Multiverse_Engine_Static)
+target_link_libraries(Core_Multiverse_Engine Panic_Handler_Multiverse_Engine)
 target_link_libraries(Core_Multiverse_Engine_Static Panic_Handler_Multiverse_Engine_Static)
