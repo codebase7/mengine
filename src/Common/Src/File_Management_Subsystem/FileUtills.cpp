@@ -507,73 +507,83 @@ int FileUtills_Get_File_Length(FILE * fp, struct MSYS_FILESIZE * fileLength)
 
 int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * dataBuf, const size_t dataBufLength, const size_t destStaringOffset, const bool blankDataBuf)
 {
-		/* Init vars. */
-		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
-		int retFromC = 0;							/* The result of C calls. */
-		size_t x = 0;								/* Counter in for loop. */
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
+	int retFromC = 0;							/* The result of C calls. */
+	size_t x = 0;								/* Counter in for loop. */
 
-		/* Check for invalid arguments. */
-		if ((IN != NULL) && (!ferror(IN)) && (!feof(IN)) && (dataBuf != NULL) && (dataBufLength > 0) && (dataLength > 0) && ((destStaringOffset + dataLength) < dataBufLength))
+	/* Check for invalid arguments. */
+	if ((IN != NULL) && (!ferror(IN)) && (!feof(IN)) && (dataBuf != NULL) && (dataBufLength > 0) && (dataLength > 0) && ((destStaringOffset + dataLength) < dataBufLength))
+	{
+		/* Blank out dataBuf with NULL bytes if needed. */
+		if (blankDataBuf)
 		{
-				/* Blank out dataBuf with NULL bytes if needed. */
-				if (blankDataBuf)
-				{
-						memset(dataBuf, '\0', dataBufLength);
-				}
+			memset(dataBuf, '\0', dataBufLength);
+		}
 
-				/* Begin data input loop. */
-				for (x = 0; ((x < dataLength) && ((destStaringOffset + x) < dataBufLength) && (!ferror(IN)) && (!feof(IN))); x++)
-				{
-						/* Get the data. */
-						retFromC = fgetc(IN);
+		/* Begin data input loop. */
+		for (x = 0; ((x < dataLength) && ((destStaringOffset + x) < dataBufLength) && (!ferror(IN)) && (!feof(IN))); x++)
+		{
+			/* Get the data. */
+			retFromC = fgetc(IN);
 
-						/* Check for EOF. */
-						if (retFromC == EOF)
-						{
-							/* Check for actual EOF or error. */
-							if ((!(feof(IN))) && (!(ferror(IN))))
-							{
-								/* The input value is (0xFF) which just so happens to be EOF,
-									but it is not an error. So copy the value.
-								*/
-								dataBuf[x] = retFromC;
-							}
-						}
-						else
-						{
-							/* Copy data to dataBuf. */
-							dataBuf[x] = retFromC;
-						}
+			/* Check for EOF. */
+			if (retFromC == EOF)
+			{
+				/* Check for actual EOF or error. */
+				if ((!(feof(IN))) && (!(ferror(IN))))
+				{
+					/* The input value is (0xFF) which just so happens to be EOF,
+						but it is not an error. So copy the value.
+					*/
+					dataBuf[x] = retFromC;
 				}
+			}
+			else
+			{
+				/* Copy data to dataBuf. */
+				dataBuf[x] = retFromC;
+			}
+		}
 
-				/* Check for success. */
-				if ((!ferror(IN)) && (x == dataLength))
-				{
-						/* Data read successfully. */
-						ret = COMMON_ERROR_SUCCESS;
-				}
-				else
-				{
-					if (feof(IN))
-					{
-						/* End of file. */
-						ret = COMMON_ERROR_END_OF_DATA;
-					}
-					else
-					{
-						/* Bad file stream. */
-						ret = COMMON_ERROR_IO_ERROR;
-					}
-				}
+		/* Check for success. */
+		if ((!ferror(IN)) && (x == dataLength))
+		{
+			/* Data read successfully. */
+			ret = COMMON_ERROR_SUCCESS;
 		}
 		else
 		{
-				/* Invalid arguments. */
-				ret = COMMON_ERROR_INVALID_ARGUMENT;
-		}
+			if (feof(IN))
+			{
+				/* End of file. */
+				ret = COMMON_ERROR_END_OF_DATA;
 
-		/* Exit function. */
-		return ret;
+				/* Log error. */
+				COMMON_LOG_DEBUG("DEBUG: FileUtills_Read_Bytes_From_File(): Reached end of file before reading the given amount of data.");
+			}
+			else
+			{
+				/* Bad file stream. */
+				ret = COMMON_ERROR_IO_ERROR;
+
+				/* Log error. */
+				COMMON_LOG_DEBUG("DEBUG: FileUtills_Read_Bytes_From_File(): Input file handle has failed.");
+			}
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+
+		/* Log error. */
+		COMMON_LOG_DEBUG("DEBUG: FileUtills_Read_Bytes_From_File(): ");
+		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+	}
+
+	/* Exit function. */
+	return ret;
 }
 
 int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const struct MSYS_FILESIZE * fileStartingOffset, const size_t dataLength)
