@@ -5,6 +5,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${O_OUTPUT_DIR})
 # Create the Byte_Order library.
 if (BUILD_BYTE_ORDER)
 	add_subdirectory(Byte_Order)
+	set (COMMON_BUILT_SHARED_LIBRARY_LIST ${COMMON_BUILT_SHARED_LIBRARY_LIST} Common_Byte_Order_Multiverse_Engine)
 	set (COMMON_BUILT_STATIC_LIBRARY_LIST ${COMMON_BUILT_STATIC_LIBRARY_LIST} Common_Byte_Order_Multiverse_Engine_Static)
 endif (BUILD_BYTE_ORDER)
 
