@@ -513,7 +513,7 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 		size_t x = 0;								/* Counter in for loop. */
 
 		/* Check for invalid arguments. */
-		if ((IN != NULL) && (ferror(IN) == 0) && (feof(IN) == 0) && (dataBuf != NULL) && (dataBufLength > 0) && (dataLength > 0) && ((destStaringOffset + dataLength) < dataBufLength))
+		if ((IN != NULL) && (!ferror(IN)) && (!feof(IN)) && (dataBuf != NULL) && (dataBufLength > 0) && (dataLength > 0) && ((destStaringOffset + dataLength) < dataBufLength))
 		{
 				/* Blank out dataBuf with NULL bytes if needed. */
 				if (blankDataBuf)
@@ -522,23 +522,48 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 				}
 
 				/* Begin data input loop. */
-				for (x = 0; ((x < dataLength) && ((destStaringOffset + x) < dataBufLength) && (ferror(IN) == 0) && (feof(IN) == 0) && (retFromC == 0)); x++)
+				for (x = 0; ((x < dataLength) && ((destStaringOffset + x) < dataBufLength) && (!ferror(IN)) && (!feof(IN))); x++)
 				{
 						/* Get the data. */
 						retFromC = fgetc(IN);
-						dataBuf[(destStaringOffset + x)] = retFromC;
+
+						/* Check for EOF. */
+						if (retFromC == EOF)
+						{
+							/* Check for actual EOF or error. */
+							if ((!(feof(IN))) && (!(ferror(IN))))
+							{
+								/* The input value is (0xFF) which just so happens to be EOF,
+									but it is not an error. So copy the value.
+								*/
+								dataBuf[x] = retFromC;
+							}
+						}
+						else
+						{
+							/* Copy data to dataBuf. */
+							dataBuf[x] = retFromC;
+						}
 				}
 
 				/* Check for success. */
-				if ((ferror(IN) == 0) && (feof(IN) == 0) && (retFromC == 0))
+				if ((!ferror(IN)) && (x == dataLength))
 				{
 						/* Data read successfully. */
 						ret = COMMON_ERROR_SUCCESS;
 				}
 				else
 				{
+					if (feof(IN))
+					{
+						/* End of file. */
+						ret = COMMON_ERROR_END_OF_DATA;
+					}
+					else
+					{
 						/* Bad file stream. */
 						ret = COMMON_ERROR_IO_ERROR;
+					}
 				}
 		}
 		else
