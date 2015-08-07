@@ -135,6 +135,106 @@ void DataProcess_Deallocate_CString(char ** str)
 	return;
 }
 
+int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength)
+{
+	/* Init vars. */
+	size_t currentNum = 0;						/* Temporary value used to store the current number we are working on. */
+	char outputValue = '\0';					/* The value that we need to write into the output buffer. (Calculated from currentNum.) */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
+	char * result = NULL;						/* The resulting string of this function. */
+	char * previousResult = NULL;				/* Temporary pointer used to copy previously generated data into the current result. */
+	size_t resultLength = 1;					/* The size of the result string. Set to one by default to allow the string to be NULL terminated. */
+	const char outputValues[10] = "0123456789";	/* C-String used to map a generated value to it's corresponding character. */
+
+	/* Check for invalid arguments. */
+	if ((str != NULL) && (strLength != NULL))
+	{
+		/* Allocate memory for result. */
+		result = (char *)malloc(resultLength);
+		if (result != NULL)
+		{
+			/* Set currentNum. */
+			currentNum = number;
+
+			/* Begin value parsing loop. */
+			do
+			{
+				/* Read the current byte's value from right to left. (Mod is a reduction operation.) */
+				outputValue = (currentNum % 10);
+
+				/* Copy the current buffer's pointer because we are about to create a new one. */
+				previousResult = result;
+
+				/* Increment the size of the new buffer. */
+				resultLength++;
+
+				/* Allocate the new buffer. */
+				result = (char*)malloc(resultLength);
+
+				/* Check for successful memory allocation. */
+				if (result != NULL)
+				{
+					/* Blank out the new buffer. */
+					memset(result, '\0', resultLength);
+
+					/* Set the first value as the previous data comes after it. */
+					result[0] = outputValues[outputValue];
+
+					/* If we have any previous data we need to copy it into the new buffer and deallocate the previous one. */
+					if (previousResult != NULL)
+					{
+						memcpy((result + 1), previousResult, (resultLength - 1));
+						free(previousResult);
+						previousResult = NULL;
+					}
+
+					/* Get the next value by chopping off the "ones place", aka divide by the current base. */
+					currentNum /= 10;
+				}
+				else
+				{
+					/* Could not allocate memory for output buffer. */
+					ret = COMMON_ERROR_MEMORY_ERROR;
+				}
+			} while ((currentNum) && (ret != COMMON_ERROR_MEMORY_ERROR));
+
+			/* Check for success. */
+			if ((ret == COMMON_ERROR_UNKNOWN_ERROR) && (result != NULL) && (resultLength > 0))
+			{
+				/* Copy result pointer, and length. */
+				(*str) = result;
+				(*strLength) = resultLength;
+
+				/* Done. */
+				ret = COMMON_ERROR_SUCCESS;
+			}
+			else
+			{
+				/* Deallocate result if needed. */
+				if (result != NULL)
+				{
+					free(result);
+					result = NULL;
+				}
+				resultLength = 0;
+			}
+		}
+		else
+		{
+			/* Could not allocate memory for result string. */
+			ret = COMMON_ERROR_MEMORY_ERROR;
+		}
+	}
+	else
+	{
+		/* Invalid argument(s). */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	__cplusplus
