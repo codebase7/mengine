@@ -255,6 +255,29 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength);
 
 /*!
+ *		int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength)
+ *
+ *		Fetches the last part of the given path and creates a sub-string from it.
+ *
+ *		(This is a wrapper around DataProcess_Get_SubString_Using_Delimiter(), and as such has similar error codes.)
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the last path component was found and a sub-string was created.
+ *		Returns COMMON_ERROR_RANGE_ERROR if the path is a relative path without any directory components.
+ *		Returns COMMON_ERROR_END_OF_DATA if the path is a directory with directory separator on the end. 
+ *										 (This should be stripped off by this function if needed, but may still be returned.)
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Returns COMMON_ERROR_INTERNAL_ERROR if a call to an engine function fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		No alteration clause:
+ *		In case of error, this function will not alter any given argument.
+ *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
+ *		 are considered errors.)
+ */
+int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength);
+
+/*!
  * 	int FileUtills_GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize)
  *
  * 	Fetches the user's profile directory from the environment, and stores

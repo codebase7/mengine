@@ -600,6 +600,90 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
 		return ret;
 }
 
+int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
+	char * cleanedPath = NULL;					/* Path without a trailing PATH_SEP. */
+	char * tempSubStr = NULL;					/* Used to create the substr. */
+	size_t tempSubStrLength = 0;				/* Size of the tempSubString. */
+	size_t cleanedPathLength = 0;				/* Length of the cleanedPath string. */
+
+	/* Check for invalid arguments. */
+	if ((path != NULL) && (pathLength > 0) && (component != NULL) && (componentLength != NULL))
+	{
+		/* Allocate memory for the cleanedPath string. */
+		cleanedPathLength = pathLength;
+		cleanedPath = (char *)malloc(cleanedPathLength);
+		if (cleanedPath != NULL)
+		{
+			/* NULL out the cleaned path string. */
+			memset(cleanedPath, '\0', cleanedPathLength);
+
+			/* Copy the given path to cleanedPath. */
+			memcpy(cleanedPath, path, cleanedPathLength);
+
+			/* Call FileUtills_RemoveTrailingSlash(). (Path had to be copied as this function will reallocate the path if it needs to.) */
+			ret = FileUtills_RemoveTrailingSlash(&cleanedPath, &cleanedPathLength);
+			if (ret == COMMON_ERROR_SUCCESS)
+			{
+				/* Call DataProcess_Get_SubString_Using_Delimiter(). */
+				ret = DataProcess_Get_SubString_Using_Delimiter(cleanedPath, cleanedPathLength, DIR_SEP_STR,
+					/* (Note: DIR_SEP_STR is NULL terminated, so we are subtracting one from the length of the delimiter.) */
+					((DIR_SEP_STR[(sizeof(DIR_SEP_STR) - 1)] == '\0') ? (sizeof(DIR_SEP_STR) - 1) : (sizeof(DIR_SEP_STR))),
+					&tempSubStr, &tempSubStrLength, true, false);
+				if ((ret == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL) && (tempSubStrLength > 0))
+				{
+					/* Copy the pointer and length. */
+					(*component) = tempSubStr;
+					(*componentLength) = tempSubStrLength;
+
+					/* Done. */
+					ret = COMMON_ERROR_SUCCESS;
+				}
+				else
+				{
+					/* Change the error code to internal error if it's not range or end of data. */
+					if ((ret != COMMON_ERROR_RANGE_ERROR) && (ret != COMMON_ERROR_END_OF_DATA))
+					{
+						/* Internal error. */
+						ret = COMMON_ERROR_INTERNAL_ERROR;
+					}
+
+					/* Deallocate the tempSubStr if needed. */
+					if (tempSubStr != NULL)
+					{
+						DataProcess_Deallocate_CString(&tempSubStr);
+					}
+				}
+			}
+			else
+			{
+				/* Call to FileUtills_RemoveTrailingSlash() failed. */
+				ret = COMMON_ERROR_INTERNAL_ERROR;
+			}
+
+			/* Deallocate the cleanedPath string. */
+			free(cleanedPath);
+			cleanedPath = NULL;
+			cleanedPathLength = 0;
+		}
+		else
+		{
+			/* Could not allocate memory for cleanedPath. */
+			ret = COMMON_ERROR_MEMORY_ERROR;
+		}
+	}
+	else
+	{
+		/* Invalid argument(s). */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 int FileUtills::GetUserProfileDirectoryPath(std::string & path)
 {
 	// Init vars.
