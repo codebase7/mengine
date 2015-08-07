@@ -22,28 +22,10 @@
 #include "DataProcess.h"
 #include "FileStreams.h"
 
-/* External includes. */
-#include <ctime>
-
 size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
 {
-	// NO, it's not 4..... (Although it could be. I won't lie.)
-
-	// Set static.
-	static bool rand_set;
-
-	// Check if we need to set the rng.
-	if ((!rand_set) || (reset_rand))
-	{
-		// Seed random number generator.
-		srand(time(NULL));
-
-		// Set rand_set.
-		rand_set = true;
-	}
-
-	// Return the result.
-	return (rand() % max_value + min_value);
+	/* Call C function. */
+	return (DataProcess_Trivial_Random_Number_Generator(min_value, max_value, reset_rand));
 }
 
 short DataProcess::IncrementingSort(std::vector<std::string> & sort)

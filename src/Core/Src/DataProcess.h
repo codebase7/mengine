@@ -27,6 +27,35 @@
 #include "Panic.h"
 #include "DataProcess_Endianness_Check.h"
 
+/* Define extern "C". */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
+
+/* Define C functions. */
+/*!
+	size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand)
+
+	This function generates psudo-random numbers based on the given max_value.
+
+	@pram min_value, the minimum value that is acceptable for the function to return.
+	@pram max_value, the maximum value that is acceptable for the function to return.
+
+	E.x. If you want a range of 1 to 100 set min_value to 1 and max_value to 100.
+
+	@pram reset_rand, if this is set to true, the RNG will be re-seeded with the current time value returned by time(NULL).
+	Otherwise the next psudo-random number from the current seed will be returned.
+
+	Returns the generated psudo-random number.
+*/
+size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand);
+
+#ifdef __cplusplus
+}	/* End of extern "C". */
+#endif	/* __cplusplus */
+
+/* Only define the below with a CPP compiler. */
+#ifdef __cplusplus
 namespace DataProcess{
 
 class Data_Object{
@@ -250,19 +279,11 @@ class Data_Object{
 /*!
 	size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
 
-	This function generates psudo-random numbers based on the given max_value.
+	A wrapper around the DataProcess_Trivial_Random_Number_Generator() C function. (For compatibility.)
 
-	@pram min_value, the minimum value that is acceptable for the function to return.
-	@pram max_value, the maximum value that is acceptable for the function to return.
+	See DataProcess_Trivial_Random_Number_Generator()'s description for documentation.
 
-	E.x. If you want a range of 1 to 100 set min_value to 1 and max_value to 100.
-
-	By default this function returns a number between 0 and 255.
-
-	@pram reset_rand, if this is set to true, the rng will be re-seeded with the current time value returned by time(NULL).
-	Otherwise the next psudo-random number from the current seed will be returned. (Default)
-
-	Returns the generated psudo-random number.
+	Note: Default values for arguments are: min_value 0, max_value 255, reset_rand false.
 */
 MSYS_DLL_EXPORT size_t Trivial_Random_Number_Generator(const size_t & min_value = 0, const size_t & max_value = 255, const bool & reset_rand = false);
 
@@ -522,6 +543,8 @@ MSYS_DLL_EXPORT short RegularExpressionParser(const std::string & expression, co
 MSYS_DLL_EXPORT short RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::Panic_ERROR * error = NULL);
 }
 
-#endif
+#endif	/* __cplusplus */
 
-// End of DataProcess.h
+#endif	/* DATAPROCESS_H */
+
+/* End of DataProcess.h */
