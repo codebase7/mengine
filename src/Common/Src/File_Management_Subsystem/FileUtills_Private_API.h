@@ -25,6 +25,16 @@
 // External includes.
 #include <string.h>
 
+/* Define the internal MSYS_FILESIZE_PRIV structure. */
+typedef struct MSYS_FILESIZE_PRIV {
+enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX. )*/
+#ifdef _MSC_VER
+		__int64	length;		/* Length of the file. */
+#else
+		off_t	length;		/* Length of the file. */
+#endif	/* _MSC_VER */
+} MSYS_FILESIZE_PRIV_T;
+
 // Namespace definition.
 namespace FileUtills{
 

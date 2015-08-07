@@ -63,6 +63,22 @@
 #endif
 #endif
 
+/*!
+ *		enum MSYS_FILESIZE_TYPES
+ *
+ *		Defines the types that an MSYS_FILESIZE object may have.
+ */
+enum MSYS_FILESIZE_TYPES {
+	UNKNOWN_FILESIZE_TYPE = 0,
+	WINDOWS_FILESIZE_TYPE = 1,
+	POSIX_FILESIZE_TYPE = 2,
+};
+
+/* File size structure. Contains the length of a file's size. */
+typedef struct MSYS_FILESIZE {
+enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX. )*/
+} MSYS_FILESIZE_T;
+
 /* Define the directory list structure. */
 typedef struct FileUtills_dirlist {
     size_t numOfEntries;		/* Used to store the number of entries in the list array. */
@@ -72,31 +88,95 @@ typedef struct FileUtills_dirlist {
 } FileUtills_dirlist_T;
 
 /*!
- * 		int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, size_t * fileLength)
+ *		int FileUtills_Create_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
+ *
+ *		Factory function for MSYS_FILESIZE structures.
+ *
+ *		WARNING: This function will NOT deallocate a preexisting object pointed to by the given
+ *		pointer argument. The function WILL overwrite the original pointer if it is successful.
+ *		If you need to keep that pointer for later deallocation, copy it elsewhere before calling
+ *		this function.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if creation of structure was successful.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer to pointer is NULL.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		In case of error, this function will NOT modify it's argument.
+ */
+int FileUtills_Create_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str);
+
+/*!
+ *		void FileUtills_Destroy_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
+ *
+ *		Destructor for MSYS_FILESIZE structures. Takes the given pointer to pointer, derefs it and
+ *		deallocates the pointer to object if it is allocated.
+ *
+ *		WARNING: This function is a destructor for MSYS_FILESIZE objects ONLY! Giving a different object
+ *		to this function will cause undefined behavior.
+ *
+ *		If the given pointer is NULL, then this function will silently fail.
+ *
+ *		This function has no return.
+ */
+void FileUtills_Destroy_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str);
+
+/*!
+ *		int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const struct MSYS_FILESIZE * str, long long int * retVal)
+ *
+ *		Accessor function.
+ *
+ *		Returns the length variable from the given MSYS_FILESIZE structure.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if successful. retVal will hold the result.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointers are NULL.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		In case of error, this function will NOT modify it's arguments.
+ */
+int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const struct MSYS_FILESIZE * str, long long int * retVal);
+
+/*!
+ *		int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(struct MSYS_FILESIZE * str, const long long int * val)
+ *
+ *		Accessor function.
+ *
+ *		Sets the length variable for the given MSYS_FILESIZE structure.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if successful.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointers are NULL.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		In case of error, this function will NOT modify it's arguments.
+ */
+int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(struct MSYS_FILESIZE * str, const long long int * val);
+
+/*
+ * 		int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, struct MSYS_FILESIZE * fileLength)
  *
  * 		Returns the length of the given file.
- * 		(This is just a wrapper around Get_File_Length().)
+ * 		(This is just a wrapper around FileUtills_Get_File_Length().)
  *
- * 		Returns COMMON_ERROR_SUCCESS if the length is read in successfuly. (fileLength will be set to the named file's length in this case.)
- * 		Otherwise returns the approperate error code.
+ * 		Returns COMMON_ERROR_SUCCESS if the length is read in successfully. (fileLength will be set to the named file's length in this case.)
+ * 		Otherwise returns the appropriate error code.
  *
  * 		In case of error, (the returned error code is not COMMON_ERROR_SUCCESS), the fileLength argument will NOT be altered.
  */
-int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, size_t * fileLength);
+int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, struct MSYS_FILESIZE * fileLength);
 
 /*!
- * 		int FileUtills_Get_File_Length(FILE * fp, size_t * fileLength)
+ * 		int FileUtills_Get_File_Length(FILE * fp, struct MSYS_FILESIZE * fileLength)
  *
  * 		Gets the length of the given open file.
  *
  * 		This function expects the file stream to be in a good state, (I.e. It's error flag is not set), and that the file
- * 		stream was opened in binary mode. (If the stream is not already open, use Get_File_Length_By_Filename() instead,
+ * 		stream was opened in binary mode. (If the stream is not already open, use FileUtills_Get_File_Length_By_Filename() instead,
  * 		it will ensure that these requirements are met.)
  *
- * 		This function calculates the size of the file by starting at the begining and working it's way to the end by calling
- * 		fgetc(), and then checking the state flags (error and eof) after each call to fgetc(). When the eof flag is set,
+ * 		This function calculates the size of the file by starting at the beginning and working it's way to the end by calling
+ * 		fgetc(), and then checking the state flags (error and eof) after each call to fgetc(). When the EOF flag is set,
  * 		(and the error flag is not set), the function will call ftello() to get the offset and check it for error. Finally
- * 		regardless if an error has occured or not, the function will attempt to restore the previous position in the file
+ * 		regardless if an error has occurred or not, the function will attempt to restore the previous position in the file
  * 		that the file was at when the call to this function was made.
  *
  * 		Returns COMMON_ERROR_SUCCESS if the file length is determined. (fileLength will be set to the determined length in this case.)
@@ -105,14 +185,14 @@ int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t f
  *
  * 		Returns COMMON_ERROR_IO_ERROR if one of the f*() functions fails.
  *
- * 		Returns COMMON_ERROR_MEMORY_ERROR if the file length was determined, but could not be retrived from the file stream because the
+ * 		Returns COMMON_ERROR_MEMORY_ERROR if the file length was determined, but could not be retrieved from the file stream because the
  * 		value could not be converted and stored. (Blame the C standard in this case.....)
  *
- * 		Otherwise returns the approperate error code.
+ * 		Otherwise returns the appropriate error code.
  *
- * 		In case of error, (the returned error code is not SUCCESS), the fileLength argument will NOT be altered.
+ * 		In case of error, (the returned error code is not COMMON_ERROR_SUCCESS), the fileLength argument will NOT be altered.
  */
-int FileUtills_Get_File_Length(FILE * fp, size_t * fileLength);
+int FileUtills_Get_File_Length(FILE * fp, struct MSYS_FILESIZE * fileLength);
 
 /*!
  *		int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * dataBuf, const size_t dataBufLength, const size_t destStaringOffset, const bool blankDataBuf)
@@ -173,6 +253,56 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
  *		Otherwise returns the appropriate error code.
  */
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength);
+
+/*!
+ *		int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength)
+ *
+ *		Fetches the last part of the given path and creates a sub-string from it.
+ *
+ *		(This is a wrapper around DataProcess_Get_SubString_Using_Delimiter(), and as such has similar error codes.)
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the last path component was found and a sub-string was created.
+ *		Returns COMMON_ERROR_RANGE_ERROR if the path is a relative path without any directory components.
+ *		Returns COMMON_ERROR_END_OF_DATA if the path is a directory with directory separator on the end. 
+ *										 (This should be stripped off by this function if needed, but may still be returned.)
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Returns COMMON_ERROR_INTERNAL_ERROR if a call to an engine function fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		No alteration clause:
+ *		In case of error, this function will not alter any given argument.
+ *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
+ *		 are considered errors.)
+ */
+int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength);
+
+/*!
+ *		int FileUtills_Get_File_Name_Component(const char * path, const size_t pathLength, char ** retStr, size_t * retStrLength, 
+ *												const int getExtension)
+ *
+ *		Fetches the file name or extension from the given path and creates a sub-string from it.
+ *
+ *		(This is a wrapper around DataProcess_Get_SubString_Using_Delimiter(), and as such has similar error codes.)
+ *
+ *		@pram getExtension whether or not to get the file extension. If set to zero the file name will be put into the sub-string,
+ *							otherwise the file extension will be put into the sub-string.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the file name / extension was found and a sub-string was created.
+ *		Returns COMMON_ERROR_RANGE_ERROR if the path is a path without an name / extension.
+ *		Returns COMMON_ERROR_END_OF_DATA if the path is a path with an extension separator ('.') (on the end / at the beginning)
+ *				 and nothing (before / after) it.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Returns COMMON_ERROR_INTERNAL_ERROR if a call to an engine function fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		No alteration clause:
+ *		In case of error, this function will not alter any given argument.
+ *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
+ *		 are considered errors.)
+ */
+int FileUtills_Get_File_Name_Component(const char * path, const size_t pathLength, char ** retStr, size_t * retStrLength, const int getExtension);
 
 /*!
  * 	int FileUtills_GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize)
