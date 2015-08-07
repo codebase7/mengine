@@ -111,6 +111,38 @@ void DataProcess_Deallocate_CString(char ** str);
 */
 int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength);
 
+/*!
+ *		int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t srcLength, const char * delim, const size_t delimLength,
+ *													char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
+ *
+ *		Basic delimiter based sub-string generation function.
+ *
+ *		Takes the given source string and looks for the first occurrence of the given delimiter string within it.
+ *		If the delimiter string is found, this function will produce a sub-string with either the remaining bytes in the
+ *		source string that come after the delimiter, or the bytes from the source string that came before the delimiter.
+ *
+ *		Optionally if searchFromEnd is non-zero, the search will start from the end of the source string instead of the beginning.
+ *
+ *		@pram getPriorData, Chooses the bytes that came before the delimiter or after the delimiter for generating the sub-string from.
+ *				If getPriorData is non-zero then the sub-string will contain the bytes before the delimiter, otherwise the sub-string will
+ *				contain the bytes after the delimiter.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the delimiter was found and a sub-string was created.
+ *		Returns COMMON_ERROR_RANGE_ERROR if the delimiter string was not found in the source string.
+ *		Returns COMMON_ERROR_END_OF_DATA if the delimiter string was found at the end of source string
+ *				with no data remaining to create the sub-string with. (subStr and subStrLength will NOT be altered in this case.)
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		No alteration clause:
+ *		In case of error, this function will not alter any given argument.
+ *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
+ *		 are considered errors.)
+ */
+int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t srcLength, const char * delim, const size_t delimLength,
+												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData);
+
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	/* __cplusplus */

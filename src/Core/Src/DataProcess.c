@@ -235,6 +235,149 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
 	return ret;
 }
 
+int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t srcLength, const char * delim, const size_t delimLength,
+												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
+{
+	/* Init vars. */
+	int foundDelim = 0;							/* Whether or not we have found the delim. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
+	char * tempSubStr = NULL;					/* Used to create the substr. */
+	size_t x = 0;								/* Counter used in search loop. */
+	size_t y = 0;								/* Counter used in search subloop. */
+	size_t tempSubStrLength = 0;				/* Size of the tempSubString. */
+
+	/* Check for invalid arguments. */
+	if ((src != NULL) && (srcLength > 0) && (delim != NULL) && (delimLength > 0) && (subStr != NULL) && (subStrLength != NULL))
+	{
+		/* Begin search loop. */
+		for (x = 0; ((x < srcLength) && (!foundDelim) && (ret == COMMON_ERROR_UNKNOWN_ERROR));)
+		{
+			/* Reset foundDelim. */
+			foundDelim = 1;
+
+			/* Begin search subloop for the delim. */
+			for (y = 0; ((y < delimLength) && (foundDelim)); y++)
+			{
+				/* Determine if we are searching from the end of the search string or not. */
+				if (searchFromEnd)
+				{
+					/* Check and see if the current byte is a match to the delim. */
+					if (src[((srcLength - 1) - (x + y))] != delim[((delimLength - 1) - y)])
+					{
+						/* Mismatch, have not found delim. */
+						foundDelim = 0;
+					}
+				}
+				else
+				{
+					/* Check and see if the current byte is a match to the delim. */
+					if (src[(x + y)] != delim[y])
+					{
+						/* Mismatch, have not found delim. */
+						foundDelim = 0;
+					}
+				}
+			}
+
+			/* Add the y value to the current x value. (Update the counters.) */
+			x += y;
+		}	/* End of search loop. */
+
+		/* Check and see if we have found the delim. */
+		if ((foundDelim) && (y == delimLength))
+		{
+			/* We found the delim, Check and see if we need the data after the delimiter or before it. */
+			if (getPriorData)
+			{
+				/* Check for bytes before the delimiter. */
+				if ((srcLength - x) > 0)
+				{
+					/* Set the size for the new substring. */
+					tempSubStrLength = (srcLength - x);
+
+					/* Allocate memory for the substring. */
+					tempSubStr = (char *)malloc(tempSubStrLength);
+					if (tempSubStr != NULL)
+					{
+						/* NULL out the buffer. */
+						memset(tempSubStr, '\0', tempSubStrLength);
+
+						/* Copy the bytes before the delimiter. */
+						memcpy(tempSubStr, src, tempSubStrLength);
+
+						/* Copy the pointer and size. */
+						(*subStr) = tempSubStr;
+						(*subStrLength) = tempSubStrLength;
+
+						/* Done. */
+						ret = COMMON_ERROR_SUCCESS;
+					}
+					else
+					{
+						/* Could not allocate memory for substring. */
+						ret = COMMON_ERROR_MEMORY_ERROR;
+					}
+				}
+				else
+				{
+					/* No bytes remaining to create substring. */
+					ret = COMMON_ERROR_END_OF_DATA;
+				}
+			}
+			else
+			{
+				/* See if there are bytes after the delimiter to create a substring with. */
+				if (((x - delimLength) > 0) && (x < (srcLength - 1)))
+				{
+					/* Set the size for the new substring. */
+					tempSubStrLength = (x - delimLength);
+
+					/* Allocate memory for the substring. */
+					tempSubStr = (char *)malloc(tempSubStrLength);
+					if (tempSubStr != NULL)
+					{
+						/* NULL out the buffer. */
+						memset(tempSubStr, '\0', tempSubStrLength);
+
+						/* Copy the bytes after the delimiter. */
+						memcpy(tempSubStr, (searchFromEnd ? (src + ((srcLength + 1) - x)) : (src + x)), (x - delimLength));
+
+						/* Copy the pointer and size. */
+						(*subStr) = tempSubStr;
+						(*subStrLength) = tempSubStrLength;
+
+						/* Done. */
+						ret = COMMON_ERROR_SUCCESS;
+					}
+					else
+					{
+						/* Could not allocate memory for substring. */
+						ret = COMMON_ERROR_MEMORY_ERROR;
+					}
+				}
+				else
+				{
+					/* No bytes remaining to create substring. */
+					ret = COMMON_ERROR_END_OF_DATA;
+				}
+			}
+		}
+		else
+		{
+			/* Delim not found in search string. */
+			ret = COMMON_ERROR_RANGE_ERROR;
+		}
+	}
+	else
+	{
+		/* Invalid argument(s). */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	__cplusplus
