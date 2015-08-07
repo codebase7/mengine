@@ -119,7 +119,7 @@ MSYS_DLL_EXPORT int Byte_Order_Bit_Comparison(const char * byte, const char bitM
 MSYS_DLL_EXPORT int Common_Byte_Swap(char * data, const size_t dataLength);
 
 /*!
- * 		int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const size_t base,
+ * 		int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const unsigned int base,
  * 										const size_t width, const char fillValue, const bool spaceBetweenBytes)
  *
  * 		Converts a given byte string to a printable (NULL-terminated) and human-readable string in the given base.
@@ -151,7 +151,7 @@ MSYS_DLL_EXPORT int Common_Byte_Swap(char * data, const size_t dataLength);
  *
  * 		In case of error, (the returned error code is not COMMON_ERROR_SUCCESS, then the given arguments will NOT be altered by this function.
  */
-MSYS_DLL_EXPORT int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const size_t base, const size_t width, const char fillValue, const bool spaceBetweenBytes);
+MSYS_DLL_EXPORT int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const unsigned int base, const size_t width, const char fillValue, const bool spaceBetweenBytes);
 
 /*!
  * 		void Common_Deallocate_Print_Bytes_CString(char ** str)

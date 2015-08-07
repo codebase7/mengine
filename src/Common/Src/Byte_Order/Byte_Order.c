@@ -139,27 +139,30 @@ int Common_Byte_Swap(char * data, const size_t dataLength)
 		return ret;
 }
 
-int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const size_t base, const size_t width, const char fillValue, const bool spaceBetweenBytes)
+int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const unsigned int base, const size_t width, const char fillValue, const bool spaceBetweenBytes)
 {
+/* Define the size of the output values array. */
+#define MSYSOUTPUTVALUESSIZE 17
+
 		/* Init vars. */
-		int ret = COMMON_ERROR_UNKNOWN_ERROR;				/* The result of this function. */
-		size_t x = 0;										/* Counter used in the print and spacing loops. */
-		size_t byteValueCount = 0;							/* Used to keep track of how many bytes we have outputted for the current byte. */
-		unsigned char currentByte = '\0';					/* Temporary value used to store the current byte we are working on. */
-		char outputValue = '\0';							/* The value that we need to write into the output buffer. (Calculated from currentValue.) */
-		char * outputBuffer = NULL;							/* Pointer to the c-string that will be outputted to the standard output. */
-		char * previousOutputBuffer = NULL;					/* Temporary pointer used to copy previously generated data into the current outputBuffer. */
-		const char outputValues[17] = "0123456789ABCDEF";	/* C-String used to map a generated value to it's corresponding character. */
-		size_t outputBufferSize = 1;						/* Current size of the outputBuffer. Set to one by default to allow the string to be NULL terminated. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;								/* The result of this function. */
+		size_t x = 0;														/* Counter used in the print and spacing loops. */
+		size_t byteValueCount = 0;											/* Used to keep track of how many bytes we have outputted for the current byte. */
+		unsigned char currentByte = '\0';									/* Temporary value used to store the current byte we are working on. */
+		size_t outputValue = 0;												/* The value that we need to write into the output buffer. (Calculated from currentValue.) */
+		char * outputBuffer = NULL;											/* Pointer to the c-string that will be given back to the caller. */
+		char * previousOutputBuffer = NULL;									/* Temporary pointer used to copy previously generated data into the current outputBuffer. */
+		const char outputValues[MSYSOUTPUTVALUESSIZE] = "0123456789ABCDEF";	/* C-String used to map a generated value to it's corresponding character. */
+		size_t outputBufferSize = 1;										/* Current size of the outputBuffer. Set to one by default to allow the string to be NULL terminated. */
 
 		/* Check for invalid arguments. */
 		if ((data != NULL) && (dataLength > 0) && (retStr != NULL) && (retStrSize != NULL) && (base >= 2) && (base <= 16))
 		{
 				/* Begin data print loop. */
-				for (x = 0; ((x < dataLength) && (ret != COMMON_ERROR_MEMORY_ERROR)); x++)
+				for (x = 0; ((x < dataLength) && (ret == COMMON_ERROR_UNKNOWN_ERROR)); x++)
 				{
 						/* Copy current value. */
-						currentByte = data[((dataLength - 1) - x)];
+						currentByte = (data[((dataLength - 1) - x)]);
 
 						/* Reset byte value count. */
 						byteValueCount = 0;
@@ -182,35 +185,43 @@ int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, ch
 								/* Check for successful memory allocation. */
 								if (outputBuffer != NULL)
 								{
-										/* Blank out the new buffer. */
-										memset(outputBuffer, '\0', outputBufferSize);
+									/* Blank out the new buffer. */
+									memset(outputBuffer, '\0', outputBufferSize);
 
-										/* Set the first value as the previous data comes after it. */
+									/* Set the first value as the previous data comes after it. */
+									if ((outputValue >= 0) && (outputValue < MSYSOUTPUTVALUESSIZE))
+									{
 										outputBuffer[0] = outputValues[outputValue];
 
 										/* If we have any previous data we need to copy it into the new buffer and deallocate the previous one. */
 										if (previousOutputBuffer != NULL)
 										{
-												memcpy((outputBuffer + 1), previousOutputBuffer, (outputBufferSize - 1));
-												free(previousOutputBuffer);
-												previousOutputBuffer = NULL;
+											memcpy((outputBuffer + 1), previousOutputBuffer, (outputBufferSize - 1));
+											free(previousOutputBuffer);
+											previousOutputBuffer = NULL;
 										}
 
 										/* Increment byte value count. */
 										byteValueCount++;
 
 										/* Get the next value by chopping off the "ones place", aka divide by the current base. */
-										currentByte /= (unsigned char)base;
+										currentByte /= base;
+									}
+									else
+									{
+										/* Invalid byte value. */
+										ret = COMMON_ERROR_RANGE_ERROR;
+									}
 								}
 								else
 								{
 										/* Could not allocate memory for output buffer. */
 										ret = COMMON_ERROR_MEMORY_ERROR;
 								}
-						}while ((currentByte) && (ret != COMMON_ERROR_MEMORY_ERROR));
+						}while ((currentByte) && (ret == COMMON_ERROR_UNKNOWN_ERROR));
 
 						/* Check and see if the generated values used up all of the requested width. */
-						if ((ret != COMMON_ERROR_MEMORY_ERROR) && (outputBuffer != NULL) && (byteValueCount < width))
+						if ((ret == COMMON_ERROR_UNKNOWN_ERROR) && (outputBuffer != NULL) && (byteValueCount < width))
 						{
 								/* Copy the current buffer's pointer because we are about to create a new one. */
 								previousOutputBuffer = outputBuffer;
@@ -246,7 +257,7 @@ int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, ch
 						}
 
 						/* Insert spacing if needed. */
-						if ((spaceBetweenBytes) && (ret != COMMON_ERROR_MEMORY_ERROR) && (outputBuffer != NULL) && ((x + 1) < dataLength))
+						if ((spaceBetweenBytes) && (ret == COMMON_ERROR_UNKNOWN_ERROR) && (outputBuffer != NULL) && ((x + 1) < dataLength))
 						{
 								/* Copy the current buffer's pointer because we are about to create a new one. */
 								previousOutputBuffer = outputBuffer;
@@ -278,7 +289,7 @@ int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, ch
 				}
 
 				/* Check for NULL output buffer. */
-				if ((ret != COMMON_ERROR_MEMORY_ERROR) && (outputBuffer != NULL) && (outputBufferSize > 0))
+				if ((ret == COMMON_ERROR_UNKNOWN_ERROR) && (outputBuffer != NULL) && (outputBufferSize > 0))
 				{
 						/* Copy the outputBuffer pointer to retStr. */
 						(*retStr) = outputBuffer;
@@ -298,6 +309,9 @@ int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, ch
 
 		/* Exit function. */
 		return ret;
+
+/* Undefine the size of the output values array. */
+#undef MSYSOUTPUTVALUESSIZE
 }
 
 void Common_Deallocate_Print_Bytes_CString(char ** str)
