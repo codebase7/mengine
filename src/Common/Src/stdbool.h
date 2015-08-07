@@ -23,6 +23,15 @@
 #ifndef MSYS_STD_BOOL_H
 #define MSYS_STD_BOOL_H
 
+/* This is only needed for C. */
+#ifndef __cplusplus
+
+/* Only define this if STD_BOOL is not defined. */
+#ifndef _STDBOOL
+
+/* Only define this if __bool_true_false_are_defined is not defined. */
+#ifndef __bool_true_false_are_defined
+
 /* Define true and false. */
 #define TRUE 0x01	/* Really this could be anything. */
 #define FALSE 0x00	/* Litteral NULL byte to conform to ANYTHING NOT NULL IS TRUE. */
@@ -34,6 +43,9 @@ typedef char bool;	/* This is a char to conform to the expectation in C++ that s
 
 /* Define __bool_true_false_are_defined (ISO) */
 #define __bool_true_false_are_defined 1
+#endif	/* __bool_true_false_are_defined */
+#endif	/* _STDBOOL */
+#endif	/* __cplusplus */
 
 #endif	/* MSYS_STD_BOOL_H */
 
