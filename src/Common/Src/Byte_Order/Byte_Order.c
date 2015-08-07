@@ -246,6 +246,11 @@ int Common_Print_Bytes_In_Binary(const char * data, const size_t dataLength, cha
 		return Common_Print_Bytes_To_CString(data, dataLength, retStr, retStrSize, 2, 8, '0', spaceBetweenBytes);
 }
 
+int Common_Print_Bytes_In_Decimal(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes)
+{
+		return Common_Print_Bytes_To_CString(data, dataLength, retStr, retStrSize, 10, 8, '0', spaceBetweenBytes);
+}
+
 #ifdef __cplusplus
 }	/* extern "C" */
 #endif	/* __cplusplus */
