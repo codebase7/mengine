@@ -50,6 +50,35 @@ extern "C" {
 */
 size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand);
 
+/*!
+ *		int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength)
+ *
+ *		Reallocates the given string to be the new length.
+ *
+ *		Optionally it may do the following:
+ *			- If newLength is 0, it will only deallocate the given string.
+ *			- If newLength is greater than zero, but str is NULL or strLength is zero then,
+ *			  this function will only allocate a string of newLength bytes.
+ *			  (The string will be NULL filled.)
+ *			- If newLength and strLength is greater than zero, and str is non-NULL,
+ *			  then the data from str will be copied into the reallocated string as follows:
+ *				- If the newLength is less than the original length, then the data from str
+ *				  will be copied, but any bytes after newLength will be truncated.
+ *				- If the newLength is greater than or equal to the original length then,
+ *				  the entire original string will be copied.
+ *			In any instance, the reallocated string will be NULL terminated. (Even if the
+ *			string data must be altered to do so. In addition, the resulting string is always
+ *			newLength in size if this function is successful.)
+ *
+ *		Returns COMMON_ERROR_SUCCESS if successful.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer to pointer is NULL.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		In case of error, the given arguments will NOT be altered.
+ */
+int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength);
+
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	/* __cplusplus */

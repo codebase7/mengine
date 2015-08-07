@@ -25,6 +25,7 @@ extern "C" {
 
 /* Internal includes. */
 #include "DataProcess.h"
+#include "../../Common/Src/Error_Handler/Common_Error_Handler_Error_Codes.h"	/* Defines Common Error Codes. */
 
 /* External includes. */
 #include <time>
@@ -48,6 +49,76 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
 
 	/* Return the result. */
 	return (rand() % max_value + min_value);
+}
+
+int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code for this function. */
+	char * tempStr = NULL;					/* Temporary string pointer used during reallocation.*/
+
+	/* Check for invalid arguments. */
+	if (str != NULL)
+	{
+		/* Allocate memory for new string. (If needed.) */
+		if (newLength > 0)
+		{
+			tempStr = (char *)malloc(newLength);
+			if (tempStr != NULL)
+			{
+				/* NULL out the new string. */
+				memset(tempStr, '\0', newLength);
+
+				/* Check and see if we need to copy the old data. */
+				if (((*str) != NULL) && (strLength > 0))
+				{
+					/* Determine which length is longer. */
+					if (newLength < strLength)
+					{
+						/* Copy the old data. */
+						memcpy(tempStr, (*str), newLength);
+					}
+					else
+					{
+						/* Copy the old data. */
+						memcpy(tempStr, (*str), strLength);
+					}
+
+					/* Make sure the tempStr is NULL terminated. */
+					tempStr[(newLength - 1)] = '\0';
+				}
+			}
+			else
+			{
+				/* Could not allocate memory. */
+				ret = COMMON_ERROR_MEMORY_ERROR;
+			}
+		}
+
+		/* Deallocate the old string. (If needed.) */
+		if ((*str) != NULL)
+		{
+			free((*str));
+			(*str) = NULL;
+		}
+
+		/* Copy the new string pointer if needed. */
+		if ((newLength > 0) && (ret == COMMON_ERROR_UNKNOWN_ERROR) && (tempStr != NULL))
+		{
+			(*str) = tempStr;
+		}
+
+		/* Done. */
+		ret = COMMON_ERROR_SUCCESS;
+	}
+	else
+	{
+		/* Invalid argument. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
 }
 
 #ifdef __cplusplus
