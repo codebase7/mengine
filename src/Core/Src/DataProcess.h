@@ -27,6 +27,128 @@
 #include "Panic.h"
 #include "DataProcess_Endianness_Check.h"
 
+/* Define extern "C". */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
+
+/* Define C functions. */
+/*!
+	size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand)
+
+	This function generates psudo-random numbers based on the given max_value.
+
+	@pram min_value, the minimum value that is acceptable for the function to return.
+	@pram max_value, the maximum value that is acceptable for the function to return.
+
+	E.x. If you want a range of 1 to 100 set min_value to 1 and max_value to 100.
+
+	@pram reset_rand, if this is set to true, the RNG will be re-seeded with the current time value returned by time(NULL).
+	Otherwise the next psudo-random number from the current seed will be returned.
+
+	Returns the generated psudo-random number.
+*/
+size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand);
+
+/*!
+ *		int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength)
+ *
+ *		Reallocates the given string to be the new length.
+ *
+ *		Optionally it may do the following:
+ *			- If newLength is 0, it will only deallocate the given string.
+ *			- If newLength is greater than zero, but str is NULL or strLength is zero then,
+ *			  this function will only allocate a string of newLength bytes.
+ *			  (The string will be NULL filled.)
+ *			- If newLength and strLength is greater than zero, and str is non-NULL,
+ *			  then the data from str will be copied into the reallocated string as follows:
+ *				- If the newLength is less than the original length, then the data from str
+ *				  will be copied, but any bytes after newLength will be truncated.
+ *				- If the newLength is greater than or equal to the original length then,
+ *				  the entire original string will be copied.
+ *			In any instance, the reallocated string will be NULL terminated. (Even if the
+ *			string data must be altered to do so. In addition, the resulting string is always
+ *			newLength in size if this function is successful.)
+ *
+ *		Returns COMMON_ERROR_SUCCESS if successful.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer to pointer is NULL.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		In case of error, the given arguments will NOT be altered.
+ */
+int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength);
+
+/*!
+ *		void DataProcess_Deallocate_CString(char ** str)
+ *
+ *		Destructor function for C-Strings allocated by DataProcess.
+ *
+ *		WARNING: Giving an object or a C-String not allocated by DataProcess will cause
+ *		undefined behaviour.
+ *
+ *		If a given pointer is NULL, this function will silently fail.
+ *
+ *		This function has no return.
+ */
+void DataProcess_Deallocate_CString(char ** str);
+
+/*!
+		int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength)
+
+		Takes given size_t and outputs the equivalent string as a C-String.
+
+		WARNING: This function will NOT deallocate the given string if it is already allocated.
+		The pointer WILL be overwritten if this function returns success!
+		If you need to keep the pointer for later deallocation, copy it elsewhere before calling this function.
+
+		Returns COMMON_ERROR_SUCCESS if successful. str will point to a C-String with string equivalent to number in this case.
+		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
+		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+		Otherwise returns the appropriate error code.
+
+		In case of error, this function will not alter any given argument.
+*/
+int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength);
+
+/*!
+ *		int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t srcLength, const char * delim, const size_t delimLength,
+ *													char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
+ *
+ *		Basic delimiter based sub-string generation function.
+ *
+ *		Takes the given source string and looks for the first occurrence of the given delimiter string within it.
+ *		If the delimiter string is found, this function will produce a sub-string with either the remaining bytes in the
+ *		source string that come after the delimiter, or the bytes from the source string that came before the delimiter.
+ *
+ *		Optionally if searchFromEnd is non-zero, the search will start from the end of the source string instead of the beginning.
+ *
+ *		@pram getPriorData, Chooses the bytes that came before the delimiter or after the delimiter for generating the sub-string from.
+ *				If getPriorData is non-zero then the sub-string will contain the bytes before the delimiter, otherwise the sub-string will
+ *				contain the bytes after the delimiter.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the delimiter was found and a sub-string was created.
+ *		Returns COMMON_ERROR_RANGE_ERROR if the delimiter string was not found in the source string.
+ *		Returns COMMON_ERROR_END_OF_DATA if the delimiter string was found at the end of source string
+ *				with no data remaining to create the sub-string with. (subStr and subStrLength will NOT be altered in this case.)
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		No alteration clause:
+ *		In case of error, this function will not alter any given argument.
+ *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
+ *		 are considered errors.)
+ */
+int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t srcLength, const char * delim, const size_t delimLength,
+												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData);
+
+#ifdef __cplusplus
+}	/* End of extern "C". */
+#endif	/* __cplusplus */
+
+/* Only define the below with a CPP compiler. */
+#ifdef __cplusplus
 namespace DataProcess{
 
 class Data_Object{
@@ -250,19 +372,11 @@ class Data_Object{
 /*!
 	size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
 
-	This function generates psudo-random numbers based on the given max_value.
+	A wrapper around the DataProcess_Trivial_Random_Number_Generator() C function. (For compatibility.)
 
-	@pram min_value, the minimum value that is acceptable for the function to return.
-	@pram max_value, the maximum value that is acceptable for the function to return.
+	See DataProcess_Trivial_Random_Number_Generator()'s description for documentation.
 
-	E.x. If you want a range of 1 to 100 set min_value to 1 and max_value to 100.
-
-	By default this function returns a number between 0 and 255.
-
-	@pram reset_rand, if this is set to true, the rng will be re-seeded with the current time value returned by time(NULL).
-	Otherwise the next psudo-random number from the current seed will be returned. (Default)
-
-	Returns the generated psudo-random number.
+	Note: Default values for arguments are: min_value 0, max_value 255, reset_rand false.
 */
 MSYS_DLL_EXPORT size_t Trivial_Random_Number_Generator(const size_t & min_value = 0, const size_t & max_value = 255, const bool & reset_rand = false);
 
@@ -522,6 +636,8 @@ MSYS_DLL_EXPORT short RegularExpressionParser(const std::string & expression, co
 MSYS_DLL_EXPORT short RegularExpressionParser(const DataProcess::Data_Object & expression, const DataProcess::Data_Object & input, Panic::Panic_ERROR * error = NULL);
 }
 
-#endif
+#endif	/* __cplusplus */
 
-// End of DataProcess.h
+#endif	/* DATAPROCESS_H */
+
+/* End of DataProcess.h */

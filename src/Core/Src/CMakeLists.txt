@@ -10,9 +10,11 @@ add_library(Basic_Linked_List_Multiverse_Engine SHARED Basic_Linked_List.c)
 add_library(Basic_Linked_List_Multiverse_Engine_Static STATIC Basic_Linked_List.c)
 
 add_library(Core_Multiverse_Engine SHARED DataProcess.cpp
+DataProcess.c
 DataProcess_Endianness_Check.cpp
 FileStreams.cpp)
 add_library(Core_Multiverse_Engine_Static STATIC DataProcess.cpp
+DataProcess.c
 DataProcess_Endianness_Check.cpp
 FileStreams.cpp)
 target_link_libraries(Core_Multiverse_Engine Panic_Handler_Multiverse_Engine
