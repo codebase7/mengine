@@ -21,51 +21,61 @@
 /* Internal includes. */
 #include "FileUtills.h"
 #include "FileUtills_Private_API.h"
+#include "FileUtills_Private_API_Windows_Syscall.h"
 
 int FileUtills::ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize)
 {
-	// Init vars.
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;			// The result of this function.
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
 
-	// Make sure we got a valid path.
+	/* Make sure we got a valid path. */
 	if ((path != NULL) && ((*path) != NULL) && (pathSize != NULL) && ((*pathSize) > 0))
 	{ 
 		
 	}
 	else
 	{
-		// Invalid path.
+		/* Invalid path. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
-		// Log the error.
+		/* Log the error. */
 		COMMON_LOG_DEBUG("FileUtills_ResolveSystemSymoblicLink(): ");
 		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 		COMMON_LOG_DEBUG(" Given path argument is invalid.");
 	}
 
-	// Return the result.
+	/* Return the result. */
 	return ret;
 }
 
-int FileUtills::GetUserProfileDirectoryPath_Syscall(std::string & path)
+int FileUtills::GetUserProfileDirectoryPath_Syscall(char ** path, size_t * pathLength)
 {
-	// Init vars.
-	int ret = COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED;	// The result of this function.
+	/* Init vars. */
+	int ret = COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED;	/* The result of this function. */
+	_TCHAR * tempPath = NULL;							/* Temporary pointer for constructing the path. */
+	size_t tempPathLength = 0;							/* Temporary variable for storing the length of the path. */
 
-	
+	/* Check for invalid arguments. */
+	if ((path != NULL) && (pathLength != NULL))
+	{
 
-	// Return the result.
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Return the result. */
 	return ret;
 }
 
 int FileUtills::GetCurrentWorkingDirectoryPath_Syscall(std::string & path)
 {
-	// Init vars.
-	int ret = COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED;	// The result of this function.
+	/* Init vars. */
+	int ret = COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED;	/* The result of this function. */
 
-
-
-	// Return the result.
+	/* Return the result. */
 	return ret;
 }
 
@@ -129,26 +139,32 @@ int FileUtills::GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
 
 FileUtills::dirlist * FileUtills::getDirectory_Syscall(const std::string & absPath, const bool & cleanList)
 {
-	// Init vars.
-	int errcpy = 0;					// Used to fetch the error code.
-	FileUtills::dirlist * ret = NULL;		// The FileUtills directory structure.
-	std::string tempname = "";			// Used to store the filename / subdirectory name for the addToArray function.
-
-	// Dumb check.
+	/* Init vars. */
+	int errcpy = 0;					/* Used to fetch the error code. */
+	FileUtills::dirlist * ret = NULL;		/* The FileUtills directory structure. */
+	std::string tempname = "";			/* Used to store the filename / subdirectory name for the addToArray function. */
+	_TCHAR * tempPath = NULL;
+	
+	
+	_tfindfirst();	/* Find first file. */
+	_tfindnext();	/* Find next file. */
+	_tfindclose();	/* Release directory search handles and resources. */
+	
+	/* Dumb check. */
 	if (absPath.size() > 0)
 	{
 
-		// Allocate the dirlist.
+		/* Allocate the dirlist. */
 		try{
 			ret = new FileUtills::dirlist;
 			if (ret != NULL)
 			{
-				// Set the path.
+				/* Set the path.*/
 				ret->path = absPath;
 
-				// Dump the path as a c string into the Directory stream object......(Overly complicated POS......)
+				/* Dump the path as a c string into the Directory stream object......(Overly complicated POS......) */
 
-				// Check and make sure we can open the directory first.
+				/* Check and make sure we can open the directory first. */
 				if ((dp = (opendir(absPath.c_str()))) == NULL)
 				{
 					// Copy the error code, and translate it.
