@@ -177,65 +177,185 @@ int FileUtills_CheckPathType(const char * path, const size_t pathSize, bool * bI
 		return ret;
 }
 
+int FileUtills_Create_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
+	struct MSYS_FILESIZE_PRIV * realStr = NULL;	/* Temporary pointer for creation of structure. */
+
+	/* Check for invalid argument. */
+	if (str != NULL)
+	{
+		/* Allocate memory. */
+		realStr = (struct MSYS_FILESIZE_PRIV *)malloc(sizeof(struct MSYS_FILESIZE_PRIV));
+		if (realStr != NULL)
+		{
+			/* Blank out the structure. */
+			memset(realStr, '\0', sizeof(struct MSYS_FILESIZE_PRIV));
+
+			/* Set the type. */
 #ifdef _MSC_VER
-int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, __int64 * fileLength)
+			realStr->type = WINDOWS_FILESIZE_TYPE;
 #else
-int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, off_t * fileLength)
+			realStr->type = POSIX_FILESIZE_TYPE;
 #endif	/* _MSC_VER */
+
+			/* Copy the pointer. */
+			(*str) = (struct MSYS_FILESIZE *)realStr;
+
+			/* Done. */
+			ret = COMMON_ERROR_SUCCESS;
+		}
+		else
+		{
+			/* Could not allocate memory for structure. */
+			ret = COMMON_ERROR_MEMORY_ERROR;
+		}
+	}
+	else
+	{
+		/* Invalid argument. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+void FileUtills_Destroy_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
+{
+	/* Check for invalid argument. */
+	if ((str != NULL) && ((*str) != NULL))
+	{
+		/* Deallocate the structure. */
+		free((*str));
+		(*str) = NULL;
+	}
+
+	/* Exit function. */
+	return;
+}
+
+int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const struct MSYS_FILESIZE * str, long long int * retVal)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;				/* The result code of this function. */
+	const struct MSYS_FILESIZE_PRIV * realStr = NULL;	/* Temporary pointer for dereferencing of structure. */
+
+	/* Check for invalid argument. */
+	if ((str != NULL) && (retVal != NULL))
+	{
+		/* Reinterpret the struct. */
+		realStr = (const struct MSYS_FILESIZE_PRIV *)str;
+
+		/* Set retVal. */
+		(*retVal) = realStr->length;
+
+		/* Done. */
+		ret = COMMON_ERROR_SUCCESS;
+	}
+	else
+	{
+		/* Invalid argument. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(struct MSYS_FILESIZE * str, const long long int * val)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
+	struct MSYS_FILESIZE_PRIV * realStr = NULL;		/* Temporary pointer for dereferencing of structure. */
+
+	/* Check for invalid argument. */
+	if ((str != NULL) && (val != NULL))
+	{
+		/* Reinterpret the struct. */
+		realStr = (struct MSYS_FILESIZE_PRIV *)str;
+
+		/* Set length. */
+		realStr->length = (*val);
+
+		/* Done. */
+		ret = COMMON_ERROR_SUCCESS;
+	}
+	else
+	{
+		/* Invalid argument. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, struct MSYS_FILESIZE * fileLength)
 {
 		/* Init vars. */
 		int retFromC = 0;							/* The result from C calls. */
 		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
 		FILE * fp = NULL;							/* Pointer to the file. */
-#ifdef _MSC_VER
-		__int64 fileSize = 0;						/* Returned size from Get_File_Length(). (VC is special.) */
-#else
-		off_t fileSize = 0;							/* Returned size from Get_File_Length(). */
-#endif	/* _MSC_VER */
+		struct MSYS_FILESIZE * fileSize = NULL;		/* Returned size from Get_File_Length(). */
 
 		/* Check for invalid arguments. */
 		if ((filename != NULL) && (filenameSize > 0) && (fileLength != NULL))
 		{
+			/* Allocate memory for the size structure. */
+			ret = FileUtills_Create_MSYS_FILESIZE_Structure(&fileSize);
+			if (ret == COMMON_ERROR_SUCCESS)
+			{
 				/* Open the file. */
 				fp = fopen(filename, "rb");
 				if (fp != NULL)
 				{
-						/* Call correct function. */
-						ret = FileUtills_Get_File_Length(fp, &fileSize);
-						if (ret == COMMON_ERROR_SUCCESS)
+					/* Call correct function. */
+					ret = FileUtills_Get_File_Length(fp, fileSize);
+					if (ret == COMMON_ERROR_SUCCESS)
+					{
+						/* Close the file. */
+						retFromC = fclose(fp);
+						if (retFromC == 0)
 						{
-								/* Close the file. */
-								retFromC = fclose(fp);
-								if (retFromC == 0)
-								{
-										/* Copy the size. */
-										(*fileLength) = fileSize;
+							/* Copy the size. */
+							(*fileLength).length = (*fileSize).length;
 
-										/* SUCCESS. */
-										ret = COMMON_ERROR_SUCCESS;
-								}
-								else
-								{
-										/* Could not close the file. */
-										ret = COMMON_ERROR_IO_ERROR;
-								}
+							/* SUCCESS. */
+							ret = COMMON_ERROR_SUCCESS;
 						}
 						else
 						{
-								/* Close the file. */
-								retFromC = fclose(fp);
-								if (retFromC != 0)
-								{
-										/* Could not close the file. */
-										ret = COMMON_ERROR_IO_ERROR;
-								}
+							/* Could not close the file. */
+							ret = COMMON_ERROR_IO_ERROR;
 						}
+					}
+					else
+					{
+						/* Close the file. */
+						retFromC = fclose(fp);
+						if (retFromC != 0)
+						{
+							/* Could not close the file. */
+							ret = COMMON_ERROR_IO_ERROR;
+						}
+					}
 				}
 				else
 				{
-						/* Could not open file. */
-						ret = COMMON_ERROR_IO_ERROR;
+					/* Could not open file. */
+					ret = COMMON_ERROR_IO_ERROR;
 				}
+
+				/* Deallocate the fileSize structure. */
+				Destroy_MSYS_FILESIZE_Structure(&fileSize);
+			}
+			else
+			{
+				/* Could not allocate memory for the fileSize structure. */
+				ret = COMMON_ERROR_MEMORY_ERROR;
+			}
 		}
 		else
 		{
@@ -247,122 +367,142 @@ int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t f
 		return ret;
 }
 
-#ifdef _MSC_VER
-int FileUtills_Get_File_Length(FILE * fp, __int64 * fileLength)
-#else
-int FileUtills_Get_File_Length(FILE * fp, off_t  * fileLength)
-#endif	/* _MSC_VER */
+int FileUtills_Get_File_Length(FILE * fp, struct MSYS_FILESIZE * fileLength)
 {
-		/* Init vars. */
-		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
-		int retFromC = 0;							/* The result of C calls. */
-		fpos_t * previousLocation = NULL;			/* The location to restore us to at the end of the function. */
-#ifdef _MSC_VER
-		long long length = 0;						/* The size of the file. (Visual C is special.) */
-#else
-		off_t length = 0;							/* The size of the file. */
-#endif	/* _MSC_VER */
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+	int retFromC = 0;								/* The result of C calls. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of a call to an engine function. */
+	fpos_t * previousLocation = NULL;				/* The location to restore us to at the end of the function. */
+	long long int retFromGetPos = 0;				/* Result from the various calls to ftell*(). */
 
-		/* Check for invalid arguments. */
-		if ((fp != NULL) && (fileLength != NULL))
+	/* Check for invalid arguments. */
+	if ((fp != NULL) && (fileLength != NULL))
+	{
+		/* Check for errors. */
+		retFromC = ferror(fp);
+		if (retFromC == 0)
 		{
-				/* Check for errors. */
-				if (ferror(fp) != 0)
+			/* Allocate memory for fpos_t. */
+			previousLocation = (fpos_t *)malloc(sizeof(fpos_t));
+			if (previousLocation != NULL)
+			{
+				/* NULL out the previousLocation buffer. */
+				memset(previousLocation, '\0', sizeof(fpos_t));
+
+				/* Set previousLocation to a known value. */
+				(*previousLocation) = 0;
+
+				/* Get the current position. */
+				retFromC = fgetpos(fp, previousLocation);
+				if (retFromC == 0)
 				{
-						/* Get the current position. */
-						retFromC = fgetpos(fp, previousLocation);
-						if (retFromC == 0)
+					/* Go back to the beginining of the file. */
+					rewind(fp);
+
+					/* Begin loop to find the end of the file. */
+					while ((ferror(fp) == 0) && (feof(fp) == 0))
+					{
+						/* Get next char. */
+						retFromC = fgetc(fp);
+					}
+
+					/* OK, now figure out if we hit the end of the file or if we hit an error. */
+					retFromC = ferror(fp);
+					if (retFromC == 0)		/* No error. */
+					{
+						/* Check for eof. */
+						retFromC = feof(fp);
+						if (retFromC != 0)		/* Hit EOF. */
 						{
-								/* Go back to the beginining of the file. */
-								rewind(fp);
-
-								/* Begin loop to find the end of the file. */
-								while ((ferror(fp) == 0) && (feof(fp) == 0))
-								{
-										/* Get next char. */
-										retFromC = fgetc(fp);
-								}
-
-								/* OK, now figure out if we hit the end of the file or if we hit an error. */
-								retFromC = ferror(fp);
-								if (retFromC == 0)		/* No error. */
-								{
-										/* Check for eof. */
-										retFromC = feof(fp);
-										if (retFromC != 0)		/* Hit EOF. */
-										{
-												/* Get the end of file position. */
+							/* Get the end of file position. */
 #ifdef _MSC_VER
-												length = _ftelli64(fp);	/* Visual C is special. */
+							retFromGetPos = _ftelli64(fp);	/* Visual C is special. */
 #else
-												length = ftello(fp);
+							retFromGetPos = ftello(fp);
 #endif	/* _MSC_VER */
-												if ((length != -1) && (length >= 0))
-												{
-														/* Set success. */
-														ret = COMMON_ERROR_SUCCESS;
-												}  
-												else
-												{
-														/* Check and see if the error is EOVERFLOW. */
-														if ((ret == -1) && (errno == EOVERFLOW))
-														{
-																/* This is a memory error, as we can't store the result. */
-																ret = COMMON_ERROR_MEMORY_ERROR;
-														}
-														else
-														{
-																/* OK, yet another IO_ERROR. */
-																ret = COMMON_ERROR_IO_ERROR;
-														}
-												}
-										}
-										else
-										{
-												/* We hit a file stream error. */
-												ret = COMMON_ERROR_IO_ERROR;
-										}
+							if ((retFromGetPos == -1) || (retFromGetPos < 0))
+							{
+								/* Check and see if the error is EOVERFLOW. */
+								if ((retFromGetPos == -1) && (errno == EOVERFLOW))
+								{
+									/* This is a memory error, as we can't store the result. */
+									ret = COMMON_ERROR_MEMORY_ERROR;
 								}
 								else
 								{
-										/* We hit a file stream error. */
-										ret = COMMON_ERROR_IO_ERROR;
+									/* OK, yet another IO_ERROR. */
+									ret = COMMON_ERROR_IO_ERROR;
 								}
-
-								/* Clear the error status, and reset the file position. */
-								clearerr(fp);
-								retFromC = fsetpos(fp, previousLocation);
-								if ((retFromC == 0) && (length >= 0) && (ret == COMMON_ERROR_SUCCESS))
-								{
-										/* Copy the length to the size_t value. */
-										(*fileLength) = length;
-								}
-								else
-								{
-										/* File stream error. */
-										ret = COMMON_ERROR_IO_ERROR;
-								}
+							}
 						}
 						else
 						{
-								/* Could not get current file position. */
-								ret = COMMON_ERROR_IO_ERROR;
+							/* We hit a file stream error. */
+							ret = COMMON_ERROR_IO_ERROR;
 						}
+					}
+					else
+					{
+						/* We hit a file stream error. */
+						ret = COMMON_ERROR_IO_ERROR;
+					}
+
+					/* Clear the error status, and reset the file position. */
+					clearerr(fp);
+					retFromC = fsetpos(fp, previousLocation);
+					if ((retFromC == 0) && (tempSize->length >= 0))
+					{
+						/* Copy the length to the given MSYS_FILESIZE structure. */
+						retFromCall = FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(fileLength, retFromGetPos);
+						if (retFromCall == COMMON_ERROR_SUCCESS)
+						{
+							/* Set success. */
+							ret = COMMON_ERROR_SUCCESS;
+						}
+						else
+						{
+							/* Internal engine error. */
+							ret = COMMON_ERROR_INTERNAL_ERROR;
+							COMMON_LOG_DEBUG("FileUtills_Get_File_Length(): Could not copy file length to management structure.");
+						}
+					}
+					else
+					{
+						/* File stream error. */
+						ret = COMMON_ERROR_IO_ERROR;
+					}
 				}
 				else
 				{
-						/* File stream has errored out. */
-						ret = COMMON_ERROR_IO_ERROR;
+					/* Could not get current file position. */
+					ret = COMMON_ERROR_IO_ERROR;
 				}
-		}
-		else 
-		{
-				/* Invalid arguments. */
-				ret = COMMON_ERROR_INVALID_ARGUMENT;
-		}
 
-		/* Exit function. */
-		return ret;
+				/* Free previousLocation. */
+				free(previousLocation);
+				previousLocation = NULL;
+			}
+			else
+			{
+				/* Could not allocate memory for fpos_t buffer. */
+				ret = COMMON_ERROR_MEMORY_ERROR;
+			}
+		}
+		else
+		{
+			/* File stream has errored out. */
+			ret = COMMON_ERROR_IO_ERROR;
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
 }
 
 int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * dataBuf, const size_t dataBufLength, const size_t destStaringOffset, const bool blankDataBuf)
