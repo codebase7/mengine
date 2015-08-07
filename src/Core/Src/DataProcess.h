@@ -18,11 +18,14 @@
     https://github.com/codebase7/mengine
 */
 
+/* Include guard. */
 #ifndef DATAPROCESS_H
 #define DATAPROCESS_H
 
+/* Internal includes. */
 #include "BaseHeader.h"
 #include "Panic.h"
+#include "DataProcess_Endianness_Check.h"
 
 namespace DataProcess{
 
