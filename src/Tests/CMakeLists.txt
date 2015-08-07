@@ -5,11 +5,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${O_OUTPUT_DIR})
 # Define Unit Tests base includes.
 set (UNIT_TESTS_INCLUDES_BASE Unit_Tests.cpp)
 
-# We may make Core an optional subsystem in the future.
+# We may make Core and Byte_Order an optional subsystem in the future.
 set (UNIT_TESTS_INCLUDES ${UNIT_TESTS_INCLUDES_BASE} 
 Test_Base_Header.cpp
 Unit_Test_Data_Object.cpp 
-Unit_Test_Data_Object_Insert_Char.cpp)
+Unit_Test_Data_Object_Insert_Char.cpp
+Unit_Test_Byte_Order.cpp)
 
 # Only build the tests for the subsystems that are enabled.
 if (BUILD_COMMON_ERROR_HANDLER)
