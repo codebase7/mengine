@@ -278,6 +278,33 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
 int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength);
 
 /*!
+ *		int FileUtills_Get_File_Name_Component(const char * path, const size_t pathLength, char ** retStr, size_t * retStrLength, 
+ *												const int getExtension)
+ *
+ *		Fetches the file name or extension from the given path and creates a sub-string from it.
+ *
+ *		(This is a wrapper around DataProcess_Get_SubString_Using_Delimiter(), and as such has similar error codes.)
+ *
+ *		@pram getExtension whether or not to get the file extension. If set to zero the file name will be put into the sub-string,
+ *							otherwise the file extension will be put into the sub-string.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the file name / extension was found and a sub-string was created.
+ *		Returns COMMON_ERROR_RANGE_ERROR if the path is a path without an name / extension.
+ *		Returns COMMON_ERROR_END_OF_DATA if the path is a path with an extension separator ('.') (on the end / at the beginning)
+ *				 and nothing (before / after) it.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Returns COMMON_ERROR_INTERNAL_ERROR if a call to an engine function fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		No alteration clause:
+ *		In case of error, this function will not alter any given argument.
+ *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
+ *		 are considered errors.)
+ */
+int FileUtills_Get_File_Name_Component(const char * path, const size_t pathLength, char ** retStr, size_t * retStrLength, const int getExtension);
+
+/*!
  * 	int FileUtills_GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize)
  *
  * 	Fetches the user's profile directory from the environment, and stores
