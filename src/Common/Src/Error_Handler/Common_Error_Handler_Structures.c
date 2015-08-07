@@ -98,10 +98,14 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{FILEUTILLS_ERROR_PATH_FILE_AS_DIRECTORY, "The path has a file in it that is being treated as a directory."},
 	{FILEUTILLS_ERROR_PATH_IS_A_FILE, "Given path is a file."},
 	{FILEUTILLS_ERROR_PATH_IS_A_DIRECTORY, "Given path is a directory."},
+	{FILEUTILLS_ERROR_PATH_IS_A_SYMLINK, "Given path is a symbolic link."},
+	{FILEUTILLS_ERROR_PATH_IS_ABSOLUTE, "Given path is in absolute format (Fully resolved)."},
+	{FILEUTILLS_ERROR_PATH_IS_RELATIVE, "Given path is in relative format (Needs resolving)."},
 	{FILEUTILLS_ERROR_FILESYSTEM_FULL, "Given filesystem is full."},
 	{FILEUTILLS_ERROR_FILESYSTEM_QUOTA_REACHED, "User's disk usage quota for the given filesystem has been reached."},
 	{FILEUTILLS_ERROR_EMPTY_DIRECTORY, "The given path is an empty directory."},
 	{FILEUTILLS_ERROR_NON_EMPTY_DIRECTORY, "The given path is a non-empty directory."},
+	{FILEUTILLS_ERROR_SYMLINK_CHAIN_TOO_DEEP, "While parsing a host-defined symbolic link chain, the host system indicated the link chain was longer than what it supports."},
 	// UI Subsystem/
 	{UI_SUBSYSTEM_ERROR_EXCEPTION_THROWN, "An exception was thrown in the UI Subsystem."},
 	// TODO: Need to add the error codes from all common namespace functions.
