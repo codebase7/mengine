@@ -551,6 +551,230 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 		return ret;
 }
 
+int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const struct MSYS_FILESIZE * fileStartingOffset, const size_t dataLength)
+{
+		/* Init vars. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
+		int retFromC = 0;							/* The result of C calls. */
+		struct MSYS_FILESIZE * inFileLength = NULL;	/* The size of the input file. */
+		FILE * IN = NULL;							/* The input file. */
+		char * inputBuf = NULL;						/* Memory buffer used for reading in data from a file. NOT on the stack! Bad input can follow! */
+		size_t remainingLength = 0;					/* Used to calculate remaining bytes to write in output loop. */
+		size_t x = 0;								/* Counter used in I/O loop. */
+		size_t y = 0;								/* Counter used in Input Loop and Output Loop. */
+		long long int realStartOffset = 0;			/* The position to start writing data into the file at. */
+
+		/* Check for invalid arguments. */
+		if ((OUT != NULL) && (ferror(OUT) == 0) && (filename != NULL) && (filenameLength > 0) && (fileStartingOffset != NULL) && (fileStartingOffset->length >= 0) && (dataLength > 0))
+		{
+			/* Allocate memory for the filesize structures. */
+			ret = FileUtills_Create_MSYS_FILESIZE_Structure(&inFileLength);
+			if (ret == COMMON_ERROR_SUCCESS)
+			{
+				/* Open the input file. */
+				IN = fopen(filename, "rb");
+				if (IN != NULL)
+				{
+					/* Get the length of the input file. */
+					ret = FileUtills_Get_File_Length(IN, inFileLength);
+
+					/* Make sure we got a valid file length and that the length of the file is big enough to store the data we want. */
+					if ((ret == COMMON_ERROR_SUCCESS) && (inFileLength->length > 0) && ((((unsigned)(fileStartingOffset->length)) + dataLength) <= ((unsigned)(inFileLength->length))))
+					{
+						/* Reset ret. */
+						ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+						/* Get the starting offset. */
+						retFromCall = FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(fileStartingOffset, realStartOffset);
+						if (retFromCall == COMMON_ERROR_SUCCESS)
+						{
+							/* Skip to the starting offset. */
+#ifdef _MSC_VER	/* VC is special */
+							retFromC = _fseeki64(IN, realStartOffset, SEEK_SET);
+#else
+							retFromC = fseeko64(IN, realStartOffset, SEEK_SET);
+#endif	/* _MSC_VER */
+							if (retFromC == 0)
+							{
+								/* Allocate input buffer. */
+								inputBuf = (char*)malloc(IO_BUF_SIZE);
+								if (inputBuf != NULL)
+								{
+									/* Begin I/O loop. */
+									for (x = 0; ((x < dataLength) && (!ferror(IN)) && (!feof(IN)) && (!ferror(OUT)));)
+									{
+										/* Determine if the remaining data to read in is less than the buffer size. */
+										remainingLength = (dataLength - x);
+										if (remainingLength >= IO_BUF_SIZE)
+										{
+											/* Set remaining length to the buffer size. */
+											remainingLength = IO_BUF_SIZE;
+										}
+
+										/* Begin input loop. */
+										for (y = 0; ((y < remainingLength) && (!ferror(IN)) && (!feof(IN))); y++)
+										{
+											/* Read in the remaining data. */
+											retFromC = fgetc(IN);
+											inputBuf[y] = retFromC;
+										}
+
+										/* Check for successful read. */
+										if ((!ferror(IN)) && (!feof(IN)))
+										{
+											/* OK, begin the output loop. */
+											for (y = 0; ((y < remainingLength) && (!ferror(OUT))); y++)
+											{
+												/* Output the current buffer. */
+												fputc(inputBuf[y], OUT);
+											}
+
+											/* Check for successful output. */
+											if (!ferror(OUT))
+											{
+												/* OK, flush the buffer. */
+												retFromC = fflush(OUT);
+												if (retFromC == 0)
+												{
+													/* OK, add the remaining amount to x. */
+													x = (x + remainingLength);
+												}
+												else
+												{
+													/* Could not flush the buffer. */
+													ret = COMMON_ERROR_IO_ERROR;
+
+													/* Log error. */
+													COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not flush output buffer data to output file.\n");
+												}
+											}
+											else
+											{
+												/* Bad output file stream. */
+												ret = COMMON_ERROR_IO_ERROR;
+
+												/* Log error. */
+												COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not write data to output file.\n");
+											}
+										}
+										else
+										{
+											/* Bad input file stream. */
+											ret = COMMON_ERROR_IO_ERROR;
+
+											/* Log error. */
+											COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not read data from input file.\n");
+										}
+									}
+
+									/* Deallocate the input memory buffer. */
+									if (inputBuf != NULL)
+									{
+										free(inputBuf);
+										inputBuf = NULL;
+									}
+
+									/* Check for success. */
+									if ((ret == COMMON_ERROR_UNKNOWN_ERROR) && (!ferror(IN)) && (!feof(IN)) && (!ferror(OUT)))
+									{
+										/* Success! */
+										ret = COMMON_ERROR_SUCCESS;
+									}
+									else
+									{ 
+										/* Check for and log IO errors. */
+										if (ret == COMMON_ERROR_IO_ERROR)
+										{
+											/* Log error. */
+											COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): File I/O Error.\n");
+										}
+									}
+								}
+								else
+								{
+									/* Could not allocate memory for input buffer. */
+									ret = COMMON_ERROR_MEMORY_ERROR;
+
+									/* Log error. */
+									COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for input buffer.\n");
+								}
+							}
+							else
+							{
+								/* Bad file stream. */
+								ret = COMMON_ERROR_IO_ERROR;
+
+								/* Log error. */
+								COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not seek to starting offset.\n");
+							}
+						}
+						else
+						{
+							/* Could not get starting offset. */
+							ret = COMMON_ERROR_INTERNAL_ERROR;
+							
+							/* Log error. */
+							COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not get starting offset from management structure.");
+						}
+					}
+					else
+					{
+						/* Invalid input file. */
+						ret = COMMON_ERROR_IO_ERROR;
+
+						/* Log error. */
+						COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not get input file length or input file is empty.\n");
+					}
+
+					/* Close the input file. */
+					retFromC = fclose(IN);
+					if ((retFromC != 0) && (ret != COMMON_ERROR_IO_ERROR))
+					{
+						/* Could not close the input file. */
+						ret = COMMON_ERROR_IO_ERROR;
+
+						/* Log error. */
+						COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not close input file ( ");
+						COMMON_LOG_DEBUG(filename);
+						COMMON_LOG_DEBUG(" ).\n");
+					}
+				}
+				else
+				{
+					/* Could not open input file. */
+					ret = COMMON_ERROR_IO_ERROR;
+
+					/* Log error. */
+					COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not open input file ( ");
+					COMMON_LOG_DEBUG(filename);
+					COMMON_LOG_DEBUG(" ).\n");
+				}
+				
+				/* Deallocate inFileLength. */
+				FileUtills_Destroy_MSYS_FILESIZE_Structure(&inFileLength);
+			}
+			else
+			{
+				/* Could not allocate memory for the inFileLength structure. */
+				ret = COMMON_ERROR_MEMORY_ERROR;
+
+				/* Log error. */
+				COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for MSYS_FILESIZE structure.\n");
+			}
+		}
+		else
+		{
+			/* Invalid arguments. */
+			ret = COMMON_ERROR_INVALID_ARGUMENT;
+
+			/* Log error. */
+			COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Invalid argument.\n");
+		}
+
+		/* Exit function. */
+		return ret;
+}
+
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
 {
 		/* Init vars. */

@@ -232,6 +232,35 @@ int FileUtills_Get_File_Length(FILE * fp, struct MSYS_FILESIZE * fileLength);
 int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * dataBuf, const size_t dataBufLength, const size_t destStaringOffset, const bool blankDataBuf);
 
 /*!
+ *		int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const struct MSYS_FILESIZE * fileStartingOffset, const size_t dataLength)
+ *
+ *		Opens the given input file in binary mode and jumps to the given starting offset,
+ *		then reads the given amount of data and writes it directly to the given output file,
+ *		finally it closes the input file.
+ *
+ *		NOTE: This function expects that the given output file is already open and not errored out when called.
+ *		The output file will remain open after the function returns. (It will still be usable if the returned error code is SUCCESS.)
+ *
+ *		The output position of the file will NOT be restored in ANY instance after this function returns.
+ *		If you need the current position for something, copy it elsewhere before calling this function.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the data is written to the output file successfully.
+ *
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given output file pointer is NULL,
+ *		the given output file has errored out prior to the function call,
+ *		filename is NULL, filenameLength is less than 1, fileStartingOffset is less than 0,
+ *		or dataLength is less than 1.
+ *
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *
+ *		Returns COMMON_ERROR_IO_ERROR on all f*() errors, or if the end of the file is hit prior to reading
+ *		the amount of requested data.
+ *
+ *		Otherwise returns the appropriate error code.
+ */
+int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const struct MSYS_FILESIZE * fileStartingOffset, const size_t dataLength);
+
+/*!
  *		int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
  *
  *		Writes out the given data in memory to the given output file.
