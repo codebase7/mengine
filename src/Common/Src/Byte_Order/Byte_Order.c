@@ -26,6 +26,83 @@
 extern "C" {
 #endif	/* __cplusplus */
 
+int Byte_Order_Bit_Comparison(const char * byte, const char bitMask, const char bitValues)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code of this function. */
+
+	/* 10000000 wanna check the first two bits, how?
+
+		11000000 <-- Bit mask of bits to actually check.
+
+		10 <-- What the two bits should be.
+
+		Do two comparisons. (One for the set (1) bits and one for the unset (0) bits.
+
+		bits should be: BINARY AND		BITMASK.		BITS THAT ARE ACTUALLY SET TO CHECK.
+		(1000000)			&	       (11000000)		= (1000000)
+
+		BITWISE NOT bits should be:	Inverted what bits should be.
+		~           (1000000)		= (01111111)
+
+		Inverted what bits should be:	BINARY AND	 BITMASK.			BITS THAT ARE NOT SET TO CHECK.
+		(01111111)							&		 (11000000)			= (0100000)
+
+		BITS TO CHECK.	BINARY AND	BITS THAT ARE SET TO CHECK.				(Comparison one result)
+		(10000000)			&		(1000000)								= SUCCESS. (1000000)
+
+		Inverted BITS TO CHECK.	BINARY AND	BITS THAT ARE NOT SET TO CHECK.	 (Comparison two result)
+		(01111111)			&		(0100000)								= SUCCESS. (0100000)
+
+		(Comparison one result) BINARY INCLUSIVE OR (Comparison two result)			(Result of both comparisons)
+		(1000000)						|				(0100000)				=	(11000000)
+
+		BITMASK		BINARY AND	(Result of both comparisons)	Final result
+		(11000000)		&			(11000000)					= SUCCESS (11000000)
+
+	*/
+
+	/* Check for invalid arguments. */
+	if (byte != NULL)
+	{
+		/* Check for all value comparison. */
+		/*ret = (bitMask == UCHAR_MAX) ?
+			/* Simple equality check, we only need to check for an exact match. Otherwise continue comparison on the next line. /
+			(((*byte) == bitValues) ? COMMON_ERROR_COMPARISON_PASSED : COMMON_ERROR_COMPARISON_FAILED) : \
+			/* HARDCODED CHECK: If both bitValues and byte are zero,
+			and bitMask is non-zero we need to return true. Otherwise continue on the next line. /
+			((((*byte) == 0) && (bitValues == 0)) ? ((bitMask != 0) ? COMMON_ERROR_COMPARISON_PASSED : COMMON_ERROR_COMPARISON_FAILED) : \
+			/* Because it's not a simple equality check, Do first comparison. (Set (1) bits.) /
+			((((*byte) & (bitValues & bitMask)) && ((~(*byte)) & ((~bitValues) & bitMask))) ?
+			/* Do the second comparison. (Unset (0) bits.) /
+			 COMMON_ERROR_COMPARISON_PASSED : COMMON_ERROR_COMPARISON_FAILED));*/
+		if (bitMask == UCHAR_MAX)
+		{
+			ret = ((*byte) == bitValues) ? COMMON_ERROR_COMPARISON_PASSED : COMMON_ERROR_COMPARISON_FAILED;
+		}
+		else
+		{
+			if (((*byte) == 0) && (bitValues == 0))
+			{
+				ret = (bitMask != 0) ? COMMON_ERROR_COMPARISON_PASSED : COMMON_ERROR_COMPARISON_FAILED;
+			}
+			else
+			{
+				ret = ((((*byte) & (bitValues & bitMask)) | ((~(*byte)) & ((~bitValues) & bitMask))) & bitMask) ?
+				COMMON_ERROR_COMPARISON_PASSED : COMMON_ERROR_COMPARISON_FAILED;
+			}
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 int Common_Byte_Swap(char * data, const size_t dataLength)
 {
 		/* Init ret. */

@@ -53,6 +53,49 @@ extern "C" {
 #include <string.h>	/* Defines memset(), memcpy(). */
 
 /*!
+ *		int Byte_Order_Bit_Comparison(const char * byte, const char bitMask, const char bitValues)
+ *
+ *		Compares the given byte's bits to the given bitValues using bitMask to define what bits to compare.
+ *
+ *		I.e. This function compares bits to see if they are equal, using the bitMask to determine what
+ *		bits to actually compare.
+ *
+ *		Example: If bitMask is 11000000, then only the first two bits are checked. So to make a truth table:
+ *
+ *		byte:		bitMask:	bitValues:		Result:
+ *		11000000	11000000	11000000		TRUE	(The checked values in byte and bitValues are identical.)
+ *		10000000	11000000	10000000		TRUE	(The checked first and second bits are identical.)
+ *		01110010	00110010	10110010		TRUE	(The checked 3rd, 4th, and 7th bits are identical.)
+ *		11000100	11000000	11000000		TRUE	(Extra bit in byte is not checked.)
+ *		11000000	11000000	11000100		TRUE	(Extra bit in bitValues is not checked.)
+ *		01000000	11000000	11000000		FALSE	(byte does not match bitValues.)
+ *		11000000	11000000	10000000		FALSE	(bitValues does not match byte.)
+ *		00000000	00000000	00000000		FALSE	(No bits are defined to check.)
+ *		00000000	00110010	00000000		TRUE	(Third, forth, and 7th bits are identical.
+ *														 (Hardcoded zero check, for consistancy with other results.))
+ *		00000000	11111111	00000000		TRUE	(Checking all bits, byte and bitValues are both zero.
+ *														 (Hardcoded zero check, for consistancy with other results.))
+ *
+ *		A note about checking for zero bits:
+ *		For consistancy with the other results, in the event an all zero byte and bitValues is given
+ *		to this function, a hard coded check is inserted to return COMMON_ERROR_COMPARISON_PASSED if
+ *		the given bitMask is not equal to zero. Otherwise it returns COMMON_ERROR_COMPARISON_FAILED.
+ *		This contradicts what would be expected from a binary AND operation and callers of this
+ *		function should therefore be aware of it and check for this result.
+ *		(Normally, a binary AND operation on an all zero set of operands would give a FALSE result.
+ *		 The best antidote I can give to deal with this function's inconsistancy is:
+ *		 It checks the given bits to see if they match, if given to a non-programmer, what would they
+ *		 think the result should be?
+ *		 Answer: (0 == 0) is TRUE, so the function should return TRUE.")
+ *
+ *		Returns COMMON_ERROR_COMPARISON_PASSED if the checked bits match.
+ *		Returns COMMON_ERROR_COMPARISON_FAILED if the checked bits do NOT match.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer to char is invalid.
+ *		Otherwise returns the approperite error code.
+ */
+MSYS_DLL_EXPORT int Byte_Order_Bit_Comparison(const char * byte, const char bitMask, const char bitValues);
+
+/*!
  *		int Common_Byte_Swap(char * data, const size_t dataLength)
  *
  *		Swaps the given bytes by swapping each byte
