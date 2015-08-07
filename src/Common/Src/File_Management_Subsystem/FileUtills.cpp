@@ -778,46 +778,55 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
 {
 		/* Init vars. */
-		int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of this function. */
-		int retFromC = 0;						/* The result of C calls. */
-		size_t x = 0;							/* Counter used in output loop. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
+		int retFromC = 0;							/* The result of C calls. */
+		size_t x = 0;								/* Counter used in output loop. */
 
 		/* Check for invalid arguments. */
-		if ((OUT != NULL) && (ferror(OUT) == 0) && (data != NULL) && (dataLength > 0))
+		if ((OUT != NULL) && (!ferror(OUT)) && (data != NULL) && (dataLength > 0))
 		{
 				/* Begin output loop. */
-				for (x = 0; ((x < dataLength) && (retFromC == 0) && (ferror(OUT) == 0)); x++)
+				for (x = 0; ((x < dataLength) && (!ferror(OUT))); x++)
 				{
 						/* Write out the data. */
-						retFromC = fputc(data[x], OUT);
+						fputc(data[x], OUT);
 				}
 
 				/* Check for good file stream. */
-				if ((retFromC == 0) && (ferror(OUT) == 0))
+				if (!ferror(OUT))
 				{
 						/* Flush the buffer. */
 						retFromC = fflush(OUT);
-						if ((retFromC == 0) && (ferror(OUT) == 0))
+						if ((retFromC == 0) && (!ferror(OUT)))
 						{
-								/* Done! */
-								ret = COMMON_ERROR_SUCCESS;
+							/* Done! */
+							ret = COMMON_ERROR_SUCCESS;
 						}
 						else
 						{
-								/* Bad file stream. */
-								ret = COMMON_ERROR_IO_ERROR;
+							/* Bad file stream. */
+							ret = COMMON_ERROR_IO_ERROR;
+
+							/* Log error. */
+							COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_Memory(): Could not flush remaining output file data to disk.\n");
 						}
 				}
 				else
 				{
-						/* Bad file stream. */
-						ret = COMMON_ERROR_IO_ERROR;
+					/* Bad file stream. */
+					ret = COMMON_ERROR_IO_ERROR;
+
+					/* Log error. */
+					COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_Memory(): Could not write data to file.\n");
 				}
 		}
 		else
 		{
-				/* Invalid arguments. */
-				ret = COMMON_ERROR_INVALID_ARGUMENT;
+			/* Invalid arguments. */
+			ret = COMMON_ERROR_INVALID_ARGUMENT;
+
+			/* Log error. */
+			COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_Memory(): Invalid argument.\n");
 		}
 
 		/* Exit function. */
