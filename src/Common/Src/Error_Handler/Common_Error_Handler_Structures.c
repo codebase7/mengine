@@ -74,6 +74,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{COMMON_ERROR_CANNOT_GET_SYSTEM_TIME, "Could not get the system's current time."},
 	{COMMON_ERROR_SUBSYSTEM_OBJECT_NOT_INITED, "Given object has not been inited yet."},
 	{COMMON_ERROR_SUBSYSTEM_OBJECT_ALREADY_INITED, "Given object has already been inited."},
+	{COMMON_ERROR_END_OF_DATA, "There is no remaining data to process."},
 	// Rendering Subsystem error codes.
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF, "Could not allocate memory for overlay image buffer."},
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF, "Could not allocate memory for transparency data buffer."},

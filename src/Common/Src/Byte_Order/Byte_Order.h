@@ -149,6 +149,20 @@ MSYS_DLL_EXPORT int Common_Print_Bytes_In_Hex(const char * data, const size_t da
  */
 MSYS_DLL_EXPORT int Common_Print_Bytes_In_Binary(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes);
 
+/*!
+* 		int Common_Print_Bytes_In_Decimal(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize,
+* 										const bool spaceBetweenBytes)
+*
+* 		Wrapper function around Common_Print_Bytes_To_CString() for converting a byte string to a human-readable decimal string.
+* 		Example output: ("10012" if spacing is disabled, "10 0 12" if spacing is enabled.)
+*
+* 		Note: This function is to make calls shorter, if you want more control over the output, call Common_Print_Bytes_To_CString() directly.
+*
+* 		All arguments and return values are identical to their Common_Print_Bytes_To_CString() counterparts. See Common_Print_Bytes_To_CString()
+* 		for their descriptions.
+*/
+MSYS_DLL_EXPORT int Common_Print_Bytes_In_Decimal(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes);
+
 #ifdef __cplusplus
 }	/* extern "C" */
 #endif	/* __cplusplus */

@@ -72,7 +72,7 @@ int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, ch
 		char outputValue = '\0';							/* The value that we need to write into the output buffer. (Calculated from currentValue.) */
 		char * outputBuffer = NULL;							/* Pointer to the c-string that will be outputted to the standard output. */
 		char * previousOutputBuffer = NULL;					/* Temporary pointer used to copy previously generated data into the current outputBuffer. */
-		const char outputValues[17] = "0123456789ABCDEF";	/* C-String used to map a generated value to it's corrosponding character. */
+		const char outputValues[17] = "0123456789ABCDEF";	/* C-String used to map a generated value to it's corresponding character. */
 		size_t outputBufferSize = 1;						/* Current size of the outputBuffer. Set to one by default to allow the string to be NULL terminated. */
 
 		/* Check for invalid arguments. */
@@ -122,8 +122,8 @@ int Common_Print_Bytes_To_CString(const char * data, const size_t dataLength, ch
 										/* Increment byte value count. */
 										byteValueCount++;
 
-										/* Get the next value by choping off the "ones place", aka devide by the current base. */
-										currentByte /= base;
+										/* Get the next value by chopping off the "ones place", aka divide by the current base. */
+										currentByte /= (unsigned char)base;
 								}
 								else
 								{
@@ -244,6 +244,11 @@ int Common_Print_Bytes_In_Hex(const char * data, const size_t dataLength, char *
 int Common_Print_Bytes_In_Binary(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes)
 {
 		return Common_Print_Bytes_To_CString(data, dataLength, retStr, retStrSize, 2, 8, '0', spaceBetweenBytes);
+}
+
+int Common_Print_Bytes_In_Decimal(const char * data, const size_t dataLength, char ** retStr, size_t * retStrSize, const bool spaceBetweenBytes)
+{
+		return Common_Print_Bytes_To_CString(data, dataLength, retStr, retStrSize, 10, 8, '0', spaceBetweenBytes);
 }
 
 #ifdef __cplusplus
