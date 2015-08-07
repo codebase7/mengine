@@ -121,6 +121,20 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
 	return ret;
 }
 
+void DataProcess_Deallocate_CString(char ** str)
+{
+	/* Check for invalid arguments. */
+	if ((str != NULL) && ((*str) != NULL))
+	{
+		/* Deallocate (*str) and set it to NULL. */
+		free((*str));
+		(*str) = NULL;
+	}
+
+	/* Exit function. */
+	return;
+}
+
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	__cplusplus

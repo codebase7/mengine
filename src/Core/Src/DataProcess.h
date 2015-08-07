@@ -79,6 +79,20 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
  */
 int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength);
 
+/*!
+ *		void DataProcess_Deallocate_CString(char ** str)
+ *
+ *		Destructor function for C-Strings allocated by DataProcess.
+ *
+ *		WARNING: Giving an object or a C-String not allocated by DataProcess will cause
+ *		undefined behaviour.
+ *
+ *		If a given pointer is NULL, this function will silently fail.
+ *
+ *		This function has no return.
+ */
+void DataProcess_Deallocate_CString(char ** str);
+
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	/* __cplusplus */
