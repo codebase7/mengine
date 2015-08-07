@@ -23,6 +23,8 @@
 #define COMMON_UNIT_TESTS_H
 
 /* Include headers from Common. (If needed.) */
+#include "Unit_Tests_Byte_Order.h"
+
 #ifdef MSYS_HAVE_FILEUTILLS
 #include "Unit_Tests_FileUtills.h"
 #endif	/* MSYS_HAVE_FILEUTILLS */
