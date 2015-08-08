@@ -3,7 +3,7 @@ set(LIBRARY_OUTPUT_PATH ${L_OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${O_OUTPUT_DIR})
 
 # Set default includes.
-set(FILEUTILLS_INCLUDES FileUtills.cpp FileUtills_Private_API.cpp)
+set(FILEUTILLS_INCLUDES FileUtills.cpp FileUtills_Private_API.cpp FileUtills_Private_API.c)
 
 # Set system specific includes.
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")

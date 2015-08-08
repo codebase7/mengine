@@ -23,43 +23,8 @@
 
 int FileUtills::IsAbsolutePathReference(const char * path, const size_t pathSize)
 {
-	// Init vars.
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;		// Result of this function.
-
-	// Check for a valid arguments.
-	if ((path != NULL) && (pathSize > 0))
-	{
-		// Check for a valid string.
-		if (path[0] == '/')	// Posix style path.
-		{
-			// Valid Posix style path.
-			ret = FILEUTILLS_ERROR_PATH_IS_ABSOLUTE;
-		}
-		else
-		{
-			// Check for a Windows / DOS style path.
-			if ((pathSize > 2) && (path[0] != '\0') && (path[1] == ':') && (path[2] == '\\'))
-			{
-				// Valid Windows / DOS style path.
-				ret = FILEUTILLS_ERROR_PATH_IS_ABSOLUTE;
-			}
-			else
-			{
-				// Path is not absolute.
-				ret = FILEUTILLS_ERROR_PATH_IS_RELATIVE;
-			}
-		}
-	}
-	else
-	{
-		// Invalid pointer.
-		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_VERBOSE("FileUtills_IsAbsolutePathReference(): ");
-		COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-	}
-
-	// Return the result.
-	return ret;
+	/* Call C function. */
+	return (FileUtills_IsAbsolutePathReference(path, pathSize));
 }
 
 int FileUtills::IsAbsolutePathReference(const char * path, const size_t pathSize, char ** absRef, size_t * absRefSize)

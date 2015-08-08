@@ -57,19 +57,10 @@ enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX
 #endif	/* _MSC_VER */
 } MSYS_FILESIZE_PRIV_T;
 
-#ifdef __cplusplus
-} /* End of extern C. */
-#endif	/* __cplusplus */
-
-
-/* Only define the namespace if using a C++ compiler. */
-#ifdef __cplusplus
-
-// Namespace definition.
-namespace FileUtills{
+/* Define C functions. */
 
 /*!
- * 	int FileUtills::IsAbsolutePathReference(const char * path, const size_t pathSize)
+ * 	int FileUtills_IsAbsolutePathReference(const char * path, const size_t pathSize)
  *
  * 	This function checks the given path to see if it's beginning is in
  * 	absolute path reference form.
@@ -90,6 +81,25 @@ namespace FileUtills{
  * 	above, then this function will return FILEUTILLS_ERROR_PATH_IS_RELATIVE.
  *
  * 	If any error occurs then, this function will return the appropriate error code.
+ */
+int FileUtills_IsAbsolutePathReference(const char * path, const size_t pathSize);
+
+#ifdef __cplusplus
+} /* End of extern C. */
+#endif	/* __cplusplus */
+
+
+/* Only define the namespace if using a C++ compiler. */
+#ifdef __cplusplus
+
+// Namespace definition.
+namespace FileUtills{
+
+/*!
+ * 	int FileUtills::IsAbsolutePathReference(const char * path, const size_t pathSize)
+ *
+ * 	This function is a wrapper around FileUtills_IsAbsolutePathReference().
+ *	See that function above for the documentation.
  */
 int IsAbsolutePathReference(const char * path, const size_t pathSize);
 
