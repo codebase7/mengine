@@ -2142,71 +2142,52 @@ int FileUtills::CheckParent(const std::string & path, const bool & read, const b
 	return result;
 }
 
-std::string FileUtills::GetParent(const std::string & path)
+int FileUtills_GetParent(char ** retStr, size_t * retStrLength)
 {
-    // Init vars.
-    std::string parentbuffer = "";
-    size_t length = 0;
-    size_t location = 0;
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of a engine function call. */
+	char * tempStr = NULL;							/* Temporary pointer for the given c-string argument to work with. */
+	size_t tempStrLength = 0;						/* Temporary size_t for the given length argument to work with. */
 
-#ifdef POSIX_COMMON_H
-    // Remove the trailing slash if present.
-    parentbuffer = RemoveTrailingSlash(path);
+	/* Check for invalid arguments. */
+	if ((retStr != NULL) && ((*retStr) != NULL) && (retStrLength != NULL))
+	{
+		/* Copy the pointer and length. */
+		tempStr = (*retStr);
+		tempStrLength = (*retStrLength);
 
-    // Check the Path for absolute path.
-    parentbuffer = FileUtills::ResolvePath(parentbuffer);
+		/* Call FileUtills_ResolvePath(). */
+		retFromCall = FileUtills_ResolvePath(&tempStr, &tempStrLength);
+		if (retFromCall == COMMON_ERROR_SUCCESS)
+		{
+			/* Call FileUtills_Get_Last_Path_Component(). */
+			ret = FileUtills_Get_Last_Path_Component(&tempStr, &tempStrLength, true);
+			if (ret == COMMON_ERROR_SUCCESS)
+			{
+				/* Copy the pointer and length. */
+				(*retStr) = tempStr;
+				(*retStrLength) = tempStrLength;
+			}
+		}
+		else
+		{
+			/* Could not resolve the given path. */
+			ret = COMMON_ERROR_INTERNAL_ERROR;
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
-    // Check the length of the path.
-    length = parentbuffer.length();
+		/* Log error. */
+		COMMON_LOG_DEBUG("DEBUG: FileUtills_GetParent(): ");
+		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+	}
 
-    // Check and see if the length is zero.
-    if (length == 0)
-    {
-        // Nothing to do so return that the path does not exist. (It clearly does not exist.)
-        parentbuffer = "";
-        return parentbuffer;
-    }
-
-    // Locate the path seperator before the last directory / file name.
-    location = parentbuffer.find_last_of(DIR_SEP);
-
-    // Check and make sure that the location of the dir sep is inside the string
-    if (location > length || length < 0 ||  location < 0)
-    {
-        // Memory error or someone is fucking with us.
-        // Either way kill the function
-        parentbuffer = "";
-        return parentbuffer;
-    }
-
-    // Check and see if the parentbuffer is a root directory
-    if (length > 1)
-    {
-        // Get the parent directory path.
-        // Note substr CAN throw an exception. so we need to put this in a try catch block.
-        try{
-            parentbuffer = parentbuffer.substr(0, location);
-        }
-        catch(exception &ex)
-        {
-            // If we end up here we're in trouble.
-            // Kill the function to be safe.
-            parentbuffer = "";
-            return parentbuffer;
-        }
-
-        // Now rerun the check for a dir sep on the end.
-        parentbuffer = RemoveTrailingSlash(parentbuffer);
-
-        // Exit function.
-        return parentbuffer;
-
-    }
-#endif
-  // arch / OS not supported.
-  parentbuffer = "";
-  return parentbuffer;
-
+	/* Exit function. */
+	return ret;
 }
 
 int FileUtills::DeletePath(const std::string & path, const bool & recursive)

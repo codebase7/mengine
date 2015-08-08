@@ -473,19 +473,23 @@ int FileUtills_IsFileOrDirectory(const char * path, const size_t pathSize);
 int FileUtills_CheckParent(const char * path, const size_t pathSize, const bool read, const bool write, const bool exec);
 
 /*!
-	int FileUtills_GetParent(char ** retStr, size_t * retStrSize)
+	int FileUtills_GetParent(char ** retStr, size_t * retStrLength)
 
 	Returns the parent directory for the given file.
 
-	Gets the path exactly like FileUtills_CheckParent().
+	This function is now a wrapper for FileUtills_Get_Last_Path_Component() with getParent set to true.
 
-	Returns COMMON_ERROR_SUCCESS with parent directory path set in retStr if successful.
+	WARNING: This function will NOT deallocate the given c-string argument (*retStr). If this function returns COMMON_ERROR_SUCCESS,
+	the given c-string pointer (*retStr) will be overwritten with a pointer to the newly created sub-string. If you need to deallocate
+	the original c-string, copy the pointer elsewhere before calling this function.
+
+	Returns COMMON_ERROR_SUCCESS with parent directory path set in retStr, and length of retStr set in retStrLength if successful.
 	(retStr's size will be set in retStrSize.)
 	
-	Returns the appropriate error code otherwise.
-	(retStr and retStrSize will NOT be altered in this case.)
+	Returns the appropriate error code otherwise. (See error code description for FileUtills_Get_Last_Path_Component() for error codes.)
+	(retStr and retStrLength will NOT be altered in this case.)
 */
-int FileUtills_GetParent(char ** retStr, size_t * retStrSize);
+int FileUtills_GetParent(char ** retStr, size_t * retStrLength);
 
 /*!
 	int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution)
