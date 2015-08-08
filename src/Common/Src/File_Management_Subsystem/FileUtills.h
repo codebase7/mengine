@@ -284,7 +284,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength);
 
 /*!
- *		int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength, const int getParent)
+ *		int FileUtills_Get_Last_Path_Component(char ** retStr, size_t * retStrLength, const int getParent)
  *
  *		Fetches the last part of the given path and creates a sub-string from it.
  *
@@ -295,6 +295,10 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
  *
  *		@pram getParent: If set to a non-zero value, then the parent path of the last path component will be used for the sub-string.
  *		Otherwise, the last path component will be used for the sub-string.
+ *
+ *		WARNING: This function will NOT deallocate the given c-string argument (*retStr). If this function returns COMMON_ERROR_SUCCESS,
+ *		the given c-string pointer (*retStr) will be overwritten with a pointer to the newly created sub-string. If you need to deallocate
+ *		the original c-string, copy the pointer elsewhere before calling this function.
  *
  *		Returns COMMON_ERROR_SUCCESS if the last path component (or parent path) was found and a sub-string was created.
  *		Returns COMMON_ERROR_RANGE_ERROR if the path is a relative path without any directory components.
@@ -310,7 +314,7 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
  *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
  *		 are considered errors.)
  */
-int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength, const int getParent);
+int FileUtills_Get_Last_Path_Component(char ** retStr, size_t * retStrLength, const int getParent);
 
 /*!
  *		int FileUtills_Get_File_Name_Component(const char * path, const size_t pathLength, char ** retStr, size_t * retStrLength, 

@@ -868,7 +868,7 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
 		return ret;
 }
 
-int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength, const int getParent)
+int FileUtills_Get_Last_Path_Component(char ** retStr, size_t * retStrLength, const int getParent)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
@@ -878,10 +878,10 @@ int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLengt
 	size_t cleanedPathLength = 0;				/* Length of the cleanedPath string. */
 
 	/* Check for invalid arguments. */
-	if ((path != NULL) && (pathLength > 0) && (component != NULL) && (componentLength != NULL))
+	if ((retStr != NULL) && ((*retStr) != NULL) && (retStrLength != NULL) && ((*retStrLength) > 0))
 	{
 		/* Allocate memory for the cleanedPath string. */
-		cleanedPathLength = pathLength;
+		cleanedPathLength = (*retStrLength);
 		cleanedPath = (char *)malloc(cleanedPathLength);
 		if (cleanedPath != NULL)
 		{
@@ -889,7 +889,7 @@ int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLengt
 			memset(cleanedPath, '\0', cleanedPathLength);
 
 			/* Copy the given path to cleanedPath. */
-			memcpy(cleanedPath, path, cleanedPathLength);
+			memcpy(cleanedPath, (*retStr), cleanedPathLength);
 
 			/* Call FileUtills_RemoveTrailingSlash(). (Path had to be copied as this function will reallocate the path if it needs to.) */
 			ret = FileUtills_RemoveTrailingSlash(&cleanedPath, &cleanedPathLength);
@@ -904,8 +904,8 @@ int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLengt
 				if ((ret == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL) && (tempSubStrLength > 0))
 				{
 					/* Copy the pointer and length. */
-					(*component) = tempSubStr;
-					(*componentLength) = tempSubStrLength;
+					(*retStr) = tempSubStr;
+					(*retStrLength) = tempSubStrLength;
 
 					/* Done. */
 					ret = COMMON_ERROR_SUCCESS;
