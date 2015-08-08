@@ -18,12 +18,34 @@
     https://github.com/codebase7/mengine
 */
 
-// Include guard.
+/* Include guard. */
 #ifndef FILEUTILLS_PRIVATE_API_H
 #define FILEUTILLS_PRIVATE_API_H
 
-// External includes.
-#include <string.h>
+/* External includes. */
+/* Define extern C. */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+
+#ifdef __cplusplus
+} /* End of extern C. */
+#endif	/* __cplusplus */
+
+#ifdef __cplusplus
+/* C++ specific external includes. */
+#include <cstring>
+#endif	/* __cplusplus */
+
+/* End of external includes. */
+
+/* Define extern C. */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
 
 /* Define the internal MSYS_FILESIZE_PRIV structure. */
 typedef struct MSYS_FILESIZE_PRIV {
@@ -34,6 +56,14 @@ enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX
 		off_t	length;		/* Length of the file. */
 #endif	/* _MSC_VER */
 } MSYS_FILESIZE_PRIV_T;
+
+#ifdef __cplusplus
+} /* End of extern C. */
+#endif	/* __cplusplus */
+
+
+/* Only define the namespace if using a C++ compiler. */
+#ifdef __cplusplus
 
 // Namespace definition.
 namespace FileUtills{
@@ -895,6 +925,8 @@ int DeletePath_Syscall(const std::string & absPath);
 int RenamePath_Syscall(const std::string & absPathSrc, const std::string & absPathDest, const bool & dereferenceSymLinks = true);
 };
 
-#endif	// FILEUTILLS_PRIVATE_API_H
+#endif	/* __cplusplus */
 
-// End of FileUtills_Private_API.h
+#endif	/* FILEUTILLS_PRIVATE_API_H */
+
+/* End of FileUtills_Private_API.h */
