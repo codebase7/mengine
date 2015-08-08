@@ -868,7 +868,7 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
 		return ret;
 }
 
-int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength)
+int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength, const int getParent)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
@@ -899,7 +899,8 @@ int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLengt
 				ret = DataProcess_Get_SubString_Using_Delimiter(cleanedPath, cleanedPathLength, DIR_SEP_STR,
 					/* (Note: DIR_SEP_STR is NULL terminated, so we are subtracting one from the length of the delimiter.) */
 					((DIR_SEP_STR[(sizeof(DIR_SEP_STR) - 1)] == '\0') ? (sizeof(DIR_SEP_STR) - 1) : (sizeof(DIR_SEP_STR))),
-					&tempSubStr, &tempSubStrLength, true, false);
+					/* If getParent is non-zero then we need to return the parent path, otherwise we need to only return the last path component. */
+					&tempSubStr, &tempSubStrLength, true, (getParent ? true : false));
 				if ((ret == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL) && (tempSubStrLength > 0))
 				{
 					/* Copy the pointer and length. */

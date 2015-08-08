@@ -284,13 +284,19 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength);
 
 /*!
- *		int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength)
+ *		int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength, const int getParent)
  *
  *		Fetches the last part of the given path and creates a sub-string from it.
  *
+ *		Alternatively, this function can be used to return a sub-string with the parent path of the last path component,
+ *		if getParent is set to a non-zero value.
+ *
  *		(This is a wrapper around DataProcess_Get_SubString_Using_Delimiter(), and as such has similar error codes.)
  *
- *		Returns COMMON_ERROR_SUCCESS if the last path component was found and a sub-string was created.
+ *		@pram getParent: If set to a non-zero value, then the parent path of the last path component will be used for the sub-string.
+ *		Otherwise, the last path component will be used for the sub-string.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if the last path component (or parent path) was found and a sub-string was created.
  *		Returns COMMON_ERROR_RANGE_ERROR if the path is a relative path without any directory components.
  *		Returns COMMON_ERROR_END_OF_DATA if the path is a directory with directory separator on the end. 
  *										 (This should be stripped off by this function if needed, but may still be returned.)
@@ -304,7 +310,7 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
  *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
  *		 are considered errors.)
  */
-int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength);
+int FileUtills_Get_Last_Path_Component(const char * path, const size_t pathLength, char ** component, size_t * componentLength, const int getParent);
 
 /*!
  *		int FileUtills_Get_File_Name_Component(const char * path, const size_t pathLength, char ** retStr, size_t * retStrLength, 
