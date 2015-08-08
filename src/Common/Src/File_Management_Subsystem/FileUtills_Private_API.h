@@ -84,33 +84,15 @@ enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX
  */
 int FileUtills_IsAbsolutePathReference(const char * path, const size_t pathSize);
 
-#ifdef __cplusplus
-} /* End of extern C. */
-#endif	/* __cplusplus */
-
-
-/* Only define the namespace if using a C++ compiler. */
-#ifdef __cplusplus
-
-// Namespace definition.
-namespace FileUtills{
-
 /*!
- * 	int FileUtills::IsAbsolutePathReference(const char * path, const size_t pathSize)
- *
- * 	This function is a wrapper around FileUtills_IsAbsolutePathReference().
- *	See that function above for the documentation.
- */
-int IsAbsolutePathReference(const char * path, const size_t pathSize);
-
-/*!
- * 	int FileUtills::IsAbsolutePathReference(const char * path, const size_t pathSize, char ** absRef, size_t * absRefSize)
+ * 	int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pathSize, char ** absRef, size_t * absRefLength)
  *
  * 	This function checks the given path to see if it's beginning is in
- * 	absolute path reference form. This version also copies the found
- * 	absolute path reference to the given absRef argument if applicable.
+ * 	absolute path reference form. This function also copies the found
+ * 	absolute path reference to the given absRef argument if absRef and
+ *	absRefLength are non-NULL.
  *
- * 	Note: This function expects absRefSize to point to a valid size_t
+ * 	WARNING: This function expects absRefLength to point to a valid size_t
  * 	variable when it is called. (This function will NOT allocate it.)
  * 	absRef will be allocated by this function, but will NOT deallocate
  * 	any pre-existing pointer. (As such you should deallocate it yourself
@@ -131,16 +113,43 @@ int IsAbsolutePathReference(const char * path, const size_t pathSize);
  * 	checked is stored in absRef as per above.
  * 	 E.x. On DOS / Windows systems: "<Drive Letter>:\" on all
  * 	other systems this will be set to "/".)
- * 	absRefSize will be set to the length of the absRef string.
+ * 	absRefLength will be set to the length of the absRef string.
  *
  * 	If the given path is NOT in absolute path reference form as defined
  * 	above, then this function will return FILEUTILLS_ERROR_PATH_IS_RELATIVE,
- * 	the absRef string and absRefSize variables will NOT BE ALTERED.
+ * 	the absRef string and absRefLength variables will NOT BE ALTERED.
  *
  * 	If any error occurs then, this function will return the appropriate error code,
- * 	the absRef string and absRefSize variables will NOT BE ALTERED.
+ * 	the absRef string and absRefLength variables will NOT BE ALTERED.
  */
-bool IsAbsolutePathReference(const char * path, std::string & absRef);
+int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pathSize, char ** absRef, size_t * absRefLength);
+
+#ifdef __cplusplus
+} /* End of extern C. */
+#endif	/* __cplusplus */
+
+
+/* Only define the namespace if using a C++ compiler. */
+#ifdef __cplusplus
+
+// Namespace definition.
+namespace FileUtills{
+
+/*!
+ * 	int FileUtills::IsAbsolutePathReference(const char * path, const size_t pathSize)
+ *
+ * 	This function is a wrapper around FileUtills_IsAbsolutePathReference().
+ *	See that function above for the documentation.
+ */
+int IsAbsolutePathReference(const char * path, const size_t pathSize);
+
+/*!
+ * 	int FileUtills::IsAbsolutePathReference(const char * path, const size_t pathSize, char ** absRef, size_t * absRefLength)
+ *
+ *	This function is a wrapper around FileUtills_IsAbsolutePathReference_absRef().
+ *	See that function above for the documentation.
+ */
+int IsAbsolutePathReference(const char * path, const size_t pathSize, char ** absRef, size_t * absRefLength);
 
 /*!
  * 	int FileUtills::GetPathSegment(const std::string & path, const size_t & currentPathPos, std::string & pathSegment, const bool & blankPathSegment)
