@@ -27,7 +27,7 @@
 
 /* Check for MSVC. */
 #ifdef _MSC_FULL_VER
-#include "..\stdbool.h"	/* bool. (MSVC is special.) */
+#include "..\..\..\stdbool.h"	/* bool. (MSVC is special.) */
 #else
 #include <stdbool.h>	// bool.
 #endif	/* _MSC_FULL_VER */
