@@ -20,6 +20,7 @@
     https://github.com/codebase7/mengine
 */
 
+/* Internal includes. */
 #include "Panic.h"
 
 std::string Panic::Panic_ERROR::ReturnLastError() const
@@ -30,7 +31,7 @@ std::string Panic::Panic_ERROR::ReturnLastError() const
 std::string Panic::Panic_ERROR::PanicHandler(const std::string & message, const int & moduleID, const unsigned int & log_level, const bool & killengine)
 {
         // Init vars.
-        fstream old_log_file;
+        std::fstream old_log_file;
         std::string temp_path = "";
         size_t size = 0;
 
@@ -41,7 +42,7 @@ std::string Panic::Panic_ERROR::PanicHandler(const std::string & message, const 
                 this->LastError = "PanicHandler : No error message specified";
 
                 // Print error to stdout
-                cout << "PanicHandler : No error message specified" <<"\n\n";
+                std::cout << "PanicHandler : No error message specified" <<"\n\n";
 
                 // Check and see if we need to die.
                 if (killengine == true)
@@ -85,7 +86,7 @@ std::string Panic::Panic_ERROR::PanicHandler(const std::string & message, const 
                 this->LastError += message;
 
                 // Print error to stdout.
-                cout << "\nPanicHandler: " << this->LastError <<"\n\n";
+				std::cout << "\nPanicHandler: " << this->LastError.c_str() <<"\n\n";
         }
 
         // Check and see if logging is enabled.
@@ -105,21 +106,21 @@ std::string Panic::Panic_ERROR::PanicHandler(const std::string & message, const 
                                 {
                                         // Reset the log line count and reset file position.
                                         this->currentLogLine = 0;
-                                        this->logfile.seekp(0, ios::beg);
-                                        this->logfile.seekg(0, ios::beg);
+                                        this->logfile.seekp(0, std::ios::beg);
+                                        this->logfile.seekg(0, std::ios::beg);
 
                                         // Create old file name.
                                         temp_path = this->pathToLogFile;
                                         temp_path += ".old";
 
                                         // Try to open the file.
-                                        old_log_file.open(temp_path.c_str(), ios::in | ios::out | ios::trunc);
+                                        old_log_file.open(temp_path.c_str(), std::ios::in | std::ios::out | std::ios::trunc);
                                         if (old_log_file.is_open())
                                         {
                                                     // Compute the size of the old log file.
-                                                    this->logfile.seekg(0, ios::end);
+                                                    this->logfile.seekg(0, std::ios::end);
                                                     size = this->logfile.tellg();
-                                                    this->logfile.seekg(0, ios::beg);
+                                                    this->logfile.seekg(0, std::ios::beg);
 
                                                     // Copy the old log file.
                                                     for(size_t x = 0; x < size; x++)
@@ -136,7 +137,7 @@ std::string Panic::Panic_ERROR::PanicHandler(const std::string & message, const 
 
                                         // Close the log_file and attempt to reopen it.
                                         this->logfile.close();
-                                        this->logfile.open(this->pathToLogFile.c_str(), ios::in | ios::out | ios::trunc);
+                                        this->logfile.open(this->pathToLogFile.c_str(), std::ios::in | std::ios::out | std::ios::trunc);
                                         if(!this->logfile.is_open())
                                         {
                                                 // Could not open log file, disable logging.
@@ -155,7 +156,7 @@ std::string Panic::Panic_ERROR::PanicHandler(const std::string & message, const 
                                 }
 
                                 // Write the log entry.
-                                this->logfile << this->LastError << '\n';
+                                this->logfile << this->LastError.c_str() << '\n';
 
                                 // Flush the output buffer.
                                 this->logfile.flush();
@@ -202,7 +203,7 @@ short Panic::Panic_ERROR::enable_logging(const std::string & path_to_logfile, co
         }
 
         // Attempt to open the file.
-        this->logfile.open(path_to_logfile.c_str(), ios::in | ios::out | ios::trunc);
+        this->logfile.open(path_to_logfile.c_str(), std::ios::in | std::ios::out | std::ios::trunc);
         if (this->logfile.is_open() == false)
         {
                 // Could not open log file.
@@ -287,7 +288,7 @@ unsigned int Panic::Panic_ERROR::get_current_log_line() const
         return this->currentLogLine;
 }
 
-void Panic::FileStream_Status(Panic::Panic_ERROR & error, fstream & stream, const unsigned int & log_level)
+void Panic::FileStream_Status(Panic::Panic_ERROR & error, std::fstream & stream, const unsigned int & log_level)
 {
         // Output status header.
         error.PanicHandler("FileStream_Status:", ERROR_ID, log_level);

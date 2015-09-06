@@ -30,5 +30,3 @@
 #include <stdlib.h>
 #include <vector>
 #include <climits>
-
-using namespace std;
