@@ -23,14 +23,25 @@
 #define DATAPROCESS_H
 
 /* Internal includes. */
-#include "BaseHeader.h"
 #include "Panic.h"
-#include "DataProcess_Endianness_Check.h"
+#if _MSC_FULL_VER && _MSC_FULL_VER < 180031101
+/* Visual C++ 2013 introduced support for C99's _Bool. Anything lower than that has to use our fake bool header. */
+#include "../../stdbool.h"
+#else
+/* Use the built in bool data type. */
+#include <stdbool.h>
+#endif	/* _MSC_FULL_VER 180021005 */
 
 /* Define extern "C". */
 #ifdef __cplusplus
 extern "C" {
 #endif	/* __cplusplus */
+
+/* External includes. */
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 /* Define C functions. */
 /*!
@@ -149,6 +160,17 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 
 /* Only define the below with a CPP compiler. */
 #ifdef __cplusplus
+
+/* Internal includes. */
+#include "DataProcess_Endianness_Check.h"
+
+/* External includes. */
+#include <iostream>
+#include <sstream>
+#include <string.h>
+#include <vector>
+
+/* Define DataProcess namespace. */
 namespace DataProcess{
 
 class Data_Object{
@@ -409,7 +431,7 @@ MSYS_DLL_EXPORT short IncrementingSort(std::vector<std::string> & sort);
 MSYS_DLL_EXPORT short DecrementingSort(std::vector<std::string> & sort);
 
 /*!
-    bool DataProcess::CheckForEOF(fstream & source)
+    bool DataProcess::CheckForEOF(std::fstream & source)
 
     Checks the given file stream for eof (End of File) status and returns the result.
 
@@ -419,7 +441,7 @@ MSYS_DLL_EXPORT short DecrementingSort(std::vector<std::string> & sort);
     Returns true if the fstream is at EOF. (End of File)
     Returns false otherwise. (Note: This function will return false if the fstream has failed. (i.e source.fail() == true).)
 */
-MSYS_DLL_EXPORT bool CheckForEOF(fstream & source);
+MSYS_DLL_EXPORT bool CheckForEOF(std::fstream & source);
 
 /*!
     GenerateUID(long int length)

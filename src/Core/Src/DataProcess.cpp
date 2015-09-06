@@ -144,7 +144,7 @@ short DataProcess::IncrementingSort(std::vector<std::string> & sort)
                 }
                 catch (...)
                 {
-                        // Exception thrown.
+                        // std::exception thrown.
                         return -9;
                 }
         }
@@ -269,7 +269,7 @@ short DataProcess::DecrementingSort(std::vector<std::string> & sort)
                 }
                 catch (...)
                 {
-                        // Exception thrown.
+                        // std::exception thrown.
                         return -9;
                 }
         }
@@ -278,7 +278,7 @@ short DataProcess::DecrementingSort(std::vector<std::string> & sort)
         return 0;
 }
 
-bool DataProcess::CheckForEOF(fstream & source)
+bool DataProcess::CheckForEOF(std::fstream & source)
 {
         // Init vars.
         size_t current_pos = 0;         // Used to store current pos.
@@ -296,7 +296,7 @@ bool DataProcess::CheckForEOF(fstream & source)
                 current_pos = source.tellg();
 
                 // Seek to the end of the file.
-                source.seekg(0, ios::end);
+                source.seekg(0, std::ios::end);
 
                 // Compare positions.
                 if (current_pos == (unsigned)source.tellg())
@@ -306,7 +306,7 @@ bool DataProcess::CheckForEOF(fstream & source)
                 }
 
                 // Seek back to the original position.
-                source.seekg(current_pos, ios::beg);
+                source.seekg(current_pos, std::ios::beg);
         }
 
         // Exit function and return the result.
@@ -397,7 +397,7 @@ double DataProcess::getnumberFromString(std::string source, std::string varName,
 	}
 
 	// Look for the varName.
-	if (source.find(varName) == string::npos)
+	if (source.find(varName) == std::string::npos)
 	{
 		error.PanicHandler("DataProcess::getnumberFromString : Can't find varName in string. Returning default 0.");
 		real_limiter = "";
@@ -423,56 +423,56 @@ double DataProcess::getnumberFromString(std::string source, std::string varName,
 			if (temp2 == "1")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == "2")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == "3")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == "4")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == "5")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == "6")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == "7")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == "8")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == "9")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == "0")
 			{
 				temp1 = temp1 += temp2;
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 			}
 			if (temp2 == real_limiter)
 			{
-				cout <<temp1 <<endl;
+				std::cout << temp1 << std::endl;
 				number_found = true;
 			}
 			if (temp2 == ".")
@@ -480,7 +480,7 @@ double DataProcess::getnumberFromString(std::string source, std::string varName,
 				if (isdecimal == true)
 				{
 					temp1 = temp1 += temp2;
-					cout <<temp1 <<endl;
+					std::cout << temp1 << std::endl;
 				}
 				if (isdecimal == false)
 				{
@@ -494,12 +494,12 @@ double DataProcess::getnumberFromString(std::string source, std::string varName,
 		}
 	}
 
-	// Check for exception, if thrown return 0. otherwise return result.
+	// Check for std::exception, if thrown return 0. otherwise return result.
 	try{
-        istringstream (temp1) >> output;
+        std::istringstream (temp1) >> output;
 	}
-	catch(exception& ex){
-        cout << "\n ERROR: DataProcess::getnumberFromString() Exception: " << ex.what() << "\n Clearing data buffer and returning zero.\n\n";
+	catch(std::exception& ex){
+        std::cout << "\n ERROR: DataProcess::getnumberFromString() std::exception: " << ex.what() << "\n Clearing data buffer and returning zero.\n\n";
 
 	// Guess what? we found bullshit. we can't clear it now so dump the buffer and exit.
 		error.PanicHandler("DataProcess::getnumberFromString : Can't convert number string back to double.");
@@ -512,7 +512,7 @@ double DataProcess::getnumberFromString(std::string source, std::string varName,
 	    real_location = 0;
 	    sourceSize = 0;
 	}
-	cout <<" the result is: " <<output <<endl;
+	std::cout << " the result is: " << output << std::endl;
 	return output;
 }
 
@@ -520,14 +520,14 @@ int DataProcess::getIntFromInput()
 {
 	int number = 0;
 	std::string dummy = "";
-	cin >> number;
-	getline(cin, dummy);    	// cin appends a end line char, so we use this to get rid of it. other wise it will show up on the next cin op.
-	if (cin.fail() == true) 	// If this goes true user has inputed a non int.
+	std::cin >> number;
+	getline(std::cin, dummy);    	// std::cin appends a end line char, so we use this to get rid of it. other wise it will show up on the next std::cin op.
+	if (std::cin.fail() == true) 	// If this goes true user has inputed a non int.
 	{
-		cout << " invalid data \n ";
+		std::cout << " invalid data \n ";
 		// Fix the buffer.
-		cin.clear();
-		getline(cin, dummy);
+		std::cin.clear();
+		getline(std::cin, dummy);
 	}
 	return number;
 }
@@ -540,7 +540,7 @@ bool DataProcess::yesNoConsolePrompt()
 
         // Prompt user.
         std::cout << "(YES or NO) (Must be in CAPS): ";
-        getline(cin, dummy);
+        getline(std::cin, dummy);
 
         // Check result, if user said YES then return true.
         if (dummy == "YES")
@@ -563,7 +563,7 @@ bool DataProcess::getboolFromstring(std::string source, std::string varName, cha
 	std::string searchString = "";
 
 	// Look for the var name
-	if (source.find(varName) == string::npos)
+	if (source.find(varName) == std::string::npos)
 	{
 		// If varname is not found in the string return default.
 		error.PanicHandler("DataProcess::getboolFromstring : Varname not found.");
@@ -580,11 +580,11 @@ bool DataProcess::getboolFromstring(std::string source, std::string varName, cha
 	{
 		delimiterReal = '\n';
 	}
-	if (source.find(delimiterReal, location1) == string::npos)
+	if (source.find(delimiterReal, location1) == std::string::npos)
 	{
 		location2 = -1;
 	}
-	if (source.find('\n', location1) == string::npos)
+	if (source.find('\n', location1) == std::string::npos)
 	{
 		location2 = -1;
 	}
@@ -599,24 +599,24 @@ bool DataProcess::getboolFromstring(std::string source, std::string varName, cha
 		searchString = source;
 	}
 // Debug
-	cout << searchString <<endl;
+	std::cout << searchString << std::endl;
 
 
 
 // Look for the var.
-	if (searchString.find("true") == string::npos && searchString.find("True") == string::npos)
+	if (searchString.find("true") == std::string::npos && searchString.find("True") == std::string::npos)
 	{
 		foundTrue = 0;
 	}
-	if (searchString.find( "True") != string::npos || searchString.find("true") != string::npos)
+	if (searchString.find( "True") != std::string::npos || searchString.find("true") != std::string::npos)
 	{
 		foundTrue = 1;
 	}
-	if (searchString.find("false") != string::npos || searchString.find("False") != string::npos)
+	if (searchString.find("false") != std::string::npos || searchString.find("False") != std::string::npos)
 	{
 		foundFalse = 1;
 	}
-	if (searchString.find("false") == string::npos && searchString.find("False") == string::npos)
+	if (searchString.find("false") == std::string::npos && searchString.find("False") == std::string::npos)
 	{
 		foundFalse = 0;
 	}
@@ -677,7 +677,7 @@ long DataProcess::ConvertToBinary(int input)
   }
 
 
-  cout <<"Outputbuffer  = " <<outputbuffer[inputcounter] <<endl <<endl;
+  std::cout <<"Outputbuffer  = " <<outputbuffer[inputcounter] << std::endl << std::endl;
   return 0;
 }
 
@@ -1156,7 +1156,7 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
                         // Begin main loop.
                         try{
                             // Output first number.
-                            cout << "0 ";
+                            std::cout << "0 ";
 
                             // Begin loop.
                             for(size_t output_count = 1; output_count < length; output_count++)
@@ -1164,7 +1164,7 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
                                     for (unsigned short x = 0; x < 10; x++)
                                     {
                                             // Output the output_count.
-                                            cout << output_count;
+                                            std::cout << output_count;
 
                                             // Check and see if the current count is changing colloms.
                                             if ((output_count%10) == 0)
@@ -1181,14 +1181,14 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
 
                                                     for (size_t y = 1; y <= collem_count; y++)
                                                     {
-                                                            cout << " ";
+                                                            std::cout << " ";
                                                     }
                                             }
                                             else
                                             {
                                                     for (size_t y = 1; y <= collem_count; y++)
                                                     {
-                                                            cout << " ";
+                                                            std::cout << " ";
                                                     }
                                             }
 
@@ -1196,7 +1196,7 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
                                             if ((output_count%10) == 0)
                                             {
                                                     // Output newline.
-                                                    cout << "\n";
+                                                    std::cout << "\n";
                                             }
                                     }
 
@@ -1205,7 +1205,7 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
                         catch(...)
                         {
                                 // Flush buffer.
-                                cout.flush();
+                                std::cout.flush();
                         }
                 }
 
@@ -1217,22 +1217,22 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
                             {
                                     if (memory_format == true)
                                     {
-                                            cout << data[x] << " ";
+                                            std::cout << data[x] << " ";
                                     }
                                     else
                                     {
-                                            cout << data[x];
+                                            std::cout << data[x];
                                     }
                             }
                             else
                             {
                                     if (memory_format == true)
                                     {
-                                            cout << '.' << " ";
+                                            std::cout << '.' << " ";
                                     }
                                     else
                                     {
-                                            cout << '.';
+                                            std::cout << '.';
                                     }
                             }
                             if (memory_format == true)
@@ -1240,7 +1240,7 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
                                     if (x%15 == 0)
                                     {
                                             // Print current line.
-                                            cout << (x/15) << "\n";
+                                            std::cout << (x/15) << "\n";
                                     }
                             }
                     }
@@ -1250,10 +1250,10 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
                         // Some error.
 
                         // Flush console buffer.
-                        cout.flush();
+                        std::cout.flush();
 
                         // Output a newline.
-                        cout << "\n\n";
+                        std::cout << "\n\n";
 
                         // Exit function.
                         return;
@@ -1267,18 +1267,18 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
                         {
                                 if ((data[x] > 31 ) && (data[x] < 127))
                                 {
-                                        cout << data[x] << " ";
+                                        std::cout << data[x] << " ";
                                 }
                                 else
                                 {
-                                        cout << " 0x" << (int)data[x] << " ";
+                                        std::cout << " 0x" << (int)data[x] << " ";
                                 }
                                 if (memory_format == true)
                                 {
                                         if (x%15 == 0)
                                         {
                                                 // Print current line.
-                                                cout << (x/15) << "\n";
+                                                std::cout << (x/15) << "\n";
                                         }
                                 }
                         }
@@ -1288,10 +1288,10 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
                         // Some error.
 
                         // Flush console buffer.
-                        cout.flush();
+                        std::cout.flush();
 
                         // Output a new line.
-                        cout << "\n\n";
+                        std::cout << "\n\n";
 
                         // Exit function.
                         return;
@@ -1299,10 +1299,10 @@ void DataProcess::dumpDataToConsole(const char * data, size_t length, size_t off
         }
 
         // Flush console buffer.
-        cout.flush();
+        std::cout.flush();
 
         // Flush console buffer.
-        cout.flush();
+        std::cout.flush();
 
         // Default return.
         return;

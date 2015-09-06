@@ -42,7 +42,7 @@ extern "C" {
 
 /* Define bool. */
 #if _MSC_FULL_VER && _MSC_FULL_VER < 180031101
-#include "../stdbool.h"	/* Older versions of Visual C don't support the C99 stdbool header. So we have to fake one. */
+#include "../../../stdbool.h"	/* Older versions of Visual C don't support the C99 stdbool header. So we have to fake one. */
 #else
 #include <stdbool.h>
 #endif

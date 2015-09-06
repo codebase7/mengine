@@ -1077,14 +1077,14 @@ int Unit_Test_Data_Object()
         }
 
         // Tell User we are starting the insert test for (char).
-        cout << "DataProcess::Data_Object::insert() (char):        ";
+        std::cout << "DataProcess::Data_Object::insert() (char):        ";
         if (Unit_Test_Data_Object_Insert_char() == 0)
         {
-                cout << "PASS\n";
+                std::cout << "PASS\n";
         }
         else
         {
-                cout << "FAIL\n";
+                std::cout << "FAIL\n";
                 return -1;
         }
 

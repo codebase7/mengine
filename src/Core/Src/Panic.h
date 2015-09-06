@@ -19,12 +19,11 @@
     https://github.com/codebase7/mengine
 */
 
+/* Include guard. */
 #ifndef PANIC_H
 #define PANIC_H
 
-#include "BaseHeader.h"
-
-// Define version and compile date time.
+/* Define version and compile date time. */
 #ifndef PANIC_HANDLER_VERSION
 #define PANIC_HANDLER_VERSION "0.0.1 Alpha\0"
 #endif
@@ -37,7 +36,7 @@
 #define PANIC_HANDLER_COMPILETIME   __TIME__
 #endif
 
-// Module ERROR IDs
+/* Module ERROR IDs */
 #define CORE_ID 1
 #define COMMON_ID 2
 #define GAME_ID 7
@@ -45,7 +44,19 @@
 #define PORT_AUDIO_ID 9
 #define ERROR_ID 10
 
-#include "Panic_Error_Levels.h"		// Defines the error / log levels.
+/* Include the error / log level definitions. */
+#include "Panic_Error_Levels.h"
+
+/* Check for C++ compiler. */
+#ifdef __cplusplus
+
+/* Internal includes. */
+#include "../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT. */
+
+/* External includes. */
+#include <iostream>
+#include <string.h>
+#include <fstream>
 
 namespace Panic{
 class Panic_ERROR {
@@ -57,7 +68,7 @@ class Panic_ERROR {
         unsigned int logLevel;			// Determines when to write to the log file.
         unsigned int maxLogLines;		// Determines when the log file will start being overwritten.
         unsigned int currentLogLine;		// Contains the current Log line.
-        fstream logfile;			// File handler for the log file.
+        std::fstream logfile;			// File handler for the log file.
         bool logfile_enabled;			// Used to tell if we are writing to a log file or not.
 
         /*
@@ -210,11 +221,11 @@ class Panic_ERROR {
         MSYS_DLL_EXPORT unsigned int get_current_log_line() const;
   };
     /*!
-            void Panic::FileStream_Status(Panic::ERROR & error, fstream & stream, const unsigned int & log_level)
+            void Panic::FileStream_Status(Panic::ERROR & error, std::fstream & stream, const unsigned int & log_level)
 
             Gets the status for a given file stream, and outputs that status to the given error handler with the given log_level.
     */
-	MSYS_DLL_EXPORT void FileStream_Status(Panic::Panic_ERROR & error, fstream & stream, const unsigned int & log_level);
+	MSYS_DLL_EXPORT void FileStream_Status(Panic::Panic_ERROR & error, std::fstream & stream, const unsigned int & log_level);
     
     /*!
             const char * Panic::Get_Library_Version()
@@ -238,6 +249,8 @@ class Panic_ERROR {
     MSYS_DLL_EXPORT const char * Get_Library_Compile_Time();
 }
 
-#endif
+#endif	/* __cplusplus */
 
-// End of Panic.h
+#endif	/* PANIC_H */
+
+/* End of Panic.h */

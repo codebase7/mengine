@@ -31,7 +31,7 @@ Mode Values are
 std::string FileStreams::configCreate(std::string path, Panic::Panic_ERROR & error)
 {
 	// init vars
-	ofstream Ini;
+	std::ofstream Ini;
 
 	// open file on disk.
 	Ini.open(path.c_str());
@@ -52,11 +52,11 @@ std::string FileStreams::configCreate(std::string path, Panic::Panic_ERROR & err
 	return "OK";
 }
 
-std::string FileStreams::configParser(string path, string key, Panic::Panic_ERROR & Error)
+std::string FileStreams::configParser(std::string path, std::string key, Panic::Panic_ERROR & Error)
 {
 	// init vars
 
-	ifstream Ini;
+	std::ifstream Ini;
 	bool dataFound = false;
 	bool fileatEOF = false;
 	bool fileFail = false;
@@ -68,8 +68,7 @@ std::string FileStreams::configParser(string path, string key, Panic::Panic_ERRO
 	long diff = 0;
 
 	// Open file
-
-	Ini.open(path.c_str(), ios::in);
+	Ini.open(path.c_str(), std::ios::in);
 
 	// check if file open failed
 
@@ -100,7 +99,7 @@ std::string FileStreams::configParser(string path, string key, Panic::Panic_ERRO
 		  // Comment Line ignore it.
 		  temp = "";
 		}
-		if (temp.find(key) != string::npos)
+		if (temp.find(key) != std::string::npos)
 		{
 			// data found. Condence variable to just data and return it.
 			dStartLocation = temp.find("=");
@@ -126,12 +125,12 @@ std::string FileStreams::configParser(string path, string key, Panic::Panic_ERRO
 			output = temp;
 			Ini.close();
 		}
-		if (temp.find(key) == string::npos && Ini.eof() != true)
+		if (temp.find(key) == std::string::npos && Ini.eof() != true)
 		{
 			// data not found try again.
 			fileatEOF = false;
 		}
-		if (temp.find(key) == string::npos && Ini.eof() == true)
+		if (temp.find(key) == std::string::npos && Ini.eof() == true)
 		{
 			// We didn't find what we were looking for so close the file, warn the user, clear the buffers, and exit the function.
 			fileatEOF = true;
@@ -145,10 +144,10 @@ std::string FileStreams::configParser(string path, string key, Panic::Panic_ERRO
 
 }
 
-string FileStreams::configWriter(string path, string key, string value, Panic::Panic_ERROR & error , bool createkey)
+std::string FileStreams::configWriter(std::string path, std::string key, std::string value, Panic::Panic_ERROR & error , bool createkey)
 {
 	// Init vars.
-	fstream OUT;			// Output File stream
+	std::fstream OUT;			// Output File stream
 	bool keyfound = false;		// has key been found in file
 	bool atEOF = false;		// has end of file been hit.
 	std::string buffer = "";	// Temp buffer for data from file.
@@ -191,8 +190,8 @@ string FileStreams::configWriter(string path, string key, string value, Panic::P
 			// Get line from file
 			getline(OUT , buffer);
 
-			// Check buffer for string
-			if (buffer.find(key.c_str()) != string::npos)
+			// Check buffer for std::string
+			if (buffer.find(key.c_str()) != std::string::npos)
 			{
 				  // Key found
 				  keyfound = true;
@@ -217,7 +216,7 @@ string FileStreams::configWriter(string path, string key, string value, Panic::P
 
 
 	// Open file in write mode.
-	OUT.open(path.c_str(), ios::out);
+	OUT.open(path.c_str(), std::ios::out);
 
 
 	// If key is not present and createkey is true write key into file.
@@ -225,7 +224,7 @@ string FileStreams::configWriter(string path, string key, string value, Panic::P
 	if (keyfound == false && createkey == true)
 	{
 		// Seek to eof.
-		OUT.seekp(ios::end);
+		OUT.seekp(std::ios::end);
 
 		// Write key to file before writing variable.
 		OUT << key <<" = " ;
@@ -235,7 +234,7 @@ string FileStreams::configWriter(string path, string key, string value, Panic::P
 	if (keyfound == true)
 	{
 		// Move to correct line.
-		OUT.seekp(ios::beg+location);
+		OUT.seekp(std::ios::beg+location);
 		getline(OUT, buffer);
 	}
 
@@ -256,7 +255,7 @@ std::string readFile(std::string file_name, int indexNumber)
 	//char input[900];
 	std::string output;
 	output = "";
-	ifstream SYSIN;
+	std::ifstream SYSIN;
 	bool indexnumberFound = false;
 	bool fileatEOF = false;
 	std::string temp = "";
@@ -271,62 +270,62 @@ std::string readFile(std::string file_name, int indexNumber)
 	realIndexNumber = realIndexNumber += indexNumber;
 
 	realIndexNumber = realIndexNumber += ']';
-	cout << "the realIndexNumber is : " <<realIndexNumber <<endl;
+	std::cout << "the realIndexNumber is : " <<realIndexNumber <<endl;
 
 	temp = "";
 
 	//Open the input file
-	SYSIN.open(file_name.c_str(), ios::in);
+	SYSIN.open(file_name.c_str(), std::ios::in);
 
 
 	//Look for the index number.
 	while(indexnumberFound != true && fileatEOF != true)
 	{
 		getline(SYSIN, temp);
-		cout << temp <<endl;
-		if (temp.find(realIndexNumber) == string::npos)
+		std::cout << temp <<endl;
+		if (temp.find(realIndexNumber) == std::string::npos)
 		{
 			if (SYSIN.eof() == true)
 			{
 				fileatEOF = true;
-				cout << "reached end of file. indexnumber not found.\n";
+				std::cout << "reached end of file. indexnumber not found.\n";
 				output = "ERROR: No indexNumber found.";
 			}
 			if (SYSIN.fail() == true)
 			{
-				cout << "ERROR: FileStream Has errored out.\n";
+				std::cout << "ERROR: FileStream Has errored out.\n";
 				SYSIN.close();
 				fileatEOF = true;
 				output = "ERROR: FileStream has errored out.";
 			}
 		}
-		if (temp.find(realIndexNumber) != string::npos)
+		if (temp.find(realIndexNumber) != std::string::npos)
 		{
-			cout <<"index Number " << indexNumber << " found.\n";
+			std::cout <<"index Number " << indexNumber << " found.\n";
 			output = temp;
 			indexnumberFound = true;
 		}
 		else
 		{
-			cout << "ERROR: Unknown error in readFile.\n";
+			std::cout << "ERROR: Unknown error in readFile.\n";
 			fileatEOF = true;
 		}
 
 	}
 	//SYSIN.getline(input, 900, '\n'); //SIDENOTE An _ifdef for diffrent platforms would be good here.
 	//output = input;
-	cout <<endl <<output <<endl;
+	std::cout <<endl <<output <<endl;
 	SYSIN.close();
 	return output;
 }
 
 */
 
-string FileStreams::Filechange()
+std::string FileStreams::Filechange()
 {
 	std::string filename = "";
-	cout << "Input a filename: ";
-	getline(cin, filename);
+	std::cout << "Input a filename: ";
+	getline(std::cin, filename);
 	return filename;
 }
 
@@ -335,9 +334,9 @@ int FileStreams::UserFileWrite(std::string file_name, int mode, std::string data
 	int errorCode;
 	if (mode == 0) //Creating New user File.
 	{
-		cout << "the mode is : " << mode <<"\n" << "the filename is : " << file_name <<"\n" << "the data is: " << data << "\n";
-		ofstream uFilewrite;
-		uFilewrite.open(file_name.c_str(), ios::out | ios::trunc);
+		std::cout << "the mode is : " << mode <<"\n" << "the filename is : " << file_name.c_str() <<"\n" << "the data is: " << data.c_str() << "\n";
+		std::ofstream uFilewrite;
+		uFilewrite.open(file_name.c_str(), std::ios::out | std::ios::trunc);
 		uFilewrite << data;
 		// TODO: uFilewrite << end of line
 		uFilewrite.close();
@@ -345,9 +344,9 @@ int FileStreams::UserFileWrite(std::string file_name, int mode, std::string data
 	}
 	if (mode == 1) //Appending to file.
 	{
-		cout << "the mode is : " << mode <<"\n" << "the filename is : " << file_name <<"\n" << "the data is: " << data << "\n";
-		ofstream uFilewrite;
-		uFilewrite.open(file_name.c_str(), ios::out | ios::app);
+		std::cout << "the mode is : " << mode <<"\n" << "the filename is : " << file_name.c_str() <<"\n" << "the data is: " << data.c_str() << "\n";
+		std::ofstream uFilewrite;
+		uFilewrite.open(file_name.c_str(), std::ios::out | std::ios::app);
 		uFilewrite << data;
 		// TODO: uFilewrite << end of line
 		uFilewrite.close();
@@ -355,33 +354,33 @@ int FileStreams::UserFileWrite(std::string file_name, int mode, std::string data
 	}
 	if (mode == 2)
 	{
-		cout << "ERROR: FileStreams.cpp: Opening a Read Only FileStream For Writing. \n";
+		std::cout << "ERROR: FileStreams.cpp: Opening a Read Only FileStream For Writing. \n";
 		errorCode = 2;
 	}
 	else if (mode > 2)
 	{
-		cout << "ERROR: FileStreams.cpp: Unknown Command. \n";
-		cout << "the mode is : " << mode <<"\n" << "the filename is : " << file_name <<"\n" << "the data is: " << data << "\n";
+		std::cout << "ERROR: FileStreams.cpp: Unknown Command. \n";
+		std::cout << "the mode is : " << mode <<"\n" << "the filename is : " << file_name.c_str() <<"\n" << "the data is: " << data.c_str() << "\n";
 		errorCode = mode;
 	}
 	return errorCode;
 }
 
-string FileStreams::readEntireFile(std::string filename, Panic::Panic_ERROR & error)
+std::string FileStreams::readEntireFile(std::string filename, Panic::Panic_ERROR & error)
 {
 	// init vars
 	std::string output = "";
 	std::string temp = "";
-	ifstream SYSIN;
+	std::ifstream SYSIN;
 
 	// Open the file
-	SYSIN.open(filename.c_str(), ios::in);
+	SYSIN.open(filename.c_str(), std::ios::in);
 
 	// Make sure file is open
 	if (SYSIN.is_open() != true)
 	{
 		// File did not open call PanicHandler and exit the function.
-		cout << "ERROR: Opening File " <<filename <<" .\n";
+		std::cout << "ERROR: Opening File " <<filename <<" .\n";
 		error.PanicHandler("FileStreams::readEntireFile : Unable to open file.");
 		SYSIN.close(); //Just to be safe.
 		return "ERROR";
@@ -413,11 +412,10 @@ string FileStreams::readEntireFile(std::string filename, Panic::Panic_ERROR & er
 	return output;
 }
 
-string FileStreams::FileSearch(std::string filename, std::string key, Panic::Panic_ERROR & error)
+std::string FileStreams::FileSearch(std::string filename, std::string key, Panic::Panic_ERROR & error)
 {
 	// init vars
-
-	ifstream FILEIN;
+	std::ifstream FILEIN;
 	bool dataFound = false;
 	bool fileatEOF = false;
 	bool fileFail = false;
@@ -425,11 +423,9 @@ string FileStreams::FileSearch(std::string filename, std::string key, Panic::Pan
 	std::string output = "";
 
 	// Open file
-
-	FILEIN.open(filename.c_str(), ios::in);
+	FILEIN.open(filename.c_str(), std::ios::in);
 
 	// check if file open failed
-
 	if (FILEIN.is_open() == false)
 	{
 		error.PanicHandler("FileStreams::FileSearch : Unable to open file.");
@@ -438,7 +434,6 @@ string FileStreams::FileSearch(std::string filename, std::string key, Panic::Pan
 	}
 
 	// get data from file.
-
 	while (dataFound != true && fileatEOF != true && fileFail != true)
 	{
 		getline(FILEIN, temp);
@@ -451,19 +446,19 @@ string FileStreams::FileSearch(std::string filename, std::string key, Panic::Pan
 			output = "ERROR";
 		}
 		// Look for data in the temp buffer.
-		if (temp.find(key) != string::npos)
+		if (temp.find(key) != std::string::npos)
 		{
-			// data found. clear temp buffer, return string. Close file and exit function.
+			// data found. clear temp buffer, return std::string. Close file and exit function.
 			dataFound = true;
 			output = temp;
 			FILEIN.close();
 		}
-		if (temp.find(key) == string::npos && FILEIN.eof() != true)
+		if (temp.find(key) == std::string::npos && FILEIN.eof() != true)
 		{
 			// data not found try again.
 			fileatEOF = false;
 		}
-		if (temp.find(key) == string::npos && FILEIN.eof() == true)
+		if (temp.find(key) == std::string::npos && FILEIN.eof() == true)
 		{
 			// We didn't find what we were looking for so close the file, warn the user, clear the buffers, and exit the function.
 			fileatEOF = true;

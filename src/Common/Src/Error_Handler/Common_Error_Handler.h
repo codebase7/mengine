@@ -29,7 +29,7 @@
 #include <stddef.h>		// Defines NULL.
 #ifndef __cplusplus
 #if _MSC_FULL_VER && _MSC_FULL_VER < 180031101	/* Visual C versions less than 2013 are special. (They lack support for C99's bool type.) */
-#include "..\stdbool.h"		/* Defines bool data type. (For C compilers.) */
+#include "..\..\..\stdbool.h"		/* Defines bool data type. (For C compilers.) */
 #else
 #include <stdbool.h>
 #endif	/* _MSC_FULL_VER && _MSC_FULL_VER < 180031101 */

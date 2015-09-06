@@ -19,11 +19,11 @@
     https://github.com/codebase7/mengine
 */
 
-// Include guard.
+/* Include guard. */
 #ifndef PANIC_ERROR_LEVELS_H
 #define PANIC_ERROR_LEVELS_H
 
-// Define the error / log levels.
+/* Define the error / log levels. */
 #define ERROR_DISABLE 0
 #define ERROR_CRITICAL 1
 #define ERROR_WARNING 2
@@ -31,6 +31,6 @@
 #define ERROR_DEBUG 4
 #define ERROR_VERBOSE 5
 
-#endif	// PANIC_ERROR_LEVELS_H
+#endif	/* PANIC_ERROR_LEVELS_H */
 
-// End of Panic_Error_Levels.h
+/* End of Panic_Error_Levels.h */
