@@ -378,6 +378,88 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 	return ret;
 }
 
+int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLength, const size_t offset,
+												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
+	char * tempSubStr = NULL;					/* Used to create the substr. */
+	size_t tempRealOffset = 0;					/* Used to hold the real starting offset in the given string. */
+	size_t tempSubStrLength = 0;				/* Size of the tempSubString. */
+
+	/* Check for invalid arguments. */
+	if ((src != NULL) && (srcLength > 0) && (offset >= 0) && (offset < srcLength) && (subStr != NULL) && (subStrLength != NULL))
+	{
+		/*
+		 *		---------------------------------------------------------------------------------------------------------
+		 *		|	searchFromEnd:	|	getPriorData:	|	substring contents:	(Starting and ending offset ranges.)	|
+		 *		---------------------------------------------------------------------------------------------------------
+		 *		|	FALSE			|	FALSE			|	offset <--> end of string									|
+		 *		|	TRUE			|	FALSE			|	(end of string - offset) <--> end of string					|
+		 *		|	FALSE			|	TRUE			|	start of string <--> offset									|
+		 *		|	TRUE			|	TRUE			|	start of string <--> (end of string - offset)				|
+		 *		---------------------------------------------------------------------------------------------------------
+		 *
+		 *		Note:	searchFromEnd only controls the offset's point of origin. (I.e. which end of the given
+		 *				string the offset is based at.) searchFromEnd does NOT control what substring is selected
+		 *				based on the given offset; the selection is made based on getPriorData.
+		 */
+
+		/* Determine the real starting offset and sub-string length. */
+		tempRealOffset = ((searchFromEnd) ? ((getPriorData) ? (0) : ((srcLength - offset))) : ((getPriorData) ? (0) : (offset)));
+		tempSubStrLength = ((searchFromEnd) ? ((getPriorData) ? ((srcLength - offset)) : ((srcLength - 1))) : ((getPriorData) ? (offset) : ((srcLength - 1))));
+
+		/* Make sure the temp values are within the given string's buffer. */
+		if ((tempRealOffset >= 0) && (tempRealOffset < srcLength) && (tempSubStrLength > 0) && ((tempRealOffset + tempSubStrLength) < srcLength))
+		{
+			/* Allocate memory for the substring. */
+			tempSubStr = (char *)malloc(tempSubStrLength);
+			if (tempSubStr != NULL)
+			{
+				/* NULL out the buffer. */
+				memset(tempSubStr, '\0', tempSubStrLength);
+
+				/* Copy the data. */
+				memcpy(tempSubStr, (src + tempRealOffset), tempSubStrLength);
+
+				/* Copy the pointer and data length. */
+				(*subStr) = tempSubStr;
+				(*subStrLength) = tempSubStrLength;
+
+				/* Done. */
+				ret = COMMON_ERROR_SUCCESS;
+			}
+			else
+			{
+				/* Could not allocate memory for substring. */
+				ret = COMMON_ERROR_MEMORY_ERROR;
+			}
+		}
+		else
+		{
+			/* Invalid temp vars. */
+			if (tempSubStrLength <= 0)
+			{
+				/* No data to create substring with. */
+				ret = COMMON_ERROR_END_OF_DATA;
+			}
+			else
+			{
+				/* Internal calculation error. (Could not calculate a valid offset and / or substring length.) */
+				ret = COMMON_ERROR_RANGE_ERROR;
+			}
+		}
+	}
+	else
+	{
+		/* Invalid argument(s). */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	__cplusplus
