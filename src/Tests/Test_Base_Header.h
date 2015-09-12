@@ -22,7 +22,17 @@
 #define TEST_BASE_HEADER_H
 
 // External Includes.
+
+/* C++ specific includes. */
+#ifdef __cplusplus
 #include <iostream>     // For std::cout / NULL macro.
+#else
+/* C specific includes. */
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+#endif	/* __cplusplus */
+
 #include <string.h>     // For strcmp.
 #ifdef _WIN32
 #include <Windows.h>	/* For SleepEx(). */

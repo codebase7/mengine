@@ -24,6 +24,17 @@
 // Include headers from Core.
 #include "../Core/Src/DataProcess.h"
 
+/* The Unit_Tests_DataProcess_Main() function is a C function. */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
+
+int Unit_Tests_DataProcess_Main();
+
+#ifdef __cplusplus
+}	/* extern "C" */
+#endif	/* __cplusplus */
+
 int Unit_Test_Data_Object();
 int Unit_Test_Data_Object_Insert_char();
 
