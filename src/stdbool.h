@@ -33,8 +33,8 @@
 #ifndef __bool_true_false_are_defined
 
 /* Define true and false. */
-#define TRUE 0x01	/* Really this could be anything. */
-#define FALSE 0x00	/* Litteral NULL byte to conform to ANYTHING NOT NULL IS TRUE. */
+#define TRUE 1	/* Really this could be anything. */
+#define FALSE 0	/* Litteral NULL byte to conform to ANYTHING NOT NULL IS TRUE. */
 #define true TRUE
 #define false FALSE
 
