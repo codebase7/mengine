@@ -54,10 +54,12 @@ extern "C" {
 
 	E.x. If you want a range of 1 to 100 set min_value to 1 and max_value to 100.
 
-	@pram reset_rand, if this is set to true, the RNG will be re-seeded with the current time value returned by time(NULL).
+	@pram reset_rand, if this is set to true, the RNG will be re-seeded with the current time value returned by time().
 	Otherwise the next psudo-random number from the current seed will be returned.
 
-	Returns the generated psudo-random number.
+	Returns the generated psudo-random number if successful.
+	If the current system time cannot be used to set the random seed, then this function will consistantly return zero (0)
+	regardless of the range defined by min_value and max_value.
 */
 size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand);
 
@@ -154,6 +156,68 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
 int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t srcLength, const char * delim, const size_t delimLength,
 												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData);
 
+/*!
+ *		int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLength, const size_t offset,
+ *												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
+ *
+ *		Takes the given source data string and offset and generates a substring from it.
+ *
+ *		Note: The generated substring is not NULL terminated. This is to allow the function to be used with unformatted data.
+ *
+ *		The substring is generated based on the given offset, searchFromEnd, and getPriorData arguments using the following truth table:
+ *
+ *		---------------------------------------------------------------------------------------------------------
+ *		|	searchFromEnd:	|	getPriorData:	|	substring contents:	(Starting and ending offset ranges.)	|
+ *		---------------------------------------------------------------------------------------------------------
+ *		|	FALSE			|	FALSE			|	offset <--> end of string									|
+ *		|	TRUE			|	FALSE			|	(end of string - offset) <--> end of string					|
+ *		|	FALSE			|	TRUE			|	start of string <--> offset									|
+ *		|	TRUE			|	TRUE			|	start of string <--> (end of string - offset)				|
+ *		---------------------------------------------------------------------------------------------------------
+ *
+ *		Note:	searchFromEnd only controls the offset's point of origin. (I.e. which end of the given
+ *				string the offset is based at.) searchFromEnd does NOT control what substring is selected
+ *				based on the given offset; the selection is made based on getPriorData.
+ *
+ *		@pram src (const char *), the source string that the substring is generated from.
+ *
+ *		@pram srcLength (const size_t), the length of the source string. (Function may fail if given length is invalid / incorrect.)
+ *
+ *		@pram offset (const size_t), the starting offset within the source string to start copying data from.
+ *
+ *		@pram subStr (char **), a pointer that points to the pointer for the generated sub-string. WARNING: The pointer value will be overwritten
+ *		if this call returns COMMON_ERROR_SUCCESS. This pointer should be released by calling DataProcess_Deallocate_CString().
+ *
+ *		@pram subStrLength (size_t *), a pointer to a size_t value that contains the length of the generated substring.
+ *
+ *		@pram searchFromEnd (integer treated as boolean), Which end of the given source string the given offset is is based at.
+ *		(Start of given string = 0, end of given string = any non-zero value.)
+ *
+ *		@pram getPriorData (integer treated as boolean), Whether or not to use the segment of data that comes before the given offset as the
+ *		generated substring. (False = zero, True = any non-zero value.)
+ *
+ *		Returns COMMON_ERROR_SUCCESS if successfull. In this case the values of subStr and subStrLength will change to contain a pointer to the generated
+ *		substring and the length of the generated substring respectively.
+ *
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is NULL, the length of the source string is 0, the given offset is less than zero or
+ *		greater than or equal to the length of the string.
+ *
+ *		Returns COMMON_ERROR_MEMORY_ERROR if memory allocation for the substring fails.
+ *
+ *		Returns COMMON_ERROR_END_OF_DATA if the given arguments would generate a substring that contains no data.
+ *		(I.e. The generated substring's length would be zero.)
+ *
+ *		Returns COMMON_ERROR_RANGE_ERROR if an internal calculation fails.
+ *
+ *		Otherwise returns the approperite error code.
+ *
+ *		No alteration clause:
+ *		In case of error, this function will not alter any given argument.
+ *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
+ *		 are considered errors.)
+ */
+int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLength, const size_t offset,
+												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData);
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	/* __cplusplus */

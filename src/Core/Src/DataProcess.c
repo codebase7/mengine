@@ -32,23 +32,50 @@ extern "C" {
 
 size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand)
 {
+	/* Define MAX_MODIFIER */
+#define MAX_MODIFIER 100000 /* Used to prevent overflowing the static modifier variable below. */
+
 	/* NO, it's not 4..... (Although it could be. I won't lie.) */
 
-	/* Set static. */
-	static bool rand_set;
+	/* Init vars. */
+	static bool rand_set;			/* Whether or not the random seed has been set or not. */
+	static size_t modifier;			/* Used to ensure that the random seed is unique if the function is called more than once within the timeframe of a second. */
+	time_t tt;						/* The current system time as a time_t. */
+	struct tm * timeM = NULL;		/* The current system time as a tm structure. */
 
 	/* Check if we need to set the RNG. */
 	if ((!rand_set) || (reset_rand))
 	{
-		/* Seed random number generator. */
-		srand(time(NULL));
+		/* Increment modifier. */
+		modifier = ((modifier < MAX_MODIFIER) ? (modifier + 1) : (0));
 
-		/* Set rand_set. */
-		rand_set = true;
+		/* Get the current system time. */
+		time(&tt);
+
+		/* Convert the current system time to a tm structure. */
+		timeM = gmtime(&tt);
+
+		/* Check for NULL pointer. */
+		if (timeM != NULL)
+		{
+			/* Seed random number generator. */
+			srand(((timeM->tm_sec) + (timeM->tm_min) + (timeM->tm_hour) + (timeM->tm_yday) + (timeM->tm_year) + (timeM->tm_mon) + (modifier)));
+
+			/* Set rand_set. */
+			rand_set = true;
+		}
+		else
+		{
+			/* Clear rand_set, so we can try again on the next call. */
+			rand_set = false;
+		}
 	}
 
 	/* Return the result. */
-	return (rand() % max_value + min_value);
+	return ((rand_set) ? (rand() % max_value + min_value) : (0));
+
+/* Undef MAX_MODIFIER. */
+#undef MAX_MODIFIER
 }
 
 int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength)
@@ -366,6 +393,88 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 		{
 			/* Delim not found in search string. */
 			ret = COMMON_ERROR_RANGE_ERROR;
+		}
+	}
+	else
+	{
+		/* Invalid argument(s). */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLength, const size_t offset,
+												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
+	char * tempSubStr = NULL;					/* Used to create the substr. */
+	size_t tempRealOffset = 0;					/* Used to hold the real starting offset in the given string. */
+	size_t tempSubStrLength = 0;				/* Size of the tempSubString. */
+
+	/* Check for invalid arguments. */
+	if ((src != NULL) && (srcLength > 0) && (offset >= 0) && (offset < srcLength) && (subStr != NULL) && (subStrLength != NULL))
+	{
+		/*
+		 *		---------------------------------------------------------------------------------------------------------
+		 *		|	searchFromEnd:	|	getPriorData:	|	substring contents:	(Starting and ending offset ranges.)	|
+		 *		---------------------------------------------------------------------------------------------------------
+		 *		|	FALSE			|	FALSE			|	offset <--> end of string									|
+		 *		|	TRUE			|	FALSE			|	(end of string - offset) <--> end of string					|
+		 *		|	FALSE			|	TRUE			|	start of string <--> offset									|
+		 *		|	TRUE			|	TRUE			|	start of string <--> (end of string - offset)				|
+		 *		---------------------------------------------------------------------------------------------------------
+		 *
+		 *		Note:	searchFromEnd only controls the offset's point of origin. (I.e. which end of the given
+		 *				string the offset is based at.) searchFromEnd does NOT control what substring is selected
+		 *				based on the given offset; the selection is made based on getPriorData.
+		 */
+
+		/* Determine the real starting offset and sub-string length. */
+		tempRealOffset = ((searchFromEnd) ? ((getPriorData) ? (0) : ((srcLength - offset))) : ((getPriorData) ? (0) : (offset)));
+		tempSubStrLength = ((searchFromEnd) ? ((getPriorData) ? ((srcLength - offset)) : ((srcLength - 1))) : ((getPriorData) ? (offset) : ((srcLength - 1))));
+
+		/* Make sure the temp values are within the given string's buffer. */
+		if ((tempRealOffset >= 0) && (tempRealOffset < srcLength) && (tempSubStrLength > 0) && ((tempRealOffset + tempSubStrLength) < srcLength))
+		{
+			/* Allocate memory for the substring. */
+			tempSubStr = (char *)malloc(tempSubStrLength);
+			if (tempSubStr != NULL)
+			{
+				/* NULL out the buffer. */
+				memset(tempSubStr, '\0', tempSubStrLength);
+
+				/* Copy the data. */
+				memcpy(tempSubStr, (src + tempRealOffset), tempSubStrLength);
+
+				/* Copy the pointer and data length. */
+				(*subStr) = tempSubStr;
+				(*subStrLength) = tempSubStrLength;
+
+				/* Done. */
+				ret = COMMON_ERROR_SUCCESS;
+			}
+			else
+			{
+				/* Could not allocate memory for substring. */
+				ret = COMMON_ERROR_MEMORY_ERROR;
+			}
+		}
+		else
+		{
+			/* Invalid temp vars. */
+			if (tempSubStrLength <= 0)
+			{
+				/* No data to create substring with. */
+				ret = COMMON_ERROR_END_OF_DATA;
+			}
+			else
+			{
+				/* Internal calculation error. (Could not calculate a valid offset and / or substring length.) */
+				ret = COMMON_ERROR_RANGE_ERROR;
+			}
 		}
 	}
 	else

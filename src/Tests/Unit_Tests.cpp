@@ -24,6 +24,7 @@
 int main()
 {
 	// Delcare vars.
+	int error_code_dataprocess = 0;
 	short error_code_data_object = 0;
 	short error_code_fileutills = 0;
 	short error_code_thread_utils = 0;
@@ -31,7 +32,10 @@ int main()
 
     // Starting Unit tests.
     std::cout << "Multiverse_Engine_Project_Public Unit Tests Compiled on: " << TESTCOMPILEDATE << " " << TESTCOMPILETIME << "\n";
-    std::cout << "Starting Unit tests for DataProcess::Data_Object. Please be pacent this can take some time.\n";
+	std::cout << "Starting Unit tests for DataProcess functions.\n";
+	error_code_dataprocess = Unit_Tests_DataProcess_Main();
+
+    std::cout << "Starting Unit tests for DataProcess::Data_Object. Please be patient this can take some time.\n";
     error_code_data_object = Unit_Test_Data_Object();
 
 	std::cout << "Starting unit tests for Byte_Order. Please wait.\n";
