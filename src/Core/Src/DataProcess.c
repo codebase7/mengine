@@ -32,18 +32,23 @@ extern "C" {
 
 size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand)
 {
+	/* Define MAX_MODIFIER */
+#define MAX_MODIFIER 100000 /* Used to prevent overflowing the static modifier variable below. */
+
 	/* NO, it's not 4..... (Although it could be. I won't lie.) */
 
-	/* Set static. */
+	/* Init vars. */
 	static bool rand_set;			/* Whether or not the random seed has been set or not. */
+	static size_t modifier;			/* Used to ensure that the random seed is unique if the function is called more than once within the timeframe of a second. */
 	time_t tt;						/* The current system time as a time_t. */
 	struct tm * timeM = NULL;		/* The current system time as a tm structure. */
-#error "time() only provides a minimal resolution of one (1) second. Without system specific calls, if this code is called multiple times within a second the same random seed will be used."
-#error "Therefore, the only portable use of this code is to use a modifier to change the value if it is the same as the current seed."
 
 	/* Check if we need to set the RNG. */
 	if ((!rand_set) || (reset_rand))
 	{
+		/* Increment modifier. */
+		modifier = ((modifier < MAX_MODIFIER) ? (modifier + 1) : (0));
+
 		/* Get the current system time. */
 		time(&tt);
 
@@ -54,7 +59,7 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
 		if (timeM != NULL)
 		{
 			/* Seed random number generator. */
-			srand(((timeM->tm_sec) + (timeM->tm_min) + (timeM->tm_hour) + (timeM->tm_yday) + (timeM->tm_year) + (timeM->tm_mon)));
+			srand(((timeM->tm_sec) + (timeM->tm_min) + (timeM->tm_hour) + (timeM->tm_yday) + (timeM->tm_year) + (timeM->tm_mon) + (modifier)));
 
 			/* Set rand_set. */
 			rand_set = true;
@@ -68,6 +73,9 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
 
 	/* Return the result. */
 	return ((rand_set) ? (rand() % max_value + min_value) : (0));
+
+/* Undef MAX_MODIFIER. */
+#undef MAX_MODIFIER
 }
 
 int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength)

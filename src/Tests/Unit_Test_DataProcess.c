@@ -252,7 +252,6 @@ int Unit_Tests_DataProcess_TRNG()
 
 	/* Return ret. */
 	return ret;
-#error "Timing issue causes TRNG() to reset the random seed too quickly for time() to return a different value."
 
 /* Run sanity checks on defines here, and abort build if they fail. */
 #if TEST_NUM_OF_RUNS < 2
