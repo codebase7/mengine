@@ -35,20 +35,39 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
 	/* NO, it's not 4..... (Although it could be. I won't lie.) */
 
 	/* Set static. */
-	static bool rand_set;
+	static bool rand_set;			/* Whether or not the random seed has been set or not. */
+	time_t tt;						/* The current system time as a time_t. */
+	struct tm * timeM = NULL;		/* The current system time as a tm structure. */
+#error "time() only provides a minimal resolution of one (1) second. Without system specific calls, if this code is called multiple times within a second the same random seed will be used."
+#error "Therefore, the only portable use of this code is to use a modifier to change the value if it is the same as the current seed."
 
 	/* Check if we need to set the RNG. */
 	if ((!rand_set) || (reset_rand))
 	{
-		/* Seed random number generator. */
-		srand(time(NULL));
+		/* Get the current system time. */
+		time(&tt);
 
-		/* Set rand_set. */
-		rand_set = true;
+		/* Convert the current system time to a tm structure. */
+		timeM = gmtime(&tt);
+
+		/* Check for NULL pointer. */
+		if (timeM != NULL)
+		{
+			/* Seed random number generator. */
+			srand(((timeM->tm_sec) + (timeM->tm_min) + (timeM->tm_hour) + (timeM->tm_yday) + (timeM->tm_year) + (timeM->tm_mon)));
+
+			/* Set rand_set. */
+			rand_set = true;
+		}
+		else
+		{
+			/* Clear rand_set, so we can try again on the next call. */
+			rand_set = false;
+		}
 	}
 
 	/* Return the result. */
-	return (rand() % max_value + min_value);
+	return ((rand_set) ? (rand() % max_value + min_value) : (0));
 }
 
 int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength)

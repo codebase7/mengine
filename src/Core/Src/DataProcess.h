@@ -54,10 +54,12 @@ extern "C" {
 
 	E.x. If you want a range of 1 to 100 set min_value to 1 and max_value to 100.
 
-	@pram reset_rand, if this is set to true, the RNG will be re-seeded with the current time value returned by time(NULL).
+	@pram reset_rand, if this is set to true, the RNG will be re-seeded with the current time value returned by time().
 	Otherwise the next psudo-random number from the current seed will be returned.
 
-	Returns the generated psudo-random number.
+	Returns the generated psudo-random number if successful.
+	If the current system time cannot be used to set the random seed, then this function will consistantly return zero (0)
+	regardless of the range defined by min_value and max_value.
 */
 size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand);
 
