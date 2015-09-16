@@ -110,9 +110,6 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
 						/* Copy the old data. */
 						memcpy(tempStr, (*str), strLength);
 					}
-
-					/* Make sure the tempStr is NULL terminated. */
-					tempStr[(newLength - 1)] = '\0';
 				}
 			}
 			else

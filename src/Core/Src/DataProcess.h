@@ -79,9 +79,11 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
  *				  will be copied, but any bytes after newLength will be truncated.
  *				- If the newLength is greater than or equal to the original length then,
  *				  the entire original string will be copied.
- *			In any instance, the reallocated string will be NULL terminated. (Even if the
- *			string data must be altered to do so. In addition, the resulting string is always
- *			newLength in size if this function is successful.)
+ *			In any instance, the reallocated string may NOT be NULL terminated. This occurs if
+ *			data is copied from the original string and either the original string is not NULL
+ *			terminated, or if the data to be copied from the original string did not include the
+ *			NULL terminator. In addition, the resulting string is always newLength in size if
+ *			this function is successful.
  *
  *		Returns COMMON_ERROR_SUCCESS if successful.
  *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer to pointer is NULL.
