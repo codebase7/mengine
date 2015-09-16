@@ -160,7 +160,8 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
  *		int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLength, const size_t offset,
  *												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
  *
- *		Takes the given source data string and offset and generates a substring from it.
+ *		Takes the given source data string and offset and generates a substring from it. The generated sub-string should be freed using
+ *		DataProcess_Deallocate_CString() when it is no longer needed.
  *
  *		Note: The generated substring is not NULL terminated. This is to allow the function to be used with unformatted data.
  *

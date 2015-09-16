@@ -409,10 +409,11 @@ int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLen
 												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
 {
 	/* Init vars. */
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
-	char * tempSubStr = NULL;					/* Used to create the substr. */
-	size_t tempRealOffset = 0;					/* Used to hold the real starting offset in the given string. */
-	size_t tempSubStrLength = 0;				/* Size of the tempSubString. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code of a call to an engine function. */
+	char * tempSubStr = NULL;						/* Used to create the substr. */
+	size_t tempRealOffset = 0;						/* Used to hold the real starting offset in the given string. */
+	size_t tempSubStrLength = 0;					/* Size of the tempSubString. */
 
 	/* Check for invalid arguments. */
 	if ((src != NULL) && (srcLength > 0) && (offset >= 0) && (offset < srcLength) && (subStr != NULL) && (subStrLength != NULL))
@@ -439,13 +440,10 @@ int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLen
 		/* Make sure the temp values are within the given string's buffer. */
 		if ((tempRealOffset >= 0) && (tempRealOffset < srcLength) && (tempSubStrLength > 0) && ((tempRealOffset + tempSubStrLength) < srcLength))
 		{
-			/* Allocate memory for the substring. */
-			tempSubStr = (char *)malloc(tempSubStrLength);
-			if (tempSubStr != NULL)
+			/* Allocate memory for the substring. Using DataProcess_Reallocate_C_String(). */
+			retFromCall = DataProcess_Reallocate_C_String(&tempSubStr, 0, tempSubStrLength);
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL))
 			{
-				/* NULL out the buffer. */
-				memset(tempSubStr, '\0', tempSubStrLength);
-
 				/* Copy the data. */
 				memcpy(tempSubStr, (src + tempRealOffset), tempSubStrLength);
 
