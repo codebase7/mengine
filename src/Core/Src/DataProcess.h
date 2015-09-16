@@ -79,9 +79,11 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
  *				  will be copied, but any bytes after newLength will be truncated.
  *				- If the newLength is greater than or equal to the original length then,
  *				  the entire original string will be copied.
- *			In any instance, the reallocated string will be NULL terminated. (Even if the
- *			string data must be altered to do so. In addition, the resulting string is always
- *			newLength in size if this function is successful.)
+ *			In any instance, the reallocated string may NOT be NULL terminated. This occurs if
+ *			data is copied from the original string and either the original string is not NULL
+ *			terminated, or if the data to be copied from the original string did not include the
+ *			NULL terminator. In addition, the resulting string is always newLength in size if
+ *			this function is successful.
  *
  *		Returns COMMON_ERROR_SUCCESS if successful.
  *		Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer to pointer is NULL.
@@ -91,6 +93,20 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
  *		In case of error, the given arguments will NOT be altered.
  */
 int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength);
+
+/*!
+ *		int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength)
+ *
+ *		Reallocates the given string to be the new length and adds a NULL byte terminator if needed.
+ *
+ *		Note: This function WILL change the given string to make it NULL byte terminated if the NULL byte
+ *		could not be added during reallocation, but only if the function returns COMMON_ERROR_SUCCESS.
+ *
+ *		(This function is a wrapper around DataProcess_Reallocate_C_String(), see that function for more information.)
+ *
+ *		In case of error, the given arguments will NOT be altered.
+ */
+int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength);
 
 /*!
  *		void DataProcess_Deallocate_CString(char ** str)
@@ -107,21 +123,24 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
 void DataProcess_Deallocate_CString(char ** str);
 
 /*!
-		int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength)
-
-		Takes given size_t and outputs the equivalent string as a C-String.
-
-		WARNING: This function will NOT deallocate the given string if it is already allocated.
-		The pointer WILL be overwritten if this function returns success!
-		If you need to keep the pointer for later deallocation, copy it elsewhere before calling this function.
-
-		Returns COMMON_ERROR_SUCCESS if successful. str will point to a C-String with string equivalent to number in this case.
-		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
-		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
-		Otherwise returns the appropriate error code.
-
-		In case of error, this function will not alter any given argument.
-*/
+ *		int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength)
+ *
+ *		Takes given size_t and outputs the equivalent human-readable string as a C-String.
+ *
+ *		The generated string should be freed using DataProcess_Deallocate_CString() when it is no longer needed.
+ *
+ *		WARNING: This function will NOT deallocate the given string if it is already allocated.
+ *		The pointer WILL be overwritten if this function returns success!
+ *		If you need to keep the pointer for later deallocation, copy it elsewhere before calling this function.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if successful. str will point to a C-String with string equivalent to number in this case.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		No alteration clause:
+ *		In case of error, this function will not alter any given argument.
+ */
 int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength);
 
 /*!
@@ -133,6 +152,8 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
  *		Takes the given source string and looks for the first occurrence of the given delimiter string within it.
  *		If the delimiter string is found, this function will produce a sub-string with either the remaining bytes in the
  *		source string that come after the delimiter, or the bytes from the source string that came before the delimiter.
+ *
+ *		The generated sub-string should be freed using DataProcess_Deallocate_CString() when it is no longer needed.
  *
  *		Optionally if searchFromEnd is non-zero, the search will start from the end of the source string instead of the beginning.
  *
@@ -160,7 +181,8 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
  *		int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLength, const size_t offset,
  *												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
  *
- *		Takes the given source data string and offset and generates a substring from it.
+ *		Takes the given source data string and offset and generates a substring from it. The generated sub-string should be freed using
+ *		DataProcess_Deallocate_CString() when it is no longer needed.
  *
  *		Note: The generated substring is not NULL terminated. This is to allow the function to be used with unformatted data.
  *

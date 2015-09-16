@@ -110,9 +110,6 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
 						/* Copy the old data. */
 						memcpy(tempStr, (*str), strLength);
 					}
-
-					/* Make sure the tempStr is NULL terminated. */
-					tempStr[(newLength - 1)] = '\0';
 				}
 			}
 			else
@@ -125,8 +122,7 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
 		/* Deallocate the old string. (If needed.) */
 		if ((*str) != NULL)
 		{
-			free((*str));
-			(*str) = NULL;
+			DataProcess_Deallocate_CString(str);
 		}
 
 		/* Copy the new string pointer if needed. */
@@ -141,6 +137,64 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
 	else
 	{
 		/* Invalid argument. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of this function. */
+	size_t newSize = 0;						/* The modified size if needed. */
+
+	/* Check for valid args. */
+	if ((str != NULL) && (newLength != NULL) && (((*str) == NULL) || (strLength > 0)))
+	{
+		/* Check and see if the new length is greater than the original length. (We have nothing to do if it is.) */
+		if (strLength >= (*newLength))
+		{
+			/* Check and see if str is defined and strLength is greater than zero. */
+			if (((*str) != NULL) && (strLength > 0))
+			{
+				/* Determine if the str is NULL terminated. */
+				if (((*str)[(strLength - 1)]) != '\0')
+				{
+					/* We need to add an extra byte for the NULL terminator. */
+					newSize = sizeof(char);
+				}
+			}
+		}
+
+		/* Safety check on newSize.... */
+		newSize = ((newSize < SIZE_MAX) && ((*newLength) < (SIZE_MAX - newSize))) ? ((*newLength) + newSize) : (*newLength);
+
+		/* Call DataProcess_Reallocate_C_String(). (It will NULL out the allocated buffer before copying data.) */
+		ret = DataProcess_Reallocate_C_String(str, strLength, newSize);
+		if ((ret == COMMON_ERROR_SUCCESS) && (str != NULL) && ((*str) != NULL))
+		{
+			/* Check and see if the size changed. */
+			if ((*newLength) != newSize)
+			{
+				/* Copy back the reallocated string's length. */
+				(*newLength) = newSize;
+			}
+			else
+			{
+				/* No size change, see if the string is NULL terminated. */
+				if (((*str)[(newSize - 1)]) != '\0')
+				{
+					/* Set the last byte to NULL, because it should be. */
+					((*str)[(newSize - 1)]) = '\0';
+				}
+			}
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 	}
 
@@ -165,20 +219,21 @@ void DataProcess_Deallocate_CString(char ** str)
 int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength)
 {
 	/* Init vars. */
-	size_t currentNum = 0;						/* Temporary value used to store the current number we are working on. */
-	char outputValue = '\0';					/* The value that we need to write into the output buffer. (Calculated from currentNum.) */
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
-	char * result = NULL;						/* The resulting string of this function. */
-	char * previousResult = NULL;				/* Temporary pointer used to copy previously generated data into the current result. */
-	size_t resultLength = 1;					/* The size of the result string. Set to one by default to allow the string to be NULL terminated. */
-	const char outputValues[10] = "0123456789";	/* C-String used to map a generated value to it's corresponding character. */
+	size_t currentNum = 0;							/* Temporary value used to store the current number we are working on. */
+	char outputValue = '\0';						/* The value that we need to write into the output buffer. (Calculated from currentNum.) */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code of a call to an engine function. */
+	char * result = NULL;							/* The resulting string of this function. */
+	char * previousResult = NULL;					/* Temporary pointer used to copy previously generated data into the current result. */
+	size_t resultLength = 1;						/* The size of the result string. Set to one by default to allow the string to be NULL terminated. */
+	const char outputValues[10] = "0123456789";		/* C-String used to map a generated value to it's corresponding character. */
 
 	/* Check for invalid arguments. */
 	if ((str != NULL) && (strLength != NULL))
 	{
 		/* Allocate memory for result. */
-		result = (char *)malloc(resultLength);
-		if (result != NULL)
+		retFromCall = DataProcess_Reallocate_C_String(&result, 0, resultLength);
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (result != NULL))
 		{
 			/* Set currentNum. */
 			currentNum = number;
@@ -196,14 +251,11 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
 				resultLength++;
 
 				/* Allocate the new buffer. */
-				result = (char*)malloc(resultLength);
+				retFromCall = DataProcess_Reallocate_C_String(&result, 0, resultLength);
 
 				/* Check for successful memory allocation. */
-				if (result != NULL)
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (result != NULL))
 				{
-					/* Blank out the new buffer. */
-					memset(result, '\0', resultLength);
-
 					/* Set the first value as the previous data comes after it. */
 					result[0] = outputValues[outputValue];
 
@@ -211,8 +263,7 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
 					if (previousResult != NULL)
 					{
 						memcpy((result + 1), previousResult, (resultLength - 1));
-						free(previousResult);
-						previousResult = NULL;
+						DataProcess_Deallocate_CString(&previousResult);
 					}
 
 					/* Get the next value by chopping off the "ones place", aka divide by the current base. */
@@ -240,8 +291,7 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
 				/* Deallocate result if needed. */
 				if (result != NULL)
 				{
-					free(result);
-					result = NULL;
+					DataProcess_Deallocate_CString(&result);
 				}
 				resultLength = 0;
 			}
@@ -266,12 +316,13 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
 {
 	/* Init vars. */
-	int foundDelim = 0;							/* Whether or not we have found the delim. */
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
-	char * tempSubStr = NULL;					/* Used to create the substr. */
-	size_t x = 0;								/* Counter used in search loop. */
-	size_t y = 0;								/* Counter used in search subloop. */
-	size_t tempSubStrLength = 0;				/* Size of the tempSubString. */
+	int foundDelim = 0;								/* Whether or not we have found the delim. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code of a call to an engine function. */
+	char * tempSubStr = NULL;						/* Used to create the substr. */
+	size_t x = 0;									/* Counter used in search loop. */
+	size_t y = 0;									/* Counter used in search subloop. */
+	size_t tempSubStrLength = 0;					/* Size of the tempSubString. */
 
 	/* Check for invalid arguments. */
 	if ((src != NULL) && (srcLength > 0) && (delim != NULL) && (delimLength > 0) && (subStr != NULL) && (subStrLength != NULL))
@@ -323,12 +374,9 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 					tempSubStrLength = (srcLength - x);
 
 					/* Allocate memory for the substring. */
-					tempSubStr = (char *)malloc(tempSubStrLength);
-					if (tempSubStr != NULL)
+					retFromCall = DataProcess_Reallocate_C_String(&tempSubStr, 0, tempSubStrLength);
+					if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL))
 					{
-						/* NULL out the buffer. */
-						memset(tempSubStr, '\0', tempSubStrLength);
-
 						/* Copy the bytes before the delimiter. */
 						memcpy(tempSubStr, src, tempSubStrLength);
 
@@ -360,12 +408,9 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 					tempSubStrLength = (x - delimLength);
 
 					/* Allocate memory for the substring. */
-					tempSubStr = (char *)malloc(tempSubStrLength);
-					if (tempSubStr != NULL)
+					retFromCall = DataProcess_Reallocate_C_String(&tempSubStr, 0, tempSubStrLength);
+					if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL))
 					{
-						/* NULL out the buffer. */
-						memset(tempSubStr, '\0', tempSubStrLength);
-
 						/* Copy the bytes after the delimiter. */
 						memcpy(tempSubStr, (searchFromEnd ? (src + ((srcLength + 1) - x)) : (src + x)), (x - delimLength));
 
@@ -409,10 +454,11 @@ int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLen
 												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
 {
 	/* Init vars. */
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
-	char * tempSubStr = NULL;					/* Used to create the substr. */
-	size_t tempRealOffset = 0;					/* Used to hold the real starting offset in the given string. */
-	size_t tempSubStrLength = 0;				/* Size of the tempSubString. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code of a call to an engine function. */
+	char * tempSubStr = NULL;						/* Used to create the substr. */
+	size_t tempRealOffset = 0;						/* Used to hold the real starting offset in the given string. */
+	size_t tempSubStrLength = 0;					/* Size of the tempSubString. */
 
 	/* Check for invalid arguments. */
 	if ((src != NULL) && (srcLength > 0) && (offset >= 0) && (offset < srcLength) && (subStr != NULL) && (subStrLength != NULL))
@@ -439,13 +485,10 @@ int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLen
 		/* Make sure the temp values are within the given string's buffer. */
 		if ((tempRealOffset >= 0) && (tempRealOffset < srcLength) && (tempSubStrLength > 0) && ((tempRealOffset + tempSubStrLength) < srcLength))
 		{
-			/* Allocate memory for the substring. */
-			tempSubStr = (char *)malloc(tempSubStrLength);
-			if (tempSubStr != NULL)
+			/* Allocate memory for the substring. Using DataProcess_Reallocate_C_String(). */
+			retFromCall = DataProcess_Reallocate_C_String(&tempSubStr, 0, tempSubStrLength);
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL))
 			{
-				/* NULL out the buffer. */
-				memset(tempSubStr, '\0', tempSubStrLength);
-
 				/* Copy the data. */
 				memcpy(tempSubStr, (src + tempRealOffset), tempSubStrLength);
 
