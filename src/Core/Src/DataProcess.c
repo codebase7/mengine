@@ -145,6 +145,64 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
 	return ret;
 }
 
+int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of this function. */
+	size_t newSize = 0;						/* The modified size if needed. */
+
+	/* Check for valid args. */
+	if ((str != NULL) && (newLength != NULL) && (((*str) == NULL) || (strLength > 0)))
+	{
+		/* Check and see if the new length is greater than the original length. (We have nothing to do if it is.) */
+		if (strLength >= (*newLength))
+		{
+			/* Check and see if str is defined and strLength is greater than zero. */
+			if (((*str) != NULL) && (strLength > 0))
+			{
+				/* Determine if the str is NULL terminated. */
+				if (((*str)[(strLength - 1)]) != '\0')
+				{
+					/* We need to add an extra byte for the NULL terminator. */
+					newSize = sizeof(char);
+				}
+			}
+		}
+
+		/* Safety check on newSize.... */
+		newSize = ((newSize < SIZE_MAX) && ((*newLength) < (SIZE_MAX - newSize))) ? ((*newLength) + newSize) : (*newLength);
+
+		/* Call DataProcess_Reallocate_C_String(). (It will NULL out the allocated buffer before copying data.) */
+		ret = DataProcess_Reallocate_C_String(str, strLength, newSize);
+		if ((ret == COMMON_ERROR_SUCCESS) && (str != NULL) && ((*str) != NULL))
+		{
+			/* Check and see if the size changed. */
+			if ((*newLength) != newSize)
+			{
+				/* Copy back the reallocated string's length. */
+				(*newLength) = newSize;
+			}
+			else
+			{
+				/* No size change, see if the string is NULL terminated. */
+				if (((*str)[(newSize - 1)]) != '\0')
+				{
+					/* Set the last byte to NULL, because it should be. */
+					((*str)[(newSize - 1)]) = '\0';
+				}
+			}
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 void DataProcess_Deallocate_CString(char ** str)
 {
 	/* Check for invalid arguments. */

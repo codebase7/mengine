@@ -95,6 +95,20 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
 int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength);
 
 /*!
+ *		int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength)
+ *
+ *		Reallocates the given string to be the new length and adds a NULL byte terminator if needed.
+ *
+ *		Note: This function WILL change the given string to make it NULL byte terminated if the NULL byte
+ *		could not be added during reallocation, but only if the function returns COMMON_ERROR_SUCCESS.
+ *
+ *		(This function is a wrapper around DataProcess_Reallocate_C_String(), see that function for more information.)
+ *
+ *		In case of error, the given arguments will NOT be altered.
+ */
+int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength);
+
+/*!
  *		void DataProcess_Deallocate_CString(char ** str)
  *
  *		Destructor function for C-Strings allocated by DataProcess.
