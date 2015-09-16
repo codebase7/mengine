@@ -107,21 +107,24 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
 void DataProcess_Deallocate_CString(char ** str);
 
 /*!
-		int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength)
-
-		Takes given size_t and outputs the equivalent string as a C-String.
-
-		WARNING: This function will NOT deallocate the given string if it is already allocated.
-		The pointer WILL be overwritten if this function returns success!
-		If you need to keep the pointer for later deallocation, copy it elsewhere before calling this function.
-
-		Returns COMMON_ERROR_SUCCESS if successful. str will point to a C-String with string equivalent to number in this case.
-		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
-		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
-		Otherwise returns the appropriate error code.
-
-		In case of error, this function will not alter any given argument.
-*/
+ *		int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength)
+ *
+ *		Takes given size_t and outputs the equivalent human-readable string as a C-String.
+ *
+ *		The generated string should be freed using DataProcess_Deallocate_CString() when it is no longer needed.
+ *
+ *		WARNING: This function will NOT deallocate the given string if it is already allocated.
+ *		The pointer WILL be overwritten if this function returns success!
+ *		If you need to keep the pointer for later deallocation, copy it elsewhere before calling this function.
+ *
+ *		Returns COMMON_ERROR_SUCCESS if successful. str will point to a C-String with string equivalent to number in this case.
+ *		Returns COMMON_ERROR_INVALID_ARGUMENT if a given argument is invalid.
+ *		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *		Otherwise returns the appropriate error code.
+ *
+ *		No alteration clause:
+ *		In case of error, this function will not alter any given argument.
+ */
 int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength);
 
 /*!
