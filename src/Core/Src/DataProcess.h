@@ -134,6 +134,8 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
  *		If the delimiter string is found, this function will produce a sub-string with either the remaining bytes in the
  *		source string that come after the delimiter, or the bytes from the source string that came before the delimiter.
  *
+ *		The generated sub-string should be freed using DataProcess_Deallocate_CString() when it is no longer needed.
+ *
  *		Optionally if searchFromEnd is non-zero, the search will start from the end of the source string instead of the beginning.
  *
  *		@pram getPriorData, Chooses the bytes that came before the delimiter or after the delimiter for generating the sub-string from.

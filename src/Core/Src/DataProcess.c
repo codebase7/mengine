@@ -266,12 +266,13 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData)
 {
 	/* Init vars. */
-	int foundDelim = 0;							/* Whether or not we have found the delim. */
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
-	char * tempSubStr = NULL;					/* Used to create the substr. */
-	size_t x = 0;								/* Counter used in search loop. */
-	size_t y = 0;								/* Counter used in search subloop. */
-	size_t tempSubStrLength = 0;				/* Size of the tempSubString. */
+	int foundDelim = 0;								/* Whether or not we have found the delim. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code of a call to an engine function. */
+	char * tempSubStr = NULL;						/* Used to create the substr. */
+	size_t x = 0;									/* Counter used in search loop. */
+	size_t y = 0;									/* Counter used in search subloop. */
+	size_t tempSubStrLength = 0;					/* Size of the tempSubString. */
 
 	/* Check for invalid arguments. */
 	if ((src != NULL) && (srcLength > 0) && (delim != NULL) && (delimLength > 0) && (subStr != NULL) && (subStrLength != NULL))
@@ -323,12 +324,9 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 					tempSubStrLength = (srcLength - x);
 
 					/* Allocate memory for the substring. */
-					tempSubStr = (char *)malloc(tempSubStrLength);
-					if (tempSubStr != NULL)
+					retFromCall = DataProcess_Reallocate_C_String(&tempSubStr, 0, tempSubStrLength);
+					if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL))
 					{
-						/* NULL out the buffer. */
-						memset(tempSubStr, '\0', tempSubStrLength);
-
 						/* Copy the bytes before the delimiter. */
 						memcpy(tempSubStr, src, tempSubStrLength);
 
@@ -360,12 +358,9 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 					tempSubStrLength = (x - delimLength);
 
 					/* Allocate memory for the substring. */
-					tempSubStr = (char *)malloc(tempSubStrLength);
-					if (tempSubStr != NULL)
+					retFromCall = DataProcess_Reallocate_C_String(&tempSubStr, 0, tempSubStrLength);
+					if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL))
 					{
-						/* NULL out the buffer. */
-						memset(tempSubStr, '\0', tempSubStrLength);
-
 						/* Copy the bytes after the delimiter. */
 						memcpy(tempSubStr, (searchFromEnd ? (src + ((srcLength + 1) - x)) : (src + x)), (x - delimLength));
 
