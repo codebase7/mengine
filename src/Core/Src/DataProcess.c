@@ -122,8 +122,7 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
 		/* Deallocate the old string. (If needed.) */
 		if ((*str) != NULL)
 		{
-			free((*str));
-			(*str) = NULL;
+			DataProcess_Deallocate_CString(str);
 		}
 
 		/* Copy the new string pointer if needed. */
