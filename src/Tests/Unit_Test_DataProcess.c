@@ -273,6 +273,16 @@ int Unit_Tests_DataProcess_TRNG()
 /* Define TRNGUseMayFailMSG. */
 const static char * TRNGUseMayFailMSG = "The remainder of these tests rely on the DataProcess_Trivial_Random_Number_Generator() function to work correctly and may fail or give false results if that function does not work correctly. Therefore the results for the remainder of the test should only be considered valid if the TRNG function works correctly.\n";
 
+/* Define some common error messages. */
+const static char * periodAndNewlineMSG = ".\n";
+const static char * errorCodeReturnedMSG = "The function returned error code: ";
+const static char * errorSuccessNoResultMSG = "The function returned success without producing a result.\n";
+const static char * errorSamePtrMSG = "The function returned success, but the returned memory pointer is identical to the original one. (No actual allocation occured.)\n";
+const static char * InvalidArgStringPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL string pointer to ";
+const static char * InvalidArgStringPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL string pointer to ";
+const static char * InvalidArgLengthPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL newLength pointer to ";
+const static char * InvalidArgLengthPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL newLength pointer to ";
+
 int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 {
 	/* Define the passed test message. */
@@ -321,14 +331,6 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 	const char * reallocationWithPreExistingNullTermFailMSG = "Unable to reallocate the random string with a pre-existing NULL termination byte using DataProcess_Reallocate_C_String_With_NULL_Terminator().\n";
 	const char * reallocateCStringFunctMSG = "DataProcess_Reallocate_C_String()";
 	const char * reallocateCStringWithNullFunctMSG = "DataProcess_Reallocate_C_String_With_NULL_Terminator()";
-	const char * InvalidArgStringPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL string pointer to ";
-	const char * InvalidArgStringPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL string pointer to ";
-	const char * InvalidArgLengthPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL newLength pointer to ";
-	const char * InvalidArgLengthPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL newLength pointer to ";
-	const char * periodAndNewlineMSG = ".\n";
-	const char * errorCodeReturnedMSG = "The function returned error code: ";
-	const char * errorSuccessNoResultMSG = "The function returned success without producing a result.\n";
-	const char * errorSamePtrMSG = "The function returned success, but the returned memory pointer is identical to the original one. (No actual allocation occured.)\n";
 
 	/* Start test section. */
 	printf("%s", START_TEST_SECTION);
