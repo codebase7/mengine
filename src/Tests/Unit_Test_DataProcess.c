@@ -671,18 +671,299 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 #undef TEST_PASSED_MSG
 }
 
+/*!
+ *	int Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_number_conversion_function()
+ *
+ *	Takes a given number between zero (0) and ten (10) and returns it's arabic numeral text character.
+ *
+ *	If the given number is outside the range of zero (0) and ten (10) then -1 is returned.
+ */
+int Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_number_conversion_function(const size_t number)
+{
+	/* Define numbersLength. */
+#define NUMBERSLENGTH 11
+
+	/* Init vars. */
+	int ret = -1;		/* The result of this function. */
+	const char numbers[NUMBERSLENGTH] = {"0123456789"};		/* Array to contain the text versions of the given numbers. */
+
+	/* Check given number argument. */
+	if ((0 <= number) && (number < 10))
+	{
+		/* Get the number so we can return it. */
+		ret = (char)(numbers[number]);
+	}
+
+	/* Exit function. */
+	return ret;
+
+	/* Undef NUMBERSLENGTH. */
+#undef NUMBERSLENGTH
+}
+
+/*!
+ *	int Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_function(const size_t randomNumber, const char * string, const size_t stringLength)
+ *
+ *	Ok, the purpose of this function is to verify that a generated string matches the number it was made from.
+ *
+ *	To that extent, we wind up reimplimenting the functionality of DataProcess_getCStringFromSizeT(),
+ *	but instead of creating a string we are checking it for accuracy.
+ */
+int Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_function(const size_t randomNumber, const char * string, const size_t stringLength)
+{
+		/* Define the error messaging macros. */
+#define TEST_FAILURE_MSG_HEAD "TEST_FAILURE: Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_function(): "
+#define TEST_ERROR_LOG_REAL(ERR_MSG) printf("%s", TEST_FAILURE_MSG_HEAD); printf("%s", ERR_MSG);
+#define TEST_ERROR_LOG(ERR_MSG) TEST_ERROR_LOG_REAL(ERR_MSG)
+
+	/* Define the numeric base of DataProcess_getCStringFromSizeT(). */
+#define TEST_NUMERIC_BASE 10
+
+	/* Init vars. */
+	char cNumber = '0';			/* Used to hold the current number we are checking for in the given string. */
+	int ret = -1;				/* The result of this function. */
+	size_t currentValue = 0;	/* The current number being verified. */
+	size_t x = 0;				/* Counter used in verififcation loop. */
+
+	/* Check for invalid arguments. */
+	if ((string != NULL) && (stringLength > 0))
+	{
+		/* Set current value. */
+		currentValue = randomNumber;
+
+		/* Begin verification loop. */
+		for (x = 0; ((ret == -1) && (x < (stringLength - 1)) && (((stringLength - 2) - x) >= 0) && (currentValue > 0)); x++)
+		{
+			/* Devide off the last digit and convert it to a text character. */
+			cNumber = Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_number_conversion_function((currentValue % TEST_NUMERIC_BASE));
+
+			/* Check the text character for a match in the given string. */
+			if (string[((stringLength - 2) - x)] == cNumber)
+			{
+				/* Proceed to the next value in the string. */
+				currentValue /= TEST_NUMERIC_BASE;
+			}
+			else
+			{
+				/* Invalid text string. */
+				ret = -3;
+			}
+		}
+
+		/* Check counter value for success. */
+		if ((ret == -1) && (x == (stringLength - 1)))
+		{
+			/* String matches the number. */
+			ret = 0;
+		}
+		else
+		{
+			/* Invalid string. */
+			ret = -3;
+		}
+	}
+	else
+	{
+		/* Invalid argument. */
+		ret = -2;
+		TEST_ERROR_LOG("Invalid argument.\n");
+	}
+
+	/* Exit function. */
+	return ret;
+
+	/* Undef macros. */
+#undef TEST_NUMERIC_BASE
+#undef TEST_ERROR_LOG_REAL
+#undef TEST_ERROR_LOG
+#undef TEST_FAILURE_MSG_HEAD
+}
+
+/*!
+ *		int Unit_Tests_DataProcess_sizet_cstring_converter()
+ *
+ *		This function tests the DataProcess_getCStringFromSizeT() function.
+ */
+int Unit_Tests_DataProcess_sizet_cstring_converter()
+{
+	/* Define the name of the function. */
+#define MSYS_FUNCT_NAME	"Unit_Tests_DataProcess_sizet_cstring_converter()"
+#define MSYS_TESTING_FUNCT_NAME "DataProcess_getCStringFromSizeT()"
+
+	/* Define the passed test message. */
+#define TEST_PASSED_MSG "Unit_Tests_DataProcess_sizet_cstring_converter(): TEST_PASSED"
+
+	/* Define the error messaging macros. */
+#define TEST_FAILURE_MSG_HEAD "TEST_FAILURE: Unit_Tests_DataProcess_sizet_cstring_converter(): "
+#define TEST_ERROR_LOG_REAL(ERR_MSG) printf("%s", TEST_FAILURE_MSG_HEAD); printf("%s", ERR_MSG);
+#define TEST_ERROR_LOG(ERR_MSG) TEST_ERROR_LOG_REAL(ERR_MSG)
+
+	/* Define the limits on the random number range. (MINIMAL value should be less than the MAXIMUM value and both should be positive.) */
+#define TEST_MINIMAL_RANDOM_NUMBER_VALUE 1
+#define TEST_MAXIMUM_RANDOM_NUMBER_VALUE 100
+
+	/* Init vars. */
+	int ret = 0;									/* The result of this test function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of a call to an engine function. */
+	size_t randVal = 0;								/* Used to generate a random number to use with DataProcess_getCStringFromSizeT(). */
+	size_t currentStringLength = 0;					/* The length of the currentString.... string. */
+	char * currentString = NULL;						/* The current string pointer. */
+	char * previousString = NULL;						/* The previous string pointer. */
+
+	/* Start test section. */
+	printf("%s", START_TEST_SECTION);
+
+	/* Warn user about TRNG use. */
+	printf("%s", TRNGUseMayFailMSG);
+	fflush(stdout);
+
+	/* Generate a random number. */
+	printf("%s%s", MSYS_FUNCT_NAME, " Attempting to generate a random number.\n");
+	randVal = DataProcess_Trivial_Random_Number_Generator(TEST_MINIMAL_RANDOM_NUMBER_VALUE, TEST_MAXIMUM_RANDOM_NUMBER_VALUE, true);
+	if (randVal != 0)
+	{
+		/* Attempt to generate the string version of the random number. */
+		printf("%s%s%i%s", MSYS_FUNCT_NAME, " Attempting to generate the string version of the random number: <", randVal, ">.\n");
+		retFromCall = DataProcess_getCStringFromSizeT(randVal, &currentString, &currentStringLength);
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL) && (currentStringLength > 0))
+		{
+			/* Check the result.... */
+			printf("%s%s", MSYS_FUNCT_NAME, " checking result.\n");
+			ret = Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_function(randVal, currentString, currentStringLength);
+			if (ret == 0)
+			{
+				/* Copy the pointer. */
+				previousString = currentString;
+
+				/* Reset currentStringLength. */
+				currentStringLength = 0;
+
+				/* Check and see if the function will overwrite the given pointer. */
+				printf("%s%s%s%s", MSYS_FUNCT_NAME, " checking to see if the given string pointer will be overwritten by ", MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+				retFromCall = DataProcess_getCStringFromSizeT(randVal, &currentString, &currentStringLength);
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL) && (currentString != previousString) && (currentStringLength > 0))
+				{
+					/* Deallocate the strings. */
+					DataProcess_Deallocate_CString(&previousString);
+					DataProcess_Deallocate_CString(&currentString);
+					currentStringLength = 0;
+
+					/* Check for INVALID_ARGUMENT error code if DataProcess_getCStringFromSizeT() is given a bad string pointer. */
+					printf("%s%s%s", InvalidArgStringPointerTestMSG, MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+					retFromCall = DataProcess_getCStringFromSizeT(randVal, NULL, &currentStringLength);
+					if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
+					{
+						/* Check for INVALID_ARGUMENT error code if DataProcess_getCStringFromSizeT() is given a bad stringLength pointer. */
+						printf("%s%s%s", InvalidArgLengthPointerTestMSG, MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+						retFromCall = DataProcess_getCStringFromSizeT(randVal, &currentString, NULL);
+						if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
+						{
+							/* Test successful. */
+							printf("%s%s", TEST_PASSED_MSG, periodAndNewlineMSG);
+							ret = 0;
+						}
+						else
+						{
+							/* Did not get invalid argument error code for bad string length pointer. */
+							ret = -6;
+							TEST_ERROR_LOG(InvalidArgLengthPointerFailMSG);
+							printf("%s%s", MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+							printf("%s%i%s", errorCodeReturnedMSG, retFromCall, periodAndNewlineMSG);
+						}
+					}
+					else
+					{
+						/* Did not get invalid argument error code for bad string pointer. */
+						ret = -5;
+						TEST_ERROR_LOG(InvalidArgStringPointerFailMSG);
+						printf("%s%s", MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+						printf("%s%i%s", errorCodeReturnedMSG, retFromCall, periodAndNewlineMSG);
+					}
+				}
+				else
+				{
+					/* Test of overwriting the given pointer failed. */
+					ret = -4;
+					TEST_ERROR_LOG("overwriting the given pointer failed.\n");
+					((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, periodAndNewlineMSG)) :
+					 (currentString == previousString) ? (printf("%s", errorSamePtrMSG)) :
+					 (printf("%s", errorSuccessNoResultMSG)));
+				}
+			}
+			else
+			{
+				/* Verification of string failed. */
+				ret = -3;
+				TEST_ERROR_LOG("Verification of string failed.\n");
+				printf("%s%i%s%s%s", "The random number <", randVal, "> does not match the generated string <", currentString, ">.\n");
+			}
+
+			/* Deallocate the result if needed. */
+			if (currentString != NULL)
+			{
+				DataProcess_Deallocate_CString(&currentString);
+				currentStringLength = 0;
+			}
+		}
+		else
+		{
+			/* Could not generate c-string. */
+			ret = -2;
+			TEST_ERROR_LOG("Could not generate c-string.\n");
+			((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, periodAndNewlineMSG)) :
+				(printf("%s", errorSuccessNoResultMSG)));
+		}
+	}
+	else
+	{
+		/* Could not generate a random number. */
+		ret = -1;
+		TEST_ERROR_LOG("Could not generate a random number.\n");
+	}
+
+	/* End test section. */
+	printf("%s", END_TEST_SECTION);
+
+	/* Flush output buffer. */
+	fflush(stdout);
+
+	/* Exit function. */
+	return ret;
+
+	/* Check for invalid random number range. */
+#if TEST_MINIMAL_RANDOM_NUMBER_VALUE < 1
+#error "Unit_Tests_DataProcess_sizet_cstring_converter(): TEST_MINIMAL_RANDOM_NUMBER_VALUE must be a greater than or equal to one (1)."
+#endif	/* TEST_MINIMAL_RANDOM_NUMBER_VALUE < 1 */
+#if TEST_MAXIMUM_RANDOM_NUMBER_VALUE < 2
+#error "Unit_Tests_DataProcess_sizet_cstring_converter(): TEST_MAXIMUM_RANDOM_NUMBER_VALUE must be a greater than or equal to two (2)."
+#endif /* TEST_MAXIMUM_RANDOM_NUMBER_VALUE < 2 */
+
+	/* Undefine the macros. */
+#undef TEST_MAXIMUM_RANDOM_NUMBER_VALUE
+#undef TEST_MINIMAL_RANDOM_NUMBER_VALUE
+#undef TEST_ERROR_LOG_REAL
+#undef TEST_ERROR_LOG
+#undef TEST_FAILURE_MSG_HEAD
+#undef TEST_PASSED_MSG
+#undef MSYS_FUNCT_NAME
+}
+
 int Unit_Tests_DataProcess_Main()
 {
 	/* Init vars. */
-	int ret = 0;					/* Result of the tests. */
-	int retFromTRNGTest = 0;		/* Result of the TRNG test. */
-	int retFromAllocatorTest = 0;	/* Result of the allocator and deallocator tests. */
+	int ret = 0;								/* Result of the tests. */
+	int retFromTRNGTest = 0;					/* Result of the TRNG test. */
+	int retFromAllocatorTest = 0;				/* Result of the allocator and deallocator tests. */
+	int retFromSizeTCStringConversionTest = 0;	/* Result of the size_t to c-string conversion tests. */
 
 	/* Begin tests for DataProcess_Trivial_Random_Number_Generator(). */
 	retFromTRNGTest = Unit_Tests_DataProcess_TRNG();
 
 	/* Begin tests for DataProcess_Reallocate_C_String() and DataProcess_Deallocate_CString(). */
 	retFromAllocatorTest = Unit_Tests_DataProcess_Allocator_and_Deallocator();
+
+	/* Begin tests for DataProcess_getCStringFromSizeT(). */
+	retFromSizeTCStringConversionTest = Unit_Tests_DataProcess_sizet_cstring_converter();
 
 	/* Return ret. */
 	return ret;
