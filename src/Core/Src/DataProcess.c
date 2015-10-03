@@ -226,6 +226,9 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
 				/* Copy the current buffer's pointer because we are about to create a new one. */
 				previousResult = result;
 
+				/* Reset the current buffer's pointer. (Otherwise Reallocate_C_String() will deallocate it.) */
+				result = NULL;
+
 				/* Increment the size of the new buffer. */
 				resultLength++;
 
