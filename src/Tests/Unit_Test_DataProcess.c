@@ -271,7 +271,7 @@ int Unit_Tests_DataProcess_TRNG()
 }
 
 /* Define TRNGUseMayFailMSG. */
-const static char * TRNGUseMayFailMSG = "The remainder of these tests rely on the DataProcess_Trivial_Random_Number_Generator() function to work correctly and may fail or give false results if that function does not work correctly. Therefore the results for the remainder of the test should only be considered valid if the TRNG function works correctly.\n";
+const static char * TRNGUseMayFailMSG = "The remainder of these tests rely on the DataProcess_Trivial_Random_Number_Generator() function to work correctly and may fail or give false results if that function does not work correctly. Therefore the results for the remainder of the test should only be considered valid if the TRNG function works correctly.\n\n";
 
 /* Define some common error messages. */
 const static char * periodAndNewlineMSG = ".\n";
