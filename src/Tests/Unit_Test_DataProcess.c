@@ -270,6 +270,9 @@ int Unit_Tests_DataProcess_TRNG()
 #undef TEST_ARRAY_SIZE
 }
 
+/* Define TRNGUseMayFailMSG. */
+const static char * TRNGUseMayFailMSG = "The remainder of these tests rely on the DataProcess_Trivial_Random_Number_Generator() function to work correctly and may fail or give false results if that function does not work correctly. Therefore the results for the remainder of the test should only be considered valid if the TRNG function works correctly.\n";
+
 int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 {
 	/* Define the passed test message. */
@@ -303,7 +306,6 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 	const char * byteDeallocationFailMSG = "Unable to deallocate the byte.\n";
 	const char * useAsAllocatorTestMSG = "Attempting to use DataProcess_Reallocate_C_String() as a memory allocator.\n";
 	const char * useAsAllocatorFailMSG = "Unable to use DataProcess_Reallocate_C_String() as a memory allocator.\n";
-	const char * TRNGUseMayFailMSG = "The remainder of these tests rely on the DataProcess_Trivial_Random_Number_Generator() function to work correctly and may fail or give false results if that function does not work correctly. Therefore the results for the remainder of the test should only be considered valid if the TRNG function works correctly.\n";
 	const char * rangeTest1MSG = "Attempting to reallocate the following string < ";
 	const char * rangeTest2MSG = " > using only the first ";
 	const char * rangeTest3MSG = " bytes";
