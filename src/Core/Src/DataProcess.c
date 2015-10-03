@@ -153,42 +153,21 @@ int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size
 	/* Check for valid args. */
 	if ((str != NULL) && (newLength != NULL) && (((*str) == NULL) || (strLength > 0)))
 	{
-		/* Check and see if the new length is greater than the original length. (We have nothing to do if it is.) */
-		if (strLength >= (*newLength))
-		{
-			/* Check and see if str is defined and strLength is greater than zero. */
-			if (((*str) != NULL) && (strLength > 0))
-			{
-				/* Determine if the str is NULL terminated. */
-				if (((*str)[(strLength - 1)]) != '\0')
-				{
-					/* We need to add an extra byte for the NULL terminator. */
-					newSize = sizeof(char);
-				}
-			}
-		}
-
+		/* Check and see if new length is greater than zero (0). */
 		/* Safety check on newSize.... */
-		newSize = ((newSize < SIZE_MAX) && ((*newLength) < (SIZE_MAX - newSize))) ? ((*newLength) + newSize) : (*newLength);
+		newSize = ((*newLength) > 0) ? (((*newLength) < (SIZE_MAX - (sizeof(char)))) ? ((*newLength) + (sizeof(char))) : (*newLength)) : (0);
 
 		/* Call DataProcess_Reallocate_C_String(). (It will NULL out the allocated buffer before copying data.) */
 		ret = DataProcess_Reallocate_C_String(str, strLength, newSize);
 		if ((ret == COMMON_ERROR_SUCCESS) && (str != NULL) && ((*str) != NULL))
 		{
-			/* Check and see if the size changed. */
-			if ((*newLength) != newSize)
+			/* See if the string is NULL terminated. */
+			if ((newSize > 0) && (((*str)[(newSize - 1)]) != '\0'))
 			{
-				/* Copy back the reallocated string's length. */
-				(*newLength) = newSize;
-			}
-			else
-			{
-				/* No size change, see if the string is NULL terminated. */
-				if (((*str)[(newSize - 1)]) != '\0')
-				{
-					/* Set the last byte to NULL, because it should be. */
-					((*str)[(newSize - 1)]) = '\0';
-				}
+				/* Set the last byte to NULL, because it should be.
+					(The last byte is always NULL if this function returns COMMON_ERROR_SUCCESS.)
+				 */
+				((*str)[(newSize - 1)]) = '\0';
 			}
 		}
 	}
@@ -246,6 +225,9 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
 
 				/* Copy the current buffer's pointer because we are about to create a new one. */
 				previousResult = result;
+
+				/* Reset the current buffer's pointer. (Otherwise Reallocate_C_String() will deallocate it.) */
+				result = NULL;
 
 				/* Increment the size of the new buffer. */
 				resultLength++;

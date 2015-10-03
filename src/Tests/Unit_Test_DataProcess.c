@@ -270,15 +270,700 @@ int Unit_Tests_DataProcess_TRNG()
 #undef TEST_ARRAY_SIZE
 }
 
+/* Define TRNGUseMayFailMSG. */
+const static char * TRNGUseMayFailMSG = "The remainder of these tests rely on the DataProcess_Trivial_Random_Number_Generator() function to work correctly and may fail or give false results if that function does not work correctly. Therefore the results for the remainder of the test should only be considered valid if the TRNG function works correctly.\n\n";
+
+/* Define some common error messages. */
+const static char * periodAndNewlineMSG = ".\n";
+const static char * errorCodeReturnedMSG = "The function returned error code: ";
+const static char * errorSuccessNoResultMSG = "The function returned success without producing a result.\n";
+const static char * errorSamePtrMSG = "The function returned success, but the returned memory pointer is identical to the original one. (No actual allocation occured.)\n";
+const static char * InvalidArgStringPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL string pointer to ";
+const static char * InvalidArgStringPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL string pointer to ";
+const static char * InvalidArgLengthPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL length pointer to ";
+const static char * InvalidArgLengthPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL length pointer to ";
+
+int Unit_Tests_DataProcess_Allocator_and_Deallocator()
+{
+	/* Define the passed test message. */
+#define TEST_PASSED_MSG "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PASSED"
+
+	/* Define the error messaging macros. */
+#define TEST_FAILURE_MSG_HEAD "TEST_FAILURE: Unit_Tests_DataProcess_Allocator_and_Deallocator(): "
+#define TEST_ERROR_LOG_REAL(ERR_MSG) printf("%s", TEST_FAILURE_MSG_HEAD); printf("%s", ERR_MSG);
+#define TEST_ERROR_LOG(ERR_MSG) TEST_ERROR_LOG_REAL(ERR_MSG)
+
+	/* Define the range of ASCII values to use for the random string. */
+#define TEST_PRINTABLE_ASCII_START 33
+#define TEST_PRINTABLE_ASCII_END 126
+
+	/* Define the length of the random string. (Must be greater than 3.) */
+#define TEST_RANDOM_STRING_LENGTH 24
+
+	/* Init vars. */
+	int ret = -999;										/* Result of the tests. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;		/* Result code from engine function. */
+	size_t x = 0;										/* Counter used in random string generation loop. */
+	size_t randVal = 0;									/* Result from the call to TRNG() function. */
+	char * currentString = NULL;						/* The current string pointer. */
+	char * previousString = NULL;						/* The previous string pointer. */
+	char * randString = NULL;							/* A random string. */
+	const char * byteAllocationTestMSG = "Attempting to allocate one (1) byte using DataProcess_Reallocate_C_String().\n";
+	const char * byteAllocationFailMSG = "Unable to allocate one (1) byte. ";
+	const char * byteReallocationTestMSG = "Attempting to reallocate the byte using DataProcess_Reallocate_C_String().\n";
+	const char * byteReallocationFailMSG = "Unable to reallocate the byte. ";
+	const char * byteDeallocationTestMSG = "Attempting to deallocate the byte using DataProcess_Deallocate_CString().\n";
+	const char * byteDeallocationFailMSG = "Unable to deallocate the byte.\n";
+	const char * useAsAllocatorTestMSG = "Attempting to use DataProcess_Reallocate_C_String() as a memory allocator.\n";
+	const char * useAsAllocatorFailMSG = "Unable to use DataProcess_Reallocate_C_String() as a memory allocator.\n";
+	const char * rangeTest1MSG = "Attempting to reallocate the following string < ";
+	const char * rangeTest2MSG = " > using only the first ";
+	const char * rangeTest3MSG = " bytes";
+	const char * rangeFailMSG = "Unable to reallocate the following string < ";
+	const char * dataMismatch1FailMSG = "Copied string < ";
+	const char * dataMismatch2FailMSG = " > does not match the source string.\n";
+	const char * reallocationWithNullTermTestMSG = "Attempting to reallocate the random string with a NULL termination byte using DataProcess_Reallocate_C_String_With_NULL_Terminator().\n";
+	const char * reallocationWithNullTermFailMSG = "Unable to reallocate the random string with a NULL termination byte.\n";
+	const char * reallocationWithNullTermFailInvalidSize1MSG = "Expected length of NULL terminated string was: ";
+	const char * reallocationWithNullTermFailInvalidSize2MSG = ". The returned length was: ";
+	const char * reallocationWithNullTermFailNoNullMSG = "The reallocated string is not null byte terminated.";
+	const char * reallocationWithPreExistingNullTermTestMSG = "Attempting to reallocate the random string using DataProcess_Reallocate_C_String_With_NULL_Terminator() with a NULL termination byte already present.\n";
+	const char * reallocationWithPreExistingNullTermFailMSG = "Unable to reallocate the random string with a pre-existing NULL termination byte using DataProcess_Reallocate_C_String_With_NULL_Terminator().\n";
+	const char * reallocateCStringFunctMSG = "DataProcess_Reallocate_C_String()";
+	const char * reallocateCStringWithNullFunctMSG = "DataProcess_Reallocate_C_String_With_NULL_Terminator()";
+
+	/* Start test section. */
+	printf("%s", START_TEST_SECTION);
+
+	/* Attempt to allocate a small amount of memory. */
+	printf("%s", byteAllocationTestMSG);
+	retFromCall = DataProcess_Reallocate_C_String(&currentString, 0, 1);
+	if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL))
+	{
+		/* Copy the pointer. */
+		previousString = currentString;
+
+		/* Now attempt to reallocate the string. */
+		printf("%s", byteReallocationTestMSG);
+		retFromCall = retFromCall = DataProcess_Reallocate_C_String(&currentString, 1, 1);
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL) && (currentString != previousString))
+		{
+			/* Set previousString to NULL.
+				(The string was deallocated by DataProcess_Reallocate_C_String() as it was a copy of currentString's pointer value.)
+			*/
+			previousString = NULL;
+
+			/* Test the deallocation function. */
+			printf("%s", byteDeallocationTestMSG);
+			DataProcess_Deallocate_CString(&currentString);
+			if (currentString == NULL)
+			{
+				/* Allocate memory for the TRNG String. */
+				printf("%s", useAsAllocatorTestMSG);
+				retFromCall = DataProcess_Reallocate_C_String(&randString, 0, TEST_RANDOM_STRING_LENGTH);
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (randString != NULL))
+				{
+					/* Warn the user that we are using the TRNG. */
+					printf("%s", TRNGUseMayFailMSG);
+
+					/* Use the TRNG to generate the source string. (Note the last character in the string should be a NULL byte.
+					   Which it is if the string was allocated by DataProcess_Reallocate_C_String().)
+					 */
+					for (x = 0; (x < (TEST_RANDOM_STRING_LENGTH - 1)); x++)
+					{
+						randVal = DataProcess_Trivial_Random_Number_Generator(TEST_PRINTABLE_ASCII_START, TEST_PRINTABLE_ASCII_END, false);
+						randString[x] = (int)randVal;
+					}
+
+					/* Allocate memory to copy the random string into. */
+					printf("%s", useAsAllocatorTestMSG);
+					retFromCall = DataProcess_Reallocate_C_String(&currentString, 0, TEST_RANDOM_STRING_LENGTH);
+					if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL))
+					{
+						/* Copy the random string, because reallocating it will loose data. */
+						memcpy(currentString, randString, TEST_RANDOM_STRING_LENGTH);
+
+						/* Copy the pointer. (To make sure a new allocation is made.) */
+						previousString = currentString;
+
+						/* Generate one final random number to determine how much of the random string should be copied. */
+						randVal = DataProcess_Trivial_Random_Number_Generator(2, (TEST_RANDOM_STRING_LENGTH - 1), false);
+
+						/* Check and see if giving a range of the source string outputs the correct sub-string. */
+						printf("%s%s%s%i%s%s", rangeTest1MSG, randString, rangeTest2MSG, randVal, rangeTest3MSG, periodAndNewlineMSG);
+						retFromCall = DataProcess_Reallocate_C_String(&currentString, TEST_RANDOM_STRING_LENGTH, randVal);
+						if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != previousString) && (currentString != randString))
+						{
+							/* Set previousString to NULL.
+								(The string was deallocated by DataProcess_Reallocate_C_String() as it was a copy of currentString's pointer value.)
+							 */
+							previousString = NULL;
+
+							/* Begin verification loop. */
+							for (x = 0; ((x < randVal) && (x < (TEST_RANDOM_STRING_LENGTH - 1))); x++)
+							{
+								/* Check for identical data in both strings. */
+								if (randString[x] != currentString[x])
+								{
+									/* Data mismatch. */
+									break;
+								}
+							}
+
+							/* Check result of verification loop. */
+							if ((x == randVal) || (x == (TEST_RANDOM_STRING_LENGTH - 1)))
+							{
+								/* Test the DataProcess_Reallocate_C_String_With_NULL_Terminator() function by setting the
+									last byte of the currentString to a non-zero value.
+								*/
+								if (currentString[(randVal - 1)] == 0x0)
+								{
+									currentString[(randVal - 1)] = 0x1;
+								}
+
+								/* Copy the string pointer. (To verifiy a new allocation was made.) */
+								previousString = currentString;
+
+								/* Abuse x to store the current random value. */
+								x = randVal;
+
+								/* Now reallocate the string. */
+								printf("%s", reallocationWithNullTermTestMSG);
+								retFromCall = DataProcess_Reallocate_C_String_With_NULL_Terminator(&currentString, randVal, &x);
+								if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL) && (currentString != previousString) &&
+									(currentString[(randVal)] == '\0'))
+								{
+									/* Set previousString to NULL.
+										(The string was deallocated by DataProcess_Reallocate_C_String() as it was a copy of currentString's pointer value.)
+									 */
+									previousString = NULL;
+
+									/* Begin verification loop. */
+									for (x = 0; ((x < randVal) && (x < (TEST_RANDOM_STRING_LENGTH - 1))); x++)
+									{
+										/* Check for identical data in both strings. */
+										if (randString[x] != currentString[x])
+										{
+											/* Data mismatch. */
+											break;
+										}
+									}
+
+									/* Check result of verification loop. */
+									if ((x == randVal) || (x == (TEST_RANDOM_STRING_LENGTH - 1)))
+									{
+										/* Copy the pointer. */
+										previousString = currentString;
+
+										/* Recall DataProcess_Reallocate_C_String_With_NULL_Terminator() with a NULL'd string.
+										   The size of the string should not change in this case.
+										 */
+										printf("%s", reallocationWithPreExistingNullTermTestMSG);
+										retFromCall = DataProcess_Reallocate_C_String_With_NULL_Terminator(&currentString, randVal, &x);
+										if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL) && (currentString != previousString) &&
+											((randVal < TEST_RANDOM_STRING_LENGTH) ? (currentString[(randVal)] == '\0') : (currentString[(TEST_RANDOM_STRING_LENGTH + 1)])))
+										{
+											/* Set previousString to NULL.
+												(The string was deallocated by DataProcess_Reallocate_C_String() as it was a copy of currentString's pointer value.)
+											 */
+											previousString = NULL;
+
+											/* Begin verification loop. */
+											for (x = 0; ((x < randVal) && (x < (TEST_RANDOM_STRING_LENGTH - 1))); x++)
+											{
+												/* Check for identical data in both strings. */
+												if (randString[x] != currentString[x])
+												{
+													/* Data mismatch. */
+													break;
+												}
+											}
+
+											/* Check result of verification loop. */
+											if ((x == randVal) || (x == (TEST_RANDOM_STRING_LENGTH - 1)))
+											{
+												/* Test for invalid argument caused by invalid pointer to pointer. */
+												printf("%s%s%s", InvalidArgStringPointerTestMSG, reallocateCStringFunctMSG, periodAndNewlineMSG);
+												retFromCall = DataProcess_Reallocate_C_String(NULL, 0, x);
+												if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
+												{
+													/* Test for invalid argument caused by invalid pointer to pointer. */
+													printf("%s%s%s", InvalidArgStringPointerTestMSG, reallocateCStringWithNullFunctMSG, periodAndNewlineMSG);
+													retFromCall = DataProcess_Reallocate_C_String_With_NULL_Terminator(NULL, 0, &x);
+													if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
+													{
+														/* Test for invalid argument caused by invalid pointer to pointer. */
+														printf("%s%s%s", InvalidArgLengthPointerTestMSG, reallocateCStringWithNullFunctMSG, periodAndNewlineMSG);
+														retFromCall = DataProcess_Reallocate_C_String_With_NULL_Terminator(&currentString, 0, NULL);
+														if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
+														{
+															/* Test successful. */
+															printf("%s%s", TEST_PASSED_MSG, periodAndNewlineMSG);
+															ret = 0;
+														}
+														else
+														{
+															/* Did not get COMMON_ERROR_INVALID_ARGUMENT error code from () due to invalid newLength pointer. */
+															ret = -14;
+															printf("%s%s%s", InvalidArgLengthPointerFailMSG, reallocateCStringWithNullFunctMSG, periodAndNewlineMSG);
+														}
+													}
+													else
+													{
+														/* Did not get COMMON_ERROR_INVALID_ARGUMENT error code from () due to invalid string pointer. */
+														ret = -13;
+														printf("%s%s%s", InvalidArgStringPointerFailMSG, reallocateCStringWithNullFunctMSG, periodAndNewlineMSG);
+													}
+												}
+												else
+												{
+													/* Did not get COMMON_ERROR_INVALID_ARGUMENT error code from DataProcess_Reallocate_C_String(). */
+													ret = -12;
+													printf("%s%s%s", InvalidArgStringPointerFailMSG, reallocateCStringFunctMSG, periodAndNewlineMSG);
+												}
+											}
+											else
+											{
+												/* Reallocation with NULL byte failed. Data Mismatch. */
+												ret = -11;
+												TEST_ERROR_LOG(reallocationWithPreExistingNullTermFailMSG);
+												printf("%s%s%s", dataMismatch1FailMSG, currentString, dataMismatch2FailMSG);
+											}
+										}
+										else
+										{
+											/* Reallocation with NULL byte failed. */
+											ret = -10;
+											TEST_ERROR_LOG(reallocationWithPreExistingNullTermFailMSG);
+											((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, ".\n")) :
+												(currentString == NULL) ? (printf("%s", errorSuccessNoResultMSG)) :
+												(currentString == previousString) ? (printf("%s", errorSamePtrMSG)) :
+												(printf(reallocationWithNullTermFailNoNullMSG)));
+										}
+									}
+									else
+									{
+										/* Reallocation with NULL byte failed. Data Mismatch. */
+										ret = -9;
+										TEST_ERROR_LOG(reallocationWithNullTermFailMSG);
+										printf("%s%s%s", dataMismatch1FailMSG, currentString, dataMismatch2FailMSG);
+									}
+								}
+								else
+								{
+									/* Reallocation with NULL byte failed. */
+									ret = -8;
+									TEST_ERROR_LOG(reallocationWithNullTermFailMSG);
+									((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, ".\n")) :
+										(currentString == NULL) ? (printf("%s", errorSuccessNoResultMSG)) :
+										(currentString == previousString) ? (printf("%s", errorSamePtrMSG)) :
+										(x != randVal) ? (printf("%s%i%s%i%s" , reallocationWithNullTermFailInvalidSize1MSG, randVal,
+										reallocationWithNullTermFailInvalidSize2MSG, x, periodAndNewlineMSG)) : (printf(reallocationWithNullTermFailNoNullMSG)));
+								}
+							}
+							else
+							{
+								/* Error data mismatch. */
+								ret = -7;
+								TEST_ERROR_LOG(rangeFailMSG);
+								printf("%s%s%i%s%s%s%s%s", randString, rangeTest2MSG, randVal, rangeTest3MSG, periodAndNewlineMSG, dataMismatch1FailMSG, currentString, dataMismatch2FailMSG);
+							}
+						}
+						else
+						{
+							/* Could not complete range test. */
+							ret = -6;
+							TEST_ERROR_LOG(rangeFailMSG);
+							printf("%s%s%i%s", randString, rangeTest2MSG, randVal, rangeTest3MSG);
+							((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, ".\n")) :
+								(currentString == NULL) ? (printf("%s", errorSuccessNoResultMSG)) : (printf("%s", errorSamePtrMSG)));
+						}
+					}
+					else
+					{
+						/* Could not allocate memory? */
+						ret = -5;
+						TEST_ERROR_LOG(useAsAllocatorFailMSG);
+						((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, ".\n")) :
+							(printf("%s", errorSuccessNoResultMSG)));
+					}
+				}
+				else
+				{
+					/* Could not allocate memory? */
+					ret = -4;
+					TEST_ERROR_LOG(useAsAllocatorFailMSG);
+					((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, ".\n")) :
+						(printf("%s", errorSuccessNoResultMSG)));
+				}
+			}
+			else
+			{
+				/* Could not deallocate the byte. */
+				ret = -3;
+				TEST_ERROR_LOG(byteDeallocationFailMSG);
+			}
+		}
+		else
+		{
+			/* Could not reallocate the byte. */
+			ret = -2;
+			TEST_ERROR_LOG(byteReallocationFailMSG);
+			((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, ".\n")) :
+				((currentString != NULL) ? (printf("%s", errorSuccessNoResultMSG)) : (printf("%s", errorSamePtrMSG))));
+		}
+
+		/* Flush output buffer. */
+		fflush(stdout);
+
+		/* Make sure to release memory if needed. */
+		if (currentString != NULL)
+		{
+			DataProcess_Deallocate_CString(&currentString);
+		}
+		if (previousString != NULL)
+		{
+			DataProcess_Deallocate_CString(&previousString);
+		}
+		if (randString != NULL)
+		{
+			DataProcess_Deallocate_CString(&randString);
+		}
+	}
+	else
+	{
+		/* Could not allocate a byte? */
+		ret = -1;
+		TEST_ERROR_LOG(byteAllocationFailMSG);
+		((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, ".\n")) :
+			(printf("%s", errorSuccessNoResultMSG)));
+	}
+
+	/* End test section. */
+	printf("%s", END_TEST_SECTION);
+
+	/* Exit function. */
+	return ret;
+
+	/* Check for valid random string length. */
+#if TEST_RANDOM_STRING_LENGTH <= 3
+#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_RANDOM_STRING_LENGTH must be greater than three (3)."
+#endif	/* TEST_RANDOM_STRING_LENGTH <= 3 */
+
+	/* Check for valid ASCII ranges. */
+#if TEST_PRINTABLE_ASCII_START >= TEST_PRINTABLE_ASCII_END
+#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PRINTABLE_ASCII_START must be less than TEST_PRINTABLE_ASCII_END."
+#endif	/* TEST_PRINTABLE_ASCII_START >= TEST_PRINTABLE_ASCII_END */
+#if TEST_PRINTABLE_ASCII_START < 1
+#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PRINTABLE_ASCII_START must be a greater than or equal to one (1)."
+#endif	/* TEST_PRINTABLE_ASCII_START < 1 */
+#if TEST_PRINTABLE_ASCII_END < 2
+#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PRINTABLE_ASCII_END must be a greater than or equal to two (2)."
+#endif /* TEST_PRINTABLE_ASCII_END < 2 */
+
+	/* Undefine the macros. */
+#undef TEST_RANDOM_STRING_LENGTH
+#undef TEST_PRINTABLE_ASCII_END
+#undef TEST_PRINTABLE_ASCII_START
+#undef TEST_ERROR_LOG_REAL
+#undef TEST_ERROR_LOG
+#undef TEST_FAILURE_MSG_HEAD
+#undef TEST_PASSED_MSG
+}
+
+/*!
+ *	int Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_number_conversion_function()
+ *
+ *	Takes a given number between zero (0) and ten (10) and returns it's arabic numeral text character.
+ *
+ *	If the given number is outside the range of zero (0) and ten (10) then -1 is returned.
+ */
+int Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_number_conversion_function(const size_t number)
+{
+	/* Define numbersLength. */
+#define NUMBERSLENGTH 11
+
+	/* Init vars. */
+	int ret = -1;		/* The result of this function. */
+	const char numbers[NUMBERSLENGTH] = {"0123456789"};		/* Array to contain the text versions of the given numbers. */
+
+	/* Check given number argument. */
+	if ((0 <= number) && (number < 10))
+	{
+		/* Get the number so we can return it. */
+		ret = (char)(numbers[number]);
+	}
+
+	/* Exit function. */
+	return ret;
+
+	/* Undef NUMBERSLENGTH. */
+#undef NUMBERSLENGTH
+}
+
+/*!
+ *	int Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_function(const size_t randomNumber, const char * string, const size_t stringLength)
+ *
+ *	Ok, the purpose of this function is to verify that a generated string matches the number it was made from.
+ *
+ *	To that extent, we wind up reimplimenting the functionality of DataProcess_getCStringFromSizeT(),
+ *	but instead of creating a string we are checking it for accuracy.
+ */
+int Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_function(const size_t randomNumber, const char * string, const size_t stringLength)
+{
+		/* Define the error messaging macros. */
+#define TEST_FAILURE_MSG_HEAD "TEST_FAILURE: Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_function(): "
+#define TEST_ERROR_LOG_REAL(ERR_MSG) printf("%s", TEST_FAILURE_MSG_HEAD); printf("%s", ERR_MSG);
+#define TEST_ERROR_LOG(ERR_MSG) TEST_ERROR_LOG_REAL(ERR_MSG)
+
+	/* Define the numeric base of DataProcess_getCStringFromSizeT(). */
+#define TEST_NUMERIC_BASE 10
+
+	/* Init vars. */
+	char cNumber = '0';			/* Used to hold the current number we are checking for in the given string. */
+	int ret = -1;				/* The result of this function. */
+	size_t currentValue = 0;	/* The current number being verified. */
+	size_t x = 0;				/* Counter used in verififcation loop. */
+
+	/* Check for invalid arguments. */
+	if ((string != NULL) && (stringLength > 0))
+	{
+		/* Set current value. */
+		currentValue = randomNumber;
+
+		/* Begin verification loop. */
+		for (x = 0; ((ret == -1) && (x < (stringLength - 1)) && (((stringLength - 2) - x) >= 0) && (currentValue > 0)); x++)
+		{
+			/* Devide off the last digit and convert it to a text character. */
+			cNumber = Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_number_conversion_function((currentValue % TEST_NUMERIC_BASE));
+
+			/* Check the text character for a match in the given string. */
+			if (string[((stringLength - 2) - x)] == cNumber)
+			{
+				/* Proceed to the next value in the string. */
+				currentValue /= TEST_NUMERIC_BASE;
+			}
+			else
+			{
+				/* Invalid text string. */
+				ret = -3;
+			}
+		}
+
+		/* Check counter value for success. */
+		if ((ret == -1) && (x == (stringLength - 1)))
+		{
+			/* String matches the number. */
+			ret = 0;
+		}
+		else
+		{
+			/* Invalid string. */
+			ret = -3;
+		}
+	}
+	else
+	{
+		/* Invalid argument. */
+		ret = -2;
+		TEST_ERROR_LOG("Invalid argument.\n");
+	}
+
+	/* Exit function. */
+	return ret;
+
+	/* Undef macros. */
+#undef TEST_NUMERIC_BASE
+#undef TEST_ERROR_LOG_REAL
+#undef TEST_ERROR_LOG
+#undef TEST_FAILURE_MSG_HEAD
+}
+
+/*!
+ *		int Unit_Tests_DataProcess_sizet_cstring_converter()
+ *
+ *		This function tests the DataProcess_getCStringFromSizeT() function.
+ */
+int Unit_Tests_DataProcess_sizet_cstring_converter()
+{
+	/* Define the name of the function. */
+#define MSYS_FUNCT_NAME	"Unit_Tests_DataProcess_sizet_cstring_converter()"
+#define MSYS_TESTING_FUNCT_NAME "DataProcess_getCStringFromSizeT()"
+
+	/* Define the passed test message. */
+#define TEST_PASSED_MSG "Unit_Tests_DataProcess_sizet_cstring_converter(): TEST_PASSED"
+
+	/* Define the error messaging macros. */
+#define TEST_FAILURE_MSG_HEAD "TEST_FAILURE: Unit_Tests_DataProcess_sizet_cstring_converter(): "
+#define TEST_ERROR_LOG_REAL(ERR_MSG) printf("%s", TEST_FAILURE_MSG_HEAD); printf("%s", ERR_MSG);
+#define TEST_ERROR_LOG(ERR_MSG) TEST_ERROR_LOG_REAL(ERR_MSG)
+
+	/* Define the limits on the random number range. (MINIMAL value should be less than the MAXIMUM value and both should be positive.) */
+#define TEST_MINIMAL_RANDOM_NUMBER_VALUE 1
+#define TEST_MAXIMUM_RANDOM_NUMBER_VALUE 100
+
+	/* Init vars. */
+	int ret = 0;									/* The result of this test function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of a call to an engine function. */
+	size_t randVal = 0;								/* Used to generate a random number to use with DataProcess_getCStringFromSizeT(). */
+	size_t currentStringLength = 0;					/* The length of the currentString.... string. */
+	char * currentString = NULL;						/* The current string pointer. */
+	char * previousString = NULL;						/* The previous string pointer. */
+
+	/* Start test section. */
+	printf("%s", START_TEST_SECTION);
+
+	/* Warn user about TRNG use. */
+	printf("%s", TRNGUseMayFailMSG);
+	fflush(stdout);
+
+	/* Generate a random number. */
+	printf("%s%s", MSYS_FUNCT_NAME, " Attempting to generate a random number.\n");
+	randVal = DataProcess_Trivial_Random_Number_Generator(TEST_MINIMAL_RANDOM_NUMBER_VALUE, TEST_MAXIMUM_RANDOM_NUMBER_VALUE, true);
+	if (randVal != 0)
+	{
+		/* Attempt to generate the string version of the random number. */
+		printf("%s%s%i%s", MSYS_FUNCT_NAME, " Attempting to generate the string version of the random number: <", randVal, ">.\n");
+		retFromCall = DataProcess_getCStringFromSizeT(randVal, &currentString, &currentStringLength);
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL) && (currentStringLength > 0))
+		{
+			/* Check the result.... */
+			printf("%s%s", MSYS_FUNCT_NAME, " checking result.\n");
+			ret = Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_function(randVal, currentString, currentStringLength);
+			if (ret == 0)
+			{
+				/* Copy the pointer. */
+				previousString = currentString;
+
+				/* Reset currentStringLength. */
+				currentStringLength = 0;
+
+				/* Check and see if the function will overwrite the given pointer. */
+				printf("%s%s%s%s", MSYS_FUNCT_NAME, " checking to see if the given string pointer will be overwritten by ", MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+				retFromCall = DataProcess_getCStringFromSizeT(randVal, &currentString, &currentStringLength);
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL) && (currentString != previousString) && (currentStringLength > 0))
+				{
+					/* Deallocate the strings. */
+					DataProcess_Deallocate_CString(&previousString);
+					DataProcess_Deallocate_CString(&currentString);
+					currentStringLength = 0;
+
+					/* Check for INVALID_ARGUMENT error code if DataProcess_getCStringFromSizeT() is given a bad string pointer. */
+					printf("%s%s%s", InvalidArgStringPointerTestMSG, MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+					retFromCall = DataProcess_getCStringFromSizeT(randVal, NULL, &currentStringLength);
+					if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
+					{
+						/* Check for INVALID_ARGUMENT error code if DataProcess_getCStringFromSizeT() is given a bad stringLength pointer. */
+						printf("%s%s%s", InvalidArgLengthPointerTestMSG, MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+						retFromCall = DataProcess_getCStringFromSizeT(randVal, &currentString, NULL);
+						if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
+						{
+							/* Test successful. */
+							printf("%s%s", TEST_PASSED_MSG, periodAndNewlineMSG);
+							ret = 0;
+						}
+						else
+						{
+							/* Did not get invalid argument error code for bad string length pointer. */
+							ret = -6;
+							TEST_ERROR_LOG(InvalidArgLengthPointerFailMSG);
+							printf("%s%s", MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+							printf("%s%i%s", errorCodeReturnedMSG, retFromCall, periodAndNewlineMSG);
+						}
+					}
+					else
+					{
+						/* Did not get invalid argument error code for bad string pointer. */
+						ret = -5;
+						TEST_ERROR_LOG(InvalidArgStringPointerFailMSG);
+						printf("%s%s", MSYS_TESTING_FUNCT_NAME, periodAndNewlineMSG);
+						printf("%s%i%s", errorCodeReturnedMSG, retFromCall, periodAndNewlineMSG);
+					}
+				}
+				else
+				{
+					/* Test of overwriting the given pointer failed. */
+					ret = -4;
+					TEST_ERROR_LOG("overwriting the given pointer failed.\n");
+					((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, periodAndNewlineMSG)) :
+					 (currentString == previousString) ? (printf("%s", errorSamePtrMSG)) :
+					 (printf("%s", errorSuccessNoResultMSG)));
+				}
+			}
+			else
+			{
+				/* Verification of string failed. */
+				ret = -3;
+				TEST_ERROR_LOG("Verification of string failed.\n");
+				printf("%s%i%s%s%s", "The random number <", randVal, "> does not match the generated string <", currentString, ">.\n");
+			}
+
+			/* Deallocate the result if needed. */
+			if (currentString != NULL)
+			{
+				DataProcess_Deallocate_CString(&currentString);
+				currentStringLength = 0;
+			}
+		}
+		else
+		{
+			/* Could not generate c-string. */
+			ret = -2;
+			TEST_ERROR_LOG("Could not generate c-string.\n");
+			((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, periodAndNewlineMSG)) :
+				(printf("%s", errorSuccessNoResultMSG)));
+		}
+	}
+	else
+	{
+		/* Could not generate a random number. */
+		ret = -1;
+		TEST_ERROR_LOG("Could not generate a random number.\n");
+	}
+
+	/* End test section. */
+	printf("%s", END_TEST_SECTION);
+
+	/* Flush output buffer. */
+	fflush(stdout);
+
+	/* Exit function. */
+	return ret;
+
+	/* Check for invalid random number range. */
+#if TEST_MINIMAL_RANDOM_NUMBER_VALUE < 1
+#error "Unit_Tests_DataProcess_sizet_cstring_converter(): TEST_MINIMAL_RANDOM_NUMBER_VALUE must be a greater than or equal to one (1)."
+#endif	/* TEST_MINIMAL_RANDOM_NUMBER_VALUE < 1 */
+#if TEST_MAXIMUM_RANDOM_NUMBER_VALUE < 2
+#error "Unit_Tests_DataProcess_sizet_cstring_converter(): TEST_MAXIMUM_RANDOM_NUMBER_VALUE must be a greater than or equal to two (2)."
+#endif /* TEST_MAXIMUM_RANDOM_NUMBER_VALUE < 2 */
+
+	/* Undefine the macros. */
+#undef TEST_MAXIMUM_RANDOM_NUMBER_VALUE
+#undef TEST_MINIMAL_RANDOM_NUMBER_VALUE
+#undef TEST_ERROR_LOG_REAL
+#undef TEST_ERROR_LOG
+#undef TEST_FAILURE_MSG_HEAD
+#undef TEST_PASSED_MSG
+#undef MSYS_FUNCT_NAME
+}
+
 int Unit_Tests_DataProcess_Main()
 {
 	/* Init vars. */
-	int ret = 0;				/* Result of the tests. */
-	int retFromTRNGTest = 0;	/* Result of the TRNG test. */
+	int ret = 0;								/* Result of the tests. */
+	int retFromTRNGTest = 0;					/* Result of the TRNG test. */
+	int retFromAllocatorTest = 0;				/* Result of the allocator and deallocator tests. */
+	int retFromSizeTCStringConversionTest = 0;	/* Result of the size_t to c-string conversion tests. */
 
 	/* Begin tests for DataProcess_Trivial_Random_Number_Generator(). */
 	retFromTRNGTest = Unit_Tests_DataProcess_TRNG();
 
+	/* Begin tests for DataProcess_Reallocate_C_String() and DataProcess_Deallocate_CString(). */
+	retFromAllocatorTest = Unit_Tests_DataProcess_Allocator_and_Deallocator();
+
+	/* Begin tests for DataProcess_getCStringFromSizeT(). */
+	retFromSizeTCStringConversionTest = Unit_Tests_DataProcess_sizet_cstring_converter();
 
 	/* Return ret. */
 	return ret;

@@ -98,9 +98,11 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
  *		int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength)
  *
  *		Reallocates the given string to be the new length and adds a NULL byte terminator if needed.
+ *		The resulting string is guaranteed to ALWAYS be NULL byte terminated if this function returns COMMON_ERROR_SUCCESS.
  *
  *		Note: This function WILL change the given string to make it NULL byte terminated if the NULL byte
- *		could not be added during reallocation, but only if the function returns COMMON_ERROR_SUCCESS.
+ *		could not be added during reallocation (this happens if the additional byte would result in a length greater than SIZE_MAX),
+ *		but only if the function returns COMMON_ERROR_SUCCESS.
  *
  *		(This function is a wrapper around DataProcess_Reallocate_C_String(), see that function for more information.)
  *
