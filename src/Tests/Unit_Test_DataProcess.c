@@ -280,8 +280,8 @@ const static char * errorSuccessNoResultMSG = "The function returned success wit
 const static char * errorSamePtrMSG = "The function returned success, but the returned memory pointer is identical to the original one. (No actual allocation occured.)\n";
 const static char * InvalidArgStringPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL string pointer to ";
 const static char * InvalidArgStringPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL string pointer to ";
-const static char * InvalidArgLengthPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL newLength pointer to ";
-const static char * InvalidArgLengthPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL newLength pointer to ";
+const static char * InvalidArgLengthPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL length pointer to ";
+const static char * InvalidArgLengthPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL length pointer to ";
 
 int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 {
