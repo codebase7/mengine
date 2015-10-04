@@ -284,6 +284,122 @@ const static char * InvalidArgLengthPointerTestMSG = "Attempting to get COMMON_E
 const static char * InvalidArgLengthPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL length pointer to ";
 
 /*!
+ *		int Unit_Tests_DataProcess_Random_String_Generator(char ** string, size_t * stringLength)
+ *
+ *		Generates a c-string using printable ASCII characters for use by other testing functions.
+ *		The generated string should be deallocated by DataProcess_Deallocate_CString() when it is
+ *		no longer needed.
+ *
+ *		Returns 0 if successful.
+ *		Returns -1 if an argument pointer is NULL.
+ *		Returns -2 if a random number could not be generated.
+ *		Returns -3 if memory allocation fails.
+ *
+ *		This function will not modifiy the given arguments if it's return code is not zero (0).
+ */
+int Unit_Tests_DataProcess_Random_String_Generator(char ** string, size_t * stringLength)
+{
+	/* Define the error messaging macros. */
+#define TEST_FAILURE_MSG_HEAD "TEST_FAILURE: Unit_Tests_DataProcess_Allocator_and_Deallocator(): "
+#define TEST_ERROR_LOG_REAL(ERR_MSG) printf("%s", TEST_FAILURE_MSG_HEAD); printf("%s", ERR_MSG);
+#define TEST_ERROR_LOG(ERR_MSG) TEST_ERROR_LOG_REAL(ERR_MSG)
+
+	/* Define the range of ASCII values to use for the random string. */
+#define TEST_PRINTABLE_ASCII_START 33
+#define TEST_PRINTABLE_ASCII_END 126
+
+	/* Define the range used to select the length of the randomly generated string. */
+#define TEST_RANDOM_STRING_LENGTH_MINIMAL 3
+#define TEST_RANDOM_STRING_LENGTH_MAXIMUM 100
+
+	/* Init vars. */
+	int ret = -999;										/* Result of the tests. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;		/* Result code from engine function. */
+	size_t x = 0;										/* Counter used in random string generation loop. */
+	size_t randVal = 0;									/* Result from the call to TRNG() function. */
+	size_t randomLength = 0;							/* Chosen length of the string to be generated. */
+	char * randString = NULL;							/* Temporary pointer used to create the random string. */
+
+	/* Check for invalid arguments. */
+	if ((string != NULL) && (stringLength != NULL))
+	{
+		/* Randomly generate a length for the string. */
+		randomLength = DataProcess_Trivial_Random_Number_Generator(TEST_RANDOM_STRING_LENGTH_MINIMAL, TEST_RANDOM_STRING_LENGTH_MAXIMUM, true);
+		if (randomLength > 0)
+		{
+			/* Allocate memory for the TRNG String. */
+			retFromCall = DataProcess_Reallocate_C_String(&randString, 0, randomLength);
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (randString != NULL))
+			{
+				/* Use the TRNG to generate the source string. (Note the last character in the string should be a NULL byte.
+					  Which it is if the string was allocated by DataProcess_Reallocate_C_String().)
+				 */
+				for (x = 0; (x < (randomLength - 1)); x++)
+				{
+					randVal = DataProcess_Trivial_Random_Number_Generator(TEST_PRINTABLE_ASCII_START, TEST_PRINTABLE_ASCII_END, false);
+					randString[x] = (int)randVal;
+				}
+
+				/* Copy the string pointer, and length value. */
+				(*string) = randString;
+				(*stringLength) = (randomLength - 1);	/* Omit NULL termination byte from string length. */
+
+				/* Done. */
+				ret = 0;
+			}
+			else
+			{
+				/* Could not allocate memory? */
+				ret = -3;
+				TEST_ERROR_LOG("Unable to allocate memory for random string.\n");
+				((retFromCall != COMMON_ERROR_SUCCESS) ? (printf("%s%i%s", errorCodeReturnedMSG, retFromCall, ".\n")) :
+				(printf("%s", errorSuccessNoResultMSG)));
+			}
+		}
+		else
+		{
+			/* Could not generate a random number. */
+			ret = -2;
+			TEST_ERROR_LOG("Could not generate a random number.\n");
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = -1;
+		TEST_ERROR_LOG("Invalid argument.\n");
+	}
+
+	/* Exit function. */
+	return ret;
+
+	/* Check for valid random string length. */
+#if TEST_RANDOM_STRING_LENGTH_MINIMAL < 3
+#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_RANDOM_STRING_LENGTH must be greater than two (2)."
+#endif	/* TEST_RANDOM_STRING_LENGTH < 3 */
+
+	/* Check for valid ASCII ranges. */
+#if TEST_PRINTABLE_ASCII_START >= TEST_PRINTABLE_ASCII_END
+#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PRINTABLE_ASCII_START must be less than TEST_PRINTABLE_ASCII_END."
+#endif	/* TEST_PRINTABLE_ASCII_START >= TEST_PRINTABLE_ASCII_END */
+#if TEST_PRINTABLE_ASCII_START < 1
+#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PRINTABLE_ASCII_START must be a greater than or equal to one (1)."
+#endif	/* TEST_PRINTABLE_ASCII_START < 1 */
+#if TEST_PRINTABLE_ASCII_END < 2
+#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PRINTABLE_ASCII_END must be a greater than or equal to two (2)."
+#endif /* TEST_PRINTABLE_ASCII_END < 2 */
+
+	/* Undefine the macros. */
+#undef TEST_RANDOM_STRING_LENGTH_MAXIMUM
+#undef TEST_RANDOM_STRING_LENGTH_MINIMAL
+#undef TEST_PRINTABLE_ASCII_END
+#undef TEST_PRINTABLE_ASCII_START
+#undef TEST_ERROR_LOG
+#undef TEST_ERROR_LOG_REAL
+#undef TEST_FAILURE_MSG_HEAD
+}
+
+/*!
  *		int Unit_Tests_DataProcess_Allocator_and_Deallocator()
  *
  *		This function tests the DataProcess_Reallocate_C_String(),
