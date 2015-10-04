@@ -420,18 +420,12 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 #define TEST_ERROR_LOG_REAL(ERR_MSG) printf("%s", TEST_FAILURE_MSG_HEAD); printf("%s", ERR_MSG);
 #define TEST_ERROR_LOG(ERR_MSG) TEST_ERROR_LOG_REAL(ERR_MSG)
 
-	/* Define the range of ASCII values to use for the random string. */
-#define TEST_PRINTABLE_ASCII_START 33
-#define TEST_PRINTABLE_ASCII_END 126
-
-	/* Define the length of the random string. (Must be greater than 3.) */
-#define TEST_RANDOM_STRING_LENGTH 24
-
 	/* Init vars. */
 	int ret = -999;										/* Result of the tests. */
 	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;		/* Result code from engine function. */
 	size_t x = 0;										/* Counter used in random string generation loop. */
 	size_t randVal = 0;									/* Result from the call to TRNG() function. */
+	size_t randStringLength = 0;						/* Length of the random string. */
 	char * currentString = NULL;						/* The current string pointer. */
 	char * previousString = NULL;						/* The previous string pointer. */
 	char * randString = NULL;							/* A random string. */
@@ -485,40 +479,34 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 			DataProcess_Deallocate_CString(&currentString);
 			if (currentString == NULL)
 			{
-				/* Allocate memory for the TRNG String. */
-				printf("%s", useAsAllocatorTestMSG);
-				retFromCall = DataProcess_Reallocate_C_String(&randString, 0, TEST_RANDOM_STRING_LENGTH);
-				if ((retFromCall == COMMON_ERROR_SUCCESS) && (randString != NULL))
-				{
-					/* Warn the user that we are using the TRNG. */
-					printf("%s", TRNGUseMayFailMSG);
+				/* Warn user about TRNG use. */
+				printf("%s", TRNGUseMayFailMSG);
+				fflush(stdout);
 
-					/* Use the TRNG to generate the source string. (Note the last character in the string should be a NULL byte.
-					   Which it is if the string was allocated by DataProcess_Reallocate_C_String().)
-					 */
-					for (x = 0; (x < (TEST_RANDOM_STRING_LENGTH - 1)); x++)
-					{
-						randVal = DataProcess_Trivial_Random_Number_Generator(TEST_PRINTABLE_ASCII_START, TEST_PRINTABLE_ASCII_END, false);
-						randString[x] = (int)randVal;
-					}
+				/* Create the TRNG String. */
+				retFromCall = Unit_Tests_DataProcess_Random_String_Generator(&randString, &randStringLength);
+				if ((retFromCall == 0) && (randString != NULL) && (randStringLength > 0))
+				{
+					/* Reset retFromCall. */
+					retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
 					/* Allocate memory to copy the random string into. */
 					printf("%s", useAsAllocatorTestMSG);
-					retFromCall = DataProcess_Reallocate_C_String(&currentString, 0, TEST_RANDOM_STRING_LENGTH);
+					retFromCall = DataProcess_Reallocate_C_String(&currentString, 0, randStringLength);
 					if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL))
 					{
 						/* Copy the random string, because reallocating it will loose data. */
-						memcpy(currentString, randString, TEST_RANDOM_STRING_LENGTH);
+						memcpy(currentString, randString, randStringLength);
 
 						/* Copy the pointer. (To make sure a new allocation is made.) */
 						previousString = currentString;
 
 						/* Generate one final random number to determine how much of the random string should be copied. */
-						randVal = DataProcess_Trivial_Random_Number_Generator(2, (TEST_RANDOM_STRING_LENGTH - 1), false);
+						randVal = DataProcess_Trivial_Random_Number_Generator(2, (randStringLength - 1), false);
 
 						/* Check and see if giving a range of the source string outputs the correct sub-string. */
 						printf("%s%s%s%i%s%s", rangeTest1MSG, randString, rangeTest2MSG, randVal, rangeTest3MSG, periodAndNewlineMSG);
-						retFromCall = DataProcess_Reallocate_C_String(&currentString, TEST_RANDOM_STRING_LENGTH, randVal);
+						retFromCall = DataProcess_Reallocate_C_String(&currentString, randStringLength, randVal);
 						if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != previousString) && (currentString != randString))
 						{
 							/* Set previousString to NULL.
@@ -527,7 +515,7 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 							previousString = NULL;
 
 							/* Begin verification loop. */
-							for (x = 0; ((x < randVal) && (x < (TEST_RANDOM_STRING_LENGTH - 1))); x++)
+							for (x = 0; ((x < randVal) && (x < randStringLength)); x++)
 							{
 								/* Check for identical data in both strings. */
 								if (randString[x] != currentString[x])
@@ -538,7 +526,7 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 							}
 
 							/* Check result of verification loop. */
-							if ((x == randVal) || (x == (TEST_RANDOM_STRING_LENGTH - 1)))
+							if ((x == randVal) || (x == randStringLength))
 							{
 								/* Test the DataProcess_Reallocate_C_String_With_NULL_Terminator() function by setting the
 									last byte of the currentString to a non-zero value.
@@ -566,7 +554,7 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 									previousString = NULL;
 
 									/* Begin verification loop. */
-									for (x = 0; ((x < randVal) && (x < (TEST_RANDOM_STRING_LENGTH - 1))); x++)
+									for (x = 0; ((x < randVal) && (x < randStringLength)); x++)
 									{
 										/* Check for identical data in both strings. */
 										if (randString[x] != currentString[x])
@@ -577,7 +565,7 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 									}
 
 									/* Check result of verification loop. */
-									if ((x == randVal) || (x == (TEST_RANDOM_STRING_LENGTH - 1)))
+									if ((x == randVal) || (x == randStringLength))
 									{
 										/* Copy the pointer. */
 										previousString = currentString;
@@ -588,7 +576,7 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 										printf("%s", reallocationWithPreExistingNullTermTestMSG);
 										retFromCall = DataProcess_Reallocate_C_String_With_NULL_Terminator(&currentString, randVal, &x);
 										if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentString != NULL) && (currentString != previousString) &&
-											((randVal < TEST_RANDOM_STRING_LENGTH) ? (currentString[(randVal)] == '\0') : (currentString[(TEST_RANDOM_STRING_LENGTH + 1)])))
+											((randVal < randStringLength) ? (currentString[(randVal)] == '\0') : (currentString[(randStringLength + 1)])))
 										{
 											/* Set previousString to NULL.
 												(The string was deallocated by DataProcess_Reallocate_C_String() as it was a copy of currentString's pointer value.)
@@ -596,7 +584,7 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 											previousString = NULL;
 
 											/* Begin verification loop. */
-											for (x = 0; ((x < randVal) && (x < (TEST_RANDOM_STRING_LENGTH - 1))); x++)
+											for (x = 0; ((x < randVal) && (x < randStringLength)); x++)
 											{
 												/* Check for identical data in both strings. */
 												if (randString[x] != currentString[x])
@@ -607,7 +595,7 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 											}
 
 											/* Check result of verification loop. */
-											if ((x == randVal) || (x == (TEST_RANDOM_STRING_LENGTH - 1)))
+											if ((x == randVal) || (x == randStringLength))
 											{
 												/* Test for invalid argument caused by invalid pointer to pointer. */
 												printf("%s%s%s", InvalidArgStringPointerTestMSG, reallocateCStringFunctMSG, periodAndNewlineMSG);
@@ -772,28 +760,9 @@ int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 	/* Exit function. */
 	return ret;
 
-	/* Check for valid random string length. */
-#if TEST_RANDOM_STRING_LENGTH <= 3
-#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_RANDOM_STRING_LENGTH must be greater than three (3)."
-#endif	/* TEST_RANDOM_STRING_LENGTH <= 3 */
-
-	/* Check for valid ASCII ranges. */
-#if TEST_PRINTABLE_ASCII_START >= TEST_PRINTABLE_ASCII_END
-#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PRINTABLE_ASCII_START must be less than TEST_PRINTABLE_ASCII_END."
-#endif	/* TEST_PRINTABLE_ASCII_START >= TEST_PRINTABLE_ASCII_END */
-#if TEST_PRINTABLE_ASCII_START < 1
-#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PRINTABLE_ASCII_START must be a greater than or equal to one (1)."
-#endif	/* TEST_PRINTABLE_ASCII_START < 1 */
-#if TEST_PRINTABLE_ASCII_END < 2
-#error "Unit_Tests_DataProcess_Allocator_and_Deallocator(): TEST_PRINTABLE_ASCII_END must be a greater than or equal to two (2)."
-#endif /* TEST_PRINTABLE_ASCII_END < 2 */
-
 	/* Undefine the macros. */
-#undef TEST_RANDOM_STRING_LENGTH
-#undef TEST_PRINTABLE_ASCII_END
-#undef TEST_PRINTABLE_ASCII_START
-#undef TEST_ERROR_LOG_REAL
 #undef TEST_ERROR_LOG
+#undef TEST_ERROR_LOG_REAL
 #undef TEST_FAILURE_MSG_HEAD
 #undef TEST_PASSED_MSG
 }
