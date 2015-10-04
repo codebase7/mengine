@@ -870,8 +870,8 @@ int Unit_Tests_DataProcess_sizet_cstring_converter_string_verification_function(
 
 	/* Undef macros. */
 #undef TEST_NUMERIC_BASE
-#undef TEST_ERROR_LOG_REAL
 #undef TEST_ERROR_LOG
+#undef TEST_ERROR_LOG_REAL
 #undef TEST_FAILURE_MSG_HEAD
 }
 
