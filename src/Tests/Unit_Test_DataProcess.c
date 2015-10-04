@@ -283,6 +283,17 @@ const static char * InvalidArgStringPointerFailMSG = "Unable to get COMMON_ERROR
 const static char * InvalidArgLengthPointerTestMSG = "Attempting to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL length pointer to ";
 const static char * InvalidArgLengthPointerFailMSG = "Unable to get COMMON_ERROR_INVALID_ARGUMENT error code by passing a NULL length pointer to ";
 
+/*!
+ *		int Unit_Tests_DataProcess_Allocator_and_Deallocator()
+ *
+ *		This function tests the DataProcess_Reallocate_C_String(),
+ *		DataProcess_Reallocate_C_String_With_NULL_Terminator(),
+ *		and DataProcess_Deallocate_CString() functions.
+ *
+ *		Note: This test function depends on a working DataProcess_Trivial_Random_Number_Generator()
+ *		function to work correctly, and may produce inaccurate results if
+ *		DataProcess_Trivial_Random_Number_Generator() does not work correctly.
+ */
 int Unit_Tests_DataProcess_Allocator_and_Deallocator()
 {
 	/* Define the passed test message. */
