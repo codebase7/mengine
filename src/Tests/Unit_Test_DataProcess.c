@@ -1037,10 +1037,11 @@ int Unit_Tests_DataProcess_sizet_cstring_converter()
 	/* Undefine the macros. */
 #undef TEST_MAXIMUM_RANDOM_NUMBER_VALUE
 #undef TEST_MINIMAL_RANDOM_NUMBER_VALUE
-#undef TEST_ERROR_LOG_REAL
 #undef TEST_ERROR_LOG
+#undef TEST_ERROR_LOG_REAL
 #undef TEST_FAILURE_MSG_HEAD
 #undef TEST_PASSED_MSG
+#undef MSYS_TESTING_FUNCT_NAME
 #undef MSYS_FUNCT_NAME
 }
 
