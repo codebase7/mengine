@@ -347,73 +347,39 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
 		if ((foundDelim) && (y == delimLength))
 		{
 			/* We found the delim, Check and see if we need the data after the delimiter or before it. */
-			if (getPriorData)
+			if ((getPriorData) ? ((srcLength - x) > 0) : (((x - delimLength) > 0) && (x < (srcLength - 1))))
 			{
-				/* Check for bytes before the delimiter. */
-				if ((srcLength - x) > 0)
+				/* Set the size for the new substring. */
+				tempSubStrLength = ((getPriorData) ? (srcLength - x) : (x - delimLength));
+
+				/* Allocate memory for the substring. */
+				retFromCall = DataProcess_Reallocate_C_String(&tempSubStr, 0, tempSubStrLength);
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL))
 				{
-					/* Set the size for the new substring. */
-					tempSubStrLength = (srcLength - x);
+					/* Copy the bytes, before the delimiter if getPriorData is true, otherwise
+						Copy the bytes after the delimiter.
+					*/
+					memcpy(tempSubStr, ((getPriorData) ? (src) :
+							(searchFromEnd ? (src + ((srcLength + 1) - x)) : (src + x))),
+							tempSubStrLength);
 
-					/* Allocate memory for the substring. */
-					retFromCall = DataProcess_Reallocate_C_String(&tempSubStr, 0, tempSubStrLength);
-					if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL))
-					{
-						/* Copy the bytes before the delimiter. */
-						memcpy(tempSubStr, src, tempSubStrLength);
+					/* Copy the pointer and size. */
+					(*subStr) = tempSubStr;
+					(*subStrLength) = tempSubStrLength;
 
-						/* Copy the pointer and size. */
-						(*subStr) = tempSubStr;
-						(*subStrLength) = tempSubStrLength;
-
-						/* Done. */
-						ret = COMMON_ERROR_SUCCESS;
-					}
-					else
-					{
-						/* Could not allocate memory for substring. */
-						ret = COMMON_ERROR_MEMORY_ERROR;
-					}
+					/* Done. */
+					ret = COMMON_ERROR_SUCCESS;
 				}
 				else
 				{
-					/* No bytes remaining to create substring. */
-					ret = COMMON_ERROR_END_OF_DATA;
+					/* Could not allocate memory for substring. */
+					ret = COMMON_ERROR_MEMORY_ERROR;
 				}
 			}
 			else
 			{
-				/* See if there are bytes after the delimiter to create a substring with. */
-				if (((x - delimLength) > 0) && (x < (srcLength - 1)))
-				{
-					/* Set the size for the new substring. */
-					tempSubStrLength = (x - delimLength);
-
-					/* Allocate memory for the substring. */
-					retFromCall = DataProcess_Reallocate_C_String(&tempSubStr, 0, tempSubStrLength);
-					if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL))
-					{
-						/* Copy the bytes after the delimiter. */
-						memcpy(tempSubStr, (searchFromEnd ? (src + ((srcLength + 1) - x)) : (src + x)), (x - delimLength));
-
-						/* Copy the pointer and size. */
-						(*subStr) = tempSubStr;
-						(*subStrLength) = tempSubStrLength;
-
-						/* Done. */
-						ret = COMMON_ERROR_SUCCESS;
-					}
-					else
-					{
-						/* Could not allocate memory for substring. */
-						ret = COMMON_ERROR_MEMORY_ERROR;
-					}
-				}
-				else
-				{
-					/* No bytes remaining to create substring. */
-					ret = COMMON_ERROR_END_OF_DATA;
-				}
+				/* No bytes remaining to create substring. */
+				ret = COMMON_ERROR_END_OF_DATA;
 			}
 		}
 		else
