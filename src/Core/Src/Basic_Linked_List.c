@@ -35,7 +35,19 @@ void Blank_MSYS_Linked_List_Object(MSYS_Linked_List_T * list)
 	/* Check for valid arguments. */
 	if (list != NULL)
 	{
+		/* Check to see if we should have allocated memory. */
+		if (list->allocated)
+		{
+			/* Check for allocated memory. */
+			if (list->data != NULL)
+			{
+				/* Deallocate memory. */
+				DataProcess_Deallocate_CString((&(list->data)));
+			}
+		}
+
 		/* Blank out the list object. */
+		list->allocated = 0;
 		list->data = NULL;
 		list->dataLength = 0;
 		list->nextObject = NULL;
