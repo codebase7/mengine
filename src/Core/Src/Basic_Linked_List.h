@@ -162,15 +162,19 @@ MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Previous_Object(const MSYS_Linked_List_
 MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAllocatedList, void ** ppData, size_t * dataLength);
 
 /*!
- * 	MSYS_DLL_EXPORT int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength)
+ * 	MSYS_DLL_EXPORT int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength, const int copyData)
  *
  * 	Copies the given contents to the given object in the list.
+ *
+ *	Pram: copyData, If non-zero the data pointed to by pData will be copied using the
+ *	linked list library's internal allocator.
+ *	If copyData is zero, then only the given pointer will be copied.
  *
  * 	Returns COMMON_ERROR_SUCCESS if copying the contents was successful.
  * 	Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer to object was NULL.
  * 	Otherwise returns the appropriate error.
  */
-MSYS_DLL_EXPORT int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength);
+MSYS_DLL_EXPORT int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength, const int copyData);
 
 /*!
  * 	MSYS_DLL_EXPORT int MSYS_Linked_List_Swap_Objects(MSYS_Linked_List_T * pFirstObject, MSYS_Linked_List_T * pSecondObject)

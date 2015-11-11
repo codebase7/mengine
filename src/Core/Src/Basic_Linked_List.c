@@ -397,20 +397,54 @@ int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAll
 	return ret;
 }
 
-int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength)
+int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength, int copyData)
 {
 	/* Init vars. */
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code for this function. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code for this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code from an engine function. */
+	char * tempData = NULL;							/* Temporary pointer used to allocate memory. */
 
 	/* Check for valid args. */
 	if (pAllocatedList != NULL)
 	{
-		/* Copy the pointer and length. */
-		pAllocatedList->data = pData;
-		pAllocatedList->dataLength = dataLength;
+		/* Check and see if we need to copy the data instead of the pointer. */
+		if (copyData)
+		{
+			/* Allocate memory. */
+			retFromCall = DataProcess_Reallocate_C_String(&tempData, 0, dataLength);
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempData != NULL))
+			{
+				/* Copy the data. */
+				memcpy(tempData, pData, dataLength);
 
-		/* Success. */
-		ret = COMMON_ERROR_SUCCESS;
+				/* Copy the allocated pointer, and data length. */
+				pAllocatedList->data = tempData;
+				pAllocatedList->dataLength = dataLength;
+
+				/* Make sure allocated is true. */
+				pAllocatedList->allocated = 1;
+
+				/* Success. */
+				ret = COMMON_ERROR_SUCCESS;
+			}
+			else
+			{
+				/* Could not allocate memory. */
+				ret = COMMON_ERROR_MEMORY_ERROR;
+			}
+		}
+		else
+		{
+			/* Copy the pointer and length. */
+			pAllocatedList->data = pData;
+			pAllocatedList->dataLength = dataLength;
+
+			/* Make sure allocated is false. */
+			pAllocatedList->allocated = 0;
+
+			/* Success. */
+			ret = COMMON_ERROR_SUCCESS;
+		}
 	}
 	else
 	{
