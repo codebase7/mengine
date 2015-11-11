@@ -36,6 +36,7 @@ extern "C" {
 
 /* Define basic linked list object. */
 typedef struct MSYS_Linked_List {
+	int allocated;				/* Whether or not we have used our allocator for the data we point to. */
 	void * data;				/* Data structure for this object in the chain. */
 	size_t dataLength;			/* Optional Length of the given data structure if data is non-NULL. */
 	struct MSYS_Linked_List * nextObject;	/* The next object in the chain, should be NULL if the current object is the last one in the chain. */
