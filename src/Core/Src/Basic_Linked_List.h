@@ -74,6 +74,19 @@ typedef struct MSYS_Linked_List {
 MSYS_DLL_EXPORT int MSYS_Linked_List_Allocate_Linked_List_Object(MSYS_Linked_List_T ** ppAllocatedList);
 
 /*!
+ *	MSYS_DLL_EXPORT int MSYS_Linked_List_Allocate_And_Return_Linked_List_Object(MSYS_Linked_List_T ** ppAllocatedList, MSYS_LINKED_LIST_T ** ppAllocatedObject)
+ *
+ *	This function is a wrapper around MSYS_Linked_List_Allocate_Linked_List_Object()
+ *	that returns the allocated object's pointer via the function's ppAllocatedObject pointer.
+ *
+ *  If ppAllocatedObject is NULL, then this function's behavior is identical to calling:
+ *		MSYS_Linked_List_Allocate_Linked_List_Object(ppAllocatedList).
+ *
+ *  See MSYS_Linked_List_Allocate_Linked_List_Object() for error code descriptions.
+ */
+MSYS_DLL_EXPORT int MSYS_Linked_List_Allocate_And_Return_Linked_List_Object(MSYS_Linked_List_T ** ppAllocatedList, MSYS_LINKED_LIST_T ** ppAllocatedObject);
+
+/*!
  * 	MSYS_DLL_EXPORT void MSYS_Linked_List_Deallocate_Linked_List_Object(MSYS_Linked_List_T ** ppAllocatedList)
  *
  * 	Deallocates the given MSYS_Linked_List object, and sets it's pointer to NULL.

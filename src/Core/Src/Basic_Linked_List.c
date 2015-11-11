@@ -119,6 +119,45 @@ int MSYS_Linked_List_Allocate_Linked_List_Object(MSYS_Linked_List_T ** ppAllocat
 	return ret;
 }
 
+MSYS_DLL_EXPORT int MSYS_Linked_List_Allocate_And_Return_Linked_List_Object(MSYS_Linked_List_T ** ppAllocatedList, MSYS_LINKED_LIST_T ** ppAllocatedObject)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
+	MSYS_Linked_List_T * tempPtr = NULL;		/* Temp pointer to keep track of the original state. */ 
+
+	/* Check for a defined originalPointer argument. */
+	if (ppAllocatedObject != NULL)
+	{
+		/* Check and see if the original pointer is valid. */
+		if ((ppAllocatedList != NULL) && ((*ppAllocatedList) != NULL))
+		{
+			/* We need to copy the original pointer so we can return a pointer to the allocated object. */
+			tempPtr = (*ppAllocatedList);
+
+			/* Call the original allocator. */
+			ret = MSYS_Linked_List_Allocate_Linked_List_Object(ppAllocatedList);
+			if ((ret == COMMON_ERROR_SUCCESS) && (ppAllocatedList != NULL))
+			{
+				/* The pointer to the allocated object is determined by the state of the original pointer passed to the allocator. */
+				(*ppAllocatedObject) = ((tempPtr == NULL) ? (*ppAllocatedList) : ((*ppAllocatedList)->nextObject));
+			}
+		}
+		else
+		{
+			/* Invalid argument. */
+			ret = COMMON_ERROR_INVALID_ARGUMENT;
+		}
+	}
+	else
+	{
+		/* Just call the original allocator. */
+		ret = MSYS_Linked_List_Allocate_Linked_List_Object(ppAllocatedList);
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 void MSYS_Linked_List_Deallocate_Linked_List_Object(MSYS_Linked_List_T ** ppAllocatedList)
 {
 	/* Init vars. */
