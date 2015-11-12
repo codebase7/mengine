@@ -167,12 +167,18 @@ MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Previous_Object(const MSYS_Linked_List_
  * 	MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAllocatedList, void ** ppData, size_t * dataLength, const int copyData)
  *
  * 	Copies the contents of the given object in the list to the given pointers.
- *	If copyData is non-zero, this function will copy the data from the given
- *	MSYS_LINKED_LIST_T object and return a pointer to the copy. This pointer should be deallocated
- *	by calling MSYS_Linked_List_Deallocate_Copied_Data().
  *
- *	If copyData is zero, then this function will only copy the MSYS_LINKED_LIST_T object's data pointer
- *	and dataLength.
+ *	@Pram: copyData, whether or not to copy the data the MSYS_LINKED_LIST_T object points to.
+ *	(If applicable see below.)
+ *
+ *	If copyData is non-zero, the given MSYS_LINKED_LIST_T object allocated (copied) the data it points to,
+ *	and the given length of the data was greater than zero, then this function will copy the data from the
+ *	given MSYS_LINKED_LIST_T object and return a pointer to the copy.
+ *	This pointer should be deallocated by calling MSYS_Linked_List_Deallocate_Copied_Data().
+ *
+ *	If copyData is zero, the given MSYS_LINKED_LIST_T object did not allocate the data it points to, or
+ *	the given length of the data was 0, then this function will only copy the MSYS_LINKED_LIST_T object's
+ *	internal data pointer and dataLength.
  *
  * 	Returns COMMON_ERROR_SUCCESS if copying the contents was successful.
  * 	Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer to pointer or pointer to data was NULL.

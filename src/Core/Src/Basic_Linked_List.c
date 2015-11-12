@@ -422,39 +422,27 @@ int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAll
 	if ((pAllocatedList != NULL) && (ppData != NULL) && (dataLength != NULL))
 	{
 		/* Check and see if we are copying the data. */
-		if (copyData)
+		if ((copyData) && (pAllocatedList->allocated) && (pAllocatedList->dataLength > 0))
 		{
-			/* Copy the data and the length if needed. */
-			if (pAllocatedList->dataLength > 0)
+			/* Allocate memory for the copy. */
+			retFromCall = DataProcess_Reallocate_C_String(&tempData, 0, (pAllocatedList->dataLength));
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempData != NULL))
 			{
-				retFromCall = DataProcess_Reallocate_C_String(&tempData, 0, (pAllocatedList->dataLength));
-				if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempData != NULL))
-				{
-					/* Copy data. */
-					memcpy(tempData, (pAllocatedList->data), (pAllocatedList->dataLength));
+				/* Copy data. */
+				memcpy(tempData, (pAllocatedList->data), (pAllocatedList->dataLength));
 
-					/* Copy the pointer and length. */
-					(*ppData) = tempData;
-					(*dataLength) = pAllocatedList->dataLength;
-
-					/* Success. */
-					ret = COMMON_ERROR_SUCCESS;
-				}
-				else
-				{
-					/* Could not allocate memory for data copy. */
-					ret = ((retFromCall != COMMON_ERROR_MEMORY_ERROR) ? (COMMON_ERROR_INTERNAL_ERROR) :
-							(COMMON_ERROR_MEMORY_ERROR));
-				}
-			}
-			else
-			{
-				/* Invalid or unallocated data. */
-				(*ppData) = NULL;
-				(*dataLength) = 0;
+				/* Copy the pointer and length. */
+				(*ppData) = tempData;
+				(*dataLength) = pAllocatedList->dataLength;
 
 				/* Success. */
 				ret = COMMON_ERROR_SUCCESS;
+			}
+			else
+			{
+				/* Could not allocate memory for data copy. */
+				ret = ((retFromCall != COMMON_ERROR_MEMORY_ERROR) ? (COMMON_ERROR_INTERNAL_ERROR) :
+						(COMMON_ERROR_MEMORY_ERROR));
 			}
 		}
 		else
