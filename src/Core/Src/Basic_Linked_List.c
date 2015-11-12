@@ -573,3 +573,16 @@ int MSYS_Linked_List_Swap_Objects(MSYS_Linked_List_T * pFirstObject, MSYS_Linked
 	/* Exit function. */
 	return ret;
 }
+
+MSYS_DLL_EXPORT void MSYS_Linked_List_Deallocate_Copied_Data(void ** ppData)
+{
+	/* Check for valid pointer. */
+	if ((ppData != NULL) && ((*ppData) != NULL))
+	{
+		/* Deallocate memory. */
+		DataProcess_Deallocate_CString(((char**)ppData));
+	}
+
+	/* Exit function. */
+	return;
+}

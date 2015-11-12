@@ -208,6 +208,21 @@ MSYS_DLL_EXPORT int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_Lis
  */
 MSYS_DLL_EXPORT int MSYS_Linked_List_Swap_Objects(MSYS_Linked_List_T * pFirstObject, MSYS_Linked_List_T * pSecondObject);
 
+/*!
+ *	MSYS_DLL_EXPORT void MSYS_Linked_List_Deallocate_Copied_Data(void ** ppData)
+ *
+ *	This function deallocates data that was copied out of a MSYS_LINKED_LIST_T object
+ *	by a call to MSYS_Linked_List_Get_Current_Object_Contents().
+ *
+ *	This function should ALWAYS be used to deallocate data that was copied out of a
+ *	MSYS_LINKED_LIST_T object by a call to MSYS_Linked_List_Get_Current_Object_Contents().
+ *
+ *	If the given pointer is invalid this function will silently fail.
+ *
+ *	This function has no return.
+ */
+MSYS_DLL_EXPORT void MSYS_Linked_List_Deallocate_Copied_Data(void ** ppData);
+
 /* End extern C if needed. */
 #ifdef __cplusplus
 }	/* extern "C" */
