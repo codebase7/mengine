@@ -465,6 +465,30 @@ int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAll
 	return ret;
 }
 
+int MSYS_Linked_List_Get_Allocated(const MSYS_Linked_List_T * pAllocatedList, int * isAllocated)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
+
+	/* Check for valid arguments. */
+	if ((pAllocatedList != NULL) && (isAllocated != NULL))
+	{
+		/* Copy the allocated flag. */
+		(*isAllocated) = pAllocatedList->allocated;
+
+		/* Success. */
+		ret = COMMON_ERROR_SUCCESS;
+	}
+	else
+	{
+		/* Invalid argument. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength, const int copyData)
 {
 	/* Init vars. */

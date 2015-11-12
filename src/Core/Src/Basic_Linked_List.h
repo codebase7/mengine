@@ -188,6 +188,18 @@ MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Previous_Object(const MSYS_Linked_List_
 MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAllocatedList, void ** ppData, size_t * dataLength, const int copyData);
 
 /*!
+ *	MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Allocated(const MSYS_Linked_List_T * pAllocatedList, int * isAllocated)
+ *
+ *	This function returns whether or not the given MSYS_LINKED_LIST_T object has allocated
+ *	the data it points to or not via it's isAllocated argument.
+ *
+ *	Returns COMMON_ERROR_SUCCESS if successful.
+ *	Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer to pointer or pointer to data was NULL.
+ * 	Otherwise returns the appropriate error code.
+ */
+MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Allocated(const MSYS_Linked_List_T * pAllocatedList, int * isAllocated);
+
+/*!
  * 	MSYS_DLL_EXPORT int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength, const int copyData)
  *
  * 	Copies the given contents to the given object in the list.
