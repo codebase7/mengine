@@ -164,15 +164,22 @@ MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Next_Object(const MSYS_Linked_List_T * 
 MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Previous_Object(const MSYS_Linked_List_T * pAllocatedList, MSYS_Linked_List_T ** ppPrevObject);
 
 /*!
- * 	MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAllocatedList, void ** ppData, size_t * dataLength)
+ * 	MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAllocatedList, void ** ppData, size_t * dataLength, const int copyData)
  *
  * 	Copies the contents of the given object in the list to the given pointers.
+ *	If copyData is non-zero, this function will copy the data from the given
+ *	MSYS_LINKED_LIST_T object and return a pointer to the copy. This pointer should be deallocated
+ *	by calling MSYS_Linked_List_Deallocate_Copied_Data().
+ *
+ *	If copyData is zero, then this function will only copy the MSYS_LINKED_LIST_T object's data pointer
+ *	and dataLength.
  *
  * 	Returns COMMON_ERROR_SUCCESS if copying the contents was successful.
  * 	Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer to pointer or pointer to data was NULL.
+ *	Returns COMMON_ERROR_MEMORY_ERROR if memory allocation for coping data failed.
  * 	Otherwise returns the appropriate error.
  */
-MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAllocatedList, void ** ppData, size_t * dataLength);
+MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAllocatedList, void ** ppData, size_t * dataLength, const int copyData);
 
 /*!
  * 	MSYS_DLL_EXPORT int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength, const int copyData)
@@ -185,6 +192,7 @@ MSYS_DLL_EXPORT int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Link
  *
  * 	Returns COMMON_ERROR_SUCCESS if copying the contents was successful.
  * 	Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer to object was NULL.
+ *	Returns COMMON_ERROR_MEMORY_ERROR if memory allocation for coping data failed.
  * 	Otherwise returns the appropriate error.
  */
 MSYS_DLL_EXPORT int MSYS_Linked_List_Set_Current_Object_Contents(MSYS_Linked_List_T * pAllocatedList, void * pData, const size_t dataLength, const int copyData);

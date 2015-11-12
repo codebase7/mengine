@@ -411,20 +411,61 @@ int MSYS_Linked_List_Get_Previous_Object(const MSYS_Linked_List_T * pAllocatedLi
 	return ret;
 }
 
-int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAllocatedList, void ** ppData, size_t * dataLength)
+int MSYS_Linked_List_Get_Current_Object_Contents(const MSYS_Linked_List_T * pAllocatedList, void ** ppData, size_t * dataLength, const int copyData)
 {
 	/* Init vars. */
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code for this function. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code for this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code from a call to an engine function. */
+	char * tempData = NULL;							/* Temporary pointer used to copy the data. */
 
 	/* Check for valid args. */
 	if ((pAllocatedList != NULL) && (ppData != NULL) && (dataLength != NULL))
 	{
-		/* Copy the pointer and length. */
-		(*ppData) = pAllocatedList->data;
-		(*dataLength) = pAllocatedList->dataLength;
+		/* Check and see if we are copying the data. */
+		if (copyData)
+		{
+			/* Copy the data and the length if needed. */
+			if (pAllocatedList->dataLength > 0)
+			{
+				retFromCall = DataProcess_Reallocate_C_String(&tempData, 0, (pAllocatedList->dataLength));
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempData != NULL))
+				{
+					/* Copy data. */
+					memcpy(tempData, (pAllocatedList->data), (pAllocatedList->dataLength));
 
-		/* Success. */
-		ret = COMMON_ERROR_SUCCESS;
+					/* Copy the pointer and length. */
+					(*ppData) = tempData;
+					(*dataLength) = pAllocatedList->dataLength;
+
+					/* Success. */
+					ret = COMMON_ERROR_SUCCESS;
+				}
+				else
+				{
+					/* Could not allocate memory for data copy. */
+					ret = ((retFromCall != COMMON_ERROR_MEMORY_ERROR) ? (COMMON_ERROR_INTERNAL_ERROR) :
+							(COMMON_ERROR_MEMORY_ERROR));
+				}
+			}
+			else
+			{
+				/* Invalid or unallocated data. */
+				(*ppData) = NULL;
+				(*dataLength) = 0;
+
+				/* Success. */
+				ret = COMMON_ERROR_SUCCESS;
+			}
+		}
+		else
+		{
+			/* Copy the pointer and length. */
+			(*ppData) = pAllocatedList->data;
+			(*dataLength) = pAllocatedList->dataLength;
+
+			/* Success. */
+			ret = COMMON_ERROR_SUCCESS;
+		}
 	}
 	else
 	{
