@@ -159,6 +159,26 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
  *
  *		Optionally if searchFromEnd is non-zero, the search will start from the end of the source string instead of the beginning.
  *
+ *		Notes about resulting substring:
+ *		If getPriorData is true, the length of the substring is sourceLength - <delimiter offset>, otherwise
+ *		the length of the substring is <delimiter offset> - <delimiter length>.
+ *
+ *		If getPriorData is true the start of the substring is the start of the source string, otherwise it depends
+ *		on the value of searchFromEnd. If searchFromEnd is true, then the start of the substring is
+ *		(<end of the string> - <delimiter offset>), otherwise the start of the string is the <delimiter offset>.
+ *
+ *		Truth Table:
+ *
+ *		--------------------------------------------------------------------------------------------------------------------------------------------------
+ *		|	getPriorData:	|	searchFromEnd: 	| Start of substring:								| Length of substring: 								|
+ *		--------------------------------------------------------------------------------------------------------------------------------------------------
+ *		|	true			|		N / A		|	Start of source	string							|	(<end of source string> - <delimiter offset>)	|
+ *		--------------------------------------------------------------------------------------------------------------------------------------------------
+ *		|	false			|		true		|	(<end of source string> - <delimiter offset>)	|	(<delimiter offset> - <delimiter length>)		|
+ *		--------------------------------------------------------------------------------------------------------------------------------------------------
+ *		|	false			|		false		|	Delimiter offset								|	(<delimiter offset> - <delimiter length>)		|
+ *		--------------------------------------------------------------------------------------------------------------------------------------------------
+ *
  *		@pram getPriorData, Chooses the bytes that came before the delimiter or after the delimiter for generating the sub-string from.
  *				If getPriorData is non-zero then the sub-string will contain the bytes before the delimiter, otherwise the sub-string will
  *				contain the bytes after the delimiter.

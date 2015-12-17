@@ -35,11 +35,6 @@ extern "C" {
 /* Pull in DLL_PORT.h */
 #include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
 
-/* Internal headers. */
-#include "../Error_Handler/Common_Error_Handler_Error_Codes.h"	/* Defines the error codes. */
-#include "Byte_Order_Integers.h"
-#include "Byte_Order_Floating_Points.h"
-
 /* Define bool. */
 #if _MSC_FULL_VER && _MSC_FULL_VER < 180031101
 #include "../../../stdbool.h"	/* Older versions of Visual C don't support the C99 stdbool header. So we have to fake one. */
@@ -51,6 +46,11 @@ extern "C" {
 #include <stddef.h>	/* Defines NULL. */
 #include <stdlib.h>	/* Defines malloc(), free(). */
 #include <string.h>	/* Defines memset(), memcpy(). */
+
+/* Internal headers. */
+#include "../Error_Handler/Common_Error_Handler_Error_Codes.h"	/* Defines the error codes. */
+#include "Byte_Order_Integers.h"
+#include "Byte_Order_Floating_Points.h"
 
 /*!
  *		int Byte_Order_Bit_Comparison(const char * byte, const char bitMask, const char bitValues)

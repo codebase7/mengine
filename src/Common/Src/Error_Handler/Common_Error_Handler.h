@@ -18,15 +18,24 @@
     https://github.com/codebase7/mengine
 */
 
-// Include guard.
+/* Include guard. */
 #ifndef COMMON_ERROR_HANDLER_H
 #define COMMON_ERROR_HANDLER_H
 
 /* Pull in DLL_PORT.h */
 #include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT, and MSYS_DLL_IMPORT_TEMPLATE. */
 
-// External includes.
-#include <stddef.h>		// Defines NULL.
+/* External includes. */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
+
+	#include <stddef.h>		/* Defines NULL. */
+
+#ifdef __cplusplus
+}	/* End of extern C. */
+#endif	/* __cplusplus */
+
 #ifndef __cplusplus
 #if _MSC_FULL_VER && _MSC_FULL_VER < 180031101	/* Visual C versions less than 2013 are special. (They lack support for C99's bool type.) */
 #include "..\..\..\stdbool.h"		/* Defines bool data type. (For C compilers.) */
@@ -35,23 +44,23 @@
 #endif	/* _MSC_FULL_VER && _MSC_FULL_VER < 180031101 */
 #endif	/* __cplusplus */
 
-// Project includes.
-#ifdef _WIN32	// Needed for different path seperator in Windows.
-#include "..\..\..\Core\Src\Panic_Error_Levels.h"	// Defines the log levels.
+/* Project includes. */
+#ifdef _WIN32	/* Needed for different path seperator in Windows. */
+#include "..\..\..\Core\Src\Panic_Error_Levels.h"	/* Defines the log levels. */
 #else
-#include "../../../Core/Src/Panic_Error_Levels.h"	// Defines the log levels.
-#include "Posix_Error_Translation_Table.h"		// Defines the POSIX errno to Common namespace error translation table and functions.
-#endif // _WIN32
+#include "../../../Core/Src/Panic_Error_Levels.h"	/* Defines the log levels. */
+#include "Posix_Error_Translation_Table.h"		/* Defines the POSIX errno to Common namespace error translation table and functions. */
+#endif /* _WIN32 */
 
 #include "Common_Error_Handler_Error_Codes.h"		/* Defines error codes. */
-#include "Common_Error_Handler_Structures.h"		// Defines the error codes, error lookup table error lookup table version number, and Common::commonLastErrorCode.
+#include "Common_Error_Handler_Structures.h"		/* Defines the error codes, error lookup table error lookup table version number, and Common::commonLastErrorCode. */
 
-// Enable C linkage if needed.
+/* Enable C linkage if needed. */
 #ifdef __cplusplus
 extern "C" {
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
-// Define the C bindings for the error handler.
+/* Define the C bindings for the error handler. */
 
 /*!
  * 	void Common_Set_Error_Log_Level(const unsigned int & logLevel)
@@ -160,16 +169,16 @@ MSYS_DLL_EXPORT bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorC
  * 	This function does not return any data to it's caller.
  */
 MSYS_DLL_EXPORT void Common_Fatal_Error_Notify();
-#endif	// MSYS_BUILD_FATAL_ERROR_SUPPORT
+#endif	/* MSYS_BUILD_FATAL_ERROR_SUPPORT */
 
-// End C Linkage if needed.
+/* End C Linkage if needed. */
 #ifdef __cplusplus
 }
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
-// Define C++ Bindings.
+/* Define C++ Bindings. */
 #ifdef __cplusplus
-// Define namespaces.
+/* Define namespaces. */
 namespace Common
 {
 	/*!
@@ -284,10 +293,10 @@ namespace Common
 	 * 	This function does not return any data to it's caller.
 	 */
 	MSYS_DLL_EXPORT void Fatal_Error_Notify();
-#endif	// MSYS_BUILD_FATAL_ERROR_SUPPORT
+#endif	/* MSYS_BUILD_FATAL_ERROR_SUPPORT */
 };
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
-#endif // COMMON_ERROR_HANDLER_H
+#endif /* COMMON_ERROR_HANDLER_H */
 
-// End of Common_Error_Handler.h
+/* End of Common_Error_Handler.h */
