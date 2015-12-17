@@ -18,23 +18,23 @@
     https://github.com/codebase7/mengine
 */
 
-// Internal includes.
-#include "Common_Error_Handler.h"		// Main header.
-#include "Common_Error_Handler_Internal.h"	// Private internal header that defines the structure used for error logging.
+/* Internal includes. */
+#include "Common_Error_Handler.h"		/* Main header. */
+#include "Common_Error_Handler_Internal.h"	/* Private internal header that defines the structure used for error logging. */
 
-// Only include the mutex header if needed by the fatal error handler.
+/* Only include the mutex header if needed by the fatal error handler. */
 #ifdef MSYS_BUILD_FATAL_ERROR_SUPPORT
-#ifdef __win32__
-#include "..\Mutexes\MSYS_Mutexes.h"		// Internal mutex support.
+#ifdef _WIN32
+#include "..\Mutexes\MSYS_Mutexes.h"		/* Internal mutex support. */
 #else
-#include "../Mutexes/MSYS_Mutexes.h"		// Internal mutex support.
-#endif	// __win32__
-#endif	// MSYS_BUILD_FATAL_ERROR_SUPPORT
+#include "../Mutexes/MSYS_Mutexes.h"		/* Internal mutex support. */
+#endif	/* _WIN32 */
+#endif	/* MSYS_BUILD_FATAL_ERROR_SUPPORT */
 
-// Enable C linkage if needed.
+/* Enable C linkage if needed. */
 #ifdef __cplusplus
 extern "C" {
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
 /*!
  * 	static int Common_commonLastErrorCode
@@ -49,39 +49,39 @@ static int Common_commonLastErrorCode = COMMON_ERROR_SUCCESS;
 
 void Common_Set_Error_Log_Level(const unsigned int logLevel)
 {
-	// Set the log level.
+	/* Set the log level. */
 	commonErrorLoggingData.errorLogLevel = logLevel;
 
-	// Exit function.
+	/* Exit function. */
 	return;
 }
 
 unsigned int Common_Get_Error_Log_Level()
 {
-	// Return the current log level.
+	/* Return the current log level. */
 	return commonErrorLoggingData.errorLogLevel;
 }
 
 void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
 {
-	// Check and see if the pointer is NULL.
+	/* Check and see if the pointer is NULL. */
 	if (loggingFunction == NULL)
 	{
-		// Set the log level to ERROR_DISABLE.
+		/* Set the log level to ERROR_DISABLE. */
 		commonErrorLoggingData.errorLogLevel = ERROR_DISABLE;
 		commonErrorLoggingData.loggingFunct = NULL;
 	}
 	else
 	{
-		// Set the pointer.
+		/* Set the pointer. */
 		commonErrorLoggingData.loggingFunct = loggingFunction;
 	}
 
-	// Exit function.
+	/* Exit function. */
 	return;
 }
 
-// Build the Fatal Error Handler if needed.
+/* Build the Fatal Error Handler if needed. */
 #ifdef MSYS_BUILD_FATAL_ERROR_SUPPORT
 /*!
  * 	static size_t registeredFatalErrorCallbackFunctionsSize
@@ -109,40 +109,40 @@ static MSYS_Mutex * fatalErrorHandlerMutex = NULL;
 
 bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction)
 {
-	// Init vars.
-	bool ret = false;										// The result of this function.
-	size_t previousErrorListSize = registeredFatalErrorCallbackFunctionsSize;			// The size of the previous error list.
-	size_t newErrorListSize = 0;									// The size of the new error list we are creating.
+	/* Init vars. */
+	bool ret = false;										/* The result of this function. */
+	size_t previousErrorListSize = registeredFatalErrorCallbackFunctionsSize;			/* The size of the previous error list. */
+	size_t newErrorListSize = 0;									/* The size of the new error list we are creating. */
 	size_t x = 0;											/* Counter used in for loops. */
-	Common_pErrorCallBackFunction * previousErrorList = registeredFatalErrorCallbackFunctions;	// The previous error list.
-	Common_pErrorCallBackFunction * newErrorList = NULL;						// The new error list we are creating.
-	MSYS_Mutex * retFromLockMutex = NULL;								// The result from the call to MSYS_Lock_Mutex().
+	Common_pErrorCallBackFunction * previousErrorList = registeredFatalErrorCallbackFunctions;	/* The previous error list. */
+	Common_pErrorCallBackFunction * newErrorList = NULL;						/* The new error list we are creating. */
+	MSYS_Mutex * retFromLockMutex = NULL;								/* The result from the call to MSYS_Lock_Mutex(). */
 
-	// Check for a valid mutex.
+	/* Check for a valid mutex. */
 	if (fatalErrorHandlerMutex == NULL)
 	{
-		// Allocate the mutex.
+		/* Allocate the mutex. */
 		fatalErrorHandlerMutex = MSYS_Create_Mutex();
 	}
 
-	// Lock the error handler mutex.
+	/* Lock the error handler mutex. */
 	retFromLockMutex = MSYS_Lock_Mutex(fatalErrorHandlerMutex);
 	if ((retFromLockMutex != NULL) && (retFromLockMutex == fatalErrorHandlerMutex))
 	{
-		// Check for valid function pointer.
+		/* Check for valid function pointer. */
 		if (fatalErrorNotifyFunction != NULL)
 		{
-			// Check for a error function list.
+			/* Check for a error function list. */
 			if ((previousErrorList != NULL) && (previousErrorListSize > 0))
 			{
-				// Re-allocate the error list.
+				/* Re-allocate the error list. */
 				newErrorList = (Common_pErrorCallBackFunction *)malloc((sizeof(Common_pErrorCallBackFunction) * (previousErrorListSize + 1)));
 				if (newErrorList != NULL)
 				{
-					// Update the size info.
+					/* Update the size info. */
 					newErrorListSize = (previousErrorListSize + 1);
 
-					// Copy the data.
+					/* Copy the data. */
 					for (x = 0; x < previousErrorListSize; x++)
 					{
 						newErrorList[x] = previousErrorList[x];
@@ -151,114 +151,114 @@ bool Common_Register_Fatal_Error_Callback(const Common_pErrorCallBackFunction fa
 			}
 			else
 			{
-				// Allocate the error list.
+				/* Allocate the error list. */
 				newErrorList = (Common_pErrorCallBackFunction *)malloc(sizeof(Common_pErrorCallBackFunction));
 				if (newErrorList != NULL)
 				{
-					// Update the size info.
+					/* Update the size info. */
 					newErrorListSize = 1;
 				}
 			}
 
-			// Check for a valid list.
+			/* Check for a valid list. */
 			if ((previousErrorListSize + 1) == newErrorListSize)
 			{
-				// Register the function.
+				/* Register the function. */
 				newErrorList[(previousErrorListSize)] = fatalErrorNotifyFunction;
 
-				// Copy the new list pointer, and size info.
+				/* Copy the new list pointer, and size info. */
 				registeredFatalErrorCallbackFunctions = newErrorList;
 				registeredFatalErrorCallbackFunctionsSize = newErrorListSize;
 
-				// Check and see if we need to deallocate the previousErrorList.
+				/* Check and see if we need to deallocate the previousErrorList. */
 				if ((previousErrorList != NULL) && (previousErrorList != newErrorList) && (previousErrorListSize > 0))
 				{
-					// Null out the old pointer list.
+					/* Null out the old pointer list. */
 					for (x = 0; x < previousErrorListSize; x++)
 					{
 						previousErrorList[x] = NULL;
 					}
 
-					// Deallocate the old array.
+					/* Deallocate the old array. */
 					free(previousErrorList);
 					previousErrorList = NULL;
 					previousErrorListSize = 0;
 				}
 
-				// We are done.
+				/* We are done. */
 				ret = true;
 			}
 		}
 
-		// Release the error handler mutex.
+		/* Release the error handler mutex. */
 		MSYS_Unlock_Mutex(fatalErrorHandlerMutex);
 	}
 
-	// Return the result.
+	/* Return the result. */
 	return ret;
 }
 
 bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction fatalErrorNotifyFunction)
 {
-	// Init vars.
-	bool ret = false;										// The result of this function.
-	size_t previousErrorListSize = registeredFatalErrorCallbackFunctionsSize;			// The size of the previous error list.
-	size_t newErrorListSize = 0;									// The size of the new error list we are creating.
+	/* Init vars. */
+	bool ret = false;										/* The result of this function. */
+	size_t previousErrorListSize = registeredFatalErrorCallbackFunctionsSize;			/* The size of the previous error list. */
+	size_t newErrorListSize = 0;									/* The size of the new error list we are creating. */
 	size_t x = 0;													/* Counter used in top level for loops. */
 	size_t y = 0;													/* Counter used in sub level 1 for loops. */
-	Common_pErrorCallBackFunction * previousErrorList = registeredFatalErrorCallbackFunctions;	// The previous error list.
-	Common_pErrorCallBackFunction * newErrorList = NULL;						// The new error list we are creating.
-	MSYS_Mutex * retFromLockMutex = NULL;								// The result from the call to MSYS_Lock_Mutex().
+	Common_pErrorCallBackFunction * previousErrorList = registeredFatalErrorCallbackFunctions;	/* The previous error list. */
+	Common_pErrorCallBackFunction * newErrorList = NULL;						/* The new error list we are creating. */
+	MSYS_Mutex * retFromLockMutex = NULL;								/* The result from the call to MSYS_Lock_Mutex(). */
 
-	// Lock the error handler mutex.
+	/* Lock the error handler mutex. */
 	retFromLockMutex = MSYS_Lock_Mutex(fatalErrorHandlerMutex);
 	if ((retFromLockMutex != NULL) && (retFromLockMutex == fatalErrorHandlerMutex))
 	{
-		// Check for valid function pointer.
+		/* Check for valid function pointer. */
 		if (fatalErrorNotifyFunction != NULL)
 		{
-			// Check for a error function list.
+			/* Check for a error function list. */
 			if ((previousErrorList != NULL) && (previousErrorListSize > 0))
 			{
-				// Check the existing list for that function.
+				/* Check the existing list for that function. */
 				for (x = 0; ((newErrorList == NULL) && (x < previousErrorListSize)); x++)
 				{
-					// Check for the correct function, to see if the function was registered previously.
+					/* Check for the correct function, to see if the function was registered previously. */
 					if (previousErrorList[x] == fatalErrorNotifyFunction)
 					{
-						// Found the function, so re-allocate the error list so we can remove it.
+						/* Found the function, so re-allocate the error list so we can remove it. */
 						newErrorList = (Common_pErrorCallBackFunction *)malloc((sizeof(Common_pErrorCallBackFunction) * (previousErrorListSize - 1)));
 						if (newErrorList != NULL)
 						{
-							// Update the size info.
+							/* Update the size info. */
 							newErrorListSize = (previousErrorListSize - 1);
 						}
 					}
 				}
 
-				// Only continue if the list was reallocated due to us finding the function to remove.
+				/* Only continue if the list was reallocated due to us finding the function to remove. */
 				if ((newErrorList != NULL) && (newErrorListSize == (previousErrorListSize - 1)))
 				{
-					// Copy the data.
+					/* Copy the data. */
 					for (x = 0, y = 0; ((x < previousErrorListSize) && (y < newErrorListSize)); x++)
 					{
-						// Make sure we don't copy the pointer we are removing.
+						/* Make sure we don't copy the pointer we are removing. */
 						if (previousErrorList[x] != fatalErrorNotifyFunction)
 						{
-							// Copy the pointer, and increment y. (Yes, y can be different than x, because it will not contain every pointer.)
+							/* Copy the pointer, and increment y. (Yes, y can be different than x, because it will not contain every pointer.) */
 							newErrorList[y] = previousErrorList[x];
 							y++;
 						}
 					}
 
-					// Now that the data is copied, copy the pointers.
+					/* Now that the data is copied, copy the pointers. */
 					registeredFatalErrorCallbackFunctions = newErrorList;
 					registeredFatalErrorCallbackFunctionsSize = newErrorListSize;
 
-					// Deallocate the old list.
+					/* Deallocate the old list. */
 					if ((previousErrorList != NULL) && (previousErrorList != newErrorList) && (previousErrorListSize > 0))
 					{
-						// Null out the old pointer list.
+						/* Null out the old pointer list. */
 						for (x = 0; x < previousErrorListSize; x++)
 						{
 							previousErrorList[x] = NULL;
@@ -269,37 +269,37 @@ bool Common_Unregister_Fatal_Error_Callback(const Common_pErrorCallBackFunction 
 						previousErrorListSize = 0;
 					}
 
-					// Done.
+					/* Done. */
 					ret = true;
 				}
 			}
 		}
 
-		// Release the error handler mutex.
+		/* Release the error handler mutex. */
 		MSYS_Unlock_Mutex(fatalErrorHandlerMutex);
 	}
 
-	// Return the result.
+	/* Return the result. */
 	return ret;
 }
 
 void Common_Fatal_Error_Notify()
 {
-	// Init vars.
-	MSYS_Mutex * retFromLockMutex = NULL;						// The result from the call to MSYS_Lock_Mutex().
+	/* Init vars. */
+	MSYS_Mutex * retFromLockMutex = NULL;						/* The result from the call to MSYS_Lock_Mutex(). */
 	size_t x = 0;												/* Counter used in loops. */
 
-	// Lock the error handler mutex.
+	/* Lock the error handler mutex. */
 	retFromLockMutex = MSYS_Lock_Mutex(fatalErrorHandlerMutex);
 	if ((retFromLockMutex != NULL) && (retFromLockMutex == fatalErrorHandlerMutex))
 	{
-		// Check for registered fatal error callbacks.
+		/* Check for registered fatal error callbacks. */
 		if (registeredFatalErrorCallbackFunctionsSize > 0)
 		{
-			// Begin vector iteration loop.
+			/* Begin vector iteration loop. */
 			for (x = 0; (x < registeredFatalErrorCallbackFunctionsSize); x++)
 			{
-				// Trigger each function.
+				/* Trigger each function. */
 				if (registeredFatalErrorCallbackFunctions[x] != NULL)
 				{
 					registeredFatalErrorCallbackFunctions[x]();
@@ -307,15 +307,15 @@ void Common_Fatal_Error_Notify()
 			}
 		}
 
-		// Release the error handler mutex.
+		/* Release the error handler mutex. */
 		MSYS_Unlock_Mutex(fatalErrorHandlerMutex);
 	}
 
-	// Exit function.
+	/* Exit function. */
 	return;
 }
 
-#endif	// MSYS_BUILD_FATAL_ERROR_SUPPORT
+#endif	/* MSYS_BUILD_FATAL_ERROR_SUPPORT */
 
 void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg)
 {
@@ -330,11 +330,11 @@ void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg)
 	    (commonErrorLoggingData.loggingFunct != NULL) &&
 	    (loggingLevel <= commonErrorLoggingData.errorLogLevel))
 	{
-		// Call the callback. (Hope it returns....)
+		/* Call the callback. (Hope it returns....) */
 		commonErrorLoggingData.loggingFunct(loggingLevel, errorMsg);
 	}
 
-	// Exit function.
+	/* Exit function. */
 	return;
 }
 
@@ -368,7 +368,7 @@ void COMMON_LOG_VERBOSE(const char * errorMsg)
 	return;
 }
 
-// End C Linkage if needed.
+/* End C Linkage if needed. */
 #ifdef __cplusplus
 }
-#endif	// __cplusplus
+#endif	/* __cplusplus */
