@@ -23,22 +23,29 @@
 #ifndef FILEUTILLS_H
 #define FILEUTILLS_H
 
-// Engine Includes
-#ifdef __win32
-#include "..\BaseHeader.h"
+/* Define extern C if needed. */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus. */
+
+/* External Includes. */
+#include <cstdio>	/* Defines FILE and friends. */
+
+/* Engine Includes */
+#ifdef _WIN32
 #include "..\Error_Handler\Common_Error_Handler.h"
 #include "..\Error_Handler\Common_Error_Handler_Internal.h"
 #else
-#include "../BaseHeader.h"
 #include "../Error_Handler/Common_Error_Handler.h"
 #include "../Error_Handler/Common_Error_Handler_Internal.h"
 #endif
 
+/* Define the appropriate Directory seperators and Symbols. */
 #ifdef _WIN32
-// Define the Windows Directory seperator
+/* Define the Windows Directory seperator */
 #define DIR_SEP '\\'
 #define HOME_DIR_SYMBOL '~'
-// Define the minimal valid absolute directory path length.
+/* Define the minimal valid absolute directory path length. */
 /*
  * MINIMAL_VALID_ABSOLUTE_PATH_LENGTH is supposed to include the needed DIR_SEP for the root directory.
  * In addition it is supposed to be the minimal number of char(s) needed to represent a valid absolute path
@@ -48,7 +55,7 @@
  */
 #define MINIMAL_VALID_ABSOLUTE_PATH_LENGTH 3
 #else
-// Define the Posix Directory Seperator.
+/* Define the Posix Directory Seperator. */
 #ifndef DIR_SEP
 #define DIR_SEP '/'
 #define HOME_DIR_SYMBOL '~'
@@ -61,8 +68,8 @@
  * In linux "<DIR_SEP>" is minimal for an absolute path. (Root of the entire filesystem / chroot.)
  */
 #define MINIMAL_VALID_ABSOLUTE_PATH_LENGTH 1
-#endif
-#endif
+#endif	/* DIR_SEP */
+#endif	/* _WIN32 */
 
 /*!
  *		enum MSYS_FILESIZE_TYPES
@@ -804,6 +811,10 @@ int FileUtills_CopyPath(const char * srcPath, const size_t srcPathSize, const ch
 */
 int FileUtills_MovePath(const char * srcPath, const size_t srcPathSize, const char * destPath, const size_t destPathSize, const bool overwrite);
 
-#endif
+#ifdef __cplusplus
+}	/* End of extern "C" */
+#endif	/* __cplusplus. */
 
-// End of FileUtills.h
+#endif	/* FILEUTILLS_H */
+
+/* End of FileUtills.h */
