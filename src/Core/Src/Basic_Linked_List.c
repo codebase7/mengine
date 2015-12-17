@@ -119,7 +119,7 @@ int MSYS_Linked_List_Allocate_Linked_List_Object(MSYS_Linked_List_T ** ppAllocat
 	return ret;
 }
 
-MSYS_DLL_EXPORT int MSYS_Linked_List_Allocate_And_Return_Linked_List_Object(MSYS_Linked_List_T ** ppAllocatedList, MSYS_LINKED_LIST_T ** ppAllocatedObject)
+MSYS_DLL_EXPORT int MSYS_Linked_List_Allocate_And_Return_Linked_List_Object(MSYS_Linked_List_T ** ppAllocatedList, MSYS_Linked_List_T ** ppAllocatedObject)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
