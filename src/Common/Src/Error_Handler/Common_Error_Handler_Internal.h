@@ -18,26 +18,26 @@
     https://github.com/codebase7/mengine
 */
 
-// Include guard.
+/* Include guard. */
 #ifndef COMMON_ERROR_HANDLER_INTERNAL_H
 #define COMMON_ERROR_HANDLER_INTERNAL_H
 
-// Project includes.
-#ifdef __win32	// Needed for different path seperator in Windows.
-#include "..\..\..\Core\Src\Panic_Error_Levels.h"	// Defines the log levels.
+/* Project includes. */
+#ifdef _WIN32	/* Needed for different path seperator in Windows. */
+#include "..\..\..\Core\Src\Panic_Error_Levels.h"	/* Defines the log levels. */
 #else
-#include "../../../Core/Src/Panic_Error_Levels.h"	// Defines the log levels.
-#endif // __win32
+#include "../../../Core/Src/Panic_Error_Levels.h"	/* Defines the log levels. */
+#endif /* _WIN32 */
 
-// Check to see if we are being included directly.
-//#ifndef COMMON_ERROR_HANDLER_H
-//#error "This header is for internal engine use only. It should not be linked against, as it is NOT a part of the public API."
-//#endif // COMMON_ERROR_HANDLER_H
+/* Check to see if we are being included directly. */
+/*#ifndef COMMON_ERROR_HANDLER_H */
+/*#error "This header is for internal engine use only. It should not be linked against, as it is NOT a part of the public API." */
+/*#endif COMMON_ERROR_HANDLER_H */
 
-// Enable C linkage if needed.
+/* Enable C linkage if needed. */
 #ifdef __cplusplus
 extern "C" {
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
 /*
  * 	struct CommonErrorLogData
@@ -142,11 +142,11 @@ MSYS_DLL_EXPORT void COMMON_LOG_DEBUG(const char * errorMsg);
  */
 MSYS_DLL_EXPORT void COMMON_LOG_VERBOSE(const char * errorMsg);
 
-// End C Linkage if needed.
+/* End C Linkage if needed. */
 #ifdef __cplusplus
 }
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
-#endif // COMMON_ERROR_HANDLER_INTERNAL_H
+#endif /* COMMON_ERROR_HANDLER_INTERNAL_H */
 
-// End of Common_Error_Handler_Internal.h
+/* End of Common_Error_Handler_Internal.h */
