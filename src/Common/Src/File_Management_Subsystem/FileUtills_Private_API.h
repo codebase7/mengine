@@ -47,6 +47,9 @@ extern "C" {
 extern "C" {
 #endif	/* __cplusplus */
 
+/* Include the Basic_Linked_List header. */
+#include "../../../Core/Src/Basic_Linked_List.h"
+
 /* Define the internal MSYS_FILESIZE_PRIV structure. */
 typedef struct MSYS_FILESIZE_PRIV {
 enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX. )*/
@@ -57,7 +60,114 @@ enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX
 #endif	/* _MSC_VER */
 } MSYS_FILESIZE_PRIV_T;
 
+/* Define the internal FileUtills_dirList_private structure. */
+typedef struct MSYS_FileUtills_dirList_PRIV {
+	size_t numOfEntries;			/* Used to store the number of entries in the list array. */
+	char * path;					/* Used to store the path of the directory that the entry list is about. */
+	size_t pathLength;				/* Length of the path string. */
+	MSYS_Linked_List * list;		/* The actual list of entries. */
+} MSYS_FileUtills_dirList_PRIV_T;
+
 /* Define C functions. */
+
+/*!
+	int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj)
+
+	Creates a MSYS_FileUtills_dirList_PRIV_T data structure, and set's obj to point to it.
+
+	WARNING: This function will overwrite the *obj pointer. If you need the previous pointer after
+	this function returns, you should copy it elsewhere before calling this function.
+
+	Returns COMMON_ERROR_SUCCESS if successful.
+	Returns COMMON_ERROR_INVALID_ARGUMENT if the given obj pointer is NULL.
+	Returns COMMON_ERROR_MEMORY_ERROR if memory allocation fails.
+
+	No alteration clause:
+		In the event of an error, this function will not modifiy the arguments given to it.
+ */
+int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj);
+
+/*!
+	void FileUtills_Destroy_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj)
+
+	Destroys (frees) the given MSYS_FileUtills_dirList_PRIV_T data structure, and
+	sets the (*obj) pointer to NULL.
+	Once destroyed, the given object should not be reused.
+
+	If given an object that is not a MSYS_FileUtills_dirList_PRIV_T data structure, the result is undefined.
+
+	Returns nothing.
+ */
+void FileUtills_Destroy_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj);
+
+/*!
+int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv,
+										const char * entry, const size_t entryLength)
+
+	Copies the given entry data and inserts it into the entry list.
+
+	Returns COMMON_ERROR_SUCCESS if successful.
+	Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointers are NULL or the entry length is less than or equal to zero.
+	Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation fails.
+	Returns COMMON_ERROR_INTERNAL_ERROR if an unexpected error occurs.
+	Otherwise returns the appropriate error code.
+
+	No alteration clause:
+		In the event of an error, this function will not modifiy the arguments given to it.
+*/
+int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv,
+										const char * entry, const size_t entryLength);
+
+/*!
+	int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset,
+										char ** entry, size_t * entryLength);
+
+	Returns a copy of the requested entry's data. (If any.)
+	This copy should be deallocated via FileUtills_dirList_PRIV_Deallocate_Entry_Data_Copy()
+	when it is no longer needed.
+
+	Returns COMMON_ERROR_SUCCESS if successful.
+	Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointers are NULL.
+	Returns COMMON_ERROR_RANGE_ERROR if the given entry offset is beyond the end of the entry list.
+	Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation fails.
+	Returns COMMON_ERROR_INTERNAL_ERROR if an unexpected error occurs.
+	Otherwise returns the appropriate error code.
+
+	No alteration clause:
+		In the event of an error, this function will not modifiy the arguments given to it.
+*/
+int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset,
+										char ** entry, size_t * entryLength);
+
+/*!
+	int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset)
+
+	Removes the given entry from the entry list.
+
+	Returns COMMON_ERROR_SUCCESS if successful.
+	Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer is NULL.
+	Returns COMMON_ERROR_RANGE_ERROR if the given entry offset is beyond the end of the entry list.
+	Returns COMMON_ERROR_INTERNAL_ERROR if an unexpected error occurs.
+	Otherwise returns the appropriate error code.
+
+	No alteration clause:
+		In the event of an error, this function will not modifiy the arguments given to it.
+*/
+int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset);
+
+/*!
+	void FileUtills_dirList_PRIV_Deallocate_Entry_Data_Copy(char ** data)
+
+	Deallocates entry data returned by FileUtills_dirList_PRIV_Get_Entry() and
+	sets the given pointer to NULL.
+
+	ALL entry data returned from FileUtills_dirList_PRIV_Get_Entry() should be
+	deallocated by this function.
+
+	If the given pointer is invalid this function will silently fail.
+	This function has no return.
+*/
+void FileUtills_dirList_PRIV_Deallocate_Entry_Data_Copy(char ** data);
 
 /*!
  * 	int FileUtills_IsAbsolutePathReference(const char * path, const size_t pathSize)
