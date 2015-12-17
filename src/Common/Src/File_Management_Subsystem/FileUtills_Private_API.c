@@ -23,21 +23,21 @@
 #include "FileUtills_Private_API.h"
 #include "../../../Core/Src/DataProcess.h"	/* For DataProcess Allocators. (DataProcess_Deallocate_C_String(), DataProcess_Reallocate_CString().) */
 
-int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj)
+int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV_T ** obj)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
-	MSYS_FileUtills_dirList_PRIV * tempObj = NULL;	/* The object we are creating. */
+	MSYS_FileUtills_dirList_PRIV_T * tempObj = NULL;	/* The object we are creating. */
 
 	/* Check for invalid pointer argument. */
 	if (obj != NULL)
 	{
 		/* Allocate object. */
-		tempObj = (MSYS_FileUtills_dirList_PRIV *)malloc((sizeof MSYS_FileUtills_dirList_PRIV));
+		tempObj = (MSYS_FileUtills_dirList_PRIV_T *)malloc((sizeof MSYS_FileUtills_dirList_PRIV_T));
 		if (tempObj != NULL)
 		{
 			/* NULL out object. */
-			memset(obj, '\0', (sizeof MSYS_FileUtills_dirList_PRIV));
+			memset(obj, '\0', (sizeof MSYS_FileUtills_dirList_PRIV_T));
 
 			/* Copy pointer. */
 			(*obj) = tempObj;
@@ -61,7 +61,7 @@ int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj)
 	return ret;
 }
 
-void FileUtills_Destroy_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj)
+void FileUtills_Destroy_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV_T ** obj)
 {
 	/* Check for valid pointer. */
 	if ((obj != NULL) && ((*obj) != NULL))
@@ -78,7 +78,7 @@ void FileUtills_Destroy_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj)
 	return;
 }
 
-int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv,
+int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPriv,
 										const char * entry, const size_t entryLength)
 {
 	/* Init vars. */
@@ -146,7 +146,7 @@ int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv
 	return ret;
 }
 
-int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset,
+int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPriv, const size_t entryOffset,
 										char ** entry, size_t * entryLength)
 {
 	/* Init vars. */
@@ -248,7 +248,7 @@ int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv
 	return ret;
 }
 
-int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset)
+int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPriv, const size_t entryOffset)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */

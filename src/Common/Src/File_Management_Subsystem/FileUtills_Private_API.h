@@ -30,7 +30,7 @@ extern "C" {
 #endif	/* __cplusplus */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string>
+#include <string.h>
 
 #ifdef __cplusplus
 } /* End of extern C. */
@@ -61,13 +61,13 @@ typedef struct MSYS_FileUtills_dirList_PRIV {
 	size_t numOfEntries;			/* Used to store the number of entries in the list array. */
 	char * path;					/* Used to store the path of the directory that the entry list is about. */
 	size_t pathLength;				/* Length of the path string. */
-	MSYS_Linked_List * list;		/* The actual list of entries. */
+	MSYS_Linked_List_T * list;		/* The actual list of entries. */
 } MSYS_FileUtills_dirList_PRIV_T;
 
 /* Define C functions. */
 
 /*!
-	int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj)
+	int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV_T ** obj)
 
 	Creates a MSYS_FileUtills_dirList_PRIV_T data structure, and set's obj to point to it.
 
@@ -81,10 +81,10 @@ typedef struct MSYS_FileUtills_dirList_PRIV {
 	No alteration clause:
 		In the event of an error, this function will not modifiy the arguments given to it.
  */
-int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj);
+int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV_T ** obj);
 
 /*!
-	void FileUtills_Destroy_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj)
+	void FileUtills_Destroy_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV_T ** obj)
 
 	Destroys (frees) the given MSYS_FileUtills_dirList_PRIV_T data structure, and
 	sets the (*obj) pointer to NULL.
@@ -94,10 +94,10 @@ int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj);
 
 	Returns nothing.
  */
-void FileUtills_Destroy_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV ** obj);
+void FileUtills_Destroy_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV_T ** obj);
 
 /*!
-int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv,
+int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPriv,
 										const char * entry, const size_t entryLength)
 
 	Copies the given entry data and inserts it into the entry list.
@@ -111,11 +111,11 @@ int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv
 	No alteration clause:
 		In the event of an error, this function will not modifiy the arguments given to it.
 */
-int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv,
+int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPriv,
 										const char * entry, const size_t entryLength);
 
 /*!
-	int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset,
+	int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPriv, const size_t entryOffset,
 										char ** entry, size_t * entryLength);
 
 	Returns a copy of the requested entry's data. (If any.)
@@ -132,11 +132,11 @@ int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv
 	No alteration clause:
 		In the event of an error, this function will not modifiy the arguments given to it.
 */
-int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset,
+int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPriv, const size_t entryOffset,
 										char ** entry, size_t * entryLength);
 
 /*!
-	int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset)
+	int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPriv, const size_t entryOffset)
 
 	Removes the given entry from the entry list.
 
@@ -149,7 +149,7 @@ int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv
 	No alteration clause:
 		In the event of an error, this function will not modifiy the arguments given to it.
 */
-int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV * dirListPriv, const size_t entryOffset);
+int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPriv, const size_t entryOffset);
 
 /*!
 	void FileUtills_dirList_PRIV_Deallocate_Entry_Data_Copy(char ** data)
