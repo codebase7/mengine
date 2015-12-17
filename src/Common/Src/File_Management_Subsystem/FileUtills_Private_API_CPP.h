@@ -32,6 +32,7 @@
 
 /* C++ specific external includes. */
 #include <cstring>
+#include <string>
 
 /* Namespace definition. */
 namespace FileUtills{
