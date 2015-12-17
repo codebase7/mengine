@@ -33,11 +33,11 @@ int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV_T ** obj)
 	if (obj != NULL)
 	{
 		/* Allocate object. */
-		tempObj = (MSYS_FileUtills_dirList_PRIV_T *)malloc((sizeof MSYS_FileUtills_dirList_PRIV_T));
+		tempObj = (MSYS_FileUtills_dirList_PRIV_T *)malloc((sizeof(MSYS_FileUtills_dirList_PRIV_T)));
 		if (tempObj != NULL)
 		{
 			/* NULL out object. */
-			memset(obj, '\0', (sizeof MSYS_FileUtills_dirList_PRIV_T));
+			memset(obj, '\0', (sizeof(MSYS_FileUtills_dirList_PRIV_T)));
 
 			/* Copy pointer. */
 			(*obj) = tempObj;
@@ -156,6 +156,7 @@ int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPr
 	char * fetchedEntry = NULL;						/* Pointer to data in linked list object. */
 	size_t fetchedEntryLength = 0;					/* Length of fetchedEntry. */
 	char * returnedEntry = NULL;					/* Pointer to copy of the entry data that is returned to the caller. */
+	size_t x = 0;									/* Loop counter. */
 
 	/* Check for invalid arguments. */
 	if ((dirListPriv != NULL) && (dirListPriv->list != NULL) && (entry != NULL) && (entryLength != NULL))
@@ -165,7 +166,7 @@ int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPr
 		if (retFromCall == COMMON_ERROR_SUCCESS)
 		{
 			/* Begin iteration loop. (Start at index one as we already have the first entry.) */
-			for (size_t x = 1; ((x < entryOffset) && (retFromCall == COMMON_ERROR_SUCCESS) && (iterator != NULL)); x++)
+			for (x = 1; ((x < entryOffset) && (retFromCall == COMMON_ERROR_SUCCESS) && (iterator != NULL)); x++)
 			{
 				/* Get the next object. */
 				retFromCall = MSYS_Linked_List_Get_Next_Object(iterator, &iterator);
@@ -175,38 +176,18 @@ int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPr
 			if (iterator != NULL)
 			{
 				/* Get the contents of the correct entry. */
-				retFromCall = MSYS_Linked_List_Get_Current_Object_Contents(iterator, ((void**)(&fetchedEntry)), &fetchedEntryLength);
+				retFromCall = MSYS_Linked_List_Get_Current_Object_Contents(iterator, ((void**)(&fetchedEntry)), &fetchedEntryLength, 1);
 				if (retFromCall == COMMON_ERROR_SUCCESS)
 				{
 					/* Check and see if there is entry data at all.... */
 					if ((fetchedEntry != NULL) && (fetchedEntryLength > 0))
 					{
-						/* Allocate memory to copy the entry data prior to returning it to the caller. */
-						retFromCall = DataProcess_Reallocate_C_String(&returnedEntry, 0, fetchedEntryLength);
-						if ((retFromCall == COMMON_ERROR_SUCCESS) && (returnedEntry != NULL))
-						{
-							/* Copy the entry data. */
-							memcpy(returnedEntry, fetchedEntry, fetchedEntryLength);
+						/* Copy the new pointer to the caller. */
+						(*entry) = fetchedEntry;
+						(*entryLength) = fetchedEntryLength;
 
-							/* Copy the new pointer to the caller. */
-							(*entry) = returnedEntry;
-							(*entryLength) = fetchedEntryLength;
-
-							/* Done. */
-							ret = COMMON_ERROR_SUCCESS;
-						}
-						else
-						{
-							/* Could not allocate memory for data copy. */
-							ret = ((retFromCall != COMMON_ERROR_MEMORY_ERROR) ? (COMMON_ERROR_INTERNAL_ERROR) :
-							(COMMON_ERROR_MEMORY_ERROR));
-
-							/* Log error. */
-							if (ret != COMMON_ERROR_MEMORY_ERROR)
-							{
-								COMMON_LOG_VERBOSE("FileUtills_dirList_PRIV_Get_Entry(): Could not create a copy of the entry data.");
-							}
-						}
+						/* Done. */
+						ret = COMMON_ERROR_SUCCESS;
 					}
 					else
 					{
@@ -256,6 +237,7 @@ int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV_T * dirLis
 	MSYS_Linked_List_T * iterator = NULL;			/* Iterator used to iterate through the linked list. */
 	char * entry = NULL;							/* Pointer to the entry data. */
 	size_t entryLength = 0;							/* Length of the entry data. */
+	size_t x = 0;									/* Loop counter. */
 
 	/* Check for invalid arguments. */
 	if ((dirListPriv != NULL) && (dirListPriv->list != NULL))
@@ -265,7 +247,7 @@ int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV_T * dirLis
 		if (retFromCall == COMMON_ERROR_SUCCESS)
 		{
 			/* Begin iteration loop. (Start at index one as we already have the first entry.) */
-			for (size_t x = 1; ((x < entryOffset) && (retFromCall == COMMON_ERROR_SUCCESS) && (iterator != NULL)); x++)
+			for (x = 1; ((x < entryOffset) && (retFromCall == COMMON_ERROR_SUCCESS) && (iterator != NULL)); x++)
 			{
 				/* Get the next object. */
 				retFromCall = MSYS_Linked_List_Get_Next_Object(iterator, &iterator);
@@ -274,25 +256,11 @@ int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV_T * dirLis
 			/* Check for valid iterator. */
 			if (iterator != NULL)
 			{
-				/* Get the contents of the correct entry. */
-				retFromCall = MSYS_Linked_List_Get_Current_Object_Contents(iterator, ((void**)(&entry)), &entryLength);
-				if (retFromCall == COMMON_ERROR_SUCCESS)
-				{
-					/* Deallocate the entry data. */
-					DataProcess_Deallocate_CString(&entry);
+				/* Deallocate the entry's linked list object. */
+				MSYS_Linked_List_Deallocate_Linked_List_Object(&iterator);
 
-					/* Deallocate the entry's linked list object. */
-					MSYS_Linked_List_Deallocate_Linked_List_Object(&iterator);
-
-					/* Done. */
-					ret = COMMON_ERROR_SUCCESS;
-				}
-				else
-				{
-					/* Unable to get object's data contents. */
-					ret = COMMON_ERROR_INTERNAL_ERROR;
-					COMMON_LOG_VERBOSE("FileUtills_dirList_PRIV_Get_Entry(): Unable to get object's data contents.");
-				}
+				/* Done. */
+				ret = COMMON_ERROR_SUCCESS;
 			}
 			else
 			{
@@ -323,7 +291,7 @@ void FileUtills_dirList_PRIV_Deallocate_Entry_Data_Copy(char ** data)
 	if ((data != NULL) && ((*data) != NULL))
 	{
 		/* Deallocate the data. */
-		DataProcess_Deallocate_CString(data);
+		MSYS_Linked_List_Deallocate_Copied_Data(data);
 	}
 
 	/* Exit function. */
