@@ -82,10 +82,7 @@ enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX
 
 /* Define the directory list structure. */
 typedef struct FileUtills_dirlist {
-    size_t numOfEntries;		/* Used to store the number of entries in the list array. */
-    std::vector<std::string> list;	/* Used to store the directory's entry data. */
-    char * path;			/* Used to store the path of the directory that the entry list is about. */
-    size_t pathSize;			/* Length of the path string. */
+    void * pointer;		/* Pointer to object. */
 } FileUtills_dirlist_T;
 
 /*!
