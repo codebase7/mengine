@@ -19,8 +19,9 @@
     https://github.com/codebase7/mengine    
 */
 
-#ifndef FILEUTILLS
-#define FILEUTILLS
+/* Include guard. */
+#ifndef FILEUTILLS_H
+#define FILEUTILLS_H
 
 // Engine Includes
 #ifdef __win32
