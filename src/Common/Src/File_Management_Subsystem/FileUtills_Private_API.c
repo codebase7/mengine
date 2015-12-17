@@ -365,8 +365,8 @@ int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pa
 					/* Copy the pointer. */
 					(*absRef) = tempAbsRef;
 
-					/* Update the absRefSize. */
-					(*absRefSize) = (sizeof(char) * 2);
+					/* Update the absRefLength. */
+					(*absRefLength) = (sizeof(char) * 2);
 				}
 				else
 				{
@@ -404,8 +404,8 @@ int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pa
 						/* Copy the pointer. */
 						(*absRef) = tempAbsRef;
 
-						/* Update the absRefSize. */
-						(*absRefSize) = (sizeof(char) * 4);
+						/* Update the absRefLength. */
+						(*absRefLength) = (sizeof(char) * 4);
 					}
 					else
 					{
