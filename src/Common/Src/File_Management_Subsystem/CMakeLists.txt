@@ -3,16 +3,17 @@ set(LIBRARY_OUTPUT_PATH ${L_OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${O_OUTPUT_DIR})
 
 # Set default includes.
-set(FILEUTILLS_INCLUDES FileUtills.cpp FileUtills_Private_API.cpp FileUtills_Private_API.c)
+set(FILEUTILLS_C_INCLUDES FileUtills.c FileUtills_Private_API.c)
+set(FILEUTILLS_CPP_INCLUDES FileUtills.cpp FileUtills_Private_API.cpp)
 
 # Set system specific includes.
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	# Building on windows.
-	set(FILEUTILLS_INCLUDES ${FILEUTILLS_INCLUDES} FileUtills_Private_API_Windows_Syscall.cpp) 
+	set(FILEUTILLS_INCLUDES ${FILEUTILLS_C_INCLUDES} ${FILEUTILLS_CPP_INCLUDES} FileUtills_Private_API_Windows_Syscall.cpp)
 	
 	ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	    # Building on Linux.
-	    set(FILEUTILLS_INCLUDES ${FILEUTILLS_INCLUDES} FileUtills_Private_API_Posix_Syscall.cpp)
+	    set(FILEUTILLS_INCLUDES ${FILEUTILLS_C_INCLUDES} ${FILEUTILLS_CPP_INCLUDES} FileUtills_Private_API_Posix_Syscall.cpp)
 
 	ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	    # We don't have a match against a known system.
