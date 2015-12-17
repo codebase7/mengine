@@ -149,6 +149,18 @@ int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const struct MSYS_F
  */
 int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(struct MSYS_FILESIZE * str, const long long int * val);
 
+/*!
+		void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T ** dirList)
+
+		Destroys (frees) the given FileUtills_dirlist data structure, and sets the (*dirList) pointer to NULL.
+		Once destroyed, the given object should not be reused.
+
+		If given an object that is not a FileUtills_dirlist data structure, the result is undefined.
+
+		Returns nothing.
+ */
+void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T ** dirList);
+
 /*
  * 		int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, struct MSYS_FILESIZE * fileLength)
  *

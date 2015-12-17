@@ -292,6 +292,27 @@ int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(struct MSYS_FILESIZ
 	return ret;
 }
 
+void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T ** dirList)
+{
+	/* Check for valid args. */
+	if ((dirList != NULL) && ((*dirList) != NULL))
+	{
+		/* Check and see if the member pointer is NULL. */
+		if ((*dirList)->pointer != NULL)
+		{
+			/* Call private object's destructor. */
+			FileUtills_Destroy_dirList_PRIV_Object(((*dirList)->pointer));
+		}
+
+		/* Destroy our object. */
+		free((*dirList));
+		(*dirList) = NULL;
+	}
+
+	/* Exit function. */
+	return;
+}
+
 int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, struct MSYS_FILESIZE * fileLength)
 {
 		/* Init vars. */
