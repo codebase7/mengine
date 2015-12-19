@@ -22,145 +22,108 @@
 #include "FileUtills.h"
 #include "FileUtills_Private_API.h"
 
-
 int FileUtills::GetUserProfileDirectoryPath(std::string & path)
 {
-	// Init vars.
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of this function. */
+	std::string resultString = "";			/* The string we will return. to the caller. */
+	char * tempString = NULL;				/* Pointer used to store result from C function call. */
+	size_t tempStringLength = 0;			/* Length of the result string from the C function call. */
 
-	// Call the syscall.
-	ret = FileUtills::GetUserProfileDirectoryPath_Syscall(path);
-	if (ret != COMMON_ERROR_SUCCESS)
+	/* Call the C function. */
+	ret = FileUtills_GetUserProfileDirectoryPath(&tempString, &tempStringLength);
+	if ((ret == COMMON_ERROR_SUCCESS) && (tempString != NULL) && (tempStringLength > 0))
 	{
-		// Blank path.
-		path.clear();
+		/* Run loop to copy the data into the resultString. */
+		for (size_t x = 0; (x < tempStringLength); x++)
+		{
+			resultString += tempString[x];
+		}
 
-		// Check for a INVALID_ARGUMENT.
-		if (ret == COMMON_ERROR_INVALID_ARGUMENT)
-		{
-			// This is an internal error.
-			ret = COMMON_ERROR_INTERNAL_ERROR;
+		/* Now copy the string. */
+		path = resultString;
 
-			// Log this error.
-			COMMON_LOG_WARNING("FileUtills::GetUserProfileDirectoryPath(): Syscall returned an invalid argument error. Please report this bug.\n");
-		}
-		else
-		{
-			// Log the error.
-			COMMON_LOG_DEBUG("FileUtills::GetUserProfileDirectoryPath(): ");
-			COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-			COMMON_LOG_DEBUG("\n");
-		}
-	}
-	else
-	{
-		// Check for success without result.
-		if (path.size() <= 0)
-		{
-			// Internal error.
-			ret = COMMON_ERROR_INTERNAL_ERROR;
-			COMMON_LOG_WARNING("FileUtills::GetUserProfileDirectoryPath(): Syscall returned an invalid path, but indicated success. Please report this bug.\n");
-		}
+		/* Success. */
+		ret = COMMON_ERROR_SUCCESS;
 	}
 
-	// Return the result.
+	/* Deallocate the C-string if needed. */
+	if (tempString != NULL)
+	{
+		FileUtills_Deallocate_CString(&tempString);
+	}
+
+	/* Exit function. */
 	return ret;
 }
 
 int FileUtills::GetCurrentWorkingDirectoryPath(std::string & path)
 {
-	// Init vars.
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of this function. */
+	std::string resultString = "";			/* The string we will return. to the caller. */
+	char * tempString = NULL;				/* Pointer used to store result from C function call. */
+	size_t tempStringLength = 0;			/* Length of the result string from the C function call. */
 
-	// Call the syscall.
-	ret = FileUtills::GetCurrentWorkingDirectoryPath_Syscall(path);
-	if (ret != COMMON_ERROR_SUCCESS)
+	/* Call the C function. */
+	ret = FileUtills_GetCurrentWorkingDirectoryPath(&tempString, &tempStringLength);
+	if ((ret == COMMON_ERROR_SUCCESS) && (tempString != NULL) && (tempStringLength > 0))
 	{
-		// Blank path.
-		path.clear();
+		/* Run loop to copy the data into the resultString. */
+		for (size_t x = 0; (x < tempStringLength); x++)
+		{
+			resultString += tempString[x];
+		}
 
-		// Check for a INVALID_ARGUMENT.
-		if (ret == COMMON_ERROR_INVALID_ARGUMENT)
-		{
-			// This is an internal error.
-			ret = COMMON_ERROR_INTERNAL_ERROR;
+		/* Now copy the string. */
+		path = resultString;
 
-			// Log this error.
-			COMMON_LOG_WARNING("FileUtills::GetCurrentWorkingDirectoryPath(): Syscall returned an invalid argument error. Please report this bug.\n");
-		}
-		else
-		{
-			// Log the error.
-			COMMON_LOG_DEBUG("FileUtills::GetCurrentWorkingDirectoryPath(): ");
-			COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-			COMMON_LOG_DEBUG("\n");
-		}
-	}
-	else
-	{
-		// Check for success without result.
-		if (path.size() <= 0)
-		{
-			// Internal error.
-			ret = COMMON_ERROR_INTERNAL_ERROR;
-			COMMON_LOG_WARNING("FileUtills::GetCurrentWorkingDirectoryPath(): Syscall returned an invalid path, but indicated success. Please report this bug.\n");
-		}
+		/* Success. */
+		ret = COMMON_ERROR_SUCCESS;
 	}
 
-	// Return the result.
+	/* Deallocate the C-string if needed. */
+	if (tempString != NULL)
+	{
+		FileUtills_Deallocate_CString(&tempString);
+	}
+
+	/* Exit function. */
 	return ret;
 }
 
-int FileUtills::GetExecDirectory(char ** retStr, size_t * retStrSize)
+int FileUtills::GetExecDirectory(std::string & path)
 {
-	// Init vars.
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;	// The result code of this function.
-	size_t resultSize = 0;			// The size of the result string.
-	char * result = NULL;			// The result string from GetExecDirectory_Syscall().
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of this function. */
+	std::string resultString = "";			/* The string we will return. to the caller. */
+	char * tempString = NULL;				/* Pointer used to store result from C function call. */
+	size_t tempStringLength = 0;			/* Length of the result string from the C function call. */
 
-	// Check for valid arguments.
-	if ((retStr != NULL) && (retStrSize != NULL))
+	/* Call the C function. */
+	ret = FileUtills_GetExecDirectory(&tempString, &tempStringLength);
+	if ((ret == COMMON_ERROR_SUCCESS) && (tempString != NULL) && (tempStringLength > 0))
 	{
-		// Call the syscall.
-		ret = FileUtills::GetExecDirectory_Syscall(&result, &resultSize);
-
-		// Check the error code.
-		switch(ret)
+		/* Run loop to copy the data into the resultString. */
+		for (size_t x = 0; (x < tempStringLength); x++)
 		{
-			// VALID ERROR CODES.
-			COMMON_ERROR_SUCCESS:
-			COMMON_ERROR_INVALID_ARGUMENT:
-			COMMON_ERROR_MEMORY_ERROR:
-				break;
-			default:	// INVALID ERROR CODE.
-				ret = COMMON_ERROR_UNKNOWN_ERROR;
-				COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): Called Syscall Function returned an invalid Common error code, and should be rewritten to return VALID Common error codes.");
-				break;
-		};
-
-		// If we were successful, copy the pointers.
-		if (ret == COMMON_ERROR_SUCCESS)
-		{
-			(*retStr) = result;
-			(*retStrSize) = resultSize;
+			resultString += tempString[x];
 		}
-		else
-		{
-			// Log the error.
-			COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
-			COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
-		}
-	}
-	else
-	{
-		// Invalid argument error.
-		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
-		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-		COMMON_LOG_DEBUG(" Invalid string or string size given.");
+
+		/* Now copy the string. */
+		path = resultString;
+
+		/* Success. */
+		ret = COMMON_ERROR_SUCCESS;
 	}
 
-	// Return ret.
+	/* Deallocate the C-string if needed. */
+	if (tempString != NULL)
+	{
+		FileUtills_Deallocate_CString(&tempString);
+	}
+
+	/* Exit function. */
 	return ret;
 }
 
