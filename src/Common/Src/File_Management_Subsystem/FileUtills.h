@@ -837,6 +837,11 @@ int FileUtills_MovePath(const char * srcPath, const size_t srcPathSize, const ch
 }	/* End of extern "C" */
 #endif	/* __cplusplus. */
 
+/* Include C++ header if needed. */
+#ifdef __cplusplus
+#include "FileUtills_CPP.h"
+#endif	/* __cplusplus. */
+
 #endif	/* FILEUTILLS_H */
 
 /* End of FileUtills.h */
