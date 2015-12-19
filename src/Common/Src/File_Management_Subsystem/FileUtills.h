@@ -42,12 +42,23 @@ extern "C" {
 #include "../../../Core/Src/DataProcess.h"
 #endif
 
+/* Define the stringifier. */
+#ifndef MSYS_REAL_STRINGIFIY
+#define MSYS_REAL_STRINGIFIY(s) #s
+#endif	/* MSYS_REAL_STRINGIFIY */
+
+#ifndef MSYS_STRINGIFIY
+#define MSYS_STRINGIFIY(s) MSYS_REAL_STRINGIFIY(s)
+#endif	/* MSYS_STRINGIFIY */
+
 /* Define the appropriate Directory seperators and Symbols. */
 #ifdef _WIN32
 /* Define the Windows Directory seperator */
 #define DIR_SEP '\\'
+#define DIR_SEP_STR MSYS_STRINGIFIY(DIR_SEP)
 #define HOME_DIR_SYMBOL '~'
 #define FILEEXT_SEP '.'
+#define FILEEXT_SEP_STR MSYS_STRINGIFIY(FILEEXT_SEP)
 /* Define the minimal valid absolute directory path length. */
 /*
  * MINIMAL_VALID_ABSOLUTE_PATH_LENGTH is supposed to include the needed DIR_SEP for the root directory.
@@ -61,9 +72,11 @@ extern "C" {
 /* Define the Posix Directory Seperator. */
 #ifndef DIR_SEP
 #define DIR_SEP '/'
+#define DIR_SEP_STR MSYS_STRINGIFIY(DIR_SEP)
 #define HOME_DIR_SYMBOL '~'
 #define Relative_Symbol "./"
 #define FILEEXT_SEP '.'
+#define FILEEXT_SEP_STR MSYS_STRINGIFIY(FILEEXT_SEP)
 /*
  * MINIMAL_VALID_ABSOLUTE_PATH_LENGTH is supposed to include the needed DIR_SEP for the root directory.
  * In addition it is supposed to be the minimal number of char(s) needed to represent a valid absolute path
