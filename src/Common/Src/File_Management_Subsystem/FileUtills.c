@@ -609,6 +609,12 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 
 int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const MSYS_FILESIZE_T * fileStartingOffset, const size_t dataLength)
 {
+/* Define IO_BUF_SIZE for this function if needed. */
+#ifndef IO_BUF_SIZE
+#define IO_BUF_SIZE 512
+#define IO_BUF_SIZE_UNDEF 1	/* Used to undef this later if needed. */
+#endif	/* IO_BUF_SIZE */
+
 		/* Init vars. */
 		int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
 		int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
@@ -830,6 +836,12 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 
 		/* Exit function. */
 		return ret;
+
+/* Undef IO_BUF_SIZE if we defined it. */
+#ifdef IO_BUF_SIZE_UNDEF
+#undef IO_BUF_SIZE
+#undef IO_BUF_SIZE_UNDEF
+#endif	/* IO_BUF_SIZE_UNDEF */
 }
 
 int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)
