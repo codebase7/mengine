@@ -316,10 +316,12 @@ void FileUtills_Destroy_FileUtills_dirlist_Structure(FileUtills_dirlist_T ** dir
 int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, MSYS_FILESIZE_T * fileLength)
 {
 		/* Init vars. */
-		int retFromC = 0;							/* The result from C calls. */
-		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
-		FILE * fp = NULL;							/* Pointer to the file. */
-		MSYS_FILESIZE_T * fileSize = NULL;			/* Returned size from Get_File_Length(). */
+		int retFromC = 0;								/* The result from C calls. */
+		int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+		long long int tempSize = 0;						/* The size of the file returned from FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(). */
+		FILE * fp = NULL;								/* Pointer to the file. */
+		MSYS_FILESIZE_T * fileSize = NULL;				/* Returned size from Get_File_Length(). */
 
 		/* Check for invalid arguments. */
 		if ((filename != NULL) && (filenameSize > 0) && (fileLength != NULL))
@@ -340,11 +342,30 @@ int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t f
 						retFromC = fclose(fp);
 						if (retFromC == 0)
 						{
-							/* Copy the size. */
-							(*fileLength).length = (*fileSize).length;
-
-							/* SUCCESS. */
-							ret = COMMON_ERROR_SUCCESS;
+							/* Get the size. */
+							retFromCall = FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(fileSize, &tempSize);
+							if (retFromCall == COMMON_ERROR_SUCCESS)
+							{
+								/* Set the size. */
+								retFromCall = FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(fileSize, &tempSize);
+								if (retFromCall == COMMON_ERROR_SUCCESS)
+								{
+									/* SUCCESS. */
+									ret = COMMON_ERROR_SUCCESS;
+								}
+								else
+								{
+									/* Could not set size in structure. */
+									ret = COMMON_ERROR_INTERNAL_ERROR;
+									COMMON_LOG_DEBUG("FileUtills_Get_File_Length_By_Filename(): Could not set size in structure.");
+								}
+							}
+							else
+							{
+								/* Could not get size from structure. */
+								ret = COMMON_ERROR_INTERNAL_ERROR;
+								COMMON_LOG_DEBUG("FileUtills_Get_File_Length_By_Filename(): Could not get size from structure.");
+							}
 						}
 						else
 						{
