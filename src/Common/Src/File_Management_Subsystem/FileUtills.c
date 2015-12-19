@@ -504,7 +504,7 @@ int FileUtills_Get_File_Length(FILE * fp, MSYS_FILESIZE_T * fileLength)
 					/* Clear the error status, and reset the file position. */
 					clearerr(fp);
 					retFromC = fsetpos(fp, previousLocation);
-					if ((retFromC == 0) && (tempSize->length >= 0))
+					if ((retFromC == 0) && (retFromGetPos >= 0))
 					{
 						/* Copy the length to the given MSYS_FILESIZE structure. */
 						retFromCall = FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(fileLength, &retFromGetPos);
