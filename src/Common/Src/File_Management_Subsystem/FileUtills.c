@@ -930,9 +930,9 @@ int FileUtills_Get_Last_Path_Component(char ** retStr, size_t * retStrLength, co
 			if (ret == COMMON_ERROR_SUCCESS)
 			{
 				/* Call DataProcess_Get_SubString_Using_Delimiter(). */
-				ret = DataProcess_Get_SubString_Using_Delimiter(cleanedPath, cleanedPathLength, DIR_SEP,
-					/* (Note: DIR_SEP is NULL terminated, so we are subtracting one from the length of the delimiter.) */
-					((DIR_SEP[(sizeof(DIR_SEP) - 1)] == '\0') ? (sizeof(DIR_SEP) - 1) : (sizeof(DIR_SEP))),
+				ret = DataProcess_Get_SubString_Using_Delimiter(cleanedPath, cleanedPathLength, DIR_SEP_STR,
+					/* (Note: DIR_SEP_STR is NULL terminated, so we are subtracting one from the length of the delimiter.) */
+					((DIR_SEP_STR[(sizeof(DIR_SEP_STR) - 1)] == '\0') ? (sizeof(DIR_SEP_STR) - 1) : (sizeof(DIR_SEP_STR))),
 					/* If getParent is non-zero then we need to return the parent path, otherwise we need to only return the last path component. */
 					&tempSubStr, &tempSubStrLength, true, (getParent ? true : false));
 				if ((ret == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL) && (tempSubStrLength > 0))
@@ -1000,9 +1000,9 @@ int FileUtills_Get_File_Name_Component(const char * path, const size_t pathLengt
 	if ((path != NULL) && (pathLength > 0) && (retStr != NULL) && (retStrLength != NULL))
 	{
 		/* Call DataProcess_Get_SubString_Using_Delimiter() to get the filename. */
-		ret = DataProcess_Get_SubString_Using_Delimiter(path, pathLength, DIR_SEP,
-			/* (Note: DIR_SEP is NULL terminated, so we are subtracting one from the length of the delimiter.) */
-			((DIR_SEP[(sizeof(DIR_SEP) - 1)] == '\0') ? (sizeof(DIR_SEP) - 1) : (sizeof(DIR_SEP))),
+		ret = DataProcess_Get_SubString_Using_Delimiter(path, pathLength, DIR_SEP_STR,
+			/* (Note: DIR_SEP_STR is NULL terminated, so we are subtracting one from the length of the delimiter.) */
+			((DIR_SEP_STR[(sizeof(DIR_SEP_STR) - 1)] == '\0') ? (sizeof(DIR_SEP_STR) - 1) : (sizeof(DIR_SEP_STR))),
 			&tempFilename, &tempFilenameLength, true, false);
 		if ((ret == COMMON_ERROR_SUCCESS) && (tempFilename != NULL) && (tempFilenameLength > 0))
 		{
