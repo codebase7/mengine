@@ -475,7 +475,7 @@ int FileUtills_Get_File_Length(FILE * fp, MSYS_FILESIZE_T * fileLength)
 					if ((retFromC == 0) && (tempSize->length >= 0))
 					{
 						/* Copy the length to the given MSYS_FILESIZE structure. */
-						retFromCall = FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(fileLength, retFromGetPos);
+						retFromCall = FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(fileLength, &retFromGetPos);
 						if (retFromCall == COMMON_ERROR_SUCCESS)
 						{
 							/* Set success. */
@@ -642,7 +642,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 						ret = COMMON_ERROR_UNKNOWN_ERROR;
 
 						/* Get the starting offset. */
-						retFromCall = FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(fileStartingOffset, realStartOffset);
+						retFromCall = FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(fileStartingOffset, &realStartOffset);
 						if (retFromCall == COMMON_ERROR_SUCCESS)
 						{
 							/* Skip to the starting offset. */
