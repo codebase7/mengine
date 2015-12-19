@@ -23,6 +23,11 @@
 #ifndef FILEUTILLS_H
 #define FILEUTILLS_H
 
+/* Check for MSVC and disable the CRT_SECURE_WARNINGS so that the compiler will be quiet about finding portable code... */
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS 1
+#endif	/* _MSC_VER */
+
 /* Define extern C if needed. */
 #ifdef __cplusplus
 extern "C" {
