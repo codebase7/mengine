@@ -29,7 +29,7 @@ extern "C" {
 #endif	/* __cplusplus. */
 
 /* External Includes. */
-#include <cstdio>	/* Defines FILE and friends. */
+#include <stdio.h>	/* Defines FILE and friends. */
 
 /* Engine Includes */
 #ifdef _WIN32
