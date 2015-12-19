@@ -292,7 +292,7 @@ int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(MSYS_FILESIZE_T * s
 	return ret;
 }
 
-void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T ** dirList)
+void FileUtills_Destroy_FileUtills_dirlist_Structure(FileUtills_dirlist_T ** dirList)
 {
 	/* Check for valid args. */
 	if ((dirList != NULL) && ((*dirList) != NULL))

@@ -157,7 +157,7 @@ int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const MSYS_FILESIZE
 int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(MSYS_FILESIZE_T * str, const long long int * val);
 
 /*!
-		void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T ** dirList)
+		void FileUtills_Destroy_FileUtills_dirlist_Structure(FileUtills_dirlist_T ** dirList)
 
 		Destroys (frees) the given FileUtills_dirlist data structure, and sets the (*dirList) pointer to NULL.
 		Once destroyed, the given object should not be reused.
@@ -166,7 +166,7 @@ int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(MSYS_FILESIZE_T * s
 
 		Returns nothing.
  */
-void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T ** dirList);
+void FileUtills_Destroy_FileUtills_dirlist_Structure(FileUtills_dirlist_T ** dirList);
 
 /*
  * 		int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, MSYS_FILESIZE_T * fileLength)
@@ -395,7 +395,7 @@ int FileUtills_GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSiz
 int FileUtills_GetExecDirectory(char ** retStr, size_t * retStrSize);
 
 /*!
-        int getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist ** dirTree, const bool & cleanList)
+        int getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist_T ** dirTree, const bool & cleanList)
 
         Lists the given directory's contents.
 
@@ -426,7 +426,7 @@ int FileUtills_GetExecDirectory(char ** retStr, size_t * retStrSize);
         Otherwise this function will return the appropriate error, and dirTree's pointer will
         not be modified.
 */
-int FileUtills_getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist ** dirTree, const bool cleanList);
+int FileUtills_getDirectory(const char * path, const size_t pathSize, FileUtills_dirlist_T ** dirTree, const bool cleanList);
 
 /*!
 	int FileUtills_DoesExist(const char * path, const size_t pathSize)
