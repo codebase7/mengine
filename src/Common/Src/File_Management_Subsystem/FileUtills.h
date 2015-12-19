@@ -93,7 +93,7 @@ typedef struct FileUtills_dirlist {
 } FileUtills_dirlist_T;
 
 /*!
- *		int FileUtills_Create_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
+ *		int FileUtills_Create_MSYS_FILESIZE_Structure(MSYS_FILESIZE_T ** str)
  *
  *		Factory function for MSYS_FILESIZE structures.
  *
@@ -109,10 +109,10 @@ typedef struct FileUtills_dirlist {
  *
  *		In case of error, this function will NOT modify it's argument.
  */
-int FileUtills_Create_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str);
+int FileUtills_Create_MSYS_FILESIZE_Structure(MSYS_FILESIZE_T ** str);
 
 /*!
- *		void FileUtills_Destroy_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
+ *		void FileUtills_Destroy_MSYS_FILESIZE_Structure(MSYS_FILESIZE_T ** str)
  *
  *		Destructor for MSYS_FILESIZE structures. Takes the given pointer to pointer, derefs it and
  *		deallocates the pointer to object if it is allocated.
@@ -124,10 +124,10 @@ int FileUtills_Create_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str);
  *
  *		This function has no return.
  */
-void FileUtills_Destroy_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str);
+void FileUtills_Destroy_MSYS_FILESIZE_Structure(MSYS_FILESIZE_T ** str);
 
 /*!
- *		int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const struct MSYS_FILESIZE * str, long long int * retVal)
+ *		int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const MSYS_FILESIZE_T * str, long long int * retVal)
  *
  *		Accessor function.
  *
@@ -139,10 +139,10 @@ void FileUtills_Destroy_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str);
  *
  *		In case of error, this function will NOT modify it's arguments.
  */
-int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const struct MSYS_FILESIZE * str, long long int * retVal);
+int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const MSYS_FILESIZE_T * str, long long int * retVal);
 
 /*!
- *		int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(struct MSYS_FILESIZE * str, const long long int * val)
+ *		int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(MSYS_FILESIZE_T * str, const long long int * val)
  *
  *		Accessor function.
  *
@@ -154,7 +154,7 @@ int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const struct MSYS_F
  *
  *		In case of error, this function will NOT modify it's arguments.
  */
-int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(struct MSYS_FILESIZE * str, const long long int * val);
+int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(MSYS_FILESIZE_T * str, const long long int * val);
 
 /*!
 		void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T ** dirList)
@@ -169,7 +169,7 @@ int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(struct MSYS_FILESIZ
 void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T ** dirList);
 
 /*
- * 		int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, struct MSYS_FILESIZE * fileLength)
+ * 		int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, MSYS_FILESIZE_T * fileLength)
  *
  * 		Returns the length of the given file.
  * 		(This is just a wrapper around FileUtills_Get_File_Length().)
@@ -179,10 +179,10 @@ void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T
  *
  * 		In case of error, (the returned error code is not COMMON_ERROR_SUCCESS), the fileLength argument will NOT be altered.
  */
-int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, struct MSYS_FILESIZE * fileLength);
+int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, MSYS_FILESIZE_T * fileLength);
 
 /*!
- * 		int FileUtills_Get_File_Length(FILE * fp, struct MSYS_FILESIZE * fileLength)
+ * 		int FileUtills_Get_File_Length(FILE * fp, MSYS_FILESIZE_T * fileLength)
  *
  * 		Gets the length of the given open file.
  *
@@ -209,7 +209,7 @@ int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t f
  *
  * 		In case of error, (the returned error code is not COMMON_ERROR_SUCCESS), the fileLength argument will NOT be altered.
  */
-int FileUtills_Get_File_Length(FILE * fp, struct MSYS_FILESIZE * fileLength);
+int FileUtills_Get_File_Length(FILE * fp, MSYS_FILESIZE_T * fileLength);
 
 /*!
  *		int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * dataBuf, const size_t dataBufLength, const size_t destStaringOffset, const bool blankDataBuf)
@@ -249,7 +249,7 @@ int FileUtills_Get_File_Length(FILE * fp, struct MSYS_FILESIZE * fileLength);
 int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * dataBuf, const size_t dataBufLength, const size_t destStaringOffset, const bool blankDataBuf);
 
 /*!
- *		int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const struct MSYS_FILESIZE * fileStartingOffset, const size_t dataLength)
+ *		int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const MSYS_FILESIZE_T * fileStartingOffset, const size_t dataLength)
  *
  *		Opens the given input file in binary mode and jumps to the given starting offset,
  *		then reads the given amount of data and writes it directly to the given output file,
@@ -275,7 +275,7 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
  *
  *		Otherwise returns the appropriate error code.
  */
-int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const struct MSYS_FILESIZE * fileStartingOffset, const size_t dataLength);
+int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const MSYS_FILESIZE_T * fileStartingOffset, const size_t dataLength);
 
 /*!
  *		int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, const size_t dataLength)

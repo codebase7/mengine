@@ -177,7 +177,7 @@ int FileUtills_CheckPathType(const char * path, const size_t pathSize, bool * bI
 		return ret;
 }
 
-int FileUtills_Create_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
+int FileUtills_Create_MSYS_FILESIZE_Structure(MSYS_FILESIZE_T ** str)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result code of this function. */
@@ -222,7 +222,7 @@ int FileUtills_Create_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
 	return ret;
 }
 
-void FileUtills_Destroy_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
+void FileUtills_Destroy_MSYS_FILESIZE_Structure(MSYS_FILESIZE_T ** str)
 {
 	/* Check for invalid argument. */
 	if ((str != NULL) && ((*str) != NULL))
@@ -236,7 +236,7 @@ void FileUtills_Destroy_MSYS_FILESIZE_Structure(struct MSYS_FILESIZE ** str)
 	return;
 }
 
-int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const struct MSYS_FILESIZE * str, long long int * retVal)
+int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const MSYS_FILESIZE_T * str, long long int * retVal)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;				/* The result code of this function. */
@@ -264,7 +264,7 @@ int FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(const struct MSYS_F
 	return ret;
 }
 
-int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(struct MSYS_FILESIZE * str, const long long int * val)
+int FileUtills_Set_Length_From_MSYS_FILESIZE_Structure_LLINT(MSYS_FILESIZE_T * str, const long long int * val)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
@@ -313,13 +313,13 @@ void FileUtills_Destroy_FileUtills_dirlist_Structure(struct FileUtills_dirlist_T
 	return;
 }
 
-int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, struct MSYS_FILESIZE * fileLength)
+int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t filenameSize, MSYS_FILESIZE_T * fileLength)
 {
 		/* Init vars. */
 		int retFromC = 0;							/* The result from C calls. */
 		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
 		FILE * fp = NULL;							/* Pointer to the file. */
-		struct MSYS_FILESIZE * fileSize = NULL;		/* Returned size from Get_File_Length(). */
+		MSYS_FILESIZE_T * fileSize = NULL;			/* Returned size from Get_File_Length(). */
 
 		/* Check for invalid arguments. */
 		if ((filename != NULL) && (filenameSize > 0) && (fileLength != NULL))
@@ -388,7 +388,7 @@ int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t f
 		return ret;
 }
 
-int FileUtills_Get_File_Length(FILE * fp, struct MSYS_FILESIZE * fileLength)
+int FileUtills_Get_File_Length(FILE * fp, MSYS_FILESIZE_T * fileLength)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
@@ -607,12 +607,12 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 	return ret;
 }
 
-int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const struct MSYS_FILESIZE * fileStartingOffset, const size_t dataLength)
+int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const MSYS_FILESIZE_T * fileStartingOffset, const size_t dataLength)
 {
 		/* Init vars. */
 		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
 		int retFromC = 0;							/* The result of C calls. */
-		struct MSYS_FILESIZE * inFileLength = NULL;	/* The size of the input file. */
+		MSYS_FILESIZE_T * inFileLength = NULL;		/* The size of the input file. */
 		FILE * IN = NULL;							/* The input file. */
 		char * inputBuf = NULL;						/* Memory buffer used for reading in data from a file. NOT on the stack! Bad input can follow! */
 		size_t remainingLength = 0;					/* Used to calculate remaining bytes to write in output loop. */
