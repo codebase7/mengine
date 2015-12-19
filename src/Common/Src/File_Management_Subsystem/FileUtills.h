@@ -35,9 +35,11 @@ extern "C" {
 #ifdef _WIN32
 #include "..\Error_Handler\Common_Error_Handler.h"
 #include "..\Error_Handler\Common_Error_Handler_Internal.h"
+#include "..\..\..\Core\Src\DataProcess.h"
 #else
 #include "../Error_Handler/Common_Error_Handler.h"
 #include "../Error_Handler/Common_Error_Handler_Internal.h"
+#include "../../../Core/Src/DataProcess.h"
 #endif
 
 /* Define the appropriate Directory seperators and Symbols. */
