@@ -610,15 +610,16 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, const size_t filenameLength, const MSYS_FILESIZE_T * fileStartingOffset, const size_t dataLength)
 {
 		/* Init vars. */
-		int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
-		int retFromC = 0;							/* The result of C calls. */
-		MSYS_FILESIZE_T * inFileLength = NULL;		/* The size of the input file. */
-		FILE * IN = NULL;							/* The input file. */
-		char * inputBuf = NULL;						/* Memory buffer used for reading in data from a file. NOT on the stack! Bad input can follow! */
-		size_t remainingLength = 0;					/* Used to calculate remaining bytes to write in output loop. */
-		size_t x = 0;								/* Counter used in I/O loop. */
-		size_t y = 0;								/* Counter used in Input Loop and Output Loop. */
-		long long int realStartOffset = 0;			/* The position to start writing data into the file at. */
+		int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+		int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
+		int retFromC = 0;								/* The result of C calls. */
+		MSYS_FILESIZE_T * inFileLength = NULL;			/* The size of the input file. */
+		FILE * IN = NULL;								/* The input file. */
+		char * inputBuf = NULL;							/* Memory buffer used for reading in data from a file. NOT on the stack! Bad input can follow! */
+		size_t remainingLength = 0;						/* Used to calculate remaining bytes to write in output loop. */
+		size_t x = 0;									/* Counter used in I/O loop. */
+		size_t y = 0;									/* Counter used in Input Loop and Output Loop. */
+		long long int realStartOffset = 0;				/* The position to start writing data into the file at. */
 
 		/* Check for invalid arguments. */
 		if ((OUT != NULL) && (ferror(OUT) == 0) && (filename != NULL) && (filenameLength > 0) && (fileStartingOffset != NULL) && (fileStartingOffset->length >= 0) && (dataLength > 0))
