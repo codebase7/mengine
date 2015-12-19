@@ -47,6 +47,7 @@ extern "C" {
 /* Define the Windows Directory seperator */
 #define DIR_SEP '\\'
 #define HOME_DIR_SYMBOL '~'
+#define FILEEXT_SEP '.'
 /* Define the minimal valid absolute directory path length. */
 /*
  * MINIMAL_VALID_ABSOLUTE_PATH_LENGTH is supposed to include the needed DIR_SEP for the root directory.
@@ -62,6 +63,7 @@ extern "C" {
 #define DIR_SEP '/'
 #define HOME_DIR_SYMBOL '~'
 #define Relative_Symbol "./"
+#define FILEEXT_SEP '.'
 /*
  * MINIMAL_VALID_ABSOLUTE_PATH_LENGTH is supposed to include the needed DIR_SEP for the root directory.
  * In addition it is supposed to be the minimal number of char(s) needed to represent a valid absolute path

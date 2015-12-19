@@ -995,9 +995,9 @@ int FileUtills_Get_File_Name_Component(const char * path, const size_t pathLengt
 		if ((ret == COMMON_ERROR_SUCCESS) && (tempFilename != NULL) && (tempFilenameLength > 0))
 		{
 			/* Call DataProcess_Get_SubString_Using_Delimiter() to get the file name (if getExtension is zero) / extension. (if getExtension is non-zero) */
-			ret = DataProcess_Get_SubString_Using_Delimiter(tempFilename, tempFilenameLength, FILEEXT_SEP_STR,
-				/* (Note: FILEEXT_SEP_STR is NULL terminated, so we are subtracting one from the length of the delimiter.) */
-				((FILEEXT_SEP_STR[(sizeof(FILEEXT_SEP_STR) - 1)] == '\0') ? (sizeof(FILEEXT_SEP_STR) - 1) : (sizeof(FILEEXT_SEP_STR))),
+			ret = DataProcess_Get_SubString_Using_Delimiter(tempFilename, tempFilenameLength, FILEEXT_SEP,
+				/* (Note: FILEEXT_SEP is NULL terminated, so we are subtracting one from the length of the delimiter.) */
+				((FILEEXT_SEP[(sizeof(FILEEXT_SEP) - 1)] == '\0') ? (sizeof(FILEEXT_SEP) - 1) : (sizeof(FILEEXT_SEP))),
 				&tempSubStr, &tempSubStrLength, true, (getExtension ? false : true));
 			if ((ret == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL) && (tempSubStrLength > 0))
 			{
@@ -1033,9 +1033,9 @@ int FileUtills_Get_File_Name_Component(const char * path, const size_t pathLengt
 			if (ret == COMMON_ERROR_RANGE_ERROR)
 			{
 				/* There is not a directory component in this path, so just check for the file name (if getExtension is zero) / extension. (if getExtension is non-zero) */
-				ret = DataProcess_Get_SubString_Using_Delimiter(path, pathLength, FILEEXT_SEP_STR,
-					/* (Note: FILEEXT_SEP_STR is NULL terminated, so we are subtracting one from the length of the delimiter.) */
-					((FILEEXT_SEP_STR[(sizeof(FILEEXT_SEP_STR) - 1)] == '\0') ? (sizeof(FILEEXT_SEP_STR) - 1) : (sizeof(FILEEXT_SEP_STR))),
+				ret = DataProcess_Get_SubString_Using_Delimiter(path, pathLength, FILEEXT_SEP,
+					/* (Note: FILEEXT_SEP is NULL terminated, so we are subtracting one from the length of the delimiter.) */
+					((FILEEXT_SEP[(sizeof(FILEEXT_SEP) - 1)] == '\0') ? (sizeof(FILEEXT_SEP) - 1) : (sizeof(FILEEXT_SEP))),
 					&tempSubStr, &tempSubStrLength, true, (getExtension ? false : true));
 				if ((ret == COMMON_ERROR_SUCCESS) && (tempSubStr != NULL) && (tempSubStrLength > 0))
 				{
