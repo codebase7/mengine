@@ -658,203 +658,224 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 		size_t x = 0;									/* Counter used in I/O loop. */
 		size_t y = 0;									/* Counter used in Input Loop and Output Loop. */
 		long long int realStartOffset = 0;				/* The position to start writing data into the file at. */
+		long long int realFileLengthlli = 0;			/* The length of the input file as a lli. */
 
 		/* Check for invalid arguments. */
-		if ((OUT != NULL) && (ferror(OUT) == 0) && (filename != NULL) && (filenameLength > 0) && (fileStartingOffset != NULL) && (fileStartingOffset->length >= 0) && (dataLength > 0))
+		if ((OUT != NULL) && (ferror(OUT) == 0) && (filename != NULL) && (filenameLength > 0) && (fileStartingOffset != NULL) && (dataLength > 0))
 		{
-			/* Allocate memory for the filesize structures. */
-			ret = FileUtills_Create_MSYS_FILESIZE_Structure(&inFileLength);
-			if (ret == COMMON_ERROR_SUCCESS)
+			/* Check for valid file starting offset. */
+			retFromCall = FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(fileStartingOffset, &realStartOffset);
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (realStartOffset > 0))
 			{
-				/* Open the input file. */
-				IN = fopen(filename, "rb");
-				if (IN != NULL)
+				/* Allocate memory for the filesize structures. */
+				ret = FileUtills_Create_MSYS_FILESIZE_Structure(&inFileLength);
+				if (ret == COMMON_ERROR_SUCCESS)
 				{
-					/* Get the length of the input file. */
-					ret = FileUtills_Get_File_Length(IN, inFileLength);
-
-					/* Make sure we got a valid file length and that the length of the file is big enough to store the data we want. */
-					if ((ret == COMMON_ERROR_SUCCESS) && (inFileLength->length > 0) && ((((unsigned)(fileStartingOffset->length)) + dataLength) <= ((unsigned)(inFileLength->length))))
+					/* Open the input file. */
+					IN = fopen(filename, "rb");
+					if (IN != NULL)
 					{
-						/* Reset ret. */
-						ret = COMMON_ERROR_UNKNOWN_ERROR;
+						/* Get the length of the input file. */
+						ret = FileUtills_Get_File_Length(IN, inFileLength);
 
-						/* Get the starting offset. */
-						retFromCall = FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(fileStartingOffset, &realStartOffset);
-						if (retFromCall == COMMON_ERROR_SUCCESS)
+						/* Make sure we got a valid file length and that the length of the file is big enough to store the data we want. */
+						if ((ret == COMMON_ERROR_SUCCESS) && (inFileLength != NULL))
 						{
-							/* Skip to the starting offset. */
-#ifdef _MSC_VER	/* VC is special */
-							retFromC = _fseeki64(IN, realStartOffset, SEEK_SET);
-#else
-							retFromC = fseeko64(IN, realStartOffset, SEEK_SET);
-#endif	/* _MSC_VER */
-							if (retFromC == 0)
+							/* Get the length of the file. */
+							retFromCall = FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT(inFileLength, &realFileLengthlli);
+							if ((retFromCall == COMMON_ERROR_SUCCESS) && (realFileLengthlli > 0) &&
+								((((unsigned)(realStartOffset)) + dataLength) <= ((unsigned)(realFileLengthlli))))
 							{
-								/* Allocate input buffer. */
-								inputBuf = (char*)malloc(IO_BUF_SIZE);
-								if (inputBuf != NULL)
+								/* Reset ret. */
+								ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+								/* Skip to the starting offset. */
+#ifdef _MSC_VER	/* VC is special */
+								retFromC = _fseeki64(IN, realStartOffset, SEEK_SET);
+#else
+								retFromC = fseeko64(IN, realStartOffset, SEEK_SET);
+#endif	/* _MSC_VER */
+								if (retFromC == 0)
 								{
-									/* Begin I/O loop. */
-									for (x = 0; ((x < dataLength) && (!ferror(IN)) && (!feof(IN)) && (!ferror(OUT)));)
+									/* Allocate input buffer. */
+									inputBuf = (char*)malloc(IO_BUF_SIZE);
+									if (inputBuf != NULL)
 									{
-										/* Determine if the remaining data to read in is less than the buffer size. */
-										remainingLength = (dataLength - x);
-										if (remainingLength >= IO_BUF_SIZE)
+										/* Begin I/O loop. */
+										for (x = 0; ((x < dataLength) && (!ferror(IN)) && (!feof(IN)) && (!ferror(OUT)));)
 										{
-											/* Set remaining length to the buffer size. */
-											remainingLength = IO_BUF_SIZE;
-										}
-
-										/* Begin input loop. */
-										for (y = 0; ((y < remainingLength) && (!ferror(IN)) && (!feof(IN))); y++)
-										{
-											/* Read in the remaining data. */
-											retFromC = fgetc(IN);
-											inputBuf[y] = retFromC;
-										}
-
-										/* Check for successful read. */
-										if ((!ferror(IN)) && (!feof(IN)))
-										{
-											/* OK, begin the output loop. */
-											for (y = 0; ((y < remainingLength) && (!ferror(OUT))); y++)
+											/* Determine if the remaining data to read in is less than the buffer size. */
+											remainingLength = (dataLength - x);
+											if (remainingLength >= IO_BUF_SIZE)
 											{
-												/* Output the current buffer. */
-												fputc(inputBuf[y], OUT);
+												/* Set remaining length to the buffer size. */
+												remainingLength = IO_BUF_SIZE;
 											}
 
-											/* Check for successful output. */
-											if (!ferror(OUT))
+											/* Begin input loop. */
+											for (y = 0; ((y < remainingLength) && (!ferror(IN)) && (!feof(IN))); y++)
 											{
-												/* OK, flush the buffer. */
-												retFromC = fflush(OUT);
-												if (retFromC == 0)
+												/* Read in the remaining data. */
+												retFromC = fgetc(IN);
+												inputBuf[y] = retFromC;
+											}
+
+											/* Check for successful read. */
+											if ((!ferror(IN)) && (!feof(IN)))
+											{
+												/* OK, begin the output loop. */
+												for (y = 0; ((y < remainingLength) && (!ferror(OUT))); y++)
 												{
-													/* OK, add the remaining amount to x. */
-													x = (x + remainingLength);
+													/* Output the current buffer. */
+													fputc(inputBuf[y], OUT);
+												}
+
+												/* Check for successful output. */
+												if (!ferror(OUT))
+												{
+													/* OK, flush the buffer. */
+													retFromC = fflush(OUT);
+													if (retFromC == 0)
+													{
+														/* OK, add the remaining amount to x. */
+														x = (x + remainingLength);
+													}
+													else
+													{
+														/* Could not flush the buffer. */
+														ret = COMMON_ERROR_IO_ERROR;
+
+														/* Log error. */
+														COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not flush output buffer data to output file.\n");
+													}
 												}
 												else
 												{
-													/* Could not flush the buffer. */
+													/* Bad output file stream. */
 													ret = COMMON_ERROR_IO_ERROR;
 
 													/* Log error. */
-													COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not flush output buffer data to output file.\n");
+													COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not write data to output file.\n");
 												}
 											}
 											else
 											{
-												/* Bad output file stream. */
+												/* Bad input file stream. */
 												ret = COMMON_ERROR_IO_ERROR;
 
 												/* Log error. */
-												COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not write data to output file.\n");
+												COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not read data from input file.\n");
 											}
+										}
+
+										/* Deallocate the input memory buffer. */
+										if (inputBuf != NULL)
+										{
+											free(inputBuf);
+											inputBuf = NULL;
+										}
+
+										/* Check for success. */
+										if ((ret == COMMON_ERROR_UNKNOWN_ERROR) && (!ferror(IN)) && (!feof(IN)) && (!ferror(OUT)))
+										{
+											/* Success! */
+											ret = COMMON_ERROR_SUCCESS;
 										}
 										else
 										{
-											/* Bad input file stream. */
-											ret = COMMON_ERROR_IO_ERROR;
-
-											/* Log error. */
-											COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not read data from input file.\n");
+											/* Check for and log IO errors. */
+											if (ret == COMMON_ERROR_IO_ERROR)
+											{
+												/* Log error. */
+												COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): File I/O Error.\n");
+											}
 										}
-									}
-
-									/* Deallocate the input memory buffer. */
-									if (inputBuf != NULL)
-									{
-										free(inputBuf);
-										inputBuf = NULL;
-									}
-
-									/* Check for success. */
-									if ((ret == COMMON_ERROR_UNKNOWN_ERROR) && (!ferror(IN)) && (!feof(IN)) && (!ferror(OUT)))
-									{
-										/* Success! */
-										ret = COMMON_ERROR_SUCCESS;
 									}
 									else
-									{ 
-										/* Check for and log IO errors. */
-										if (ret == COMMON_ERROR_IO_ERROR)
-										{
-											/* Log error. */
-											COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): File I/O Error.\n");
-										}
+									{
+										/* Could not allocate memory for input buffer. */
+										ret = COMMON_ERROR_MEMORY_ERROR;
+
+										/* Log error. */
+										COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for input buffer.\n");
 									}
 								}
 								else
 								{
-									/* Could not allocate memory for input buffer. */
-									ret = COMMON_ERROR_MEMORY_ERROR;
+									/* Bad file stream. */
+									ret = COMMON_ERROR_IO_ERROR;
 
 									/* Log error. */
-									COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for input buffer.\n");
+									COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not seek to starting offset.\n");
 								}
 							}
 							else
 							{
-								/* Bad file stream. */
+								/* Invalid input file. */
 								ret = COMMON_ERROR_IO_ERROR;
 
 								/* Log error. */
-								COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not seek to starting offset.\n");
+								COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not get input file length or input file is empty.\n");
+							}
+
+							/* Close the input file. */
+							retFromC = fclose(IN);
+							if ((retFromC != 0) && (ret != COMMON_ERROR_IO_ERROR))
+							{
+								/* Could not close the input file. */
+								ret = COMMON_ERROR_IO_ERROR;
+
+								/* Log error. */
+								COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not close input file ( ");
+								COMMON_LOG_DEBUG(filename);
+								COMMON_LOG_DEBUG(" ).\n");
 							}
 						}
 						else
 						{
-							/* Could not get starting offset. */
-							ret = COMMON_ERROR_INTERNAL_ERROR;
-							
-							/* Log error. */
-							COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not get starting offset from management structure.");
+							/* Could not get length of the file. */
+							if (retFromCall != COMMON_ERROR_SUCCESS)
+							{
+								/* FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT() Call errored out. */
+								ret = retFromCall;
+							}
+							else
+							{
+								ret = COMMON_ERROR_INTERNAL_ERROR;
+								COMMON_LOG_DEBUG("FileUtills_Write_Data_To_File_From_File(): Could not get length of file. FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT() returned success without result.");
+							}
 						}
 					}
 					else
 					{
-						/* Invalid input file. */
+						/* Could not open input file. */
 						ret = COMMON_ERROR_IO_ERROR;
 
 						/* Log error. */
-						COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not get input file length or input file is empty.\n");
-					}
-
-					/* Close the input file. */
-					retFromC = fclose(IN);
-					if ((retFromC != 0) && (ret != COMMON_ERROR_IO_ERROR))
-					{
-						/* Could not close the input file. */
-						ret = COMMON_ERROR_IO_ERROR;
-
-						/* Log error. */
-						COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not close input file ( ");
+						COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not open input file ( ");
 						COMMON_LOG_DEBUG(filename);
 						COMMON_LOG_DEBUG(" ).\n");
 					}
+
+					/* Deallocate inFileLength. */
+					FileUtills_Destroy_MSYS_FILESIZE_Structure(&inFileLength);
 				}
 				else
 				{
-					/* Could not open input file. */
-					ret = COMMON_ERROR_IO_ERROR;
+					/* Could not allocate memory for the inFileLength structure. */
+					ret = COMMON_ERROR_MEMORY_ERROR;
 
 					/* Log error. */
-					COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not open input file ( ");
-					COMMON_LOG_DEBUG(filename);
-					COMMON_LOG_DEBUG(" ).\n");
+					COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for MSYS_FILESIZE structure.\n");
 				}
-				
-				/* Deallocate inFileLength. */
-				FileUtills_Destroy_MSYS_FILESIZE_Structure(&inFileLength);
 			}
 			else
 			{
-				/* Could not allocate memory for the inFileLength structure. */
-				ret = COMMON_ERROR_MEMORY_ERROR;
-
-				/* Log error. */
-				COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for MSYS_FILESIZE structure.\n");
+				/* Either we have an invalid file starting offset or we could not get it from the file. */
+				ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (COMMON_ERROR_INTERNAL_ERROR) : (COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(((retFromCall != COMMON_ERROR_SUCCESS) ?
+									("FileUtills_Write_Data_To_File_From_File(): Could not get starting offset from management structure.") :
+									("FileUtills_Write_Data_To_File_From_File(): Invalid file starting offset.")));
 			}
 		}
 		else
