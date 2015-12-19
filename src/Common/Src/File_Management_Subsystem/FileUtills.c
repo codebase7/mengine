@@ -465,6 +465,14 @@ int FileUtills_Get_File_Length(FILE * fp, MSYS_FILESIZE_T * fileLength)
 #endif	/* _MSC_VER */
 							if ((retFromGetPos == -1) || (retFromGetPos < 0))
 							{
+/* _ftelli64() in MSC does not return an EOVERFLOW errno status.
+	Actually, it has no way to indicate (as of 19/12/2015 anyway...)
+	that the file size is too big to store in the return variable.
+
+	This will probably change one day, so if if / when it does,
+	just add the detection code here and return COMMON_ERROR_MEMORY_ERROR.
+*/
+#ifndef _MSC_VER
 								/* Check and see if the error is EOVERFLOW. */
 								if ((retFromGetPos == -1) && (errno == EOVERFLOW))
 								{
@@ -473,9 +481,12 @@ int FileUtills_Get_File_Length(FILE * fp, MSYS_FILESIZE_T * fileLength)
 								}
 								else
 								{
+#endif	/* _MSC_VER */
 									/* OK, yet another IO_ERROR. */
 									ret = COMMON_ERROR_IO_ERROR;
+#ifndef _MSC_VER
 								}
+#endif	/* _MSC_VER */
 							}
 						}
 						else
