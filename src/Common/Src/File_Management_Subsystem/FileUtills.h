@@ -84,7 +84,7 @@ enum MSYS_FILESIZE_TYPES {
 
 /* File size structure. Contains the length of a file's size. */
 typedef struct MSYS_FILESIZE {
-enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX. )*/
+	enum MSYS_FILESIZE_TYPES type;			/* What type of struct it is. (Windows or POSIX. )*/
 } MSYS_FILESIZE_T;
 
 /* Define the directory list structure. */
