@@ -370,7 +370,7 @@ int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t f
 				}
 
 				/* Deallocate the fileSize structure. */
-				Destroy_MSYS_FILESIZE_Structure(&fileSize);
+				FileUtills_Destroy_MSYS_FILESIZE_Structure(&fileSize);
 			}
 			else
 			{
