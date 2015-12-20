@@ -547,7 +547,15 @@ int FileUtills_GetParent(char ** retStr, size_t * retStrLength);
 /*!
 	int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution)
 
-	Checks the path given, and converts it to a absolute path.
+	Checks the path given, and converts it to a absolute path. The result is allocated by this function,
+	and a pointer to it is stored in retStr. The size of the result is stored in retStrSize.
+
+	WARNING: If this function returns success, the contents of retStr and retStrSize will be overwritten,
+	and no deallocation attempt will be made on them. (Even if they were created by this function.)
+	If the contents of retStr and retStrSize are needed for use after this function returns, then the
+	contents should be copied elsewhere before calling this function.
+
+	When the result of this function is no longer needed it should be deallocated with FileUtills_Deallocate_CString().
 
 	Setting disableSymLinkResolution to true will disable resolving any symbolic link(s) if a
 	symbolic link is encountered while resolving the given path(s). Setting
@@ -555,10 +563,17 @@ int FileUtills_GetParent(char ** retStr, size_t * retStrLength);
 	symbolic link(s) that are encountered while resolving the given path(s).
 
 	Returns COMMON_ERROR_SUCCESS if successful, retStr and retStrSize will be altered in this
-	case. (Any pre-existing c-string given to this function as retStr will be deallocated.)
+	case.
 
-	Otherwise the appropriate error code is returned. (retStr and retStrSize will be unaltered in
-	this instance.)
+	Returns COMMON_ERROR_INVALID_ARGUMENT if the given path is empty, it's size is less than or equal to zero,
+	or a given pointer is NULL.
+
+	Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+
+	Returns COMMON_ERROR_INTERNAL_ERROR if an unexpected error occurs while processing the path.
+
+	No alteration clause:
+ 		In case of error, this function will not alter any given argument.
 */
 int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution);
 

@@ -84,6 +84,26 @@ namespace FileUtills {
 	 *	for the error code descriptions.
 	 */
 	int GetExecDirectory(std::string & path);
+
+	/*!
+	 *	int FileUtills_ResolvePath(const std::string path, std::string & resolvedPath, const bool disableSymLinkResolution)
+	 *
+	 *	Checks the path given, and converts it to a absolute path.
+	 *
+	 *	This function is a wrapper to FileUtills_ResolvePath(), and returns all of it's error codes.
+	 *
+	 *	Setting disableSymLinkResolution to true will disable resolving any symbolic link(s) if a
+	 *	symbolic link is encountered while resolving the given path(s). Setting
+	 *	disableSymLinkResolution to false will make this function resolve any
+	 *	symbolic link(s) that are encountered while resolving the given path(s).
+	 *
+	 *	Returns COMMON_ERROR_SUCCESS if successful, retStr and retStrSize will be altered in this
+	 *	case.
+	 *
+	 *	Otherwise returns all error codes from FileUtills_ResolvePath(). See documentation
+	 *	for the error code descriptions.
+	 */
+	int ResolvePath(const std::string path, std::string & resolvedPath, const bool disableSymLinkResolution);
 }	/* End of FileUtills namespace. */
 
 #endif	/* __cplusplus */
