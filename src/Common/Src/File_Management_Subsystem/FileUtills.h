@@ -115,6 +115,20 @@ typedef struct FileUtills_dirlist {
 } FileUtills_dirlist_T;
 
 /*!
+ *		void FileUtills_Deallocate_CString(char ** str)
+ *
+ *		Deallocates C strings made by FileUtills, and sets the given pointer to NULL.
+ *		Once the object is deallocated, it should not be dereferenced again.
+ *
+ *		If given a string NOT created by FileUtills, the behaviour and result of this function is undefined.
+ *
+ *		If given an invalid (NULL) pointer this function will silently fail.
+ *
+ *		This function has no return.
+ */
+void FileUtills_Deallocate_CString(char ** str);
+
+/*!
  *		int FileUtills_Create_MSYS_FILESIZE_Structure(MSYS_FILESIZE_T ** str)
  *
  *		Factory function for MSYS_FILESIZE structures.

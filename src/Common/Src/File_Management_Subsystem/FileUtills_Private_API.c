@@ -405,3 +405,483 @@ int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pa
 	/* Return the result. */
 	return ret;
 }
+
+int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
+{
+    /* Init vars. */
+	bool eraseLoopDone = false;						/* Used to tell when the loop for erasing the current directory segment from the output is done. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code from this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code from another engine function. */
+	const char * pCurrentPos = NULL;				/* Used to access the path string. */
+	size_t x = 0;									/* Counter used in parsing loop. */
+	size_t initalOffset = 0;						/* Used to start parsing at the correct offset if the given path starts with a resolveable identifier. */
+	size_t currentOutputPos = 0;					/* Used to store the current position in the output string.
+													 * (Reasoning for this is that I can't determine if any of
+													 * the insertion operators consider NULL characters to not
+													 * be a valid part of the string's value.
+													 * (E.x. for the given string: "some\0\0\0" is the current
+													 * insertion point 4 or is it 7? Also does the C++ standard
+													 * define this, or is the result implimentation defined, or
+													 * is this possibly undefined behavour?))
+													 */
+	char * output = NULL;							/* Result of this function. */
+	size_t outputLength = 0;						/* Length of the output string. */
+	char * homeDir = NULL;							/* Used if we need to get the home (User profile) directory. */
+	size_t homeDirLength = 0;						/* Length of the homeDir string. */
+	char * currentDir = NULL;						/* Used if we need to get the current working directory. */
+	size_t currentDirLength = 0;					/* Length of the currentDir string. */
+
+	/* Check for invalid args. */
+	if ((retStr != NULL) && ((*retStr) != NULL) && (retStrSize != NULL) && ((*retStrSize) > 0))
+	{
+		/* Results:
+		 *
+		 * 	Does nothing but copy the path string to the output
+		 * 	string if the path is already absolute.
+		 *
+		 * 	If the path is not absolute, then the path is made
+		 * 	absolute before being returned.
+		 *
+		 * 	Default is to assume the path is Relative.
+		 *
+		 * 	This function does NOT filter invalid characters in
+		 * 	the given path. (Valid characters are filesystem
+		 * 	specific. The OS in use may not allow the user to
+		 * 	access that information without special privileges.
+		 * 	In addition it's not practical for us to maintain a
+		 * 	list of valid characters for each filesystem type in
+		 * 	existance. (Some OSes may not have an easy mechinism
+		 * 	for determining what characters are valid vs. invalid
+		 * 	short of attempting to actually use them.)) As such
+		 * 	any given invalid character will be retained in the
+		 * 	output string if this function succeeds.
+		 *
+		 * 	Notes: About linux behavior.
+		 * 	/foo/bar/../fee translates to /foo/fee. (../ nulls out bar.)
+		 * 	/foo/./bar translates to /foo/bar. (./ is ignored or translates to the current path without it.)
+		 * 	/foo/./bar/../ translates to /foo. (./ is ignored like above, ../ nulls out bar.)
+		 * 	/foo/./bar/../.././ translates to /. (the first ./ is ignored like above, the first ../ nulls out bar, the second ../ nulls out foo, and the last ./ is ignored like above.)
+		 * 	/foo/./bar/../../~ results in a no such file or directory error. (Apperently ~ only has a special meaning if it is located at the beginning of the given path string. Also not all shells resolve it.)
+		 * 	/foo/./bar/../../$HOME translates to $HOME. (./ is ignored like above, the first ../ nulls out bar, the second ../ nulls out foo, and $ is treated as the start of an enviorment variable. the enviorment variable's name is HOME (the space is the delimiter.))
+		 * 	./foo translates to <current working directory>/foo.
+		 * 	../foo translates to <parent of the current working directory>/foo.
+		 * 	foo translates to <current working directory>/foo.
+		 */
+
+		/* Get a pointer to the path string. */
+		pCurrentPos = (*retStr);
+
+		/* Make sure we got the pointer. */
+		if (pCurrentPos != NULL)
+		{
+			/* First allocate enough memory for the current path string. */
+			retFromCall = DataProcess_Reallocate_C_String(&output, 0, (*retStrSize));
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (output != NULL))
+			{
+				/* Set the outputLength. */
+				outputLength = (*retStrSize);
+
+				/*
+				 * 	Check to see if the path is a user profile directory path.
+				 *
+				 * 	This only has a special meaning if there is a DIR_SEP as the next character,
+				 * 	or if it is the only character in the given path string.
+				 *
+				 * 	If this is not the case, then the HOME_DIR_SYMBOL looses it's special meaning,
+				 * 	and is assumed to be a part of the current path segment.
+				 */
+				if ((pCurrentPos[0] == HOME_DIR_SYMBOL) && ((outputLength == 1) || ((outputLength > 1) && (pCurrentPos[1] == DIR_SEP))))
+				{
+					/* Get the user profile directory path. */
+					ret = FileUtills_GetUserProfileDirectoryPath(&homeDir, &homeDirLength);
+					if ((ret == COMMON_ERROR_SUCCESS) && (homeDir != NULL) && (homeDirLength > 0))
+					{
+						/* Allocate memory for the output string to hold the home dir path. */
+						retFromCall = DataProcess_Reallocate_C_String(&output, 0, (outputLength + (homeDirLength)));
+						if ((retFromCall == COMMON_ERROR_SUCCESS) && (output != NULL))
+						{
+							/* Set the length of the output string. */
+							outputLength += homeDirLength;
+
+							/* Set the user profile directory. */
+							memcpy(output, homeDir, homeDirLength);
+
+							/* Update currentOutputPos. */
+							currentOutputPos = homeDirLength;
+
+							/* Set the initial offset. */
+							initalOffset = 1;
+						}
+						else
+						{
+							/* Unable to reallocate memory for the output string. */
+							ret = COMMON_ERROR_MEMORY_ERROR;
+						}
+					}
+					else
+					{
+						/* Unable to get user profile directory. */
+						ret = COMMON_ERROR_INTERNAL_ERROR;
+						COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Unable to get needed user profile directory path, aborting.\n");
+
+						/* Deallocate output. */
+						DataProcess_Deallocate_CString(&output);
+						outputLength = 0;
+					}
+				}
+				else
+				{
+					/* Check for an absolute path reference. */
+					/* We need to check for a abosolute reference here. (If it is an absolute reference we do nothing.) */
+					retFromCall = FileUtills_IsAbsolutePathReference((*retStr), (*retStrSize));
+					if (retFromCall == FILEUTILLS_ERROR_PATH_IS_RELATIVE)
+					{
+						/* The default is to assume that the path is relative to the current working directory. */
+						/* Get the current working directory. */
+						retFromCall = FileUtills_GetCurrentWorkingDirectoryPath(&currentDir, &currentDirLength);
+						if ((retFromCall == COMMON_ERROR_SUCCESS) && (currentDir != NULL) && (currentDirLength > 0))
+						{
+							/* Allocate memory for the output string to hold the current dir path. */
+							retFromCall = DataProcess_Reallocate_C_String(&output, 0, (outputLength + currentDirLength));
+							if ((retFromCall == COMMON_ERROR_SUCCESS) && (output != NULL))
+							{
+								/* Set the length of the output string. */
+								outputLength += currentDirLength;
+
+								/* Copy the current working directory. */
+								memcpy(output, currentDir, currentDirLength);
+
+								/* Update currentOutputPos. */
+								currentOutputPos = currentDirLength;
+
+								/*
+								 * 	Continue parsing looking for another dot as we may not be done yet.
+								 *
+								 * 	If this is not the case, then we assume that the given path is a path
+								 * 	segment that starts in the given working directory.
+								 */
+								if (pCurrentPos[0] == '.')
+								{
+									/* Check and see if there is something else to parse after the dot. */
+									if ((*retStrSize) > 1)
+									{
+										/* Check for another dot. */
+										if (pCurrentPos[1] == '.') /* ".." (Parent directory of the current working directory.) */
+										{
+											/*
+											 * 	Check for the end of the path or that there is another directory seperator present.
+											 *
+											 * 	If this is not the case then the first two dots loose their special meaning, and we
+											 * 	assume that the first two dots are part of the current path segment.
+											 * 	(That or the caller made a typo....)
+											 */
+											if (((*retStrSize) == 2) || (((*retStrSize) > 2) && (pCurrentPos[2] == DIR_SEP)) || (((*retStrSize) == 3) && (pCurrentPos[2] == '\0')))
+											{
+												/* Erase the last directory segment from the output. */
+												retFromCall = FileUtills_RemoveLastPathSegment(&output, &outputLength);
+												if ((retFromCall == COMMON_ERROR_SUCCESS) && (outputLength > 0))
+												{
+													/* Skip the first two dots. */
+													initalOffset = 2;
+												}
+												else
+												{
+													/* FileUtills_RemoveLastPathSegment() failed. */
+													ret = COMMON_ERROR_INTERNAL_ERROR;
+													COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Call to FileUtills_RemoveLastPathSegment() failed, unable to get needed parent directory. Aborting.\n");
+
+													/* Deallocate output. */
+													DataProcess_Deallocate_CString(&output);
+													outputLength = 0;
+												}
+											}
+										}
+									}
+									else
+									{
+										/*
+										 * 	The dot is by itself, assumed to be a reference to the
+										 * 	current working directory.
+										 *
+										 * 	(Rather than a reference to a file in the current working
+										 * 	directory whose filename is a dot.)
+										 */
+										initalOffset = 1;
+									}
+								}
+								else
+								{
+									/* This is the start of a directory entry, so add a DIR_SEP to output and increment currentOutputPos. */
+									output[currentOutputPos] = DIR_SEP;
+									currentOutputPos++;
+								}
+							}
+							else
+							{
+								/* Could not allocate memory to hold the currentDir in the output string. */
+								ret = COMMON_ERROR_MEMORY_ERROR;
+							}
+						}
+						else
+						{
+							/* Could not get current working directory. */
+							ret = COMMON_ERROR_INTERNAL_ERROR;
+							COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Unable to get needed current working directory path, aborting.\n");
+
+							/* Deallocate output. */
+							DataProcess_Deallocate_CString(&output);
+							outputLength = 0;
+						}
+					}
+					else
+					{
+						/* Check for FILEUTILLS_ERROR_PATH_IS_ABSOLUTE. */
+						if (retFromCall != FILEUTILLS_ERROR_PATH_IS_ABSOLUTE)
+						{
+							/* Call to FileUtills_IsAbsolutePathReference() failed. */
+							ret = COMMON_ERROR_INTERNAL_ERROR;
+
+							/* Log the error. */
+							COMMON_LOG_DEBUG("FileUtills_ResolvePath(): Could not determing if the given path was an absolute path reference, aborting.\n");
+
+							/* Deallocate output. */
+							DataProcess_Deallocate_CString(&output);
+							outputLength = 0;
+						}
+					}
+				}
+
+				/* Start processing loop. */
+				for (x = initalOffset; ((x < (*retStrSize)) && (ret == COMMON_ERROR_UNKNOWN_ERROR)); x++)
+				{
+					/* Selection switch. */
+					switch (pCurrentPos[x])
+					{
+						case '.':		/* Dot ('.') character. Normally used for indicating
+									   the current or parent directory.
+
+									   For the dot character to have a special meaning,
+									   one of the following conditions must be true:
+
+										- There must be a DIR_SEP at either the
+										(x + 1) or (x + 2) position (but not both) in
+										the given path string. (In the case of the
+										latter, position (x + 1) must have another
+										dot character for (x + 2) to have a meaning.)
+
+										- The dot characters (either "." or "..") must
+										be at the end of the given path string, and
+										have nothing after them. (The terminating NULL
+										byte for c-style strings is permitted however.)
+
+									   If both of these conditions are false, then the
+									   dot character is assumed to be part of the
+									   current path segment, and therefore loses it's
+									   special meaning.
+									*/
+
+						/* Check and see if we have at least one character left after the current position. */
+						if ((x + 1) < (*retStrSize))
+						{
+							/* Check for ".<DIR_SEP>" current working directory variant. */
+							if (pCurrentPos[(x + 1)] == DIR_SEP)
+							{
+								/* Increment x to skip checking the directory seperator on the next loop iteration. */
+								x++;
+							}
+							else
+							{
+									/* Check for ".." variant. (Parent directory.) */
+									if (pCurrentPos[(x + 1)] == '.')
+									{
+										/*
+										 *	Determine if we can continue.
+										 *
+										 * 	/foo/bar/..<NON DIR_SEP> is a valid path.
+										 * 	(Yes, ".." only has a special meaning if it's at the end of a path.
+										 * 	Otherwise it's considered part of a filesystem entry.
+										 * 	Ex. "/foo/bar/..my_filename_begins_with_two_dots" is a valid filename.)
+										 */
+										if (((x + 2) >= (*retStrSize)) ||
+										    (((x + 2) < (*retStrSize)) && ((pCurrentPos[(x + 2)] == DIR_SEP) || (((x + 3) >= (*retStrSize)) && (pCurrentPos[(x + 2)] == '\0')))))
+										{
+											/* Referening the parent directory. Check to see if we are at the root directory. (No parent path reference can pass beyond the filesystem's root directory.) */
+											if (currentOutputPos > MINIMAL_VALID_ABSOLUTE_PATH_LENGTH)
+											{
+												/* Reset eraseLoopDone. */
+												eraseLoopDone = false;
+
+												/* Remove last path segment from output. (Search from the end of the output string.) */
+												ret = FileUtills_RemoveLastPathSegment(&output, &outputLength);
+												if ((ret == COMMON_ERROR_SUCCESS) && (output != NULL) && (outputLength > 0))
+												{
+													/* Set eraseLoopDone. */
+													eraseLoopDone = true;
+												}
+												else
+												{
+													/* FileUtills_RemoveLastPathSegment() failed. */
+													ret = COMMON_ERROR_INTERNAL_ERROR;
+													COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Call to FileUtills_RemoveLastPathSegment() failed. Unable to remove current path segment. Aborting.\n");
+
+													/* Deallocate output. */
+													DataProcess_Deallocate_CString(&output);
+													outputLength = 0;
+												}
+											}
+
+											/* Check to see if there are at least two characters after the current position. */
+											if (((x + 2) < (*retStrSize)) && (pCurrentPos[(x + 2)] == DIR_SEP))
+											{
+												/* Increment x by 2 to skip the dots and the directory seperator. */
+												x += 2;
+											}
+											else
+											{
+												/* Increment x to skip the dots. */
+												x++;
+											}
+										}
+										else
+										{
+											/* Allocate memory for adding dot to output string. */
+											retFromCall = DataProcess_Reallocate_C_String(&output, outputLength, (outputLength + (sizeof(char))));
+											if ((retFromCall == COMMON_ERROR_SUCCESS) && (output != NULL))
+											{
+												/* Copy the dot. */
+												memcpy((output + outputLength), (pCurrentPos + x), (sizeof(char)));
+
+												/* Update outputLength. */
+												outputLength += (sizeof(char));
+
+												/* Increment currentOutputPos. */
+												currentOutputPos++;
+											}
+											else
+											{
+												/* Could not reallocate memory for output string addition. */
+												ret = COMMON_ERROR_MEMORY_ERROR;
+
+												/* Deallocate output. */
+												DataProcess_Deallocate_CString(&output);
+												outputLength = 0;
+											}
+										}
+									}
+									else
+									{
+										/* Allocate memory for adding dot to output string. */
+										retFromCall = DataProcess_Reallocate_C_String(&output, outputLength, (outputLength + (sizeof(char))));
+										if ((retFromCall == COMMON_ERROR_SUCCESS) && (output != NULL))
+										{
+											/* Copy the dot. */
+											memcpy((output + outputLength), (pCurrentPos + x), (sizeof(char)));
+
+											/* Update outputLength. */
+											outputLength += (sizeof(char));
+
+											/* Increment currentOutputPos. */
+											currentOutputPos++;
+										}
+										else
+										{
+											/* Could not reallocate memory for output string addition. */
+											ret = COMMON_ERROR_MEMORY_ERROR;
+
+											/* Deallocate output. */
+											DataProcess_Deallocate_CString(&output);
+											outputLength = 0;
+										}
+									}
+							}
+						}
+						break;
+						default:
+							/* Check and see if the current character is a DIR_SEP and it is the last character in the string. */
+							if (((x + 1) < (*retStrSize)) || (((x + 1) == (*retStrSize)) && (pCurrentPos[x] != DIR_SEP)))
+							{
+								/* We don't do anything here, except copy the data to the output buffer. */
+								retFromCall = DataProcess_Reallocate_C_String(&output, outputLength, (outputLength + (sizeof(char))));
+								if ((retFromCall == COMMON_ERROR_SUCCESS) && (output != NULL) && (outputLength > 0))
+								{
+									/* Copy the data. */
+									memcpy((output + outputLength), (pCurrentPos + x), (sizeof(char)));
+
+									/* Update outputLength. */
+									outputLength += (sizeof(char));
+
+									/* Increment currentOutputPos. */
+									currentOutputPos++;
+								}
+								else
+								{
+									/* Could not reallocate memory for output string addition. */
+									ret = COMMON_ERROR_MEMORY_ERROR;
+
+									/* Deallocate output. */
+									DataProcess_Deallocate_CString(&output);
+									outputLength = 0;
+								}
+							}
+							break;
+					};
+				}
+
+				/* Set ret. */
+				ret = COMMON_ERROR_SUCCESS;
+
+				/* Copy output to retStr. */
+				(*retStr) = output;
+				(*retStrSize) = outputLength;
+
+				/* Log result. */
+				COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Path ( ");
+				COMMON_LOG_VERBOSE((*retStr));
+				COMMON_LOG_VERBOSE(" ) resolved to ( ");
+				COMMON_LOG_VERBOSE(output);
+				COMMON_LOG_VERBOSE(").\n");
+			}
+			else
+			{
+				/* Could not allocate memory for output. */
+				ret = COMMON_ERROR_MEMORY_ERROR;
+			}
+		}
+		else
+		{
+			/* Could not get pointer for given path. */
+			ret = COMMON_ERROR_INTERNAL_ERROR;
+			COMMON_LOG_WARNING("FileUtills_ResolvePath(): ");
+			COMMON_LOG_WARNING(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+			COMMON_LOG_WARNING(" Unable to get pointer to given path argument.\n");
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+		COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): ");
+		COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_VERBOSE(" No path given.\n");
+	}
+
+	/* Check for allocated strings, and deallocate them if needed. */
+	if (homeDir != NULL)
+	{
+		DataProcess_Deallocate_CString(&homeDir);
+		homeDirLength = 0;
+	}
+	if (currentDir != NULL)
+	{
+		DataProcess_Deallocate_CString(&currentDir);
+		currentDirLength = 0;
+	}
+	if ((ret != COMMON_ERROR_SUCCESS) && (output != NULL))
+	{
+		DataProcess_Deallocate_CString(&output);
+		outputLength = 0;
+	}
+
+	/* Return the result. */
+	return ret;
+}
