@@ -568,6 +568,13 @@ int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize);
  */
 int FileUtills_ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize);
 
+/*!
+ * 	size_t FileUtills_Get_Max_Symlink_Depth_Syscall()
+ *
+ * 	Returns the host's maximum supported symbolic link depth.
+ */
+size_t FileUtills_Get_Max_Symlink_Depth_Syscall();
+
 #ifdef __cplusplus
 } /* End of extern C. */
 #endif	/* __cplusplus */

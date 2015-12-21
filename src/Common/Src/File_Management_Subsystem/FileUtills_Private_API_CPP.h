@@ -141,18 +141,6 @@ int RemoveLastPathSegment(std::string & path, size_t * currentPathPos);
 int RemoveLastPathSegment(std::string & path);
 
 /*!
- * 	size_t FileUtills::Get_Max_Symlink_Depth()
- *
- * 	Returns the maximum supported symbolic link depth.
- */
-size_t Get_Max_Symlink_Depth()
-{
-	return 0;
-}
-
-
-
-/*!
  * 	FileUtills::dirlist * FileUtills::getDirectory_Helper(const std::string & absPath, const bool & cleanList)
  *
  * 	Helper function that calls FileUtills::getDirectory_Syscall() for
