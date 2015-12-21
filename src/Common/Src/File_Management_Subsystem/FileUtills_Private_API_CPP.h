@@ -103,61 +103,29 @@ int GetPathSegment(const std::string & path, const size_t & currentPathPos, std:
 int GetLastPathSegment(const std::string & path, std::string & pathSegment, const bool & blankPathSegment = true);
 
 /*!
- * 	int FileUtills::RemoveLastPathSegment(char ** path, size_t * currentPathPos)
+ * 	int FileUtills::RemoveLastPathSegment(std::string & path, size_t * currentPathPos)
  *
  * 	This function removes a path segment from the given path, and updates the
  * 	given currentPathPos variable to point to the location in the string
  * 	where the removed path segment began.
  *
- * 	Long description:
- * 	The given path argument is checked to see if is is big enough to have more
- * 	than just the filesystem root directory reference. If this is not the case
- * 	then this function will return the COMMON_ERROR_INVALID_ARGUMENT error
- * 	code, and the given path and position arguments will NOT be modified.
+ *	This function is a wrapper to FileUtills_RemoveLastPathSegmentAtPosition(), and performs
+ *	conversions of the result to an std::string. As such this function will return all of
+ *	FileUtills_RemoveLastPathSegmentAtPosition()'s error codes.
  *
- * 	The given path argument is copied to a temporary variable.
+ * 	This function will return the COMMON_ERROR_SUCCESS error code if it is successful,
+ * 	the results will be stored in the given path argument.
  *
- * 	The path segment to remove is determined by the given currentPathPos
- * 	variable. currentPathPos is checked to make sure it is within the capacity
- * 	of the given string and if it is, iterates backwards in the string until a
- * 	directory seperator (defined by DIR_SEP) is found. If the currentPathPos
- * 	check fails, then this function will return the COMMON_ERROR_INVALID_ARGUMENT
- * 	error code, and the given path and position arguments will NOT be modified.
+ *	See FileUtills_RemoveLastPathSegmentAtPosition() for the remaining error code descriptions.
  *
- * 	Once the path segment to remove is identfied, a check is performed to make sure
- * 	the function is not removing the filesystem root directory reference.
- *
- * 		If the path segment to be removed is within the filesystem root directory, then the
- * 		path segment is removed by replacing all of the bytes from the start of the path
- * 		segment to be removed (while preserving the DIR_SEP as required for the filesystem
- * 		root directory reference) to the end of the string with NULL character bytes.
- *
- * 		If removal of the path segment will not result in the removal of the filesystem root
- * 		directory reference, then the path segment is removed by replacing all of the bytes
- * 		from the start of the path segment to be removed (including the DIR_SEP) to the end
- * 		of the string with NULL character bytes.
- *
- * 	If the path segment is removed, then currentPathPos will be updated to indicate where
- * 	the next path segment's entry name (file or directory name) would start in the altered
- * 	string.
- *
- * 	If a path segment to remove cannot be found, then the given path and position arguments will
- * 	NOT be altered, and the function will return the COMMON_ERROR_SUCCESS error code.
- *
- * 	In any case, the returned error code will also be written to Common::commonLastErrorCode.
- *
- * 	Short description:
- * 	This function will return the COMMON_ERROR_SUCCESS error code if it is successfull,
- * 	the results will be stored in the given arguments.
- *
- * 	NOTE: This function will NOT deallocate a pre-existing pointer, but it WILL OVERWRITE IT.
- * 	(So if you need to use or deallocate it later, make sure to copy the pointer before calling
+ * 	NOTE: This function will NOT deallocate a pre-existing string, but it WILL OVERWRITE IT.
+ * 	(So if you need to use or deallocate it later, make sure to copy the string before calling
  * 	 this function.)
  *
- * 	If an error occurs, the error will be returned, and the given arguments will NOT
- * 	be altered.
+ *	No alteration clause:
+ *		In case of error, this function will not alter any given argument.
  */
-int RemoveLastPathSegment(char ** path, size_t * pathSize, size_t * currentPathPos);
+int RemoveLastPathSegment(std::string & path, size_t * currentPathPos);
 
 /*!
  * 	int FileUtills::RemoveLastPathSegment(char ** path, size_t * pathSize)

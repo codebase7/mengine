@@ -132,96 +132,64 @@ int FileUtills::GetLastPathSegment(const std::string & path, std::string & pathS
 	return (FileUtills::GetPathSegment(path, currentPathPos, pathSegment));
 }
 
-int FileUtills::RemoveLastPathSegment(char ** path, size_t * pathSize, size_t * currentPathPos)
+int FileUtills::RemoveLastPathSegment(std::string & path, size_t * currentPathPos)
 {
-	// Init vars.
-	int result = COMMON_ERROR_UNKNOWN_ERROR;			// Result of this function.
-	size_t tempPathSize = 0;					// The temporary variable used to store the new path's size.
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* Result code of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* Result code of other engine functions. */
+	size_t pathSize = 0;							/* The given path's size. */
+	char * tempPath = NULL;							/* Temporary pointer to construct the result string. */
+	std::string resultStr = "";						/* The result string of this function. */
 
-	// Check for valid path.
-	if ((pathSize != NULL) && ((*pathSize) > 0) && (path != NULL) && ((*path) != NULL))
+	/* Get the path size. */
+	pathSize = path.size();
+
+	/* Copy the string to a C-style string. */
+	retFromCall = FileUtills::CopyStdStringToCString(path, &tempPath);
+	if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempPath != NULL))
 	{
-		// Check for a valid path position.
-		if ((currentPathPos != NULL) && ((*currentPathPos) > 0))
+		/* Call C function. */
+		ret = FileUtills_RemoveLastPathSegmentAtPosition(&tempPath, &pathSize, currentPathPos);
+		if ((ret == COMMON_ERROR_SUCCESS) && (tempPath != NULL) && (pathSize > 0))
 		{
-			// Make sure the path position is within the path buffer.
-			if (*currentPathPos < *pathSize)
+			/* OK, copy the result path to the path var. */
+			retFromCall = FileUtills::CopyCStringToStdString(tempPath, &pathSize, &resultStr);
+			if (retFromCall != NULL)
 			{
-				// Remove last path segment from output. (Search from the end of the output string.)
-				for (size_t y = 0; ((y < (*pathSize))) && (result == COMMON_ERROR_UNKNOWN_ERROR)); y++)
-				{
-					// Look for the DIR_SEP.
-					if ((*path)[((*currentPathPos) - y)] == DIR_SEP)
-					{
-						// Check to see if we have hit the first directory seperator.
-						if (((*currentPathPos) - y) == MINIMAL_VALID_ABSOLUTE_PATH_LENGTH)
-						{
-							// Decrement y, as we need this directory seperator.
-							y--;
-						}
+				/* Deallocate the C style string. */
+				FileUtills_Deallocate_CString(&tempPath);
 
-						// Calculate the new string's length.
-						tempPathSize = (sizeof(char) * ((*currentPathPos) - y));
+				/* Copy the resultStr to the path variable. */
+				path = resultStr;
 
-						// Reallocate the new path string.
-						result = FileUtills_Reallocate_CString_Buffer(path, (*pathSize), tempPathSize);
-						if (result == COMMON_ERROR_SUCCESS)
-
-							// Reset the current path position.
-							(*currentPathPos) = ((*currentPathPos) - y);
-
-							// Reset the pathSize.
-							(*pathSize) = tempPathSize;
-						}
-						else
-						{
-							// Call to FileUtills_Reallocate_CString_Buffer() failed.
-							COMMON_LOG_DEBUG("FileUtills_RemoveLastPathSegment(): Call to FileUtills_Reallocate_CString_Buffer() failed with error code: ");
-							COMMON_LOG_DEBUG(Common_Get_Error_Message(result));
-							if (result == COMMON_ERROR_UNKNOWN_ERROR)
-							{
-								// Change result to COMMON_ERROR_INTERNAL_ERROR, to avoid false success message later.
-								result = COMMON_ERROR_INTERNAL_ERROR;
-							}
-						}
-					}
-				}
-
-				// If we get here and result is still COMMON_UNKNOWN_ERROR, then the path did not have a directory seperator in it.
-				if (result == COMMON_ERROR_UNKNOWN_ERROR)
-				{
-					result = COMMON_ERROR_SUCCESS;
-				}
+				/* Done. */
+				ret = COMMON_ERROR_SUCCESS;
 			}
 			else
 			{
-				// currentPathPos is beyond the end of the path buffer.
-				result = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegment(): ");
-				COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-				COMMON_LOG_VERBOSE(" current path position is beyond the end of the path buffer. (Nice try.)");
+				/* Could not copy c string to std::string. */
+				ret = retFromCall;
+				COMMON_LOG_DEBUG("FileUtills::RemoveLastPathSegment(): Could not copy result string to path argument.");
 			}
-		}
-		else
-		{
-			// Invalid currentPathPos.
-			result = COMMON_ERROR_INVALID_ARGUMENT;
-			COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegment(): ");
-			COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-			COMMON_LOG_VERBOSE(" current path position is invalid.");
 		}
 	}
 	else
 	{
-		// No path given.
-		result = COMMON_ERROR_INVALID_ARGUMENT;
+		/* No path given. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
 		COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegment(): ");
 		COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 		COMMON_LOG_VERBOSE(" No valid path given.");
 	}
 
-	// Return the result.
-	return result;
+	/* Deallocate the tempPath string if needed. */
+	if (tempPath != NULL)
+	{
+		DataProcess_Deallocate_CString(&tempPath);
+	}
+
+	/* Return the result. */
+	return ret;
 }
 
 int FileUtills::RemoveLastPathSegment(char ** path, size_t * pathSize)
