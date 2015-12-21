@@ -885,3 +885,122 @@ int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
 	/* Return the result. */
 	return ret;
 }
+
+int FileUtills_RemoveLastPathSegmentAtPosition(char ** path, size_t * pathSize, size_t * currentPathPos)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* Result code of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* Result code of other engine functions. */
+	size_t tempPathSize = 0;						/* The temporary variable used to store the new path's size. */
+	size_t y = 0;									/* Loop counter. */
+	char * tempPath = NULL;							/* Temporary pointer to construct the result string. */
+
+	/* Check for valid path. */
+	if ((pathSize != NULL) && ((*pathSize) > 0) && (path != NULL) && ((*path) != NULL))
+	{
+		/* Check for a valid path position. */
+		if ((currentPathPos != NULL) && ((*currentPathPos) > 0))
+		{
+			/* Make sure the path position is within the path buffer. */
+			if ((*currentPathPos) < (*pathSize))
+			{
+				/* Remove last path segment from output. (Search from the end of the output string.) */
+				for (y = 0; (((y < (*pathSize))) && (ret == COMMON_ERROR_UNKNOWN_ERROR)); y++)
+				{
+					/* Look for the DIR_SEP. */
+					if ((*path)[((*currentPathPos) - y)] == DIR_SEP)
+					{
+						/* Check to see if we have hit the first directory seperator. */
+						if (((*currentPathPos) - y) == MINIMAL_VALID_ABSOLUTE_PATH_LENGTH)
+						{
+							/* Decrement y, as we need this directory seperator. */
+							y--;
+						}
+
+						/* Calculate the new string's length. */
+						tempPathSize = ((sizeof(char)) * ((*currentPathPos) - y));
+
+						/* Reallocate the new path string. */
+						retFromCall = DataProcess_Reallocate_C_String(&tempPath, 0, tempPathSize);
+						if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempPath != NULL))
+						{
+							/* Memcopy the data to the new buffer. */
+							memcpy(tempPath, path, tempPathSize);
+
+							/* Reset the current path position. */
+							(*currentPathPos) = ((*currentPathPos) - y);
+
+							/* Reset the pathSize. */
+							(*pathSize) = tempPathSize;
+
+							/* Copy the temp pointer. */
+							(*path) = tempPath;
+
+							/* Success. */
+							ret = COMMON_ERROR_SUCCESS;
+						}
+						else
+						{
+							/* Call to DataProcess_Reallocate_C_String() failed. */
+							if (retFromCall == COMMON_ERROR_MEMORY_ERROR)
+							{
+								ret = COMMON_ERROR_MEMORY_ERROR;
+							}
+							else
+							{
+								ret = COMMON_ERROR_INTERNAL_ERROR;
+							}
+
+							/* Log the error. */
+							COMMON_LOG_DEBUG("FileUtills_RemoveLastPathSegmentAtPosition(): Call to DataProcess_Reallocate_C_String() failed with error code: ");
+							COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+						}
+					}
+				}
+
+				/* If we get here and result is still COMMON_UNKNOWN_ERROR, then the path did not have a directory seperator in it. */
+				if (ret == COMMON_ERROR_UNKNOWN_ERROR)
+				{
+					ret = COMMON_ERROR_SUCCESS;
+				}
+			}
+			else
+			{
+				/* currentPathPos is beyond the end of the path buffer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+				COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegmentAtPosition(): ");
+				COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_VERBOSE(" current path position is beyond the end of the path buffer. (Nice try.)");
+			}
+		}
+		else
+		{
+			/* Invalid currentPathPos. */
+			ret = COMMON_ERROR_INVALID_ARGUMENT;
+			COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegmentAtPosition(): ");
+			COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+			COMMON_LOG_VERBOSE(" current path position is invalid.");
+		}
+	}
+	else
+	{
+		/* No path given. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+		COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegmentAtPosition(): ");
+		COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_VERBOSE(" No valid path given.");
+	}
+
+	/* Check for success. */
+	if (ret != COMMON_ERROR_SUCCESS)
+	{
+		/* Deallocate the tempPath string if needed. */
+		if (tempPath != NULL)
+		{
+			DataProcess_Deallocate_CString(&tempPath);
+		}
+	}
+
+	/* Return the result. */
+	return ret;
+}

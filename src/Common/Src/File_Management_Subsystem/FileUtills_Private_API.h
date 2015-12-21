@@ -307,6 +307,67 @@ int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pa
  */
 int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize);
 
+/*!
+ * 	int FileUtills_RemoveLastPathSegmentAtPosition(char ** path, size_t * pathSize, size_t * currentPathPos)
+ *
+ * 	This function removes a path segment from the given path, and updates the
+ * 	given currentPathPos variable to point to the location in the string
+ * 	where the removed path segment began.
+ *
+ * 	Long description:
+ * 	The given path argument is checked to see if is is big enough to have more
+ * 	than just the filesystem root directory reference. If this is not the case
+ * 	then this function will return the COMMON_ERROR_INVALID_ARGUMENT error
+ * 	code, and the given path and position arguments will NOT be modified.
+ *
+ * 	The path segment to remove is determined by the given currentPathPos
+ * 	variable. currentPathPos is checked to make sure it is within the capacity
+ * 	of the given string and if it is, iterates backwards in the string until a
+ * 	directory seperator (defined by DIR_SEP) is found. If the currentPathPos
+ * 	check fails, then this function will return the COMMON_ERROR_INVALID_ARGUMENT
+ * 	error code, and the given path and position arguments will NOT be modified.
+ *
+ * 	Once the path segment to remove is identfied, a check is performed to make sure
+ * 	the function is not removing the filesystem root directory reference.
+ *
+ * 		If the path segment to be removed is within the filesystem root directory, then the
+ * 		path segment is removed by replacing all of the bytes from the start of the path
+ * 		segment to be removed (while preserving the DIR_SEP as required for the filesystem
+ * 		root directory reference) to the end of the string with NULL character bytes.
+ *
+ * 		If removal of the path segment will not result in the removal of the filesystem root
+ * 		directory reference, then the path segment is removed by replacing all of the bytes
+ * 		from the start of the path segment to be removed (including the DIR_SEP) to the end
+ * 		of the string with NULL character bytes.
+ *
+ * 	If the path segment is removed, then currentPathPos will be updated to indicate where
+ * 	the next path segment's entry name (file or directory name) would start in the altered
+ * 	string.
+ *
+ * 	If a path segment to remove cannot be found, then the given path and position arguments will
+ * 	NOT be altered, and the function will return the COMMON_ERROR_SUCCESS error code.
+ *
+ * 	Error Codes:
+ * 	Returns COMMON_ERROR_SUCCESS if successful, the results will be stored in the given arguments.
+ *
+ *	Returns COMMON_ERROR_INVALID_ARGUMENT if a given path (pointer) is NULL, the given length of
+ *	the path is less than or equal to zero, or if the currentPathPos is less than zero, or beyond
+ *	the given path length.
+ *
+ *	Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+ *
+ *	Returns COMMON_ERROR_INTERNAL_ERROR if the memory allocation call fails for some other reason.
+ *	(Reason for failure will be sent to the debug log.)
+ *
+ * 	NOTE: This function will NOT deallocate a pre-existing pointer, but it WILL OVERWRITE IT.
+ * 	(So if you need to use or deallocate it later, make sure to copy the pointer before calling
+ * 	 this function.)
+ *
+ *	No alteration clause:
+ *		In the event of an error, this function will not modifiy the arguments given to it.
+ */
+int FileUtills_RemoveLastPathSegmentAtPosition(char ** path, size_t * pathSize, size_t * currentPathPos);
+
 #ifdef __cplusplus
 } /* End of extern C. */
 #endif	/* __cplusplus */
