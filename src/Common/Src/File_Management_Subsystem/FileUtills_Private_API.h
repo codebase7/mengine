@@ -231,7 +231,7 @@ int FileUtills_IsAbsolutePathReference(const char * path, const size_t pathSize)
 int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pathSize, char ** absRef, size_t * absRefLength);
 
 /*!
- * 	int FileUtills_ResolvePath_Helper(char * retStr, size_t * retStrSize)
+ * 	int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
  *
  * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY OUTSIDE OF THE
  * 	FILEUTILLS NAMESPACE. THIS FUNCTION EXPECTS ANY AND ALL OTHER
@@ -305,7 +305,7 @@ int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pa
  * 	error message will be logged to describe the error encountered more
  * 	throughly.)
  */
-int FileUtills_ResolvePath_Helper(char * retStr, size_t * retStrSize);
+int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize);
 
 #ifdef __cplusplus
 } /* End of extern C. */
