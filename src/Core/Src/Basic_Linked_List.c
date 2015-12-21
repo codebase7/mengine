@@ -25,6 +25,7 @@ extern "C" {
 
 /* Internal includes. */
 #include "Basic_Linked_List.h"
+#include "DataProcess.h"
 
 /* External includes. */
 #include <stdlib.h>	/* Define malloc() & free(). */
@@ -42,7 +43,7 @@ void Blank_MSYS_Linked_List_Object(MSYS_Linked_List_T * list)
 			if (list->data != NULL)
 			{
 				/* Deallocate memory. */
-				DataProcess_Deallocate_CString((&(list->data)));
+				DataProcess_Deallocate_CString(((char**)(&(list->data))));
 			}
 		}
 
