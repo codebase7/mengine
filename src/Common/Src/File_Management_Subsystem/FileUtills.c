@@ -1376,20 +1376,21 @@ int FileUtills_GetExecDirectory(char ** retStr, size_t * retStrSize)
 int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** retStr, size_t * retStrSize, const bool disableSymLinkResolution)
 {
 	/* Init vars. */
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of this function. */
-	size_t numOfResolveAttempts = 0;			/* The number of times we have attempted to resolve a symbolic link. */
-	size_t outputStrSize = 0;					/* The current size of the output string. */
-	size_t tempLinkBufSize = 0;					/* The current size of the tempLinkBuf. */
-	size_t x = 0;								/* Loop counter. */
-	char * outputStr = NULL;					/* The resolved path. */
-	char * tempLinkBuf = NULL;					/* Used to hold the result of FileUtills_ResolveSystemSymoblicLink_Syscall(). */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
+	size_t numOfResolveAttempts = 0;				/* The number of times we have attempted to resolve a symbolic link. */
+	size_t outputStrSize = 0;						/* The current size of the output string. */
+	size_t tempLinkBufSize = 0;						/* The current size of the tempLinkBuf. */
+	size_t x = 0;									/* Loop counter. */
+	char * outputStr = NULL;						/* The resolved path. */
+	char * tempLinkBuf = NULL;						/* Used to hold the result of FileUtills_ResolveSystemSymoblicLink_Syscall(). */
 
 	/* Check for valid path. */
 	if ((path != NULL) && (pathSize > 0) && (retStr != NULL) && (retStrSize != NULL))
 	{
 			/* Allocate buffer for outputStr. */
-			outputStr = (char*)malloc(pathSize);
-			if (outputStr != NULL)
+			retFromCall = DataProcess_Reallocate_C_String(&outputStr, 0, pathSize);
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (outputStr != NULL))
 			{
 				/* Copy path to outputStr. */
 				for (outputStrSize = 0; ((ret == COMMON_ERROR_UNKNOWN_ERROR) && (outputStrSize < pathSize)); outputStrSize++)
@@ -1414,22 +1415,22 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 				if ((pathSize == outputStrSize) && (ret == COMMON_ERROR_UNKNOWN_ERROR))
 				{
 					/* Begin resolution loop. */
-					for (numOfResolveAttempts = 0; ((ret == FILEUTILLS_ERROR_PATH_IS_A_SYMLINK) && (numOfResolveAttempts < (FileUtills_Get_Max_Symlink_Depth()))); numOfResolveAttempts++)
+					for (numOfResolveAttempts = 0; ((retFromCall == FILEUTILLS_ERROR_PATH_IS_A_SYMLINK) && (numOfResolveAttempts < (FileUtills_Get_Max_Symlink_Depth()))); numOfResolveAttempts++)
 					{
 						/* Resolve the given path. */
-						ret = FileUtills_ResolvePath_Helper(outputStr, &outputStrSize);
+						retFromCall = FileUtills_ResolvePath_Helper(&outputStr, &outputStrSize);
 
 						/* Check for error. */
-						if (ret == COMMON_ERROR_SUCCESS)
+						if ((retFromCall == COMMON_ERROR_SUCCESS) && (outputStr != NULL) && (outputStrSize > 0))
 						{
 							/* Check for valid result. */
 							if ((outputStr != NULL) && (outputStrSize > 0))
 							{
 								/* Check to see if the path is a symbolic link. */
-								ret = FileUtills_IsFileOrDirectory_Helper(outputStr, outputStrSize);
+								retFromCall = FileUtills_IsFileOrDirectory_Helper(outputStr, outputStrSize);
 
 								/* Check the result. */
-								switch (ret)
+								switch (retFromCall)
 								{
 									case COMMON_ERROR_SUCCESS:		/* System specific (unchecked) filesystem entry type. */
 									case FILEUTILLS_ERROR_PATH_IS_A_DIRECTORY:
@@ -1442,17 +1443,17 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 										if (!disableSymLinkResolution)
 										{
 											/* OK, Resolve the symbolic link. */
-											ret = FileUtills_ResolveSystemSymoblicLink_Syscall(outputStr, outputStrSize, &tempLinkBuf, &tempLinkBufSize);
-											if (ret == COMMON_ERROR_SUCCESS)
+											retFromCall = FileUtills_ResolveSystemSymoblicLink_Syscall(outputStr, outputStrSize, &tempLinkBuf, &tempLinkBufSize);
+											if (retFromCall == COMMON_ERROR_SUCCESS)
 											{
 												/* Check for success without result. */
 												if ((tempLinkBuf != NULL) && (tempLinkBufSize > 0))
 												{
 													/* OK, we need to determine if the resolved symbolic link is a relative path or an absolute path. */
-													ret = FileUtills_IsAbsolutePathReference(tempLinkBuf, tempLinkBufSize);
+													retFromCall = FileUtills_IsAbsolutePathReference(tempLinkBuf, tempLinkBufSize);
 
 													/* Check for absolute path result. */
-													if (ret == FILEUTILLS_ERROR_PATH_IS_ABSOLUTE)
+													if (retFromCall == FILEUTILLS_ERROR_PATH_IS_ABSOLUTE)
 													{
 														/* Replace the result with the absolute path. */
 														free(outputStr);
@@ -1462,18 +1463,18 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 													else
 													{
 														/* Check for relative path. */
-														if (ret == FILEUTILLS_ERROR_PATH_IS_RELATIVE)
+														if (retFromCall == FILEUTILLS_ERROR_PATH_IS_RELATIVE)
 														{
 															/* Remove the symlink from the outputStr. */
-															ret = FileUtills_RemoveLastPathSegment(&outputStr, &outputStrSize);
-															if (ret == COMMON_ERROR_SUCCESS)
+															retFromCall = FileUtills_RemoveLastPathSegment(&outputStr, &outputStrSize);
+															if (retFromCall == COMMON_ERROR_SUCCESS)
 															{
 																/* Reallocate the buffer to store the relative path. */
-																ret = FileUtills_Reallocate_CString_Buffer(&outputStr, outputStrSize, (outputStrSize + tempLinkBufSize));
-																if (ret == COMMON_ERROR_SUCCESS)
+																retFromCall = FileUtills_Reallocate_CString_Buffer(&outputStr, outputStrSize, (outputStrSize + tempLinkBufSize));
+																if ((retFromCall == COMMON_ERROR_SUCCESS) && (outputStr != NULL))
 																{
-																	/* Reset ret. */
-																	ret = COMMON_ERROR_UNKNOWN_ERROR;
+																	/* Reset retFromCall. */
+																	retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
 																	/* Append the relative path to the result. */
 																	for (x = outputStrSize; ((x < (outputStrSize + tempLinkBufSize)) && (ret == COMMON_ERROR_UNKNOWN_ERROR)); x++)
@@ -1497,9 +1498,10 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 																else
 																{
 																	/* An error occured while reallocating the buffer. */
-																	if (ret == COMMON_ERROR_MEMORY_ERROR)
+																	if (retFromCall == COMMON_ERROR_MEMORY_ERROR)
 																	{
 																		/* Unable to allocate memory for buffer reallocation. */
+																		ret = COMMON_ERROR_MEMORY_ERROR;
 																		COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
 																		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
 																		COMMON_LOG_DEBUG(" out of usable memory. Cannot reallocate buffer for addition of relative path.");
@@ -1507,31 +1509,31 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 																	else
 																	{
 																		/* All other errors. */
-																		COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-																		COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
-																		COMMON_LOG_DEBUG(" unable to reallocate output buffer for addition of relative path. Please report this bug.");
 																		ret = COMMON_ERROR_INTERNAL_ERROR;
+																		COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
+																		COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+																		COMMON_LOG_DEBUG(" unable to reallocate output buffer for addition of relative path. Please report this bug.");
 																	}
 																}
 															}
 															else
 															{
 																/* Unable to remove the last path segment. */
-																COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-																COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-																COMMON_LOG_DEBUG(" Call to path segment removal function failed. Please report this bug.");
 																ret = COMMON_ERROR_INTERNAL_ERROR;
+																COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
+																COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+																COMMON_LOG_DEBUG(" Call to path segment removal function failed. Please report this bug.");
 															}
 														}
 														else
 														{
 															/* This is any other error. */
+															ret = COMMON_ERROR_INTERNAL_ERROR;
 															COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-															COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
+															COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
 															COMMON_LOG_DEBUG(" Unable to resolve the given path ( ");
 															COMMON_LOG_DEBUG(path);
 															COMMON_LOG_DEBUG(" ) Unable to determine the type of the symbolic link.");
-															ret = COMMON_ERROR_INTERNAL_ERROR;
 														}
 													}
 												}
@@ -1549,12 +1551,12 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 											else
 											{
 												/* OK an error occured report and log it. */
-												if (ret == COMMON_ERROR_INVALID_ARGUMENT)
+												if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
 												{
 													/* This is an internal engine error. */
 													ret = COMMON_ERROR_INTERNAL_ERROR;
 													COMMON_LOG_WARNING("FileUtills_ResolvePath(): ");
-													COMMON_LOG_WARNING(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+													COMMON_LOG_WARNING(Common_Get_Error_Message(retFromCall));
 													COMMON_LOG_WARNING(" Call to system symbolic link resolution function failed with the given path ( ");
 													COMMON_LOG_WARNING(outputStr);
 													COMMON_LOG_WARNING(" ) Please report this bug.");
@@ -1562,6 +1564,7 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 												else
 												{
 													/* This is any other error. */
+													ret = COMMON_ERROR_INTERNAL_ERROR;
 													COMMON_LOG_DEBUG("FileUtills_ResolvePath(): Unable to resolve the given path ( ");
 													COMMON_LOG_DEBUG(outputStr);
 													COMMON_LOG_DEBUG(" ) Unable to resolve system defined symbolic link.");
@@ -1571,12 +1574,12 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 										break;
 									default:
 										/* OK an error occured report and log it. */
-										if (ret == COMMON_ERROR_INVALID_ARGUMENT)
+										if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
 										{
 											/* This is an internal engine error. */
 											ret = COMMON_ERROR_INTERNAL_ERROR;
 											COMMON_LOG_WARNING("FileUtills_ResolvePath(): ");
-											COMMON_LOG_WARNING(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+											COMMON_LOG_WARNING(Common_Get_Error_Message(retFromCall));
 											COMMON_LOG_WARNING(" Call to FileUtills_IsFileOrDirectory() failed with the given path ( ");
 											COMMON_LOG_WARNING(path);
 											COMMON_LOG_WARNING(" ) Please report this bug.\n");
@@ -1584,6 +1587,7 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 										else
 										{
 											/* This is any other error. */
+											ret = COMMON_ERROR_INTERNAL_ERROR;
 											COMMON_LOG_DEBUG("FileUtills_ResolvePath(): Unable to resolve the given path ( ");
 											COMMON_LOG_DEBUG(path);
 											COMMON_LOG_DEBUG(" ) Unable to determine final path type.\n");
@@ -1646,8 +1650,7 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 	{
 		if (outputStr != NULL)
 		{
-			free(outputStr);
-			outputStr = NULL;
+			DataProcess_Deallocate_CString(&outputStr);
 		}
 	}
 
