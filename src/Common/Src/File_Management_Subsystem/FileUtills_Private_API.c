@@ -1013,3 +1013,30 @@ int FileUtills_RemoveLastPathSegment(char ** path, size_t * pathSize)
 	/* Call FileUtills_RemoveLastPathSegmentAtPosition() and return it's result. */
 	return (FileUtills_RemoveLastPathSegmentAtPosition(path, pathSize, &fakeCurrentPathPos));
 }
+
+int FileUtills_IsFileOrDirectory_Helper(const char * absPath, const size_t absPathSize)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of this function. */
+
+	/* Call syscall function. */
+	ret = FileUtills_IsFileOrDirectory_Syscall(absPath, absPathSize);
+
+	/* Check return. */
+	switch (ret)
+	{
+		/* VALID ERROR CODES: */
+		case FILEUTILLS_ERROR_PATH_IS_A_FILE:
+		case FILEUTILLS_ERROR_PATH_IS_A_DIRECTORY:
+		case FILEUTILLS_ERROR_PATH_IS_A_SYMLINK:
+		case COMMON_ERROR_SUCCESS:
+			break;
+		default:	/* Called function returned an invalid error code. */
+			ret = COMMON_ERROR_UNKNOWN_ERROR;
+			COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectoryHelper(): Called FileUtills_IsFileOrDirectory_Syscall() function returned an invalid error code, and needs to be rewritten to conform to the error code definitions. Please report this bug.");
+			break;
+	};
+
+	/* Return the result. */
+	return ret;
+}

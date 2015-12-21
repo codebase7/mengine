@@ -380,6 +380,38 @@ int FileUtills_RemoveLastPathSegmentAtPosition(char ** path, size_t * pathSize, 
 */
 int FileUtills_RemoveLastPathSegment(char ** path, size_t * pathSize);
 
+/*!
+ * 	int FileUtills_IsFileOrDirectory_Helper(const char * absPath, const size_t absPathSize)
+ *
+ * 	Helper function that calls FileUtills_IsFileOrDirectory_Syscall() for
+ * 	determining whether or not a given path is a file or
+ * 	directory on a filesystem.
+ *
+ * 	This is used internally by other FileUtills functions to
+ * 	prevent calling FileUtills_ResolvePath() multiple times.
+ *
+ * 	WARNING: This function expects that the given path has
+ * 	already been resolved by FileUtills_ResolvePath().
+ * 	If the path needs to be resolved (if you are unsure then
+ * 	it does) use the public API version of this function,
+ * 	which will resolve the path.
+ *
+ * 	Returns FILEUTILLS_ERROR_PATH_IS_A_FILE if the given absPath is a file
+ * 	in the filesystem.
+ *
+ * 	Returns FILEUTILLS_PATH_IS_A_DIRECTORY if the given absPath is a
+ * 	directory on the file system.
+ *
+ * 	Returns FILEUTILLS_ERROR_PATH_IS_A_SYMLINK if the given absPath is a
+ * 	symbolic link in the file system.
+ *
+ * 	Returns COMMON_ERROR_SUCCESS if the given absPath is a valid (but unrecognised)
+ * 	entry in the filesystem.
+ *
+ * 	Otherwise the appropriate error is returned to the caller.
+ */
+int FileUtills_IsFileOrDirectory_Helper(const char * absPath, const size_t absPathSize);
+
 #ifdef __cplusplus
 } /* End of extern C. */
 #endif	/* __cplusplus */
