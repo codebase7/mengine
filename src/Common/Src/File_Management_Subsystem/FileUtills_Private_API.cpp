@@ -145,7 +145,7 @@ int FileUtills::RemoveLastPathSegment(std::string & path, size_t * currentPathPo
 	pathSize = path.size();
 
 	/* Copy the string to a C-style string. */
-	retFromCall = FileUtills::CopyStdStringToCString(path, &tempPath);
+	retFromCall = DataProcess::CopyStdStringToCString(path, &tempPath);
 	if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempPath != NULL))
 	{
 		/* Call C function. */
@@ -153,11 +153,11 @@ int FileUtills::RemoveLastPathSegment(std::string & path, size_t * currentPathPo
 		if ((ret == COMMON_ERROR_SUCCESS) && (tempPath != NULL) && (pathSize > 0))
 		{
 			/* OK, copy the result path to the path var. */
-			retFromCall = FileUtills::CopyCStringToStdString(tempPath, &pathSize, &resultStr);
+			retFromCall = DataProcess::CopyCStringToStdString(tempPath, &pathSize, &resultStr);
 			if (retFromCall != NULL)
 			{
 				/* Deallocate the C style string. */
-				FileUtills_Deallocate_CString(&tempPath);
+				DataProcess_Deallocate_CString(&tempPath);
 
 				/* Copy the resultStr to the path variable. */
 				path = resultStr;
