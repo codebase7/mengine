@@ -23,14 +23,24 @@
 #include "FileUtills_Private_API.h"
 #include "FileUtills_Private_API_Windows_Syscall.h"
 
-int FileUtills::ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize)
+size_t FileUtills_Get_Max_Symlink_Depth_Syscall()
+{
+	/* Windows supports a maximum of 31 reparse points (and therefore symbolic links).
+		See also: https://msdn.microsoft.com/en-us/library/windows/desktop/aa365460%28v=vs.85%29.aspx
+
+		For some reason there does not appear to be a system constant for it....
+	*/
+	return (MSYS_MAX_SYMLINK_DEPTH);
+}
+
+int FileUtills_ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
 
 	/* Make sure we got a valid path. */
 	if ((path != NULL) && ((*path) != NULL) && (pathSize != NULL) && ((*pathSize) > 0))
-	{ 
+	{
 		
 	}
 	else

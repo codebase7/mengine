@@ -27,6 +27,12 @@
 #define FILEUTILLS_USER_DOCUMENTS_ID CSIDL_PERSONAL
 #define FILEUTILLS_APPDATA_ID CSIDL_LOCAL_APPDATA
 
+/* Define MSYS_MAX_SYMLINK_DEPTH.
+	MSDN Says the max depth is 31.
+	https://msdn.microsoft.com/en-us/library/windows/desktop/aa365460%28v=vs.85%29.aspx
+*/
+#define MSYS_MAX_SYMLINK_DEPTH 31
+
 #endif	/* FILEUTILLS_PRIVATE_API_WINDOWS_SYSCALL_H */
 
 /* End of FileUtills_Private_API_Windows_Syscall.h. */
