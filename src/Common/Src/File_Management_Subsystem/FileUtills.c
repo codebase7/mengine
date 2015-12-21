@@ -1221,7 +1221,7 @@ int FileUtills_GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize)
 	if (tempStr != NULL)
 	{
 		/* Call Syscall deallocator. */
-		FileUtills_Deallocate_String_Syscall(&tempStr);
+		FileUtills_Deallocate_CString_Syscall(&tempStr);
 	}
 	if ((ret != COMMON_ERROR_SUCCESS) && (outputStr != NULL))
 	{
@@ -1291,7 +1291,7 @@ int FileUtills_GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSiz
 	if (tempStr != NULL)
 	{
 		/* Call Syscall deallocator. */
-		FileUtills_Deallocate_String_Syscall(&tempStr);
+		FileUtills_Deallocate_CString_Syscall(&tempStr);
 	}
 	if ((ret != COMMON_ERROR_SUCCESS) && (outputStr != NULL))
 	{
@@ -1361,7 +1361,7 @@ int FileUtills_GetExecDirectory(char ** retStr, size_t * retStrSize)
 	if (tempStr != NULL)
 	{
 		/* Call Syscall deallocator. */
-		FileUtills_Deallocate_String_Syscall(&tempStr);
+		FileUtills_Deallocate_CString_Syscall(&tempStr);
 	}
 	if ((ret != COMMON_ERROR_SUCCESS) && (outputStr != NULL))
 	{
