@@ -67,6 +67,21 @@ typedef struct MSYS_FileUtills_dirList_PRIV {
 /* Define C functions. */
 
 /*!
+ *		void FileUtills_Deallocate_CString_Syscall(char ** str)
+ *
+ *		Deallocates C strings made by FileUtills Syscall functions, and sets the given pointer to NULL.
+ *		Once the object is deallocated, it should not be dereferenced again.
+ *
+ *		If given a string NOT created by a FileUtills Syscall function, the behaviour and result of this
+ *		function is undefined.
+ *
+ *		If given an invalid (NULL) pointer this function will silently fail.
+ *
+ *		This function has no return.
+ */
+void FileUtills_Deallocate_CString_Syscall(char ** str);
+
+/*!
 	int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV_T ** obj)
 
 	Creates a MSYS_FileUtills_dirList_PRIV_T data structure, and set's obj to point to it.
