@@ -368,6 +368,18 @@ int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize);
  */
 int FileUtills_RemoveLastPathSegmentAtPosition(char ** path, size_t * pathSize, size_t * currentPathPos);
 
+/*!
+	int FileUtills_RemoveLastPathSegment(char ** path, size_t * pathSize)
+
+	This function is a shortcut wrapper around FileUtills_RemoveLastPathSegmentAtPosition() with the assumption that
+	the path segment to remove is at the end of the string. (End of the string is determined by the given pathSize.)
+	As such, this function is equivalent to calling FileUtills_RemoveLastPathSegmentAtPosition() with a currentPathPos
+	value of 0.
+
+	See FileUtills_RemoveLastPathSegmentAtPosition()'s documentation for the usage and error code documentation.
+*/
+int FileUtills_RemoveLastPathSegment(char ** path, size_t * pathSize);
+
 #ifdef __cplusplus
 } /* End of extern C. */
 #endif	/* __cplusplus */

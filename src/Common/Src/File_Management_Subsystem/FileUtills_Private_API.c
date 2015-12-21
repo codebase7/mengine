@@ -1004,3 +1004,12 @@ int FileUtills_RemoveLastPathSegmentAtPosition(char ** path, size_t * pathSize, 
 	/* Return the result. */
 	return ret;
 }
+
+int FileUtills_RemoveLastPathSegment(char ** path, size_t * pathSize)
+{
+	/* Init vars. */
+	size_t fakeCurrentPathPos = 0;	/* Fake variable to satisfy FileUtills_RemoveLastPathSegmentAtPosition()'s arugment list. */
+
+	/* Call FileUtills_RemoveLastPathSegmentAtPosition() and return it's result. */
+	return (FileUtills_RemoveLastPathSegmentAtPosition(path, pathSize, &fakeCurrentPathPos));
+}
