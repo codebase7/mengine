@@ -684,33 +684,6 @@ int FileUtills::DoesExist_Helper(const std::string & absPath)
 	return ret;
 }
 
-int FileUtills::IsFileOrDirectory_Helper(const char * absPath, const size_t absPathSize)
-{
-	// Init vars.
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;	// The result of this function.
-
-	// Call syscall function.
-	ret = IsFileOrDirectory_Syscall(absPath, absPathSize);
-
-	// Check return.
-	switch (ret)
-	{
-		// VALID ERROR CODES:
-		FILEUTILLS_ERROR_PATH_IS_A_FILE:
-		FILEUTILLS_ERROR_PATH_IS_A_DIRECTORY:
-		FILEUTILLS_ERROR_PATH_IS_A_SIMLINK:
-		COMMON_ERROR_SUCCESS:
-			break;
-		default:	// Called function returned an invalid error code.
-			ret = COMMON_ERROR_UNKNOWN_ERROR;
-			COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectoryHelper(): Called IsFileOrDirectory_Syscall() function returned an invalid error code, and needs to be rewritten to conform to the error code definitions.");
-			break;
-	};
-
-	// Return the result.
-	return ret;
-}
-
 int FileUtills::DeletePath_Helper(const std::string & absPath, const bool & recursive)
 {
 	// Init vars.

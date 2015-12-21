@@ -590,38 +590,6 @@ int DoesExist_Helper(const std::string & absPath);
 int DoesExist_Syscall(const std::string & absPath);
 
 /*!
- * 	int FileUtills::IsFileOrDirectory_Helper(const char * absPath, const size_t absPathSize)
- *
- * 	Helper function that calls FileUtills::IsFileOrDirectory_Syscall() for
- * 	determining whether or not a given path is a file or
- * 	directory on a filesystem.
- *
- * 	This is used internally by other FileUtills functions to
- * 	prevent calling FileUtills::ResolvePath() multiple times.
- *
- * 	WARNING: This function expects that the given path has
- * 	already been resolved by FileUtills::ResolvePath().
- * 	If the path needs to be resolved (if you are unsure then
- * 	it does) use the public API version of this function,
- * 	which will resolve the path.
- *
- * 	Returns FILEUTILLS_ERROR_PATH_IS_A_FILE if the given absPath is a file
- * 	in the filesystem.
- *
- * 	Returns FILEUTILLS_PATH_IS_A_DIRECTORY if the given absPath is a
- * 	directory on the file system.
- *
- * 	Returns FILEUTILLS_ERROR_PATH_IS_A_SYMLINK if the given absPath is a
- * 	symbolic link in the file system.
- *
- * 	Returns COMMON_ERROR_SUCCESS if the given absPath is a valid (but unrecognised)
- * 	entry in the filesystem.
- *
- * 	Otherwise the appropriate error is returned to the caller.
- */
-int IsFileOrDirectory_Helper(const char * absPath, const size_t absPathSize);
-
-/*!
  * 	int FileUtills::IsFileOrDirectory_Syscall(const std::string & absPath)
  *
  * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY OUTSIDE OF THE
