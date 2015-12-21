@@ -23,6 +23,37 @@
 #include "FileStreams.h"
 #include "../../Common/Src/Error_Handler/Common_Error_Handler_Error_Codes.h"
 
+int DataProcess::CopyCStringToStdString(const char * source, const size_t & sourceLength, std::string & dest)
+{
+	/* Init result. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
+	std::string tempStr = "";						/* Temporary string used to copy data. */
+
+	/* Check for valid data. */
+	if ((source != NULL) && (sourceLength > 0))
+	{
+		/* Begin loop to copy data. */
+		for (size_t x = 0; (x < sourceLength); x++)
+		{
+			tempStr += source[x];
+		}
+
+		/* Copy the tempStr to dest. */
+		dest = tempStr;
+
+		/* Success. */
+		ret = COMMON_ERROR_SUCCESS;
+	}
+	else
+	{
+		/* Invalid argument. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
 {
 	/* Call C function. */

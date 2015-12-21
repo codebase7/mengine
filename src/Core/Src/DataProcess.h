@@ -500,6 +500,31 @@ class Data_Object{
 };
 
 /*!
+	int DataProcess::CopyCStringToStdString(const char * source, const size_t & sourceLength, std::string & dest)
+
+	This function takes a given C style string and copies it to a std::string by copying the amount of bytes given by
+	sourceLength.
+	The resulting string if this function succeeds will be the same length as the given sourceLength.
+
+	NOTE: This function will NOT deallocate a pre-existing string, but it WILL OVERWRITE IT.
+	(So if you need to use or deallocate it later, make sure to copy the string before calling
+	 this function.)
+
+	WARNING: This function will copy the given amount of bytes (as defined by sourceLength) from the given source pointer.
+	If the source string's buffer is NOT at least sourceLength bytes long, then the result of this function is UNDEFINED.
+	(Depending on the system, a memory access violation may occur, or the function may copy data from beyond the end of
+	 the source string's buffer, but neither of these behaviours can be guaranteed by this function. It is up to the caller
+	 to ensure that the given amount of bytes to copy is within the given source string's allocated memory buffer.)
+
+	Returns COMMON_ERROR_SUCCESS if the function succeeds. (Result string will be stored in dest.)
+	Returns COMMON_ERROR_INVALID_ARGUMENT if the given source string pointer is NULL, or the given length is less than or equal to zero.
+
+	No alteration clause:
+		In case of error, this function will not alter any given argument.
+*/
+MSYS_DLL_EXPORT int CopyCStringToStdString(const char * source, const size_t & sourceLength, std::string & dest);
+
+/*!
 	size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
 
 	A wrapper around the DataProcess_Trivial_Random_Number_Generator() C function. (For compatibility.)
