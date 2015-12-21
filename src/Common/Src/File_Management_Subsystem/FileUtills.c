@@ -1415,7 +1415,7 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 				if ((pathSize == outputStrSize) && (ret == COMMON_ERROR_UNKNOWN_ERROR))
 				{
 					/* Begin resolution loop. */
-					for (numOfResolveAttempts = 0; ((retFromCall == FILEUTILLS_ERROR_PATH_IS_A_SYMLINK) && (numOfResolveAttempts < (FileUtills_Get_Max_Symlink_Depth()))); numOfResolveAttempts++)
+					for (numOfResolveAttempts = 0; ((retFromCall == FILEUTILLS_ERROR_PATH_IS_A_SYMLINK) && (numOfResolveAttempts < (FileUtills_Get_Max_Symlink_Depth_Syscall()))); numOfResolveAttempts++)
 					{
 						/* Resolve the given path. */
 						retFromCall = FileUtills_ResolvePath_Helper(&outputStr, &outputStrSize);
@@ -1620,7 +1620,7 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 					}
 
 					/* Check and see if the loop exited because we hit the resolution attempt limit. */
-					if (numOfResolveAttempts >= FileUtills_Get_Max_Symlink_Depth())
+					if (numOfResolveAttempts >= FileUtills_Get_Max_Symlink_Depth_Syscall())
 					{
 						/* Resolve attempt limit reached. */
 						ret = FILEUTILLS_ERROR_SYMLINK_CHAIN_TOO_DEEP;
