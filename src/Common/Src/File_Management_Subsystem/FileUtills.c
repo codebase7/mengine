@@ -1442,110 +1442,114 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 										/* Check and see if we are resolving symbolic links. */
 										if (!disableSymLinkResolution)
 										{
+											/* Copy the pointers. */
+											tempLinkBuf = outputStr;
+											tempLinkBufSize = outputStrSize;
+
 											/* OK, Resolve the symbolic link. */
-											retFromCall = FileUtills_ResolveSystemSymoblicLink_Syscall(outputStr, outputStrSize, &tempLinkBuf, &tempLinkBufSize);
-											if (retFromCall == COMMON_ERROR_SUCCESS)
+											retFromCall = FileUtills_ResolveSystemSymoblicLink_Syscall(&tempLinkBuf, &tempLinkBufSize);
+											if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempLinkBuf != NULL) && (tempLinkBufSize > 0))
 											{
-												/* Check for success without result. */
-												if ((tempLinkBuf != NULL) && (tempLinkBufSize > 0))
+												/* OK, we need to determine if the resolved symbolic link is a relative path or an absolute path. */
+												retFromCall = FileUtills_IsAbsolutePathReference(tempLinkBuf, tempLinkBufSize);
+
+												/* Check for relative path. (We don't need to do anything with an absolute path.) */
+												if (retFromCall == FILEUTILLS_ERROR_PATH_IS_RELATIVE)
 												{
-													/* OK, we need to determine if the resolved symbolic link is a relative path or an absolute path. */
-													retFromCall = FileUtills_IsAbsolutePathReference(tempLinkBuf, tempLinkBufSize);
-
-													/* Check for absolute path result. */
-													if (retFromCall == FILEUTILLS_ERROR_PATH_IS_ABSOLUTE)
+													/* Remove the symlink from the outputStr. */
+													retFromCall = FileUtills_RemoveLastPathSegment(&tempLinkBuf, &tempLinkBufSize);
+													if (retFromCall == COMMON_ERROR_SUCCESS)
 													{
-														/* Replace the result with the absolute path. */
-														free(outputStr);
-														outputStr = tempLinkBuf;
-														outputStrSize = tempLinkBufSize;
-													}
-													else
-													{
-														/* Check for relative path. */
-														if (retFromCall == FILEUTILLS_ERROR_PATH_IS_RELATIVE)
+														/* Reallocate the buffer to store the relative path. */
+														retFromCall = DataProcess_Reallocate_C_String(&outputStr, outputStrSize, (outputStrSize + tempLinkBufSize));
+														if ((retFromCall == COMMON_ERROR_SUCCESS) && (outputStr != NULL))
 														{
-															/* Remove the symlink from the outputStr. */
-															retFromCall = FileUtills_RemoveLastPathSegment(&outputStr, &outputStrSize);
-															if (retFromCall == COMMON_ERROR_SUCCESS)
-															{
-																/* Reallocate the buffer to store the relative path. */
-																retFromCall = DataProcess_Reallocate_C_String(&outputStr, outputStrSize, (outputStrSize + tempLinkBufSize));
-																if ((retFromCall == COMMON_ERROR_SUCCESS) && (outputStr != NULL))
-																{
-																	/* Reset retFromCall. */
-																	retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+															/* Reset retFromCall. */
+															retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-																	/* Append the relative path to the result. */
-																	for (x = outputStrSize; ((x < (outputStrSize + tempLinkBufSize)) && (ret == COMMON_ERROR_UNKNOWN_ERROR)); x++)
-																	{
-																		/* Check for NULL. */
-																		if ((tempLinkBuf[x] == '\0') && ((x + 1) != (outputStrSize + tempLinkBufSize)))
-																		{
-																			/* Alright, the tempLinkBuf should NOT have a NULL character in the middle of the buffer. */
-																			ret = COMMON_ERROR_INTERNAL_ERROR;
-																			COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-																			COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-																			COMMON_LOG_DEBUG(" invalid NULL character found in the middle of a resolved symbolic link's buffer.");
-																		}
-																		else
-																		{
-																			/* Copy the data. */
-																			outputStr[x] = tempLinkBuf[x];
-																		}
-																	}
+															/* Append the relative path to the result. */
+															for (x = outputStrSize; ((x < (outputStrSize + tempLinkBufSize)) && (ret == COMMON_ERROR_UNKNOWN_ERROR)); x++)
+															{
+																/* Check for NULL. */
+																if ((tempLinkBuf[x] == '\0') && ((x + 1) != (outputStrSize + tempLinkBufSize)))
+																{
+																	/* Alright, the tempLinkBuf should NOT have a NULL character in the middle of the buffer. */
+																	ret = COMMON_ERROR_INTERNAL_ERROR;
+																	COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
+																	COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+																	COMMON_LOG_DEBUG(" invalid NULL character found in the middle of a resolved symbolic link's buffer.");
 																}
 																else
 																{
-																	/* An error occured while reallocating the buffer. */
-																	if (retFromCall == COMMON_ERROR_MEMORY_ERROR)
-																	{
-																		/* Unable to allocate memory for buffer reallocation. */
-																		ret = COMMON_ERROR_MEMORY_ERROR;
-																		COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-																		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
-																		COMMON_LOG_DEBUG(" out of usable memory. Cannot reallocate buffer for addition of relative path.");
-																	}
-																	else
-																	{
-																		/* All other errors. */
-																		ret = COMMON_ERROR_INTERNAL_ERROR;
-																		COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-																		COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-																		COMMON_LOG_DEBUG(" unable to reallocate output buffer for addition of relative path. Please report this bug.");
-																	}
+																	/* Copy the data. */
+																	outputStr[x] = tempLinkBuf[x];
 																}
-															}
-															else
-															{
-																/* Unable to remove the last path segment. */
-																ret = COMMON_ERROR_INTERNAL_ERROR;
-																COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-																COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-																COMMON_LOG_DEBUG(" Call to path segment removal function failed. Please report this bug.");
 															}
 														}
 														else
 														{
-															/* This is any other error. */
-															ret = COMMON_ERROR_INTERNAL_ERROR;
-															COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-															COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-															COMMON_LOG_DEBUG(" Unable to resolve the given path ( ");
-															COMMON_LOG_DEBUG(path);
-															COMMON_LOG_DEBUG(" ) Unable to determine the type of the symbolic link.");
+															/* An error occured while reallocating the buffer. */
+															if (retFromCall == COMMON_ERROR_MEMORY_ERROR)
+															{
+																/* Unable to allocate memory for buffer reallocation. */
+																ret = COMMON_ERROR_MEMORY_ERROR;
+																COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
+																COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+																COMMON_LOG_DEBUG(" out of usable memory. Cannot reallocate buffer for addition of relative path.");
+															}
+															else
+															{
+																/* All other errors. */
+																ret = COMMON_ERROR_INTERNAL_ERROR;
+																COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
+																COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+																COMMON_LOG_DEBUG(" unable to reallocate output buffer for addition of relative path. Please report this bug.");
+															}
 														}
+													}
+													else
+													{
+														/* Unable to remove the last path segment. */
+														ret = COMMON_ERROR_INTERNAL_ERROR;
+														COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
+														COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+														COMMON_LOG_DEBUG(" Call to path segment removal function failed. Please report this bug.");
 													}
 												}
 												else
 												{
-													/* Success without result. */
-													ret = COMMON_ERROR_INTERNAL_ERROR;
-
-													/* Log the error. */
-													COMMON_LOG_WARNING("FileUtills_ResolvePath(): ");
-													COMMON_LOG_WARNING(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-													COMMON_LOG_WARNING(" Call to system symbolic link resolution function indicated success but did not give a result. Please report this bug.");
+													/* Check and see if the path is absolute. */
+													if (ret == FILEUTILLS_ERROR_PATH_IS_ABSOLUTE)
+													{
+														/* Copy the absolute path to the output path. */
+														retFromCall = DataProcess_Reallocate_C_String(&outputStr, 0, tempLinkBufSize);
+														if ((retFromCall == COMMON_ERROR_SUCCESS) && (outputStr != NULL))
+														{
+															/* Copy the string. */
+															for (x = 0; (x < tempLinkBufSize); x++)
+															{
+																outputStr[x] = tempLinkBuf[x];
+															}
+														}
+														else
+														{
+															/* Could not reallocate memory for outputStr. */
+															ret = COMMON_ERROR_MEMORY_ERROR;
+															COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
+															COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+															COMMON_LOG_DEBUG(" Call to DataProcess_Reallocate_C_String() failed while attempting to copy resolved absolute path system symbolic link.");
+														}
+													}
+													else
+													{
+														/* This is any other error. */
+														ret = COMMON_ERROR_INTERNAL_ERROR;
+														COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
+														COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+														COMMON_LOG_DEBUG(" Unable to resolve the given path ( ");
+														COMMON_LOG_DEBUG(path);
+														COMMON_LOG_DEBUG(" ) Unable to determine the type of the symbolic link.");
+													}
 												}
 											}
 											else
@@ -1570,6 +1574,13 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 													COMMON_LOG_DEBUG(" ) Unable to resolve system defined symbolic link.");
 												}
 											}
+
+											/* Deallocate the resolved symlink string if needed. */
+											if (tempLinkBuf != NULL)
+											{
+												FileUtills_Deallocate_CString_Syscall(&tempLinkBuf);
+											}
+											tempLinkBufSize = 0;
 										}
 										break;
 									default:
