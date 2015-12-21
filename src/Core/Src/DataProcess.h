@@ -525,6 +525,28 @@ class Data_Object{
 MSYS_DLL_EXPORT int CopyCStringToStdString(const char * source, const size_t & sourceLength, std::string & dest);
 
 /*!
+	int DataProcess::CopyStdStringToCString(const std::string & source, char ** dest)
+
+	This function takes a given std::string and copies it to a C style string.
+	The resulting string if this function succeeds will be the same length as the source string.
+
+	NOTE: This function will NOT deallocate a pre-existing pointer, but it WILL OVERWRITE IT.
+	(So if you need to use or deallocate it later, make sure to copy the pointer before calling
+	 this function.)
+
+	When the result string of this function is no longer needed, it should be deallocated by calling
+	DataProcess_Deallocate_CString().
+
+	Returns COMMON_ERROR_SUCCESS if the function succeeds. (Result string will be pointed to by dest.)
+	Returns COMMON_ERROR_INVALID_ARGUMENT if the given source string is empty, or it's data could not be accessed.
+	Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+
+	No alteration clause:
+		In case of error, this function will not alter any given argument.
+*/
+MSYS_DLL_EXPORT int CopyStdStringToCString(const std::string & source, char ** dest);
+
+/*!
 	size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
 
 	A wrapper around the DataProcess_Trivial_Random_Number_Generator() C function. (For compatibility.)
