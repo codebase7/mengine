@@ -192,32 +192,13 @@ int FileUtills::RemoveLastPathSegment(std::string & path, size_t * currentPathPo
 	return ret;
 }
 
-int FileUtills::RemoveLastPathSegment(char ** path, size_t * pathSize)
+int FileUtills::RemoveLastPathSegment(std::string & path)
 {
-	// Init ret.
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;	// The result of this function.
-	size_t currentPathPos = 0;		// A fake variable to satisfy the Real FileUtills_RemoveLastPathSegment() function.
+	/* Init vars. */
+	size_t fakeCurrentPathPos = 0;	/* Fake variable to satisfy FileUtills_RemoveLastPathSegmentAtPosition()'s arugment list. */
 
-	// Check for valid pathSize.
-	if (((*pathSize) != NULL) && ((*pathSize) > 0))
-	{
-		// currentPathPos must be within the path. (I.e. it can't be at the NULL terminator.)
-		currentPathPos = ((*pathSize) - 1);
-
-		// Call the real FileUtills_RemoveLastPathSegment() function.
-		ret = FileUtills::RemoveLastPathSegment(path, pathSize, &currentPathPos));
-	}
-	else
-	{
-		// Invalid pathSize.
-		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegment(): ");
-		COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-		COMMON_LOG_VERBOSE(" No valid path given.");
-	}
-
-	// Call the real RemoveLastPathSegment() function.
-	return ret;
+	/* Call FileUtills::RemoveLastPathSegment() and return it's result. */
+	return (FileUtills::RemoveLastPathSegment(path, &fakeCurrentPathPos));
 }
 
 FileUtills::dirlist * FileUtills::getDirectory_Helper(const std::string & absPath, const bool & cleanList)
