@@ -1470,7 +1470,7 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 															if (retFromCall == COMMON_ERROR_SUCCESS)
 															{
 																/* Reallocate the buffer to store the relative path. */
-																retFromCall = FileUtills_Reallocate_CString_Buffer(&outputStr, outputStrSize, (outputStrSize + tempLinkBufSize));
+																retFromCall = DataProcess_Reallocate_C_String(&outputStr, outputStrSize, (outputStrSize + tempLinkBufSize));
 																if ((retFromCall == COMMON_ERROR_SUCCESS) && (outputStr != NULL))
 																{
 																	/* Reset retFromCall. */
