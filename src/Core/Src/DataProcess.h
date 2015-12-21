@@ -37,6 +37,9 @@
 extern "C" {
 #endif	/* __cplusplus */
 
+/* Include DLL_PORT.h */
+#include "../../DLL_PORT.h"
+
 /* External includes. */
 #include <stddef.h>
 #include <stdlib.h>
@@ -61,7 +64,7 @@ extern "C" {
 	If the current system time cannot be used to set the random seed, then this function will consistantly return zero (0)
 	regardless of the range defined by min_value and max_value.
 */
-size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand);
+MSYS_DLL_EXPORT size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand);
 
 /*!
  *		int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength)
@@ -92,7 +95,7 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
  *
  *		In case of error, the given arguments will NOT be altered.
  */
-int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength);
+MSYS_DLL_EXPORT int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength);
 
 /*!
  *		int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength)
@@ -108,7 +111,7 @@ int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const s
  *
  *		In case of error, the given arguments will NOT be altered.
  */
-int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength);
+MSYS_DLL_EXPORT int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size_t strLength, size_t * newLength);
 
 /*!
  *		void DataProcess_Deallocate_CString(char ** str)
@@ -122,7 +125,7 @@ int DataProcess_Reallocate_C_String_With_NULL_Terminator(char ** str, const size
  *
  *		This function has no return.
  */
-void DataProcess_Deallocate_CString(char ** str);
+MSYS_DLL_EXPORT void DataProcess_Deallocate_CString(char ** str);
 
 /*!
  *		int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength)
@@ -143,7 +146,7 @@ void DataProcess_Deallocate_CString(char ** str);
  *		No alteration clause:
  *		In case of error, this function will not alter any given argument.
  */
-int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength);
+MSYS_DLL_EXPORT int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength);
 
 /*!
  *		int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t srcLength, const char * delim, const size_t delimLength,
@@ -196,8 +199,8 @@ int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * s
  *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
  *		 are considered errors.)
  */
-int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t srcLength, const char * delim, const size_t delimLength,
-												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData);
+MSYS_DLL_EXPORT int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t srcLength, const char * delim, const size_t delimLength,
+																char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData);
 
 /*!
  *		int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLength, const size_t offset,
@@ -260,8 +263,8 @@ int DataProcess_Get_SubString_Using_Delimiter(const char * src, const size_t src
  *		(For the purposes of this no-alteration clause, the error codes COMMON_ERROR_RANGE_ERROR and COMMON_ERROR_END_OF_DATA
  *		 are considered errors.)
  */
-int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLength, const size_t offset,
-												char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData);
+MSYS_DLL_EXPORT int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLength, const size_t offset,
+															char ** subStr, size_t * subStrLength, const int searchFromEnd, const int getPriorData);
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	/* __cplusplus */
