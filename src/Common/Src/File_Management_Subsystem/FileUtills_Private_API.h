@@ -451,6 +451,123 @@ int FileUtills_IsFileOrDirectory_Helper(const char * absPath, const size_t absPa
  */
 int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absPathSize);
 
+/*!
+ * 	int FileUtills_GetUserProfileDirectoryPath_Syscall(char ** retStr, size_t * retStrSize)
+ *
+ * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY.
+ *	THIS FUNCTION EXPECTS ANY AND ALL OTHER
+ * 	SAFETY CHECKS HAVE PASSED BEFORE IT IS CALLED.
+ *
+ * 	Helper function that calls the host's syscall for
+ * 	getting the user profile directory's location on
+ * 	the filesystem for the current user.
+ *
+ * 	This function is required to translate any error that
+ * 	may be returned by the syscall into a Common namespace
+ * 	error code.
+ *
+ * 	This function is permitted to perform any necessary allocations or
+ * 	modifications needed by the host's syscall to perform the task, however
+ * 	these modifications and or allocations must be undone prior to the
+ * 	function's return. In addition this function must catch any thrown
+ * 	exception created by itself or the host's syscall. (In that instance
+ * 	COMMON_ERROR_EXCEPTION_THROWN must be returned, regardless of result.)
+ */
+int FileUtills_GetUserProfileDirectoryPath_Syscall(char ** retStr, size_t * retStrSize);
+
+/*!
+ * 	int FileUtills_GetCurrentWorkingDirectoryPath_Syscall(char ** retStr, size_t * retStrSize)
+ *
+ * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY.
+ *	THIS FUNCTION EXPECTS ANY AND ALL OTHER
+ * 	SAFETY CHECKS HAVE PASSED BEFORE IT IS CALLED.
+ *
+ * 	Helper function that calls the host's syscall for
+ * 	getting the current working directory's location on
+ * 	the filesystem.
+ *
+ * 	This function is required to translate any error that
+ * 	may be returned by the syscall into a Common namespace
+ * 	error code.
+ *
+ * 	This function is permitted to perform any necessary allocations or
+ * 	modifications needed by the host's syscall to perform the task, however
+ * 	these modifications and or allocations must be undone prior to the
+ * 	function's return. In addition this function must catch any thrown
+ * 	exception created by itself or the host's syscall. (In that instance
+ * 	COMMON_ERROR_EXCEPTION_THROWN must be returned, regardless of result.)
+ */
+int FileUtills_GetCurrentWorkingDirectoryPath_Syscall(char ** retStr, size_t * retStrSize);
+
+/*!
+ * 	int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
+ *
+ * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY.
+ *	THIS FUNCTION EXPECTS ANY AND ALL OTHER
+ * 	SAFETY CHECKS HAVE PASSED BEFORE IT IS CALLED.
+ *
+ * 	Helper function that calls the host's syscall for
+ * 	getting the main executable's location on the filesystem.
+ *
+ * 	This function is required to translate any error that
+ * 	may be returned by the syscall into a Common namespace
+ * 	error code.
+ *
+ * 	This function is permitted to perform any necessary allocations or
+ * 	modifications needed by the host's syscall to perform the task, however
+ * 	these modifications and or allocations must be undone prior to the
+ * 	function's return. In addition this function must catch any thrown
+ * 	exception created by itself or the host's syscall. (In that instance
+ * 	COMMON_ERROR_EXCEPTION_THROWN must be returned, regardless of result.)
+ */
+int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize);
+
+/*!
+ * 	int FileUtills_ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize)
+ *
+ * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY.
+ *	THIS FUNCTION EXPECTS ANY AND ALL OTHER
+ * 	SAFETY CHECKS HAVE PASSED BEFORE IT IS CALLED.
+ *
+ * 	Helper function that calls the host's syscall(s) to resolve a given symbolic link.
+ * 	(Note: This only works if the given symbolic link is in the format that the host system
+ * 	expects / supports.)
+ *
+ * 	WARNING: This function verifies that the given path is a symbolic link using the host system's syscalls
+ * 	for doing so. Depending on your views / requirements of secure programming, this function may not be
+ * 	considered safe to call from certain contexts.
+ *
+ * 	All public FileUtills functions will wind up calling this function (directly or indirectly), as a side
+ * 	effect of FileUtills_ResolvePath() encountering a symbolic link during path resolution. (Unless the
+ * 	called public FileUtills function had it's disableSymLinkResolution boolean argument set to true
+ * 	explicitly.)
+ *
+ * 	Returns COMMON_ERROR_SUCCESS if successful. (path will have it's contents reset and the resolved
+ * 	path stored in it. pathSize will be reset and have the correct size in it for the resolved path.
+ * 	Note: No deallocation is performed on either pointer, so if you need to keep the existing pointer
+ * 	you should copy it elsewhere before calling this function.)
+ *
+ * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given path argument is empty, or if the given path string is
+ * 	not a symbolic link as defined by the host system.
+ *
+ * 	Returns all other errors where appropriate.
+ *
+ * 	This function is required to translate any error that
+ * 	may be returned by the syscall into a Common namespace
+ * 	error code.
+ *
+ * 	This function is permitted to perform any necessary allocations or
+ * 	modifications needed by the host's syscall to perform the task, however
+ * 	these modifications and or allocations must be undone prior to the
+ * 	function's return. In addition this function must catch any thrown
+ * 	exception created by itself or the host's syscall. (In that instance
+ * 	COMMON_ERROR_EXCEPTION_THROWN must be returned, regardless of result.)
+ *
+ *	No alteration clause:
+ *		In the event of an error, this function will not modifiy the arguments given to it.
+ */
+int FileUtills_ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize);
+
 #ifdef __cplusplus
 } /* End of extern C. */
 #endif	/* __cplusplus */
