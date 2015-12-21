@@ -590,33 +590,6 @@ int DoesExist_Helper(const std::string & absPath);
 int DoesExist_Syscall(const std::string & absPath);
 
 /*!
- * 	int FileUtills::IsFileOrDirectory_Syscall(const std::string & absPath)
- *
- * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY OUTSIDE OF THE
- * 	FILEUTILLS NAMESPACE. THIS FUNCTION EXPECTS ANY AND ALL OTHER
- * 	SAFETY CHECKS HAVE PASSED BEFORE IT IS CALLED.
- *
- * 	Helper function that calls the host's syscall for
- * 	determining whether or not a given path is a file or 
- * 	directory on a filesystem.
- *
- * 	This function is required to translate any error that
- * 	may be returned by the syscall into a Common namespace
- * 	error code.
- *
- * 	The result of this function is stored in Common::commonLastErrorCode
- * 	in addition to being returned.
- *
- * 	This function is permitted to perform any nessacarry allocations or
- * 	modifications needed by the host's syscall to perform the task, however
- * 	these modifications and or allocations must be undone prior to the
- * 	function's return. In addition this function must catch any thrown
- * 	exception created by itself or the host's syscall. (In that instance
- * 	COMMON_ERROR_EXCEPTION_THROWN must be returned, regardless of result.)
- */
-int IsFileOrDirectory_Syscall(const std::string & absPath);
-
-/*!
  * 	int FileUtills::DeletePath_Helper(const std::string & absPath, const bool & recursive)
  *
  * 	Helper function that calls FileUtills::DeletePath_Syscall() for

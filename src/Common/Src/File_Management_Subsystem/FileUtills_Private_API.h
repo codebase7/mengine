@@ -412,6 +412,30 @@ int FileUtills_RemoveLastPathSegment(char ** path, size_t * pathSize);
  */
 int FileUtills_IsFileOrDirectory_Helper(const char * absPath, const size_t absPathSize);
 
+/*!
+ * 	int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absPathSize)
+ *
+ * 	WARNING: NEVER CALL THIS FUNCTION DIRECTLY.
+ *	THIS FUNCTION EXPECTS ANY AND ALL OTHER
+ * 	SAFETY CHECKS HAVE PASSED BEFORE IT IS CALLED.
+ *
+ * 	Helper function that calls the host's syscall for
+ * 	determining whether or not a given path is a file or
+ * 	directory on a filesystem.
+ *
+ * 	This function is required to translate any error that
+ * 	may be returned by the syscall into a Common namespace
+ * 	error code.
+ *
+ * 	This function is permitted to perform any necessary allocations or
+ * 	modifications needed by the host's syscall to perform the task, however
+ * 	these modifications and or allocations must be undone prior to the
+ * 	function's return. In addition this function must catch any thrown
+ * 	exception created by itself or the host's syscall. (In that instance
+ * 	COMMON_ERROR_EXCEPTION_THROWN must be returned, regardless of result.)
+ */
+int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absPathSize);
+
 #ifdef __cplusplus
 } /* End of extern C. */
 #endif	/* __cplusplus */
