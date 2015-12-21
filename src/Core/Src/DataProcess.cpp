@@ -21,6 +21,7 @@
 /* Internal includes. */
 #include "DataProcess.h"
 #include "FileStreams.h"
+#include "../../Common/Src/Error_Handler/Common_Error_Handler_Error_Codes.h"
 
 size_t DataProcess::Trivial_Random_Number_Generator(const size_t & min_value, const size_t & max_value, const bool & reset_rand)
 {
