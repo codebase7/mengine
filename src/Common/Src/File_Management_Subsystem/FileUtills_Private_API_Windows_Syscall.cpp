@@ -33,6 +33,85 @@ size_t FileUtills_Get_Max_Symlink_Depth_Syscall()
 	return (MSYS_MAX_SYMLINK_DEPTH);
 }
 
+/*!
+	int FileUtills_Windows_Syscall_Copy_C_String(const char * source, const size_t sourceLength, char ** dest)
+
+	Internal function for coping a const string for later modification.
+	(Copied string if the function succeeds will be pointed to by dest, copied string is always
+	 the same length as it's source.)
+
+	Note: This function will overwrite dest without deallocating it. If you need whatever
+	dest points to after this function returns, copy the pointer elsewhere before calling
+	this function.
+
+	When this string is no longer needed it should be deallocated by
+	FileUtills_Windows_Syscall_Deallocate_CString(), BEFORE returning to the helper
+	or public engine function.
+
+	Returns COMMON_ERROR_SUCCESS if successful.
+	Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is NULL, or if sourceLength <= 0.
+	Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+
+	No alteration clause:
+		In the event of an error, this function will not modifiy the arguments given to it.
+*/
+int FileUtills_Windows_Syscall_Copy_C_String(const char * source, const size_t sourceLength, char ** dest)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of other engine functions. */
+	size_t x = 0;									/* Loop counter. */
+	char * tempDest = NULL;							/* Temporary pointer used to copy the source string. */
+
+	/* Check for valid arguments. */
+	if ((source != NULL) && (sourceLength > 0) && (dest != NULL))
+	{
+		/* Allocate memory for the copy. */
+		retFromCall = DataProcess_Reallocate_C_String(&tempDest, 0, sourceLength);
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempDest != NULL))
+		{
+			/* Copy the string. */
+			for (x = 0; (x < sourceLength); x++)
+			{
+				tempDest[x] = source[x];
+			}
+
+			/* Copy the pointer. */
+			(*dest) = tempDest;
+
+			/* Done. */
+			ret = COMMON_ERROR_SUCCESS;
+		}
+		else
+		{
+			/* Could not allocate memory for tempDest. */
+			ret = COMMON_ERROR_MEMORY_ERROR;
+			COMMON_LOG_DEBUG("FileUtills_Windows_Syscall_Copy_C_String(): ");
+			COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+		COMMON_LOG_DEBUG("FileUtills_Windows_Syscall_Copy_C_String(): ");
+		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+	}
+
+	/* Check for no success. */
+	if (ret != COMMON_ERROR_SUCCESS)
+	{
+		/* Deallocate tempDest if needed. */
+		if (tempDest != NULL)
+		{
+			DataProcess_Deallocate_CString(&tempDest);
+		}
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 int FileUtills_ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize)
 {
 	/* Init vars. */
