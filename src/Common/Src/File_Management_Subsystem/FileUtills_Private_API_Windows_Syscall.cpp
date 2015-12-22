@@ -42,6 +42,15 @@ void FileUtills_Windows_Syscall_Deallocate_CString(char ** obj)
 	return;
 }
 
+void FileUtils_Deallocate_CString_Syscall(char ** obj)
+{
+	/* Call the real syscall function. */
+	FileUtills_Windows_Syscall_Deallocate_CString(obj);
+
+	/* Exit function. */
+	return;
+}
+
 /*!
 	int FileUtills_Windows_Syscall_Copy_C_String(const char * source, const size_t sourceLength, char ** dest)
 
