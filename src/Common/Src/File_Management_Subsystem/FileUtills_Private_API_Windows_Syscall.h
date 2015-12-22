@@ -33,6 +33,9 @@
 */
 #define MSYS_MAX_SYMLINK_DEPTH 31
 
+/* Define extended length prefix for filesystem calls to use Unicode mode. */
+#define MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX "\\?\"
+
 #endif	/* FILEUTILLS_PRIVATE_API_WINDOWS_SYSCALL_H */
 
 /* End of FileUtills_Private_API_Windows_Syscall.h. */
