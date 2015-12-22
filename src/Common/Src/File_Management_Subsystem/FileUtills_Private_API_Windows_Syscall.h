@@ -36,6 +36,10 @@
 /* Define extended length prefix for filesystem calls to use Unicode mode. */
 #define MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX "\\?\"
 
+/* Define the crap for the devil's loop in FileUtills_GetExecDirectory_Syscall(). */
+#define MSYS_MAX_GET_EXE_PATH_REALLOC 4
+#define MSYS_MAX_GET_EXE_PATH_REALLOC_BASE_SIZE 1000
+
 #endif	/* FILEUTILLS_PRIVATE_API_WINDOWS_SYSCALL_H */
 
 /* End of FileUtills_Private_API_Windows_Syscall.h. */
