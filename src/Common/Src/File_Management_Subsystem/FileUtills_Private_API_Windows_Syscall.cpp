@@ -276,61 +276,258 @@ int FileUtills::GetCurrentWorkingDirectoryPath_Syscall(std::string & path)
 	return ret;
 }
 
-int FileUtills::GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
+int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
 {
-	// Init vars.
-	int ret = COMMON_ERROR_UNKNOWN_ERROR;	// The result code returned from this function.
-	char * result = NULL;			// The string returned from this function.
-	size_t resultSize = 0;			// The size of the result string.
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code returned from this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code returned from other engine functions. */
+	LPTSTR readLinkBuf = NULL;						/* The buffer used to get the string from the host. */
+	LPTSTR checkBuffer = NULL;						/* The buffer used to check the result of calling GetModuleFileName() with it's previous result. */
+	DWORD realBufferLength = 0;						/* The current length used to allocate the buffers. */
+	DWORD firstBufferLength = 0;					/* The result length for readLinkBuf returned from GetModuleFileName(). */
+	DWORD secondBufferLength = 0;					/* The result length for checkBuffer returned from GetModuleFileName(). */
 
-	// Check for valid arguments.
+	/* Check for valid arguments. */
 	if ((retStr != NULL) && (retStrSize != NULL))
 	{
-
-		// Copy the pointer.
-		result = PROC_PATH;
-		resultSize = PROC_PATH_SIZE;
-
-		// Call FileUtills::ResolveSystemSymoblicLink_Syscall(). (Make sure it's the real path not a symlink. (PROC_PATH is a symlink, and a weird one at that.))
-		ret = FileUtills::ResolveSystemSymoblicLink_Syscall(&result, &resultSize);
-		if (ret == COMMON_ERROR_SUCCESS)
+		/*
+		 * 	OK, run the hard limited implemetation.
+		 * 	(Copied from the original FileUtills::GetExecDirectory_Syscall() implemetation for POSIX.)
+		 *
+		 * 	We do this to avoid a runaway reallocation loop which could be considered a resource starvation
+		 * 	issue. (See below for the original rant, just replace the symlink talk with "using GetModuleFileName()",
+		 *	"readlink()" with "GetModuleFileName()", "linux" with "windows", "/proc/self/exe" with "<where ever your exe is>",
+		 *	"the glibc manual" with "MSDN", and delete the second issue.
+		 *
+		 *	Apperently Brain Dead Coders is an epidemic.......
+		 *
+		 * 	(Begin original rant.)
+		 *
+		 * 	Short version:
+		 * 	This is a cluster<explisitive>.
+		 *
+		 * 	Long version:
+		 * 	The only reliable (guarrenteed to work) method for getting the executable
+		 * 	path in linux, is by using readlink() on /proc/self/exe.
+		 *
+		 * 	However, this has several issues.
+		 *
+		 * 	First issue: readlink() expects a preallocated buffer to store the result.
+		 * 	If the preallocated buffer is too small for the full path, then readlink()
+		 * 	will silently truncate the remaining data and not tell us how much was
+		 * 	left over.
+		 *
+		 * 	Second issue: The proc filesystem misbehaves and does not fill in the
+		 * 	st_size field of the stat structure. So as a result we can't easilly
+		 * 	tell how much memory to allocate for our buffer.
+		 *
+		 * 	Third issue: Because some filesystems allow paths of unlimited size,
+		 * 	(i.e. the only restriction is having the space to store the path),
+		 * 	we can't use PATH_MAX (as it's possibly wrong), and we can't set a
+		 * 	limit on our memory allocation.
+		 *
+		 * 	Because of these issues, the glibc MANUAL actually gives an indefinite
+		 * 	loop of memory allocation->readlink()->if(!got entire link)->Deallocate memory->Allocate memory.
+		 * 	for reading a symlink from the filesystem.
+		 *
+		 * 	This loop is reimplimented here, but with three differences.
+		 *
+		 * 		- The loop will end once a certian amount of reallocations (defined by MAX_GET_EXE_PATH_REALLOC)
+		 * 		  is reached. (This is to prevent some of the above issues.)
+		 *
+		 * 		- The loop will also check to make sure that the returned string has not been altered.
+		 * 		  (via memcmp). (Attempt to prevent a compromised system from mallissously changing the
+		 * 		   symlink's destionation as a result of our multiple accesses to the link itself.)
+		 *
+		 * 		- The loop will reallocate the buffer after the link is fully read so that ONLY the
+		 * 		  needed memory to store it is allocated for it. (Prevent unnessacarry memory usage.)
+		 *
+		 * 	(End of original rant.)
+		 */
+		/* Begin the devil's loop. */
+		for (size_t x = 0; ((x < MSYS_MAX_GET_EXE_PATH_REALLOC) &&
+					((readLinkBuf == NULL) && (checkBuffer == NULL)) &&
+					(ret == COMMON_ERROR_UNKNOWN_ERROR)); x++)
 		{
-			// The resulting path is actually the exe itself, so we need to call RemoveLastPathSegment().
-			ret = FileUtills::RemoveLastPathSegment(&result, &resultSize);
-			if (ret == COMMON_ERROR_SUCCESS)
+			/* Recalculate bufferLength. */
+			realBufferLength = (MSYS_MAX_GET_EXE_PATH_REALLOC_BASE_SIZE * (x + 1));
+
+			/* Allocate the memory. */
+			retFromCall = DataProcess_Reallocate_C_String(((char**)&readLinkBuf), 0, realBufferLength);
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (readLinkBuf != NULL))
 			{
-				// Copy the result string to retStr.
-				(*retStr) = result;
-				(*retStrSize) = resultSize;
+				retFromCall = DataProcess_Reallocate_C_String(((char**)&checkBuffer), 0, realBufferLength);
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (checkBuffer != NULL))
+				{
+					/* Make sure it was allocated. */
+					if ((readLinkBuf != NULL) && (checkBuffer != NULL))
+					{
+						/* Blank out the allocated memory. */
+						memset(readLinkBuf, '\0', realBufferLength);
+						memset(checkBuffer, '\0', realBufferLength);
+
+						/* Call GetModuleFileName() for the first buffer. */
+						firstBufferLength = GetModuleFileName(NULL, readLinkBuf, realBufferLength);
+
+						/* Check bufferLength. */
+						if (firstBufferLength >= 0)
+						{
+							/* Check to see if we got the entire path. */
+							if (firstBufferLength < realBufferLength)
+							{
+								/* Call GetModuleFileName() for the second buffer. */
+								secondBufferLength = GetModuleFileName(NULL, checkBuffer, realBufferLength);
+
+								/* Check secondBufferLength. */
+								if (secondBufferLength >= 0)
+								{
+									/* Check to see if we got the entire path. */
+									if (secondBufferLength == firstBufferLength)
+									{
+										/* Call memcmp(). */
+										if (memcmp(readLinkBuf, checkBuffer, realBufferLength) == 0)
+										{
+											/* Paths match, deallocate the second buffer. */
+											if (checkBuffer != NULL)
+											{
+												memset(checkBuffer, '\0', realBufferLength);
+												DataProcess_Deallocate_CString(&checkBuffer);
+											}
+
+											/* Reallocate the buffer. (Free unneeded memory.) */
+											retFromCall = FileUtills_Reallocate_CString_Buffer(readLinkBuf, realBufferLength, firstBufferLength);
+											if (retFromCall == COMMON_ERROR_SUCCESS)
+											{
+												/* Copy the first buffer pointer to the path buffer pointer. */
+												(*retStr) = readLinkBuf;
+
+												/* Copy the length of the buffer. */
+												(*retStrSize) = firstBufferLength;
+
+												/* Done. */
+												ret = COMMON_ERROR_SUCCESS;
+											}
+											else
+											{
+												/* Could not free the unneeded memory. */
+												ret = COMMON_ERROR_MEMORY_ERROR;
+												COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): Call to FileUtills_Reallocate_CString_Buffer() failed: ");
+												COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+											}
+										}
+										else
+										{
+											/* Something is screwing with us...abort. */
+											ret = COMMON_ERROR_INTERNAL_ERROR;
+											COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
+											COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+										}
+									}
+									else
+									{
+										/* Something is screwing with us...abort. */
+										ret = COMMON_ERROR_INTERNAL_ERROR;
+										COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
+										COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+									}
+								}
+								else
+								{
+									/* Error. */
+									errcpy = GetLastError();
+									ret = Common_Error_Handler_Translate_Windows_Error_Code(errcpy);
+									COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): GetModuleFileName() system call returned: ");
+									COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
+								}
+							}
+							else
+							{
+								/* We did not get the entire link, so we need to deallocate it for the next loop. */
+								if (readLinkBuf != NULL)
+								{
+									memset(readLinkBuf, '\0', realBufferLength);
+									DataProcess_Deallocate_CString(&readLinkBuf);
+								}
+								if (checkBuffer != NULL)
+								{
+									memset(checkBuffer, '\0', realBufferLength);
+									DataProcess_Deallocate_CString(&checkBuffer);
+								}
+							}
+						}
+						else
+						{
+							/* Error. */
+							errcpy = GetLastError();
+							ret = Common_Error_Handler_Translate_Windows_Error_Code(errcpy);
+							COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): GetModuleFileName() system call returned: ");
+							COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
+						}
+					}
+				}
+				else
+				{
+					/* Could not allocate memory for check buffer. */
+					ret = COMMON_ERROR_MEMORY_ERROR;
+					COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
+					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+					COMMON_LOG_DEBUG(" Could not allocate memory for check buffer.");
+				}
 			}
 			else
 			{
-				// Could not remove exe from path.
-				COMMON_LOG_DEBUG("FileUtills_GetExecDirectory_Syscall(): Could not remove exe from it's path, call to FileUtills_RemoveLastPathSegment() failed: ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
+				/* Could not allocate memory for path buffer. */
+				ret = COMMON_ERROR_MEMORY_ERROR;
+				COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
+				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+				COMMON_LOG_DEBUG(" Could not allocate memory for path buffer.");
 			}
 		}
-		else
-		{
-			// This is an internal engine error.
-			ret = COMMON_ERROR_INTERNAL_ERROR;
 
-			// Report it.
-			COMMON_LOG_WARNING("FileUtills_GetExecDirectory(): ");
-			COMMON_LOG_WARNING(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-			COMMON_LOG_WARNING(" Getting the executable path failed. (Call to an internal engine function failed.) Please report this bug.");
+		/*
+			* 	If we reach here, and ret == COMMON_ERROR_UNKNOWN_ERROR,
+			* 	then we have failed. (Most likely we ran out of reallocation attempts...)
+			*/
+		if (ret == COMMON_ERROR_UNKNOWN_ERROR)
+		{
+			/*
+			 * Set COMMON_INTERNAL_ERROR.
+			 *
+			 * (The system most likely can fetch the link,
+			 *  but we need to limit the reallocation attempts
+			 *  to prevent issues. So it's not appropriate to use
+			 *  FILEUTILLS_PATH_LENGTH_INVALID.)
+			 */
+			ret = COMMON_ERROR_INTERNAL_ERROR;
+			COMMON_LOG_INFO("FileUtills_GetExecDirectory(): ");
+			COMMON_LOG_INFO(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+			COMMON_LOG_INFO(" Unable to resolve the symbolic link due to engine limitation. (Length of the resolved path is too long.)");
 		}
-#endif
+
+		/* If unsuccessful, make sure both buffers are deallocated. */
+		if (ret != COMMON_ERROR_SUCCESS)
+		{
+			if (readLinkBuf != NULL)
+			{
+				memset(readLinkBuf, '\0', realBufferLength);
+				DataProcess_Deallocate_CString(&readLinkBuf);
+			}
+			if (checkBuffer != NULL)
+			{
+				memset(checkBuffer, '\0', realBufferLength);
+				DataProcess_Deallocate_CString(&checkBuffer);
+			}
+		}
 	}
 	else
 	{
-		// Invalid arguments.
+		/* Invalid arguments. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 		COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
 		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 	}
 
-	// Return result.
+	/* Return result. */
 	return ret;
 }
 
