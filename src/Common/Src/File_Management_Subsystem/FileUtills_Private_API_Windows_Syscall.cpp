@@ -716,7 +716,7 @@ int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absP
 	}
 
 	/* Deallocate temporary string memory. */
-	FileUtils_Deallocate_CString_Syscall(&tempAbsPath);
+	FileUtills_Windows_Syscall_Deallocate_CString(&tempAbsPath);
 
 	/* Return the result. */
 	return ret;
