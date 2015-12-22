@@ -33,6 +33,15 @@ size_t FileUtills_Get_Max_Symlink_Depth_Syscall()
 	return (MSYS_MAX_SYMLINK_DEPTH);
 }
 
+void FileUtills_Windows_Syscall_Deallocate_CString(char ** obj)
+{
+	/* Deallocate the pointer. */
+	DataProcess_Deallocate_CString(obj);
+
+	/* Exit function. */
+	return;
+}
+
 /*!
 	int FileUtills_Windows_Syscall_Copy_C_String(const char * source, const size_t sourceLength, char ** dest)
 
