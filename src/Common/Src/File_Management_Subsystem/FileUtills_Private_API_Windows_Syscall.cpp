@@ -389,126 +389,158 @@ int FileUtills::DoesExist_Syscall(const std::string & absPath)
 	return ret;
 }
 
-int FileUtills::IsFileOrDirectory_Syscall(const char * absPath, const size_t absPathSize)
+int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absPathSize)
 {
-	// Init vars.
-	int ret = COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED;	// Result of this function. (Defaults to function not implemented.)
+	/* Init vars. */
+	int ret = COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED;	/* Result of this function. (Defaults to function not implemented.) */
+	char * tempAbsPath = NULL;							/* Temporary variable used to prepend the needed syntax for unicode use. */
+	size_t tempAbsPathLength = 0;						/* Length of the tempAbsPath string. */
+	DWORD retGFA = 0;									/* The result of the call to GetFileAttributes(). */
+	LPWIN32_FIND_DATA fdLP = NULL;						/* Pointer to a LPWIN32_FIND_DATA structure. Used when checking for symlinks. */
+	HANDLE retFFF = NULL;								/* The handle from FindFirstFile(). */
 
-	// Check for invalid absPath.
+	/* Check for invalid absPath. */
 	if ((absPath != NULL) && (absPathSize() > 0))
 	{
-		
-	struct stat * buf = NULL;				// Linux stat structure, used with syscall.
-
-	// Check for invalid absPath.
-	if ((absPath != NULL) && (absPathSize() > 0))
-	{
-		// Init stat buffer.
-		buf = new struct stat;
-		if (buf != NULL)
+		/* Copy the absPath pointer and length. */
+		retFromCall = FileUtills_Windows_Syscall_Copy_C_String(absPath, absPathSize, tempAbsPath);
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempAbsPath != NULL))
 		{
-			// Ask the OS to stat() the path.
-			ret = lstat(absPath, buf);
+			/* Set tempAbsPathLength. */
+			tempAbsPathLength = absPathSize;
 
-			// Check the result.
-			if (ret == 0)
+			/* Convert string to have needed prepended tag. */
+			retFromCall = FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(&tempAbsPath, &tempAbsPathLength);
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempAbsPath != NULL) && (tempAbsPathLength > 0))
 			{
-				// Log result.
-				COMMON_LOG_VERBOSE("FileUtills::IsFileOrDirectory(): The given path ( ");
-				COMMON_LOG_VERBOSE(absPath);
-
-				// Check the stat structure.
-				if (S_ISREG((buf->st_mode)))
+				/* Call GetFileAttributes(). */
+				retGFA = GetFileAttributes(tempAbsPath);
+				if (retGFA != INVALID_FILE_ATTRIBUTES)
 				{
-					// Path is a regular file.
-					ret = FILEUTILLS_ERROR_PATH_IS_A_FILE;
-
-					// Log result.
-					COMMON_LOG_VERBOSE(" ) is a regular file.");
-				}
-				else
-				{
-					if (S_ISDIR((buf->st_mode)))
+					/* Check for directory. */
+					if (retGFA | FILE_ATTRIBUTE_DIRECTORY)
 					{
-						// Path is a directory.
 						ret = FILEUTILLS_ERROR_PATH_IS_A_DIRECTORY;
-
-						// Log result.
-						COMMON_LOG_VERBOSE(" ) is a directory.");
 					}
 					else
 					{
-						// Check for a symlink.
-						if (S_ISLNK((buf->st_mode)))
-						{
-							// Symlink.
-							ret = FILEUTILLS_ERROR_PATH_IS_A_SYMLINK;
+						/* Check for a file.
 
-							// Log result.
-							COMMON_LOG_VERBOSE(" ) is a symbolic link.");
+							Note: Windows does not provide a "this is a file" attribute,
+							so we have to check for all other entry types, to determine if
+							the given filesystem entry is a file.
+						*/
+						if (retGFA | FILE_ATTRIBUTE_DEVICE)
+						{
+							/* This is a device handle!
+								The engine does not support
+								accessing raw devices, so return
+								COMMON_ERROR_SUCCESS.
+							*/
+							ret = COMMON_ERROR_SUCCESS;
 						}
 						else
 						{
-							// Special file.
-							ret = COMMON_ERROR_SUCCESS;
-
-							// Log result.
-							COMMON_LOG_VERBOSE(" ) is a special file.");
+							/* It's a file. */
+							ret = FILEUTILLS_ERROR_PATH_IS_A_FILE;
 						}
 					}
+
+					/* Check for reparse point. */
+					if (retGFA | FILE_ATTRIBUTE_REPARSE_POINT)
+					{
+						/* Get the entry's LPWIN32_FIND_DATA structure. */
+						retFFF = FindFirstFile(tempAbsPath, fdLP);
+						if ((retFFF != INVALID_HANDLE_VALUE) && (retFFF != ERROR_FILE_NOT_FOUND) && (fdLP != NULL))
+						{
+							/* Check for symlink. */
+							if ((fdLP->dwReserved0) | IO_REPARSE_TAG_SYMLINK)
+							{
+								ret = FILEUTILLS_ERROR_PATH_IS_A_SYMLINK;
+							}
+						}
+						else
+						{
+							/* Call failed get error info. */
+							retGFA = GetLastError();
+
+							/* Translate the error code. */
+							retFromCall = Common_Error_Handler_Translate_Windows_Error_Code(retGFA);
+							ret = retFromCall;
+
+							/* Log the error. */
+							COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
+							COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+						}
+					}
+				}
+				else
+				{
+					/* Call failed get error info. */
+					retGFA = GetLastError();
+
+					/* Translate the error code. */
+					retFromCall = Common_Error_Handler_Translate_Windows_Error_Code(retGFA);
+					ret = retFromCall;
+
+					/* Log the error. */
+					COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
+					COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
 				}
 			}
 			else
 			{
-				// Error, translate it and log it.
-				errcpy = errno;
-				ret = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
-
-				// Check for non-existance.
-				if (ret == FILEUTILLS_ERROR_NON_EXISTANT)
+				/* Check for memory error. */
+				if (retFromCall == COMMON_ERROR_MEMORY_ERROR)
 				{
-					COMMON_LOG_VERBOSE("FileUtills::IsFileOrDirectory(): The given path ( ");
-					COMMON_LOG_VERBOSE(absPath);
-					COMMON_LOG_VERBOSE(" ) or a componet of it does not exist.");
+					ret = COMMON_ERROR_MEMORY_ERROR;
 				}
 				else
 				{
-					COMMON_LOG_DEBUG("FileUtills::IsFileOrDirectory(): ");
-					COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-					COMMON_LOG_DEBUG(" Was returned while checking path ( ");
-					COMMON_LOG_DEBUG(absPath);
-					COMMON_LOG_DEBUG(" ).");
+					/* Could not prepend the extended length prefix to the given path. */
+					ret = COMMON_ERROR_INTERNAL_ERROR;
+					COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Could not prepend extended length prefix to path.");
 				}
 			}
-
-			// Delete stat buffer.
-			delete buf;
-			buf = NULL;
 		}
 		else
 		{
-			// Coul not allocate stat structure.
+			/* Could not copy path string to temp buffer. */
 			ret = COMMON_ERROR_MEMORY_ERROR;
-
-			// Log the error if needed.
-			COMMON_LOG_DEBUG("FileUtills::IsFileOrDirectory(): ");
-			COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
+			COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): ");
+			COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+			COMMON_LOG_DEBUG(" Could not copy path string to temp buffer.");
 		}
-	}
-	#endif	// POSIX_COMMON_H
 	}
 	else
 	{
-		// Invalid absPath.
+		/* Invalid absPath. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
-		// Log the error.
-		COMMON_LOG_DEBUG("FileUtills::IsFileOrDirectory(): ");
-		COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
+		/* Log the error. */
+		COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): ");
+		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 		COMMON_LOG_DEBUG(" Given path is invalid.");
 	}
 
-	// Return the result.
+	/* Check for open handle and close it if needed. */
+	if (fdLP != NULL)
+	{
+		if (FindClose(fdLP))
+		{
+			fdLP = NULL;
+		}
+		else
+		{
+			/* Could not release LPWIN32_FIND_DATA structure. */
+			COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Could not release LPWIN32_FIND_DATA structure.");
+		}
+	}
+
+	/* Deallocate temporary string memory. */
+	FileUtils_Deallocate_CString_Syscall(&tempAbsPath);
+
+	/* Return the result. */
 	return ret;
 }
 
