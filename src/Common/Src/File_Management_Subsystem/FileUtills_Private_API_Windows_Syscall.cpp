@@ -112,6 +112,96 @@ int FileUtills_Windows_Syscall_Copy_C_String(const char * source, const size_t s
 	return ret;
 }
 
+/*!
+	int FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(char ** path, size_t * pathSize)
+
+	Modifies the given string to prepend MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX
+	to the given path. (This allows the windows syscalls to use paths beyond MAX_PATH in length.)
+	The resulting string pointer will overwrite the original path pointer, and pathSize will be updated
+	to reflect the length of the resulting string.
+
+	The length of the resulting string should always be:
+	((*pathSize) + sizeof(MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX)).
+
+	Note: This function will overwrite path and pathSize without deallocating them. If you need whatever
+	they point to after this function returns, copy them elsewhere before calling
+	this function.
+
+	When this string is no longer needed it should be deallocated by
+	FileUtills_Windows_Syscall_Deallocate_CString(), BEFORE returning to the helper
+	or public engine function.
+
+	Returns COMMON_ERROR_SUCCESS if successful.
+	Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is NULL, or if pathSize <= 0.
+	Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+
+	No alteration clause:
+		In the event of an error, this function will not modifiy the arguments given to it.
+*/
+int FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(char ** path, size_t * pathSize)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result code of other engine functions. */
+	size_t x = 0;									/* Loop counter. */
+	char * tempPath = NULL;							/* Temporary variable used to prepend MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX to the path. */
+
+	/* Check for valid data. */
+	if ((path != NULL) && ((*path) != NULL) && (pathSize != NULL) && ((*pathSize) > 0))
+	{
+		/* Allocate memory for a new string. */
+		retFromCall = DataProcess_Reallocate_CString(&tempPath, 0, ((*pathSize) + sizeof(MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX)));
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempPath != NULL))
+		{
+			/* Add the MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX. */
+			for (x = 0; (x < sizeof(MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX)); x++)
+			{
+				tempPath[x] = MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX[x];
+			}
+
+			/* Copy the original string. */
+			for (x = 0; (x < (*pathSize)); x++)
+			{
+				tempPath[x] = ((*path)[x]);
+			}
+
+			/* Copy the new pointer and size. */
+			(*path) = tempPath;
+			(*pathSize) = ((*pathSize) + sizeof(MSYS_FILEUTILLS_WINDOWS_SYSCALL_EXTENDED_LENGTH_PREFIX));
+
+			/* Done. */
+			ret = COMMON_ERROR_SUCCESS;
+		}
+		else
+		{
+			/* Could not allocate memory for tempPath. */
+			ret = COMMON_ERROR_MEMORY_ERROR;
+			COMMON_LOG_DEBUG("FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(): ");
+			COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+		}
+	}
+	else
+	{
+		/* Invalid argument. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+		COMMON_LOG_DEBUG("FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(): ");
+		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+	}
+
+	/* Check for no success. */
+	if (ret != COMMON_ERROR_SUCCESS)
+	{
+		/* Deallocate tempPath if needed. */
+		if (tempPath != NULL)
+		{
+			DataProcess_Deallocate_CString(&tempPath);
+		}
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 int FileUtills_ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize)
 {
 	/* Init vars. */
