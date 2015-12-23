@@ -267,10 +267,145 @@ int FileUtills::GetUserProfileDirectoryPath_Syscall(char ** path, size_t * pathL
 	return ret;
 }
 
-int FileUtills::GetCurrentWorkingDirectoryPath_Syscall(std::string & path)
+int FileUtills_GetCurrentWorkingDirectoryPath_Syscall(char ** path, size_t * pathLength)
 {
 	/* Init vars. */
-	int ret = COMMON_ERROR_FUNCTION_NOT_IMPLEMENTED;	/* The result of this function. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of other engine functions. */
+	size_t tempPathLength = 0;						/* The length of the tempPath string. */
+	DWORD retGCD = 0;								/* The result of GetCurrentDirectory(). */
+	char * tempPath = NULL;							/* Temporary variable for fetching the path from the host. */
+
+	/* Check for invalid arguments. */
+	if ((path != NULL) && (pathLength != NULL))
+	{
+		/* Set tempPathLength. */
+		tempPathLength = MSYS_MAX_GET_EXE_PATH_REALLOC_BASE_SIZE;
+
+		/* Allocate memory for the path. */
+		retFromCall = DataProcess_Reallocate_C_String(&tempPath, 0, tempPathLength);
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempPath != NULL))
+		{
+			/* Get the path. */
+			retGCD = GetCurrentDirectory(tempPathLength, tempPath);
+			if (retGCD > tempPathLength)
+			{
+				/* The buffer is not big enough retGCD contains the needed size, in characters. */
+				tempPathLength = retGCD;
+
+				/* The buffer is not big enough so reallocate it. */
+				retFromCall = DataProcess_Reallocate_C_String(&tempPath, 0, tempPathLength);
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempPath != NULL))
+				{
+					/* Get the path. */
+					retGCD = GetCurrentDirectory(tempPathLength, tempPath);
+					if (retGCD > tempPathLength)
+					{
+						/* Host has changed the current directory since the last call, so abort. */
+						ret = COMMON_ERROR_RACE_CONDITION;
+						COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+						COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_RACE_CONDITION));
+						COMMON_LOG_DEBUG(" Host has changed the current working directory while attempting to get it's path.");
+					}
+					else
+					{
+						if (retGCD == 0)
+						{
+							/* Call to GetCurrentDirectory() failed, get the error code. */
+							retGCD = GetLastError();
+
+							/* Translate the error code. */
+							retFromCall = Common_Error_Handler_Translate_Windows_Error_Code(retGFA);
+							ret = retFromCall;
+
+							/* Log the error. */
+							COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
+							COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+						}
+						else
+						{
+							/* Copy the pointer and length. */
+							(*path) = tempPath;
+							(*pathLength) = tempPathLength;
+
+							/* Success. */
+							ret = COMMON_ERROR_SUCCESS;
+						}
+					}
+				}
+				else
+				{
+					/* Could not allocate memory for path string. */
+					ret = COMMON_ERROR_MEMORY_ERROR;
+					COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+					COMMON_LOG_DEBUG(" Could not allocate memory for path string.");
+				}
+			}
+			else
+			{
+				if (retGCD == 0)
+				{
+					/* Call to GetCurrentDirectory() failed, get the error code. */
+					retGCD = GetLastError();
+
+					/* Translate the error code. */
+					retFromCall = Common_Error_Handler_Translate_Windows_Error_Code(retGFA);
+					ret = retFromCall;
+
+					/* Log the error. */
+					COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
+					COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+				}
+				else
+				{
+					/* Reallocate the buffer to reduce memory consumption. */
+					retFromCall = DataProcess_Reallocate_C_String_With_NULL_Terminator(&tempPath, tempPathLength, retGCD);
+					if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempPath != NULL))
+					{
+						/* Copy the pointer and length. */
+						(*path) = tempPath;
+						(*pathLength) = tempPathLength;
+
+						/* Success. */
+						ret = COMMON_ERROR_SUCCESS;
+					}
+					else
+					{
+						/* Could not allocate memory for path string. */
+						ret = COMMON_ERROR_MEMORY_ERROR;
+						COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+						COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+						COMMON_LOG_DEBUG(" Could not allocate memory for path string.");
+					}
+				}
+			}
+		}
+		else
+		{
+			/* Could not allocate memory for path string. */
+			ret = COMMON_ERROR_MEMORY_ERROR;
+			COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+			COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+			COMMON_LOG_DEBUG(" Could not allocate memory for path string.");
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+		COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+	}
+
+	/* If unsuccessful, make sure the buffer is deallocated. */
+	if (ret != COMMON_ERROR_SUCCESS)
+	{
+		if (tempPath != NULL)
+		{
+			DataProcess_Deallocate_CString(&tempPath);
+		}
+	}
 
 	/* Return the result. */
 	return ret;
