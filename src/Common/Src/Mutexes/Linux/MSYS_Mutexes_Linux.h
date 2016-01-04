@@ -35,6 +35,16 @@
 extern "C" {
 #endif	/* __cplusplus */
 
+/* Check which C standard is supported by the compiler. */
+#if __STDC_VERSION__ < 199901L
+#error "BAD BOOL!"
+/* We need to include our fake stdbool.h header file. */
+#include "../../../../stdbool.h"
+#else
+/* Use the compiler's version of stdbool.h. */
+#include <stdbool.h>
+#endif  /* __STDC_VERSION__ < 199901L */
+
 /* Define the invalid thread ID to use. */
 #define MSYS_INVALID_TID 0
 
