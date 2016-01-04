@@ -21,6 +21,11 @@
 /* Internal includes. */
 #include "Byte_Order.h"
 
+/* We need to include limits.h for UCHAR_MAX. (MSVC includes it automaticly with the above headers.) */
+#ifdef __GNUC__
+#include <limits.h>
+#endif  /* __GNUC__ */
+
 /* Check for C++ compiler. */
 #ifdef __cplusplus
 extern "C" {
