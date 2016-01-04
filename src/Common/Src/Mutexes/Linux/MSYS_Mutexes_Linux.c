@@ -19,7 +19,7 @@
 */
 
 /* Internal includes. */
-#include "MSYS_Mutexes.h"
+#include "../MSYS_Mutexes.h"
 
 /* Define extern C */
 #ifdef __cplusplus
