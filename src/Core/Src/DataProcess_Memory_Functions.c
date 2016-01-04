@@ -146,4 +146,4 @@ void DataProcess_Deallocate_CString(char ** str)
 
 #ifdef __cplusplus
 }	/* End of extern "C". */
-#endif	__cplusplus
+#endif	/* __cplusplus */
