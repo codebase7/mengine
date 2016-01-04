@@ -26,14 +26,19 @@
 extern "C" {
 #endif	/* __cplusplus */
 
+/* Because we need to issue syscall(), we need to include the needed headers. */
+#define _GNU_SOURCE
+#include <unistd.h>
+#include <sys/syscall.h>
+
 /* Define the needed function calls. */
 long MSYS_Get_Thread_ID()
 {
 	/* Init vars. */
 	long ret = 0;		/* The result of this function. */
-
+/* NOTE: This call really needs to return a generic value (Probably a struct....) that contains the correct value. (Along with an ID to identify the source library...) That's going to require changing the API though. */
 	/* Call the system call gettid(2). (NOT pthread_self(3), that cannot be converted to a long in ANY reasonable manner. Hence the linux host preprocessor check as gettid(2) is linux specific.) */
-	ret = gettid();
+	ret = syscall(SYS_gettid);
 
 	/* Check for success. */
 	if (ret == 0)
