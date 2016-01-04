@@ -363,4 +363,4 @@ int DataProcess_Get_SubString_Using_Offset(const char * src, const size_t srcLen
 
 #ifdef __cplusplus
 }	/* End of extern "C". */
-#endif	__cplusplus
+#endif	/* __cplusplus */
