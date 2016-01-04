@@ -30,6 +30,9 @@
 extern "C" {
 #endif	// __cplusplus
 
+/* Include common error code definitions. */
+#include "Common_Error_Handler_Error_Codes.h"
+
 /*!
  * 	#define COMMON_POSIX_ERROR_TRANSLATION_TABLE_API_VERSION
  * 
