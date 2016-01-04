@@ -60,7 +60,7 @@ int DataProcess::CopyStdStringToCString(const std::string & source, char ** dest
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result code of this function. */
 	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* Result code of other engine functions. */
 	size_t sourceLength = 0;						/* The length of the source string. */
-	char * tempStr = "";							/* Temporary string used to copy data. */
+	char * tempStr = NULL;							/* Temporary string used to copy data. */
 	const char * sourcePtr = NULL;					/* Temporary pointer used to copy the source string's data. */
 
 	/* Get the source string's length, and pointer. */
