@@ -46,6 +46,11 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 
+/* We need to include stdint.h for SIZE_MAX. (MSVC includes it automaticly with the above headers.) */
+#ifdef __GNUC__
+#include <stdint.h>
+#endif  /* __GNUC__ */
+
 /* Define C functions. */
 /*!
 	size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand)
