@@ -23,6 +23,11 @@
 /* Internal includes. */
 #include "Panic.h"
 
+/* External includes. */
+#ifdef __GNUC__
+#include <cstdlib>  /* Needed to define exit(). (MSVC includes this header automaticly with the includes from Panic.h.) */
+#endif /* __GNUC__ */
+
 std::string Panic::Panic_ERROR::ReturnLastError() const
 {
         return this->LastError;
