@@ -264,6 +264,15 @@ extern "C" {
 											ret = COMMON_ERROR_SUCCESS;
 										}
 								}
+								else
+								{
+									/* Library is not loaded. */
+									ret = DYNLIB_ERROR_LIBRARY_NOT_LOADED;
+									lib->bLastCallEncounteredAnError = true;
+									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The given library <");
+									COMMON_LOG_VERBOSE(lib->pathToLibrary);
+									COMMON_LOG_VERBOSE("> is not loaded.");
+								}
 						}
 						else
 						{
