@@ -201,54 +201,54 @@ extern "C" {
 
 		void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName)
 		{
-				// Init vars.
-				void * result = NULL;				// The result of this function.
+				/* Init vars. */
+				void * result = NULL;				/* The result of this function. */
 
-				// Check to see if the pointer to the management structure is valid.
+				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						// Reset bLastCallEncounteredAnError.
+						/* Reset bLastCallEncounteredAnError. */
 						lib->bLastCallEncounteredAnError = false;
 		
-						// Check to see if symbolName is NULL.
+						/* Check to see if symbolName is NULL. */
 						if (symbolName != NULL)
 						{
-								// Check for a loaded library.
+								/* Check for a loaded library. */
 								if (((lib->bIsLoaded) && (lib->osSpecificPointerData != NULL)))
 								{
-									// Get the address.
+									/* Get the address. */
 									result = (void*)GetProcAddress((HMODULE)lib->osSpecificPointerData, symbolName);
 									if (result == NULL)
 									{
-										// An error occured fetching the symbol.
+										/* An error occured fetching the symbol. */
 										lib->bLastCallEncounteredAnError = true;
 										COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): Unable to retrive symbol.\n");
 									}
 								}
 								else
 								{
-									// Library is not loaded.
+									/* Library is not loaded. */
 									lib->bLastCallEncounteredAnError = true;
 									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The library is not loaded.\n");
 								}
 						}
 						else
 						{
-								// symbolName is NULL.
+								/* symbolName is NULL. */
 								lib->bLastCallEncounteredAnError = true;
 								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): No symbol name was given, cannot load a symbol without a name to identifiy it.\n");
 						}
 				}
 				else
 				{
-					// Library structure is invalid.
+					/* Library structure is invalid. */
 					COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The engine's library structure for the given library is invalid. Unable to lookup function without a valid library structure.\n");
 				}
 
-				// Return result.
+				/* Return result. */
 				return result;
 		}
 #ifdef __cplusplus
-}		// End of extern C.
-#endif
+}		/* End of extern C. */
+#endif	/* __cplusplus */
 
