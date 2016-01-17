@@ -23,7 +23,8 @@
 #define COMMON_ERROR_HANDLER_STRUCTURES_H
 
 /* Internal Includes. */
-#include "Error_Struct.h"	/* Structure used to create error lookup table. */
+#include "Error_Struct.h"		/* Structure used to create error lookup table. */
+#include "../../../DLL_PORT.h"	/* Defines MSYS_DLL_EXPORT. */
 
 /* Define the Common unknown error message. (It has to be replicated in two places, once for the C code and once for the C++ bindings.) */
 #define COMMON_UNKNOWN_ERROR_MSG_DEF "Unknown error code."
