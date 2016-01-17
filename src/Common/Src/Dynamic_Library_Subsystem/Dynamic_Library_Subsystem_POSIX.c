@@ -209,17 +209,22 @@ extern "C" {
 				return ret;
 		}
 
-		void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName)
+		int Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName, void ** retSym)
 		{
 				/* Init vars. */
-				void * result = NULL;				/* The result of this function. */
+				int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+				void * pSym = NULL;								/* The returned symbol pointer. */
+				char * hostErr = NULL;							/* The result returned from dlerror(). */
 
 				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						/* Reset bLastCallEncounteredAnError. */
-						lib->bLastCallEncounteredAnError = false;
+					/* Reset bLastCallEncounteredAnError. */
+					lib->bLastCallEncounteredAnError = false;
 
+					/* Check and see if retSym is valid. */
+					if (retSym != NULL)
+					{
 						/* Check to see if symbolName is NULL. */
 						if (symbolName != NULL)
 						{
@@ -230,26 +235,61 @@ extern "C" {
 										dlerror();
 
 										/* Call dlsym. */
-										result = dlsym(lib->osSpecificPointerData, symbolName);
+										pSym = dlsym(lib->osSpecificPointerData, symbolName);
 
 										/* Call dlerror again to check for an error. */
-										if (dlerror() != NULL)
+										hostErr = dlerror();
+										if (hostErr != NULL)
 										{
-											/* An error occured. */
-											result = NULL;
+											/* An error occured.
+												There is no clean way to check the error given here, as dlerror() returns a human-readable string.
+												In addition, dlsym() does not have any defined error codes in the POSIX standard.
+												As such we have no way of returning the specific error encountered to the caller,
+												so we must return COMMON_ERROR_SYSTEM_SPECIFIC.
+											 */
+											ret = COMMON_ERROR_SYSTEM_SPECIFIC;
 											lib->bLastCallEncounteredAnError = true;
+											COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): Error returned from host: ");
+											COMMON_LOG_VERBOSE(hostErr);
+										}
+										else
+										{
+											/* Copy pSym to retSym. */
+											(*retSym) = pSym;
+
+											/* Success. */
+											ret = COMMON_ERROR_SUCCESS;
 										}
 								}
 						}
 						else
 						{
-								/* symbolName is NULL. */
-								lib->bLastCallEncounteredAnError = true;
+							/* symbolName is NULL. */
+							ret = COMMON_ERROR_INVALID_ARGUMENT;
+							lib->bLastCallEncounteredAnError = true;
+							COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): ");
+							COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 						}
+					}
+					else
+					{
+						/* retSym is NULL. */
+						ret = COMMON_ERROR_INVALID_ARGUMENT;
+						lib->bLastCallEncounteredAnError = true;
+						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): ");
+						COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					}
+				}
+				else
+				{
+					/* Invalid management structure. */
+					ret = COMMON_ERROR_INVALID_ARGUMENT;
+					COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): ");
+					COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 				}
 
 				/* Return result. */
-				return result;
+				return ret;
 		}
 #ifdef __cplusplus
 }		/* End of extern C. */
