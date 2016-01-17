@@ -18,7 +18,7 @@
     https://github.com/codebase7/mengine
 */
 
-// Include guard.
+/* Include guard. */
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H
 
@@ -29,21 +29,21 @@
 #ifdef _MSC_FULL_VER
 #include "..\..\..\stdbool.h"	/* bool. (MSVC is special.) */
 #else
-#include <stdbool.h>	// bool.
+#include <stdbool.h>	/* bool. */
 #endif	/* _MSC_FULL_VER */
-#include <stddef.h>	// NULL.
-#include <stdlib.h>	// Malloc.
+#include <stddef.h>	/* NULL. */
+#include <stdlib.h>	/* Malloc. */
 
-// Internal includes.
-#include "Dynamic_Library_Subsystem_Data_Structures.h"		// Contains data structures used internally.
+/* Internal includes. */
+#include "Dynamic_Library_Subsystem_Data_Structures.h"		/* Contains data structures used internally. */
 
 #ifdef __win32
-#include "..\Error_Handler\Common_Error_Handler_Internal.h"			// Contains the function defintions for calling the common error handler.
+#include "..\Error_Handler\Common_Error_Handler_Internal.h"			/* Contains the function defintions for calling the common error handler. */
 #else
-#include "../Error_Handler/Common_Error_Handler_Internal.h"			// Contains the function defintions for calling the common error handler.
-#endif // __win32
+#include "../Error_Handler/Common_Error_Handler_Internal.h"			/* Contains the function defintions for calling the common error handler. */
+#endif /* __win32 */
 
-// Defines for the default library extension.
+/* Defines for the default library extension. */
 #ifdef __win32
 #define DL_EXTENSION ".dll"
 #elif __linux__
@@ -51,7 +51,7 @@
 #endif
 
 #ifdef __cplusplus
-// Define extern C.
+/* Define extern C. */
 extern "C" {
 #endif
 		/*!
@@ -60,20 +60,17 @@ extern "C" {
 		 *
 		 * 	This function calls the system specific dynamic library handler and attempts to load the requested library.
 		 *
-		 * 	Note: Due to the nature of the Dynamic_Library_Subsystem being a generic wrapper over the system specific calls,
-		 * 	we cannot return more informative error messages. (Not without a generic error lookup table anyway....)
-		 *
 		 * 	Pram: const char * pathToLibrary, a pointer to the c-string that contains the path to the library on disk.
 		 * 	Pram: const bool reloadLibrary, whether or not to reload the library if it is already loaded.
 		 * 	Pram: Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, A pointer to a properly constructed
 		 * 	management data structure used internally.
 		 *
-		 * 	Returns 0 if the library was successfully loaded. (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
-		 * 	Returns -1 if the library could not be loaded. (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
-		 * 	Returns -2 if the attempt to unload the library failed. (Only possible if reloadLibrary is true.) (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
-		 * 	Returns -3 if the pathToLibrary pointer was NULL. (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
-		 * 	Returns -4 if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
-		 *	Returns 1 if the library was already loaded. (Only possible if reloadLibrary is false.) (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
+		 * 	Returns COMMON_ERROR_SUCCESS if the library was successfully loaded. (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
+		 * 	Returns Translated host system error code if the library could not be loaded. (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
+		 * 	Returns All errors returned by Common_Dynamic_Library_Subsystem_Unload_Library() if the attempt to unload the library failed. (Only possible if reloadLibrary is true.) (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
+		 * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the pathToLibrary pointer was NULL. (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
+		 * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
+		 *	Returns DYNLIB_ERROR_LIBRARY_ALREADY_LOADED if the library was already loaded. (Only possible if reloadLibrary is false.) (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
 		 */
 		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary,
 																		 Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
@@ -82,9 +79,6 @@ extern "C" {
 		 * 	int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		 *
 		 * 	This function calls the system specific dynamic library handler and attempts to unload the requested library.
-		 *
-		 * 	Note: Due to the nature of the Dynamic_Library_Subsystem being a generic wrapper over the system specific calls,
-		 * 	we cannot return more informative error messages. (Not without a generic error lookup table anyway....)
 		 *
 		 * 	Note: Due to the underlying system, even if this call is successful, the library may still be loaded in memory.
 		 * 	Internally, the Dynamic_Library_Subsystem blocks attempts to load the library multiple times via calls to Common_Dynamic_Library_Subsystem_Load_Library().
@@ -99,22 +93,19 @@ extern "C" {
 		 * 	Pram: Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, A pointer to a properly constructed
 		 * 	management data structure used internally.
 		 *
-		 * 	Returns 0 if the library unload call returned successful.
-		 * 	Returns -1 if the library was not loaded according to the given management data structure.
-		 * 	Returns -2 if the library unload call returned unsuccessful.
-		 *	Returns -4 if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
+		 * 	Returns COMMON_ERROR_SUCCESS if the library unload call returned successful.
+		 * 	Returns DYNLIB_ERROR_LIBRARY_NOT_LOADED if the library was not loaded according to the given management data structure.
+		 * 	Returns Translated host system error code if the library unload call returned unsuccessful.
+		 *	Returns COMMON_ERROR_INVALID_ARGUMENT if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
 		 */
 		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
 
 		/*!
-		 * 	void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib,
-		 * 							     const char * symbolName)
+		 * 	int Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib,
+		 * 							     const char * symbolName, void ** retSym)
 		 *
 		 * 	This function calls the system specific dynamic library handler and attempts to fetch a pointer to the first byte
 		 * 	of the given symbol.
-		 *
-		 * 	Note: Due to the nature of the Dynamic_Library_Subsystem being a generic wrapper over the system specific calls,
-		 * 	we cannot return more informative error messages. (Not without a generic error lookup table anyway....)
 		 *
 		 * 	Note: To check for an error result from this function, check the value of lib.bLastCallEncounteredAnError.
 		 * 	If lib.bLastCallEncounteredAnError is false, no error occured during this function. Otherwise an error occured.
@@ -123,17 +114,21 @@ extern "C" {
 		 * 	management data structure used internally.
 		 * 	Pram: const char * symbolName, A pointer to a c-string that contains the name of the requested symbol to
 		 * 	search for.
+		 *	Pram: void ** retSym, A double pointer that will hold the address to the first byte of the requested symbol if the function succeeds.
+		 *	(retSym will NOT be modified if this function returns an error.)
 		 *
-		 * 	Returns a valid pointer if the resulting lookup returned a valid pointer. (The value of lib.bLastCallEncounteredAnError will be false in this case.)
+		 * 	Returns COMMON_ERROR_SUCCESS if the resulting lookup returned a valid pointer. (The value of lib.bLastCallEncounteredAnError will be false in this case.)
 		 * 	Returns a NULL pointer if the resulting lookup returned a NULL pointer. (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
-		 * 	Returns a NULL pointer if the lookup failed for some reason. (The value of lib.bLastCallEncounteredAnError will be true in this case.)
-		 *	Returns a NULL pointer if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
+		 *		(Note: Some systems may not support NULL symbols, in this case the result is the same as if the lookup failed, see below.)
+		 * 	Returns Translated host system error code if the lookup failed for some reason. (The value of lib.bLastCallEncounteredAnError will be true in this case.)
+		 *	Returns COMMON_ERROR_INVALID_ARGUMENT if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library, symbolName, or retSym pointer(s) was / were set to NULL.
+		 *	Returns DYNLIB_ERROR_LIBRARY_NOT_LOADED if the library was not loaded according to the given management data structure.
 		 */
-		MSYS_DLL_EXPORT void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName);
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName, void ** retSym);
 #ifdef __cplusplus
-}		// End of extern C.
-#endif
+}		/* End of extern C. */
+#endif	/* __cplusplus */
 
-#endif
+#endif	/* MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H */
 
-// End of Dynamic_Library_Subsystem.h
+/* End of Dynamic_Library_Subsystem.h */

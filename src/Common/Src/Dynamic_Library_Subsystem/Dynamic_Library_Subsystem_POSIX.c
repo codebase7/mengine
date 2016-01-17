@@ -18,185 +18,292 @@
     https://github.com/codebase7/mengine
 */
 
+/* Check for linux. */
 #ifdef __linux__
+
+/* Internal includes */
 #include "Dynamic_Library_Subsystem.h"
+#include "../Error_Handler/Common_Error_Handler_Structures.h"
+
+/* External includes. */
 #include <dlfcn.h>	// dlopen, dlclose, dlsym, dlerror.
 
+/* Check for C++ Compiler. */
 #ifdef __cplusplus
-// Define extern C.
+/* Define extern C. */
 extern "C" {
-#endif
+#endif	/* __cplusplus */
 		int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary, Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
-				// Init vars.
-				int result = 0;				// The result of this function.
-				void * callResult = NULL;		// The result of the call to dlopen().
+				/* Init vars. */
+				int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+				int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
+				char * hostErr = NULL;							/* The result returned from dlerror(). */
+				void * callResult = NULL;						/* The result of the call to dlopen(). */
 
-				// Check to see if the pointer to the management structure is valid.
+				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						// Check to see if pathToLibrary is NULL.
+						/* Check to see if pathToLibrary is NULL. */
 						if (pathToLibrary != NULL)
 						{
-								// Check to see if the library is loaded.
+								/* Check to see if the library is loaded. */
 								if ((!lib->bIsLoaded) || (reloadLibrary))
 								{
-										// Check and see if the library is loaded.
+										/* Check and see if the library is loaded. */
 										if (lib->bIsLoaded)
 										{
-												// Call Unload_Library.
-												result = Common_Dynamic_Library_Subsystem_Unload_Library(lib);
+												/* Call Unload_Library. */
+												retFromCall = Common_Dynamic_Library_Subsystem_Unload_Library(lib);
 										}
 
-										// Only continue if the library was unloaded, or if we did not need to unload the library.
-										if (result == 0)
+										/* Only continue if the library was unloaded, or if we did not need to unload the library. */
+										if ((retFromCall == COMMON_ERROR_UNKNOWN_ERROR) || (retFromCall == COMMON_ERROR_SUCCESS))
 										{
-												// Set the values in lib.
+												/* Set the values in lib. */
 												lib->bIsLoaded = false;
 												lib->bLastCallEncounteredAnError = false;
 												lib->osSpecificPointerData = NULL;
 												lib->pathToLibrary = pathToLibrary;
 
-												// Call dlopen().
+												/* Call dlopen(). */
 												callResult = dlopen(lib->pathToLibrary, RTLD_LAZY | RTLD_LOCAL);
 
-												// Check the callResult.
+												/* Check the callResult. */
 												if (callResult == NULL)
 												{
-														// Could not load the library.
-														result = -1;
+														/* An error occured.
+															There is no clean way to check the error given here, as dlerror() returns a human-readable string.
+															In addition, dlopen() does not have any defined error codes in the POSIX standard.
+															As such we have no way of returning the specific error encountered to the caller,
+															so we must return COMMON_ERROR_SYSTEM_SPECIFIC.
+														 */
+														ret = COMMON_ERROR_SYSTEM_SPECIFIC;
+
+														/* Could not load the library. */
+														hostErr = dlerror();
 														lib->bLastCallEncounteredAnError = true;
+														COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Could not load <");
+														COMMON_LOG_VERBOSE(lib->pathToLibrary);
+														COMMON_LOG_VERBOSE("> Host function returned: ");
+														COMMON_LOG_VERBOSE(hostErr);
 												}
 												else
 												{
-														// Cast the OS specific data structure pointer to void*.
+														/* Cast the OS specific data structure pointer to void. */
 														lib->osSpecificPointerData = callResult;
 
-														// Set bIsLoaded.
+														/* Set bIsLoaded. */
 														lib->bIsLoaded = true;
+
+														/* Clear lib->bLastCallEncounteredAnError. */
+														lib->bLastCallEncounteredAnError = false;
+
+														/* Success. */
+														ret = COMMON_ERROR_SUCCESS;
+														COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): <");
+														COMMON_LOG_VERBOSE(lib->pathToLibrary);
+														COMMON_LOG_VERBOSE("> loaded.");
 												}
 										}
 										else
 										{
-												// Encountered an error during the unload.
-												result = -2;
+												/* Encountered an error during the unload. */
+												ret = retFromCall;
 												lib->bLastCallEncounteredAnError = true;
+												COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Unable to reload library.");
 										}
 								}
 								else
 								{
-										// Library is already loaded.
-										result = 1;
+										/* Library is already loaded. */
+										ret = DYNLIB_ERROR_LIBRARY_ALREADY_LOADED;
 								}
 						}
 						else
 						{
-								// pathToLibrary is NULL.
-								result = -3;
+								/* pathToLibrary is NULL. */
+								ret = COMMON_ERROR_INVALID_ARGUMENT;
 								lib->bLastCallEncounteredAnError = true;
+								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): No path to the library was given. Unable to load a library without the path to it.");
 						}
 				}
 				else
 				{
-						// Management structure is invalid.
-						result = -4;
+						/* Management structure is invalid. */
+						ret = COMMON_ERROR_INVALID_ARGUMENT;
+						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): The engine's library structure for the given library is invalid. Unable to load a library without a valid library structure.");
 				}
 
-				// Return result.
-				return result;
+				/* Return result. */
+				return ret;
 		}
 
 		int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
-				// Init vars.
-				int result = 0;				// The result of this function.
+				/* Init vars. */
+				int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+				int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
+				char * hostErr = NULL;							/* The result returned from dlerror(). */
 
-				// Check to see if the pointer to the management structure is valid.
+				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						// Reset bLastCallEncounteredAnError.
+						/* Reset bLastCallEncounteredAnError. */
 						lib->bLastCallEncounteredAnError = false;
 
-						// Check for a valid handle.
+						/* Check for a valid handle. */
 						if ((lib->bIsLoaded) && (lib->osSpecificPointerData != NULL))
 						{
-								// Call dlclose().
-								result = dlclose(lib->osSpecificPointerData);
+								/* Call dlclose(). */
+								retFromCall = dlclose(lib->osSpecificPointerData);
 
-								// Check result.
-								if (result != 0)
+								/* Check result. */
+								if (retFromCall != 0)
 								{
-									// An error occured.
-									result = -2;
+									/* An error occured.
+										There is no clean way to check the error given here, as dlerror() returns a human-readable string.
+										In addition, dlclose() does not have any defined error codes in the POSIX standard.
+										As such we have no way of returning the specific error encountered to the caller,
+										so we must return COMMON_ERROR_SYSTEM_SPECIFIC.
+									 */
+									ret = COMMON_ERROR_SYSTEM_SPECIFIC;
+
+									/* Could not load the library. */
+									hostErr = dlerror();
 									lib->bLastCallEncounteredAnError = true;
+									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): Could not unload <");
+									COMMON_LOG_VERBOSE(lib->pathToLibrary);
+									COMMON_LOG_VERBOSE("> Host function returned: ");
+									COMMON_LOG_VERBOSE(hostErr);
 								}
 								else
 								{
-									// Library unloaded successfully.
+									/* Library unloaded successfully. */
 									lib->osSpecificPointerData = NULL;
 									lib->bIsLoaded = false;
+									lib->bLastCallEncounteredAnError = false;
+
+									/* Success. */
+									ret = COMMON_ERROR_SUCCESS;
+									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): <";
+									COMMON_LOG_VERBOSE(lib->pathToLibrary);
+									COMMON_LOG_VERBOSE("> unloaded.");
 								}
 						}
 						else
 						{
-								// Library is not loaded.
-								result = -1;
+								/* Library is not loaded. */
+								ret = DYNLIB_ERROR_LIBRARY_NOT_LOADED;
 								lib->bLastCallEncounteredAnError = true;
+								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): The given library <");
+								COMMON_LOG_VERBOSE(lib->pathToLibrary);
+								COMMON_LOG_VERBOSE("> is not loaded.");
 						}
 				}
 				else
 				{
-						// Management structure is invalid.
-						result = -4;
+						/* Management structure is invalid. */
+						ret = COMMON_ERROR_INVALID_ARGUMENT_ERROR;
+						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): The engine's library structure for the given library is invalid. Unable to unload a library without a valid library structure.");
 				}
 
-				// Return result.
-				return result;
+				/* Return result. */
+				return ret;
 		}
 
-		void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName)
+		int Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName, void ** retSym)
 		{
-				// Init vars.
-				void * result = NULL;				// The result of this function.
+				/* Init vars. */
+				int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+				void * pSym = NULL;								/* The returned symbol pointer. */
+				char * hostErr = NULL;							/* The result returned from dlerror(). */
 
-				// Check to see if the pointer to the management structure is valid.
+				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						// Reset bLastCallEncounteredAnError.
-						lib->bLastCallEncounteredAnError = false;
+					/* Reset bLastCallEncounteredAnError. */
+					lib->bLastCallEncounteredAnError = false;
 
-						// Check to see if symbolName is NULL.
+					/* Check and see if retSym is valid. */
+					if (retSym != NULL)
+					{
+						/* Check to see if symbolName is NULL. */
 						if (symbolName != NULL)
 						{
-								// Check to see if we have a valid handle.
+								/* Check to see if we have a valid handle. */
 								if ((lib->bIsLoaded) && (lib->osSpecificPointerData != NULL))
 								{
-										// Call dlerror to clear the error state.
+										/* Call dlerror to clear the error state. */
 										dlerror();
 
-										// Call dlsym.
-										result = dlsym(lib->osSpecificPointerData, symbolName);
+										/* Call dlsym. */
+										pSym = dlsym(lib->osSpecificPointerData, symbolName);
 
-										// Call dlerror again to check for an error.
-										if (dlerror() != NULL)
+										/* Call dlerror again to check for an error. */
+										hostErr = dlerror();
+										if (hostErr != NULL)
 										{
-											// An error occured.
-											result = NULL;
+											/* An error occured.
+												There is no clean way to check the error given here, as dlerror() returns a human-readable string.
+												In addition, dlsym() does not have any defined error codes in the POSIX standard.
+												As such we have no way of returning the specific error encountered to the caller,
+												so we must return COMMON_ERROR_SYSTEM_SPECIFIC.
+											 */
+											ret = COMMON_ERROR_SYSTEM_SPECIFIC;
 											lib->bLastCallEncounteredAnError = true;
+											COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): Error returned from host: ");
+											COMMON_LOG_VERBOSE(hostErr);
 										}
+										else
+										{
+											/* Copy pSym to retSym. */
+											(*retSym) = pSym;
+
+											/* Success. */
+											ret = COMMON_ERROR_SUCCESS;
+										}
+								}
+								else
+								{
+									/* Library is not loaded. */
+									ret = DYNLIB_ERROR_LIBRARY_NOT_LOADED;
+									lib->bLastCallEncounteredAnError = true;
+									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The given library <");
+									COMMON_LOG_VERBOSE(lib->pathToLibrary);
+									COMMON_LOG_VERBOSE("> is not loaded.");
 								}
 						}
 						else
 						{
-								// symbolName is NULL.
-								lib->bLastCallEncounteredAnError = true;
+							/* symbolName is NULL. */
+							ret = COMMON_ERROR_INVALID_ARGUMENT;
+							lib->bLastCallEncounteredAnError = true;
+							COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): ");
+							COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 						}
+					}
+					else
+					{
+						/* retSym is NULL. */
+						ret = COMMON_ERROR_INVALID_ARGUMENT;
+						lib->bLastCallEncounteredAnError = true;
+						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): ");
+						COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					}
+				}
+				else
+				{
+					/* Invalid management structure. */
+					ret = COMMON_ERROR_INVALID_ARGUMENT;
+					COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): ");
+					COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 				}
 
-				// Return result.
-				return result;
+				/* Return result. */
+				return ret;
 		}
 #ifdef __cplusplus
-}		// End of extern C.
-#endif
-#endif
+}		/* End of extern C. */
+#endif	/* __cplusplus */
+#endif	/* __linux__ */
