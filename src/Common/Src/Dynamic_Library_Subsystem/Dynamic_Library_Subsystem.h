@@ -18,7 +18,7 @@
     https://github.com/codebase7/mengine
 */
 
-// Include guard.
+/* Include guard. */
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H
 
@@ -29,21 +29,21 @@
 #ifdef _MSC_FULL_VER
 #include "..\stdbool.h"	/* bool. (MSVC is special.) */
 #else
-#include <stdbool.h>	// bool.
+#include <stdbool.h>	/* bool. */
 #endif	/* _MSC_FULL_VER */
-#include <stddef.h>	// NULL.
-#include <stdlib.h>	// Malloc.
+#include <stddef.h>	/* NULL. */
+#include <stdlib.h>	/* Malloc. */
 
-// Internal includes.
-#include "Dynamic_Library_Subsystem_Data_Structures.h"		// Contains data structures used internally.
+/* Internal includes. */
+#include "Dynamic_Library_Subsystem_Data_Structures.h"		/* Contains data structures used internally. */
 
 #ifdef __win32
-#include "..\Error_Handler\Common_Error_Handler_Internal.h"			// Contains the function defintions for calling the common error handler.
+#include "..\Error_Handler\Common_Error_Handler_Internal.h"			/* Contains the function defintions for calling the common error handler. */
 #else
-#include "../Error_Handler/Common_Error_Handler_Internal.h"			// Contains the function defintions for calling the common error handler.
-#endif // __win32
+#include "../Error_Handler/Common_Error_Handler_Internal.h"			/* Contains the function defintions for calling the common error handler. */
+#endif /* __win32 */
 
-// Defines for the default library extension.
+/* Defines for the default library extension. */
 #ifdef __win32
 #define DL_EXTENSION ".dll"
 #elif __linux__
@@ -51,7 +51,7 @@
 #endif
 
 #ifdef __cplusplus
-// Define extern C.
+/* Define extern C. */
 extern "C" {
 #endif
 		/*!
@@ -131,9 +131,9 @@ extern "C" {
 		 */
 		MSYS_DLL_EXPORT void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName);
 #ifdef __cplusplus
-}		// End of extern C.
-#endif
+}		/* End of extern C. */
+#endif	/* __cplusplus */
 
-#endif
+#endif	/* MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H */
 
-// End of Dynamic_Library_Subsystem.h
+/* End of Dynamic_Library_Subsystem.h */
