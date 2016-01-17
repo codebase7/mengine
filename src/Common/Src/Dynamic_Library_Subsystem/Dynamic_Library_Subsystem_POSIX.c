@@ -143,7 +143,7 @@ extern "C" {
 				/* Init vars. */
 				int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
 				int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
-				int errcpy = 0;									/* The current errno. */
+				char * hostErr = NULL;							/* The result returned from dlerror(). */
 
 				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
@@ -160,19 +160,21 @@ extern "C" {
 								/* Check result. */
 								if (retFromCall != 0)
 								{
-									/* Copy the errno. */
-									errcpy = errno;
-
-									/* Translate the error code. */
-									retFromCall = Common_Translate_Posix_Errno_To_Common_Error_Code(errcpy);
+									/* An error occured.
+										There is no clean way to check the error given here, as dlerror() returns a human-readable string.
+										In addition, dlclose() does not have any defined error codes in the POSIX standard.
+										As such we have no way of returning the specific error encountered to the caller,
+										so we must return COMMON_ERROR_SYSTEM_SPECIFIC.
+									 */
+									ret = COMMON_ERROR_SYSTEM_SPECIFIC;
 
 									/* Could not load the library. */
-									ret = retFromCall;
+									hostErr = dlerror();
 									lib->bLastCallEncounteredAnError = true;
 									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): Could not unload <");
 									COMMON_LOG_VERBOSE(lib->pathToLibrary);
 									COMMON_LOG_VERBOSE("> Host function returned: ");
-									COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+									COMMON_LOG_VERBOSE(hostErr);
 								}
 								else
 								{
