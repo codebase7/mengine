@@ -103,7 +103,7 @@ const static Common_windowsErrorCodeTableEntry Common_windowsErrorTranslationTab
  * 	Returns the API Version number of the Common_windowsErrorTranslationTable
  * 	array.
  */
-const unsigned int Common_Get_Windows_Error_Translation_Table_API_Version();
+MSYS_DLL_EXPORT const unsigned int Common_Get_Windows_Error_Translation_Table_API_Version();
 
 /*!
  * 	const unsigned int Common_Get_Windows_Error_Translation_Table_Size()
@@ -111,7 +111,7 @@ const unsigned int Common_Get_Windows_Error_Translation_Table_API_Version();
  * 	Returns the size of the Common_windowsErrorTranslationTable
  * 	array.
  */
-const unsigned int Common_Get_Windows_Error_Translation_Table_Size();
+MSYS_DLL_EXPORT const unsigned int Common_Get_Windows_Error_Translation_Table_Size();
 
 /*!
  * 	int Common_Translate_Windows_Error_Code_To_Common_Error_Code(const DWORD err)
@@ -126,7 +126,7 @@ const unsigned int Common_Get_Windows_Error_Translation_Table_Size();
  * 	Returns COMMON_SYSTEM_SPECIFIC if the given Windows error code does not have a
  * 	Common namespace error code translation.
  */
-int Common_Translate_Windows_Error_Code_To_Common_Error_Code(const DWORD err);
+MSYS_DLL_EXPORT int Common_Translate_Windows_Error_Code_To_Common_Error_Code(const DWORD err);
 
 /* End C Linkage if needed. */
 #ifdef __cplusplus
@@ -153,7 +153,7 @@ namespace Common
 	 * 	Returns the API Version number of the Common_windowsErrorTranslationTable
 	 * 	array.
 	 */
-	const unsigned int Get_Windows_Error_Translation_Table_API_Version();
+	MSYS_DLL_EXPORT const unsigned int Get_Windows_Error_Translation_Table_API_Version();
 
 	/*!
 	 * 	const unsigned int Common::Get_Windows_Error_Translation_Table_Size()
@@ -163,7 +163,7 @@ namespace Common
 	 * 	Returns the size of the Common::windowsErrorTranslationTable
 	 * 	array.
 	 */
-	const unsigned int Get_Windows_Error_Translation_Table_Size();
+	MSYS_DLL_EXPORT const unsigned int Get_Windows_Error_Translation_Table_Size();
 
 	/*!
 	 * 	int Common::Translate_Windows_Error_Code_To_Common_Error_Code(const DWORD & err)
@@ -180,7 +180,7 @@ namespace Common
 	 * 	Returns COMMON_SYSTEM_SPECIFIC if the given Windows error code does not have a
 	 * 	Common namespace error code translation.
 	 */
-	int Translate_Windows_Error_Code_To_Common_Error_Code(const DWORD & err);
+	MSYS_DLL_EXPORT int Translate_Windows_Error_Code_To_Common_Error_Code(const DWORD & err);
 };
 #endif	/* __cplusplus */
 
