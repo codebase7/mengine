@@ -33,7 +33,7 @@
 #ifdef __cplusplus
 /* Define extern C. */
 extern "C" {
-#endif
+#endif	/* __cplusplus */
 		int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary, Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
 				/* Init vars. */

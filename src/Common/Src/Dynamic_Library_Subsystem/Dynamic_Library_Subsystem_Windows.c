@@ -22,12 +22,15 @@
 #include "Dynamic_Library_Subsystem.h"
 #include "../Error_Handler/Common_Error_Handler_Structures.h"
 #include "../Error_Handler/Windows_Error_Translation_Table.h"
+
+/* External includes. */
 #include <windows.h>
 
+/* Check for C++ Compiler. */
 #ifdef __cplusplus
 /* Define extern C. */
 extern "C" {
-#endif
+#endif	/* __cplusplus */
 		int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary, Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
 				/* Init vars. */
