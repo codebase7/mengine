@@ -89,6 +89,9 @@ extern "C" {
 
 														/* Success. */
 														ret = COMMON_ERROR_SUCCESS;
+														COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): <");
+														COMMON_LOG_VERBOSE(lib->pathToLibrary);
+														COMMON_LOG_VERBOSE("> loaded.");
 												}
 										}
 										else
@@ -96,7 +99,7 @@ extern "C" {
 												/* Encountered an error during the unload. */
 												ret = retFromCall;
 												lib->bLastCallEncounteredAnError = true;
-												COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Unable to reload library.\n");
+												COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Unable to reload library.");
 										}
 								}
 								else
@@ -110,14 +113,14 @@ extern "C" {
 								/* pathToLibrary is NULL. */
 								ret = COMMON_ERROR_INVALID_ARGUMENT;
 								lib->bLastCallEncounteredAnError = true;
-								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): No path to the library was given. Unable to load a library without the path to it.\n");
+								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): No path to the library was given. Unable to load a library without the path to it.");
 						}
 				}
 				else
 				{
 						/* Management structure is invalid. */
 						ret = COMMON_ERROR_INVALID_ARGUMENT;
-						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): The engine's library structure for the given library is invalid. Unable to load a library without a valid library structure.\n");
+						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): The engine's library structure for the given library is invalid. Unable to load a library without a valid library structure.");
 				}
 
 				/* Exit function. */
