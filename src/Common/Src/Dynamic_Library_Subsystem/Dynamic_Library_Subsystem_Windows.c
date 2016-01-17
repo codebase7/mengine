@@ -18,95 +18,110 @@
     https://github.com/codebase7/mengine    
 */
 
+/* Internal includes. */
 #include "Dynamic_Library_Subsystem.h"
+#include "../Error_Handler/Common_Error_Handler_Structures.h"
+#include "../Error_Handler/Windows_Error_Translation_Table.h"
 #include <windows.h>
 
 #ifdef __cplusplus
-// Define extern C.
+/* Define extern C. */
 extern "C" {
 #endif
 		int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary, Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
-				// Init vars.
-				int result = 0;				// The result of this function.
-				HMODULE callResult = NULL;	// The result of the call to LoadLibraryEx().
+				/* Init vars. */
+				int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+				int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
+				HMODULE callResult = NULL;						/* The result of the call to LoadLibraryEx(). */
+				DWORD retLLEX = 0;								/* Error code from LoadLibraryEx(). */
 
-				// Check to see if the pointer to the management structure is valid.
+				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						// Check to see if pathToLibrary is NULL.
+						/* Check to see if pathToLibrary is NULL. */
 						if (pathToLibrary != NULL)
 						{
-								// Check to see if the library is loaded.
+								/* Check to see if the library is loaded. */
 								if ((!lib->bIsLoaded) || (reloadLibrary))
 								{
-										// Check and see if the library is loaded.
+										/* Check and see if the library is loaded. */
 										if (lib->bIsLoaded)
 										{
-												// Call Unload_Library.
-												result = Common_Dynamic_Library_Subsystem_Unload_Library(lib);
+												/* Call Unload_Library. */
+												retFromCall = Common_Dynamic_Library_Subsystem_Unload_Library(lib);
 										}
 		
-										// Only continue if the library was unloaded, or if we did not need to unload the library.
-										if (result == 0)
+										/* Only continue if the library was unloaded, or if we did not need to unload the library. */
+										if ((retFromCall == COMMON_ERROR_UNKNOWN_ERROR) || (retFromCall == COMMON_ERROR_SUCCESS))
 										{
-												// Set the values in lib.
+												/* Set the values in lib. */
 												lib->bIsLoaded = false;
 												lib->bLastCallEncounteredAnError = false;
 												lib->osSpecificPointerData = NULL;
 												lib->pathToLibrary = pathToLibrary;
 		
-												// Call LoadLibraryEx().
+												/* Call LoadLibraryEx(). */
 												callResult = LoadLibraryEx(lib->pathToLibrary, NULL, 0);
 		
-												// Check the callResult.
+												/* Check the callResult. */
 												if (callResult == NULL)
 												{
-														// Could not load the library.
-														result = -1;
+														/* Get the last error. */
+														retLLEX = GetLastError();
+														retFromCall = Common_Translate_Windows_Error_Code_To_Common_Error_Code(retLLEX);
+
+														/* Could not load the library. */
+														ret = retFromCall;
 														lib->bLastCallEncounteredAnError = true;
-														COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Could not load the library.\n");
+														COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Could not load <");
+														COMMON_LOG_VERBOSE(lib->pathToLibrary);
+														COMMON_LOG_VERBOSE("> Host function returned: ");
+														COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
 												}
 												else
 												{
-														// Cast the OS specific data structure pointer to void*. 
+														/* Cast the OS specific data structure pointer to void*.  */
 														lib->osSpecificPointerData = (void*)callResult;
 		
-														// Set bIsLoaded.
+														/* Set bIsLoaded. */
 														lib->bIsLoaded = true;
+
+														/* Success. */
+														ret = COMMON_ERROR_SUCCESS;
 												}
 										}
 										else
 										{
-												// Encountered an error during the unload.
-												result = -2;
+												/* Encountered an error during the unload. */
+												ret = retFromCall;
 												lib->bLastCallEncounteredAnError = true;
 												COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Unable to reload library.\n");
 										}
 								}
 								else
 								{
-										// Library is already loaded.
-										result = 1;
+										/* Library is already loaded. */
+										ret = DYNLIB_ERROR_LIBRARY_ALREADY_LOADED;
 								}
 						}
 						else
 						{
-								// pathToLibrary is NULL.
-								result = -3;
+								/* pathToLibrary is NULL. */
+								ret = COMMON_ERROR_INVALID_ARGUMENT;
 								lib->bLastCallEncounteredAnError = true;
 								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): No path to the library was given. Unable to load a library without the path to it.\n");
 						}
 				}
 				else
 				{
-						// Management structure is invalid.
-						result = -4;
+						/* Management structure is invalid. */
+						ret = COMMON_ERROR_INVALID_ARGUMENT;
 						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): The engine's library structure for the given library is invalid. Unable to load a library without a valid library structure.\n");
 				}
 
-				// Return result.
-				return result;
+				/* Exit function. */
+				return ret;
 		}
 
 		int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)

@@ -68,12 +68,12 @@ extern "C" {
 		 * 	Pram: Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, A pointer to a properly constructed
 		 * 	management data structure used internally.
 		 *
-		 * 	Returns 0 if the library was successfully loaded. (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
-		 * 	Returns -1 if the library could not be loaded. (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
-		 * 	Returns -2 if the attempt to unload the library failed. (Only possible if reloadLibrary is true.) (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
-		 * 	Returns -3 if the pathToLibrary pointer was NULL. (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
-		 * 	Returns -4 if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
-		 *	Returns 1 if the library was already loaded. (Only possible if reloadLibrary is false.) (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
+		 * 	Returns COMMON_ERROR_SUCCESS if the library was successfully loaded. (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
+		 * 	Returns Translated host system error code if the library could not be loaded. (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
+		 * 	Returns All errors returned by Common_Dynamic_Library_Subsystem_Unload_Library() if the attempt to unload the library failed. (Only possible if reloadLibrary is true.) (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
+		 * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the pathToLibrary pointer was NULL. (The value of lib.bLastCallEncounteredAnError will be true in this case as well.)
+		 * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
+		 *	Returns DYNLIB_ERROR_LIBRARY_ALREADY_LOADED if the library was already loaded. (Only possible if reloadLibrary is false.) (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
 		 */
 		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary,
 																		 Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
