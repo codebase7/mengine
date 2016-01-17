@@ -95,6 +95,9 @@ extern "C" {
 														/* Set bIsLoaded. */
 														lib->bIsLoaded = true;
 
+														/* Clear lib->bLastCallEncounteredAnError. */
+														lib->bLastCallEncounteredAnError = false;
+
 														/* Success. */
 														ret = COMMON_ERROR_SUCCESS;
 														COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): <");
