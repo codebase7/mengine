@@ -18,13 +18,13 @@
     https://github.com/codebase7/mengine
 */
 
-// Internal Includes.
+/* Internal Includes. */
 #include "Common_Error_Handler.h"
 
-// Enable C linkage if needed.
+/* Enable C linkage if needed. */
 #ifdef __cplusplus
 extern "C" {
-#endif	// __cplusplus
+#endif	/* __cplusplus */
 
 /*!
  * 	const char * COMMON_ERROR_UNKNOWN_ERROR_MSG
@@ -57,7 +57,7 @@ const char COMMON_ERROR_UNKNOWN_ERROR_MSG[] = COMMON_UNKNOWN_ERROR_MSG_DEF;
  * 	between revisions.)
  */
 const Common_Error_Object Common_commonErrorTable[] = {
-	// Define the initilizers for the lookup table.
+	/* Define the initilizers for the lookup table. */
 	{COMMON_ERROR_UNKNOWN_ERROR, COMMON_ERROR_UNKNOWN_ERROR_MSG},
 	{COMMON_ERROR_SYSTEM_SPECIFIC, "System specific error code. Check log."},
 	{COMMON_ERROR_SUCCESS, "Success."},
@@ -78,14 +78,14 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{COMMON_ERROR_COMPARISON_PASSED, "A check passed it's requirements."},
 	{COMMON_ERROR_COMPARISON_FAILED, "A check failed to pass it's requirements."},
 	{COMMON_ERROR_RACE_CONDITION, "Another process or thread has altered the state of an object needed by the function while the function was using it. Because of the modification to the object, the function could not complete it's task successfully. Please make sure nothing is accessing the needed object before calling the function again."},
-	// Rendering Subsystem error codes.
+	/* Rendering Subsystem error codes. */
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF, "Could not allocate memory for overlay image buffer."},
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF, "Could not allocate memory for transparency data buffer."},
 	{RENDERER_ERROR_MEM_BUF_ALLOC_EXCEPTION, "Exception thrown while attempting to allocate memory buffer(s)."},
 	{RENDERER_ERROR_DUPE_OVERLAY_EXCEPTION, "Exception thrown while duplicating overlay, clearing dest overlay."},
 	{RENDERER_ERROR_INVAL_OVERLAY_SELF_OVERWRITE, "Given overlays are the same. Cannot overwrite an overlay with itself."},
 	{RENDERER_ERROR_TRANSPARENCY_DISABLED, "Transparency is disabled on given overlay."},
-	// Threading Subsystem (Thread_Utils) error codes.
+	/* Threading Subsystem (Thread_Utils) error codes. */
 	{THREAD_UTILS_ERROR_EXCEPTION_THROWN, "Exception thrown in threading subsystem."},
 	{THREAD_UTILS_ERROR_PLUGIN_LOAD_FAILURE, "Unable to load plugin(s). Internal error."},
 	{THREAD_UTILS_ERROR_THREAD_COULD_NOT_START, "Could not start new thread."},
@@ -94,7 +94,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{THREAD_UTILS_ERROR_MUTEX_ALREADY_LOCKED, "The given mutex is already locked."},
 	{THREAD_UTILS_ERROR_CONDITION_WAIT_TIMEOUT_REACHED, "Given timeout period was exceeded while waiting for the condition variable to signal."},
 	{THREAD_UTILS_ERROR_CONDITION_CANNOT_LOCK_MUTEX, "Could not lock internal mutex in condition variable object."},
-	// FileUtills.
+	/* FileUtills. */
 	{FILEUTILLS_ERROR_EXISTANT, "The path exists."},
 	{FILEUTILLS_ERROR_NON_EXISTANT, "The path (or a component of the path) does not exist."},
 	{FILEUTILLS_ERROR_READ_ONLY, "The path is read only."},
@@ -110,9 +110,9 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{FILEUTILLS_ERROR_EMPTY_DIRECTORY, "The given path is an empty directory."},
 	{FILEUTILLS_ERROR_NON_EMPTY_DIRECTORY, "The given path is a non-empty directory."},
 	{FILEUTILLS_ERROR_SYMLINK_CHAIN_TOO_DEEP, "While parsing a host-defined symbolic link chain, the host system indicated the link chain was longer than what it supports."},
-	// UI Subsystem/
+	/* UI Subsystem */
 	{UI_SUBSYSTEM_ERROR_EXCEPTION_THROWN, "An exception was thrown in the UI Subsystem."},
-	// TODO: Need to add the error codes from all common namespace functions.
+	/* TODO: Need to add the error codes from all common namespace functions. */
 };
 
 const unsigned int Common_Get_Error_Table_API_Version()
@@ -127,31 +127,31 @@ const unsigned int Common_Get_Error_Table_Size()
 
 const char * Common_Get_Error_Message(const int errorCode)
 {
-	// Init vars.
-	const char * result = COMMON_ERROR_UNKNOWN_ERROR_MSG;		// Result of this function.
-	const size_t errorTableSize = Common_Get_Error_Table_Size();	// Size of the Common error lookup table.
+	/* Init vars. */
+	const char * result = COMMON_ERROR_UNKNOWN_ERROR_MSG;			/* Result of this function. */
+	const size_t errorTableSize = Common_Get_Error_Table_Size();	/* Size of the Common error lookup table. */
 	size_t x = 0;													/* Counter used in for loop. */
 
-	// Check for COMMON_UNKNOWN_ERROR.
+	/* Check for COMMON_UNKNOWN_ERROR. */
 	if (errorCode != COMMON_ERROR_UNKNOWN_ERROR)
 	{
-		// Begin lookup loop.
+		/* Begin lookup loop. */
 		for (x = 0; ((x < errorTableSize) && (result == COMMON_ERROR_UNKNOWN_ERROR_MSG)); x++)
 		{
-			// Check for the correct error code.
+			/* Check for the correct error code. */
 			if (Common_commonErrorTable[x].errorCode == errorCode)
 			{
-				// Found the correct error code.
+				/* Found the correct error code. */
 				result = Common_commonErrorTable[x].error;
 			}
 		}
 	}
 
-	// Return the result.
+	/* Return the result. */
 	return result;
 }
 
-// End C Linkage if needed.
+/* End C Linkage if needed. */
 #ifdef __cplusplus
-}
-#endif	// __cplusplus	
+}	/* extern "C" */
+#endif	/* __cplusplus	*/
