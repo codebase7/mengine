@@ -211,31 +211,31 @@ extern "C" {
 
 		void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName)
 		{
-				// Init vars.
-				void * result = NULL;				// The result of this function.
+				/* Init vars. */
+				void * result = NULL;				/* The result of this function. */
 
-				// Check to see if the pointer to the management structure is valid.
+				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						// Reset bLastCallEncounteredAnError.
+						/* Reset bLastCallEncounteredAnError. */
 						lib->bLastCallEncounteredAnError = false;
 
-						// Check to see if symbolName is NULL.
+						/* Check to see if symbolName is NULL. */
 						if (symbolName != NULL)
 						{
-								// Check to see if we have a valid handle.
+								/* Check to see if we have a valid handle. */
 								if ((lib->bIsLoaded) && (lib->osSpecificPointerData != NULL))
 								{
-										// Call dlerror to clear the error state.
+										/* Call dlerror to clear the error state. */
 										dlerror();
 
-										// Call dlsym.
+										/* Call dlsym. */
 										result = dlsym(lib->osSpecificPointerData, symbolName);
 
-										// Call dlerror again to check for an error.
+										/* Call dlerror again to check for an error. */
 										if (dlerror() != NULL)
 										{
-											// An error occured.
+											/* An error occured. */
 											result = NULL;
 											lib->bLastCallEncounteredAnError = true;
 										}
@@ -243,15 +243,15 @@ extern "C" {
 						}
 						else
 						{
-								// symbolName is NULL.
+								/* symbolName is NULL. */
 								lib->bLastCallEncounteredAnError = true;
 						}
 				}
 
-				// Return result.
+				/* Return result. */
 				return result;
 		}
 #ifdef __cplusplus
-}		// End of extern C.
-#endif
-#endif
+}		/* End of extern C. */
+#endif	/* __cplusplus */
+#endif	/* __linux__ */
