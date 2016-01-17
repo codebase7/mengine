@@ -138,7 +138,9 @@ extern "C" {
 		int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
 				/* Init vars. */
-				int result = 0;				/* The result of this function. */
+				int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+				int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
+				int errcpy = 0;									/* The current errno. */
 
 				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
@@ -150,37 +152,58 @@ extern "C" {
 						if ((lib->bIsLoaded) && (lib->osSpecificPointerData != NULL))
 						{
 								/* Call dlclose(). */
-								result = dlclose(lib->osSpecificPointerData);
+								retFromCall = dlclose(lib->osSpecificPointerData);
 
 								/* Check result. */
-								if (result != 0)
+								if (retFromCall != 0)
 								{
-									/* An error occured. */
-									result = -2;
+									/* Copy the errno. */
+									errcpy = errno;
+
+									/* Translate the error code. */
+									retFromCall = Common_Translate_Posix_Errno_To_Common_Error_Code(errcpy);
+
+									/* Could not load the library. */
+									ret = retFromCall;
 									lib->bLastCallEncounteredAnError = true;
+									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): Could not unload <");
+									COMMON_LOG_VERBOSE(lib->pathToLibrary);
+									COMMON_LOG_VERBOSE("> Host function returned: ");
+									COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
 								}
 								else
 								{
 									/* Library unloaded successfully. */
 									lib->osSpecificPointerData = NULL;
 									lib->bIsLoaded = false;
+									lib->bLastCallEncounteredAnError = false;
+
+									/* Success. */
+									ret = COMMON_ERROR_SUCCESS;
+									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): <";
+									COMMON_LOG_VERBOSE(lib->pathToLibrary);
+									COMMON_LOG_VERBOSE("> unloaded.");
 								}
 						}
 						else
 						{
 								/* Library is not loaded. */
-								result = -1;
+								ret = DYNLIB_ERROR_LIBRARY_NOT_LOADED;
 								lib->bLastCallEncounteredAnError = true;
+								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): The given library <");
+								COMMON_LOG_VERBOSE(lib->pathToLibrary);
+								COMMON_LOG_VERBOSE("> is not loaded.");
 						}
 				}
 				else
 				{
 						/* Management structure is invalid. */
-						result = -4;
+						ret = COMMON_ERROR_INVALID_ARGUMENT_ERROR;
+						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): The engine's library structure for the given library is invalid. Unable to unload a library without a valid library structure.");
 				}
 
 				/* Return result. */
-				return result;
+				return ret;
 		}
 
 		void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName)
