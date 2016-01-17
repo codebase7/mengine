@@ -137,49 +137,49 @@ extern "C" {
 
 		int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
-				// Init vars.
-				int result = 0;				// The result of this function.
+				/* Init vars. */
+				int result = 0;				/* The result of this function. */
 
-				// Check to see if the pointer to the management structure is valid.
+				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						// Reset bLastCallEncounteredAnError.
+						/* Reset bLastCallEncounteredAnError. */
 						lib->bLastCallEncounteredAnError = false;
 
-						// Check for a valid handle.
+						/* Check for a valid handle. */
 						if ((lib->bIsLoaded) && (lib->osSpecificPointerData != NULL))
 						{
-								// Call dlclose().
+								/* Call dlclose(). */
 								result = dlclose(lib->osSpecificPointerData);
 
-								// Check result.
+								/* Check result. */
 								if (result != 0)
 								{
-									// An error occured.
+									/* An error occured. */
 									result = -2;
 									lib->bLastCallEncounteredAnError = true;
 								}
 								else
 								{
-									// Library unloaded successfully.
+									/* Library unloaded successfully. */
 									lib->osSpecificPointerData = NULL;
 									lib->bIsLoaded = false;
 								}
 						}
 						else
 						{
-								// Library is not loaded.
+								/* Library is not loaded. */
 								result = -1;
 								lib->bLastCallEncounteredAnError = true;
 						}
 				}
 				else
 				{
-						// Management structure is invalid.
+						/* Management structure is invalid. */
 						result = -4;
 				}
 
-				// Return result.
+				/* Return result. */
 				return result;
 		}
 
