@@ -116,6 +116,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	/* Dynamic Library Subsystem. */
 	{DYNLIB_ERROR_INVALID_LIBRARY, "The given library is not recognized by the system. (Invalid container format / not a library / data corruption / etc.)"},
 	{DYNLIB_ERROR_LIBRARY_ALREADY_LOADED, "The given library is already loaded."},
+	{DYNLIB_ERROR_LIBRARY_NOT_LOADED, "The given library is not currently loaded."},
 	{DYNLIB_ERROR_HOST_VS_LIBRARY_MISMATCH, "The given library was built for a different system. (Different OS / Arch / etc.)"},
 	/* TODO: Need to add the error codes from all common namespace functions. */
 };
