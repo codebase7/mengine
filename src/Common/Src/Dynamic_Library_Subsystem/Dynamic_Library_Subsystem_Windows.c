@@ -132,28 +132,28 @@ extern "C" {
 
 		int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		{
-				// Init vars.
-				int result = 0;				// The result of this function.
+				/* Init vars. */
+				int result = 0;				/* The result of this function. */
 
-				// Check to see if the pointer to the management structure is valid.
+				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						// Reset bLastCallEncounteredAnError.
+						/* Reset bLastCallEncounteredAnError. */
 						lib->bLastCallEncounteredAnError = false;
 		
-						// Check and see if the OS specific data structure pointer is valid.
+						/* Check and see if the OS specific data structure pointer is valid. */
 						if ((lib->bIsLoaded) && (lib->osSpecificPointerData != NULL))
 						{
-								// Call FreeLibrary.
+								/* Call FreeLibrary. */
 								if (FreeLibrary((HMODULE)lib->osSpecificPointerData))
 								{
-										// The library was unloaded successfully.
+										/* The library was unloaded successfully. */
 										lib->bIsLoaded = false;
 										lib->osSpecificPointerData = NULL;
 								}
 								else
 								{
-										// Could not unload the library.
+										/* Could not unload the library. */
 										result = -2;
 										lib->bLastCallEncounteredAnError = true;
 										COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): Could not unload the library.\n");
@@ -161,7 +161,7 @@ extern "C" {
 						}
 						else
 						{
-								// Library is not loaded.
+								/* Library is not loaded. */
 								result = -1;
 								lib->bLastCallEncounteredAnError = true;
 								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): The library is not loaded.\n");
@@ -169,12 +169,12 @@ extern "C" {
 				}
 				else
 				{
-						// Management structure is invalid.
+						/* Management structure is invalid. */
 						result = -4;
 						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): The engine's library structure for the given library is invalid. Unable to unload a library without a valid library structure.\n");
 				}
 
-				// Return result.
+				/* Return result. */
 				return result;
 		}
 
