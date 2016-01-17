@@ -78,6 +78,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{COMMON_ERROR_COMPARISON_PASSED, "A check passed it's requirements."},
 	{COMMON_ERROR_COMPARISON_FAILED, "A check failed to pass it's requirements."},
 	{COMMON_ERROR_RACE_CONDITION, "Another process or thread has altered the state of an object needed by the function while the function was using it. Because of the modification to the object, the function could not complete it's task successfully. Please make sure nothing is accessing the needed object before calling the function again."},
+	{COMMON_ERROR_HOST_NOT_SUPPORTED, "The host system does not support the requested function / command / feature."},
 	/* Rendering Subsystem error codes. */
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF, "Could not allocate memory for overlay image buffer."},
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF, "Could not allocate memory for transparency data buffer."},
@@ -112,6 +113,10 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{FILEUTILLS_ERROR_SYMLINK_CHAIN_TOO_DEEP, "While parsing a host-defined symbolic link chain, the host system indicated the link chain was longer than what it supports."},
 	/* UI Subsystem */
 	{UI_SUBSYSTEM_ERROR_EXCEPTION_THROWN, "An exception was thrown in the UI Subsystem."},
+	/* Dynamic Library Subsystem. */
+	{DYNLIB_ERROR_INVALID_LIBRARY, "The given library is not recognized by the system. (Invalid container format / not a library / data corruption / etc.)"},
+	{DYNLIB_ERROR_LIBRARY_ALREADY_LOADED, "The given library is already loaded."},
+	{DYNLIB_ERROR_HOST_VS_LIBRARY_MISMATCH, "The given library was built for a different system. (Different OS / Arch / etc.)"},
 	/* TODO: Need to add the error codes from all common namespace functions. */
 };
 
