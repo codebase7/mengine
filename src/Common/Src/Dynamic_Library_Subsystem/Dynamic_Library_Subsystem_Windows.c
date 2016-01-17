@@ -199,17 +199,23 @@ extern "C" {
 				return ret;
 		}
 
-		void * Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName)
+		int Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName, void ** retSym)
 		{
 				/* Init vars. */
-				void * result = NULL;				/* The result of this function. */
+				int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+				int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
+				void * pSym = NULL;								/* The returned symbol pointer. */
+				DWORD retGPA = 0;								/* Error code from GetProcAddress(). */
 
 				/* Check to see if the pointer to the management structure is valid. */
 				if (lib != NULL)
 				{
-						/* Reset bLastCallEncounteredAnError. */
-						lib->bLastCallEncounteredAnError = false;
+					/* Reset bLastCallEncounteredAnError. */
+					lib->bLastCallEncounteredAnError = false;
 		
+					/* Check and see if retSym is valid. */
+					if (retSym != NULL)
+					{
 						/* Check to see if symbolName is NULL. */
 						if (symbolName != NULL)
 						{
@@ -217,36 +223,66 @@ extern "C" {
 								if (((lib->bIsLoaded) && (lib->osSpecificPointerData != NULL)))
 								{
 									/* Get the address. */
-									result = (void*)GetProcAddress((HMODULE)lib->osSpecificPointerData, symbolName);
-									if (result == NULL)
+									pSym = (void*)GetProcAddress((HMODULE)lib->osSpecificPointerData, symbolName);
+									if (pSym == NULL)
 									{
+										/* Get the last error. */
+										retGPA = GetLastError();
+										retFromCall = Common_Translate_Windows_Error_Code_To_Common_Error_Code(retGPA);
+
 										/* An error occured fetching the symbol. */
+										ret = retFromCall;
 										lib->bLastCallEncounteredAnError = true;
-										COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): Unable to retrive symbol.\n");
+										COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): Could not fetch symbol in <");
+										COMMON_LOG_VERBOSE(lib->pathToLibrary);
+										COMMON_LOG_VERBOSE("> Host function returned: ");
+										COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+									}
+									else
+									{
+										/* Copy pSym to retSym. */
+										(*retSym) = pSym;
+
+										/* Success. */
+										ret = COMMON_ERROR_SUCCESS;
 									}
 								}
 								else
 								{
 									/* Library is not loaded. */
+									ret = DYNLIB_ERROR_LIBRARY_NOT_LOADED;
 									lib->bLastCallEncounteredAnError = true;
-									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The library is not loaded.\n");
+									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The given library <");
+									COMMON_LOG_VERBOSE(lib->pathToLibrary);
+									COMMON_LOG_VERBOSE("> is not loaded.");
 								}
 						}
 						else
 						{
-								/* symbolName is NULL. */
-								lib->bLastCallEncounteredAnError = true;
-								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): No symbol name was given, cannot load a symbol without a name to identifiy it.\n");
+							/* symbolName is NULL. */
+							ret = COMMON_ERROR_INVALID_ARGUMENT;
+							lib->bLastCallEncounteredAnError = true;
+							COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): No symbol name was given, cannot load a symbol without a name to identifiy it.");
 						}
+					}
+					else
+					{
+						/* retSym is NULL. */
+						ret = COMMON_ERROR_INVALID_ARGUMENT;
+						lib->bLastCallEncounteredAnError = true;
+						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): ");
+						COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					}
 				}
 				else
 				{
 					/* Library structure is invalid. */
-					COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The engine's library structure for the given library is invalid. Unable to lookup function without a valid library structure.\n");
+					ret = COMMON_ERROR_INVALID_ARGUMENT;
+					COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The engine's library structure for the given library is invalid. Unable to lookup function without a valid library structure.");
 				}
 
 				/* Return result. */
-				return result;
+				return ret;
 		}
 #ifdef __cplusplus
 }		/* End of extern C. */
