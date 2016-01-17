@@ -159,7 +159,7 @@ extern "C" {
 
 										/* Success. */
 										ret = COMMON_ERROR_SUCCESS;
-										COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): <";
+										COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): <");
 										COMMON_LOG_VERBOSE(lib->pathToLibrary);
 										COMMON_LOG_VERBOSE("> unloaded.");
 								}
@@ -191,7 +191,7 @@ extern "C" {
 				else
 				{
 						/* Management structure is invalid. */
-						ret = COMMON_ERROR_INVALID_ARGUMENT_ERROR;
+						ret = COMMON_ERROR_INVALID_ARGUMENT;
 						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): The engine's library structure for the given library is invalid. Unable to unload a library without a valid library structure.");
 				}
 
