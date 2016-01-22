@@ -79,6 +79,8 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{COMMON_ERROR_COMPARISON_FAILED, "A check failed to pass it's requirements."},
 	{COMMON_ERROR_RACE_CONDITION, "Another process or thread has altered the state of an object needed by the function while the function was using it. Because of the modification to the object, the function could not complete it's task successfully. Please make sure nothing is accessing the needed object before calling the function again."},
 	{COMMON_ERROR_HOST_NOT_SUPPORTED, "The host system does not support the requested function / command / feature."},
+	{COMMON_ERROR_TRUE, "The result of the previous operation returned true. (See the code documentation for what the result actually means. This is just a generic boolean response.)"},
+	{COMMON_ERROR_FALSE, "The result of the previous operation returned false. (See the code documentation for what the result actually means. This is just a generic boolean response.)"},
 	/* Rendering Subsystem error codes. */
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF, "Could not allocate memory for overlay image buffer."},
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF, "Could not allocate memory for transparency data buffer."},

@@ -7,12 +7,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${O_OUTPUT_DIR})
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 		# Building on windows.
 		set(DYNAMIC_LIBRARY_SUBSYSTEM_INCLUDES Dynamic_Library_Subsystem_Data_Structures.c
+				Dynamic_Library_Subsystem_Data_Structures_Private_API.c
 				Dynamic_Library_Subsystem_Windows.c)
 		unset(DYNAMIC_LIBRARY_SUBSYSTEM_LINK_LIBS)
 	
 		ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 				# Building on Linux.
 				set(DYNAMIC_LIBRARY_SUBSYSTEM_INCLUDES Dynamic_Library_Subsystem_Data_Structures.c
+				Dynamic_Library_Subsystem_Data_Structures_Private_API.c
 				Dynamic_Library_Subsystem_POSIX.c)
 				set(DYNAMIC_LIBRARY_SUBSYSTEM_LINK_LIBS dl)
 
@@ -25,8 +27,10 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 # Actually build it.
 add_library(Dynamic_Library_Subsystem_Multiverse_Engine_Static STATIC ${DYNAMIC_LIBRARY_SUBSYSTEM_INCLUDES})
 target_link_libraries(Dynamic_Library_Subsystem_Multiverse_Engine_Static ${DYNAMIC_LIBRARY_SUBSYSTEM_LINK_LIBS} 
-Common_Error_Handler_Multiverse_Engine_Static)
+Common_Error_Handler_Multiverse_Engine_Static
+Core_Multiverse_Engine_Static)
 
 add_library(Dynamic_Library_Subsystem_Multiverse_Engine SHARED ${DYNAMIC_LIBRARY_SUBSYSTEM_INCLUDES})
 target_link_libraries(Dynamic_Library_Subsystem_Multiverse_Engine ${DYNAMIC_LIBRARY_SUBSYSTEM_LINK_LIBS} 
-Common_Error_Handler_Multiverse_Engine)
+Common_Error_Handler_Multiverse_Engine
+Core_Multiverse_Engine)
