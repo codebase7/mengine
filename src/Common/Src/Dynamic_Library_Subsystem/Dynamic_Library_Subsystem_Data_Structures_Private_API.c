@@ -90,15 +90,15 @@ extern "C" {
 			if (lib != NULL)
 			{
 				/* Clear the data. */
-				result->bIsLoaded = false;
-				result->bLastCallEncounteredAnError = false;
-				result->osSpecificPointerData = NULL;
+				lib->bIsLoaded = false;
+				lib->bLastCallEncounteredAnError = false;
+				lib->osSpecificPointerData = NULL;
 
 				/* Check for set pathToLibrary. */
-				if (result->pathToLibrary != NULL)
+				if (lib->pathToLibrary != NULL)
 				{
 					/* Deallocate memory for the pathToLibrary variable. */
-					DataProcess_Deallocate_CString(&(result->pathToLibrary));
+					DataProcess_Deallocate_CString(&(lib->pathToLibrary));
 				}
 			}
 
@@ -159,8 +159,8 @@ extern "C" {
 			/* Check for valid pointer. */
 			if (lib != NULL)
 			{
-				/* Check bLastCallEncounteredError. */
-				ret = ((lib->bLastCallEncounteredError) ? (COMMON_ERROR_TRUE) : (COMMON_ERROR_FALSE));
+				/* Check bLastCallEncounteredAnError. */
+				ret = ((lib->bLastCallEncounteredAnError) ? (COMMON_ERROR_TRUE) : (COMMON_ERROR_FALSE));
 			}
 			else
 			{
@@ -180,8 +180,8 @@ extern "C" {
 			/* Check for valid pointer. */
 			if (lib != NULL)
 			{
-				/* Set bLastCallEncounteredError. */
-				lib->bLastCallEncounteredError = value;
+				/* Set bLastCallEncounteredAnError. */
+				lib->bLastCallEncounteredAnError = value;
 
 				/* Success. */
 				ret = COMMON_ERROR_SUCCESS;
@@ -220,7 +220,7 @@ extern "C" {
 			return ret;
 		}
 
-		int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const void * value)
+		int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, void * value)
 		{
 			/* Init vars. */
 			int ret = COMMON_ERROR_UNKNOWN_ERROR;
@@ -282,7 +282,7 @@ extern "C" {
 				if ((value != NULL) && (valueLength > 0))
 				{
 					/* Allocate memory. */
-					retFromCall = DataProcess_Reallocate_CString(tempPath, 0, valueLength);
+					retFromCall = DataProcess_Reallocate_C_String(&tempPath, 0, valueLength);
 					if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempPath != NULL))
 					{
 						/* Copy the path string. */
