@@ -55,7 +55,7 @@ extern "C" {
 					result->pointer = NULL;
 
 					/* Call the real function. */
-					ret = Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)(&(result->pointer))));
+					ret = Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private **)(&(result->pointer))));
 				}
 				else
 				{
@@ -82,7 +82,7 @@ extern "C" {
 				if ((*lib)->pointer != NULL)
 				{
 					/* Deallocate the pointer. */
-					Common_Dynamic_Library_Subsystem_Destroy_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)(&((*lib)->pointer))));
+					Common_Dynamic_Library_Subsystem_Destroy_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private **)(&((*lib)->pointer))));
 				}
 
 				/* Free the structure. */
@@ -99,7 +99,7 @@ extern "C" {
 			if ((lib != NULL) && (lib->pointer != NULL))
 			{
 				/* Call real function. */
-				Common_Dynamic_Library_Subsystem_Blank_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)));
+				Common_Dynamic_Library_Subsystem_Blank_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)));
 			}
 
 			/* Exit function. */
@@ -115,7 +115,7 @@ extern "C" {
 			if ((lib != NULL) && (lib->pointer != NULL))
 			{
 				/* Call real function. */
-				ret = Common_Dynamic_Library_Subsystem_Get_IsLoaded_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)));
+				ret = Common_Dynamic_Library_Subsystem_Get_IsLoaded_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)));
 			}
 			else
 			{
@@ -136,7 +136,7 @@ extern "C" {
 			if ((lib != NULL) && (lib->pointer != NULL))
 			{
 				/* Call real function. */
-				ret = Common_Dynamic_Library_Subsystem_Set_IsLoaded_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), value);
+				ret = Common_Dynamic_Library_Subsystem_Set_IsLoaded_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)), value);
 			}
 			else
 			{
@@ -157,7 +157,7 @@ extern "C" {
 			if ((lib != NULL) && (lib->pointer != NULL))
 			{
 				/* Call real function. */
-				ret = Common_Dynamic_Library_Subsystem_Get_LastCallEncounteredError_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)));
+				ret = Common_Dynamic_Library_Subsystem_Get_LastCallEncounteredError_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)));
 			}
 			else
 			{
@@ -178,7 +178,7 @@ extern "C" {
 			if ((lib != NULL) && (lib->pointer != NULL))
 			{
 				/* Call real function. */
-				ret = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), value);
+				ret = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)), value);
 			}
 			else
 			{
@@ -199,7 +199,7 @@ extern "C" {
 			if ((lib != NULL) && (lib->pointer != NULL) && (retVar != NULL))
 			{
 				/* Call real function. */
-				ret = Common_Dynamic_Library_Subsystem_Get_OsSpecificPointerData_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), retVar);
+				ret = Common_Dynamic_Library_Subsystem_Get_OsSpecificPointerData_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)), retVar);
 			}
 			else
 			{
@@ -211,7 +211,7 @@ extern "C" {
 			return ret;
 		}
 
-		int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const void * value)
+		int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, void * value)
 		{
 			/* Init vars. */
 			int ret = COMMON_ERROR_UNKNOWN_ERROR;
@@ -220,7 +220,7 @@ extern "C" {
 			if ((lib != NULL) && (lib->pointer != NULL))
 			{
 				/* Call real function. */
-				ret = Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), value);
+				ret = Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)), value);
 			}
 			else
 			{
@@ -241,7 +241,7 @@ extern "C" {
 			if ((lib != NULL) && (lib->pointer != NULL) && (retVar != NULL))
 			{
 				/* Call real function. */
-				ret = Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), retVar);
+				ret = Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)), retVar);
 			}
 			else
 			{
@@ -264,7 +264,7 @@ extern "C" {
 			if ((lib != NULL) && (lib->pointer != NULL) && (((value == NULL) && (valueLength == 0)) || ((value != NULL) && (valueLength > 0))))
 			{
 				/* Call real function. */
-				ret = Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), value, valueLength);
+				ret = Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)), value, valueLength);
 			}
 			else
 			{
