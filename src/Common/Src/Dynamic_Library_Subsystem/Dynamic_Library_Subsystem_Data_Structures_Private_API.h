@@ -53,7 +53,7 @@ extern "C" {
 								    (For example, Windows defines loaded libraries with an HMODULE pointer,
 								    which is needed to unload the library or to search it.)
 								*/
-			const char * pathToLibrary;			/* Path to the dynamic library file on disk. */
+			char * pathToLibrary;			/* Path to the dynamic library file on disk. */
 		};
 
 		/* Create user defined data type for Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private structure. */
@@ -181,7 +181,7 @@ extern "C" {
 		int Common_Dynamic_Library_Subsystem_Get_OsSpecificPointerData_Loaded_Dynamic_Library_Private(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, void ** retVar);
 
 		/*!
-		 * 	int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const void * value)
+		 * 	int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, void * value)
 		 *
 		 * 	ACCESSOR FUNCTION.
 		 *
@@ -191,7 +191,7 @@ extern "C" {
 		 * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer is NULL.
 		 *	Otherwise returns the appropriate error code.
 		 */
-		int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const void * value);
+		int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, void * value);
 
 		/*!
 		 * 	int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const char ** retVar)
