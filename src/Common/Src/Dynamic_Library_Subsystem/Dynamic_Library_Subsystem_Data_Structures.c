@@ -28,6 +28,12 @@
 /* Define extern C. */
 extern "C" {
 #endif	/* __cplusplus	 */
+		int Common_Dynamic_Library_Subsystem_Get_API_Version()
+		{
+			/* Return the API Version number. */
+			return MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_LEVEL;
+		}
+
 		int Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library ** lib)
 		{
 			/* Init vars. */
