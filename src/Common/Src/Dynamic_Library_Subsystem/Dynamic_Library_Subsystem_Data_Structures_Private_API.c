@@ -22,6 +22,7 @@
 #include "Dynamic_Library_Subsystem.h"
 #include "Dynamic_Library_Subsystem_Data_Structures_Private_API.h"
 #include "../../../Core/Src/DataProcess.h"
+#include "../Error_Handler/Common_Error_Handler_Structures.h"
 
 /* Check for C++ Compiler. */
 #ifdef __cplusplus
