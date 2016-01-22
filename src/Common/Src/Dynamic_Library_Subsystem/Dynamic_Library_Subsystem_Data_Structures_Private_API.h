@@ -25,8 +25,6 @@
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_DATA_STRUCTURES_PRIVATE_API_H
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_DATA_STRUCTURES_PRIVATE_API_H
 
-#error "FIXME: Abstraction required for Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library data structure."
-
 /* Check for C++ Compiler. */
 #ifdef __cplusplus
 /* Define extern C. */
