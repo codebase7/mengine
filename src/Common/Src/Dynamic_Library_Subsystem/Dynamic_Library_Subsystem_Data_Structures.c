@@ -18,44 +18,257 @@
     https://github.com/codebase7/mengine    
 */
 
+/* Internal includes */
 #include "Dynamic_Library_Subsystem.h"
+#include "Dynamic_Library_Subsystem_Data_Structures_Private_API.h"
+#include "../../../Core/Src/DataProcess.h"
 
+/* Check for C++ Compiler. */
 #ifdef __cplusplus
-// Define extern C.
+/* Define extern C. */
 extern "C" {
-#endif
-		Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library()
+#endif	/* __cplusplus	 */
+		int Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library ** lib)
 		{
-			// Create the referece.
+			/* Init vars. */
+			int ret = COMMON_ERROR_UNKNOWN_ERROR;
+			int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 			Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * result = NULL;
-			result = ((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library*)(malloc(sizeof(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library))));
 
-			// Check for a valid result.
-			if (result != NULL)
-			{
-				// Initilize the vars.
-				result->bIsLoaded = false;
-				result->bLastCallEncounteredAnError = false;
-				result->osSpecificPointerData = NULL;
-				result->pathToLibrary = NULL;
-			}
-
-			// Return result.
-			return result;
-		}
-
-		void Common_Dynamic_Library_Subsystem_Destroy_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib)
-		{
-			// Check for valid pointer.
+			/* Check for valid arguments. */
 			if (lib != NULL)
 			{
-				// Free the structure.
-				free(lib);
+				/* Create the referece. */
+				retFromCall = DataProcess_Reallocate_C_String(((char**)(&result)), 0, sizeof(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library));
+
+				/* Check for a valid result. */
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (result != NULL))
+				{
+					/* Set the pointer to NULL. */
+					result->pointer = NULL;
+
+					/* Call the real function. */
+					ret = Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)(&(result->pointer))));
+				}
+				else
+				{
+					/* Could not init structure. */
+					ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
+				}
+			}
+			else
+			{
+				/* Invalid lib pointer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
 			}
 
-			// Exit function.
+			/* Return result. */
+			return ret;
+		}
+
+		void Common_Dynamic_Library_Subsystem_Destroy_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library ** lib)
+		{
+			/* Check for valid pointer. */
+			if ((lib != NULL) && ((*lib) != NULL))
+			{
+				/* Check for allocated pointer. */
+				if ((*lib)->pointer != NULL)
+				{
+					/* Deallocate the pointer. */
+					Common_Dynamic_Library_Subsystem_Destroy_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)(&((*lib)->pointer))));
+				}
+
+				/* Free the structure. */
+				DataProcess_Deallocate_CString(((char **)(lib)));
+			}
+
+			/* Exit function. */
 			return;
 		}
+
+		void Common_Dynamic_Library_Subsystem_Blank_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib)
+		{
+			/* Check for valid pointers. */
+			if ((lib != NULL) && (lib->pointer != NULL))
+			{
+				/* Call real function. */
+				Common_Dynamic_Library_Subsystem_Blank_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)));
+			}
+
+			/* Exit function. */
+			return;
+		}
+
+		int Common_Dynamic_Library_Subsystem_Get_IsLoaded_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib)
+		{
+			/* Init vars. */
+			int ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+			/* Check for valid pointers. */
+			if ((lib != NULL) && (lib->pointer != NULL))
+			{
+				/* Call real function. */
+				ret = Common_Dynamic_Library_Subsystem_Get_IsLoaded_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)));
+			}
+			else
+			{
+				/* Invalid lib pointer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+			}
+
+			/* Exit function. */
+			return ret;
+		}
+
+		int Common_Dynamic_Library_Subsystem_Set_IsLoaded_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const bool value)
+		{
+			/* Init vars. */
+			int ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+			/* Check for valid pointers. */
+			if ((lib != NULL) && (lib->pointer != NULL))
+			{
+				/* Call real function. */
+				ret = Common_Dynamic_Library_Subsystem_Set_IsLoaded_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), value);
+			}
+			else
+			{
+				/* Invalid lib pointer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+			}
+
+			/* Exit function. */
+			return ret;
+		}
+
+		int Common_Dynamic_Library_Subsystem_Get_LastCallEncounteredError_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib)
+		{
+			/* Init vars. */
+			int ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+			/* Check for valid pointers. */
+			if ((lib != NULL) && (lib->pointer != NULL))
+			{
+				/* Call real function. */
+				ret = Common_Dynamic_Library_Subsystem_Get_LastCallEncounteredError_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)));
+			}
+			else
+			{
+				/* Invalid lib pointer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+			}
+
+			/* Exit function. */
+			return ret;
+		}
+
+		int Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const bool value)
+		{
+			/* Init vars. */
+			int ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+			/* Check for valid pointers. */
+			if ((lib != NULL) && (lib->pointer != NULL))
+			{
+				/* Call real function. */
+				ret = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), value);
+			}
+			else
+			{
+				/* Invalid lib pointer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+			}
+
+			/* Exit function. */
+			return ret;
+		}
+
+		int Common_Dynamic_Library_Subsystem_Get_OsSpecificPointerData_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, void ** retVar)
+		{
+			/* Init vars. */
+			int ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+			/* Check for valid pointers. */
+			if ((lib != NULL) && (lib->pointer != NULL) && (retVar != NULL))
+			{
+				/* Call real function. */
+				ret = Common_Dynamic_Library_Subsystem_Get_OsSpecificPointerData_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), retVar);
+			}
+			else
+			{
+				/* Invalid lib pointer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+			}
+
+			/* Exit function. */
+			return ret;
+		}
+
+		int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const void * value)
+		{
+			/* Init vars. */
+			int ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+			/* Check for valid pointers. */
+			if ((lib != NULL) && (lib->pointer != NULL))
+			{
+				/* Call real function. */
+				ret = Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), value);
+			}
+			else
+			{
+				/* Invalid lib pointer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+			}
+
+			/* Exit function. */
+			return ret;
+		}
+
+		int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char ** retVar)
+		{
+			/* Init vars. */
+			int ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+			/* Check for valid pointers. */
+			if ((lib != NULL) && (lib->pointer != NULL) && (retVar != NULL))
+			{
+				/* Call real function. */
+				ret = Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), retVar);
+			}
+			else
+			{
+				/* Invalid lib pointer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+			}
+
+			/* Exit function. */
+			return ret;
+		}
+
+		int Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char * value, const size_t valueLength)
+		{
+			/* Init vars. */
+			int ret = COMMON_ERROR_UNKNOWN_ERROR;
+			int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+			char * tempPath = NULL;
+
+			/* Check for valid pointers. */
+			if ((lib != NULL) && (lib->pointer != NULL) && (((value == NULL) && (valueLength == 0)) || ((value != NULL) && (valueLength > 0))))
+			{
+				/* Call real function. */
+				ret = Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private)((*lib)->pointer)), value, valueLength);
+			}
+			else
+			{
+				/* Invalid lib pointer. */
+				ret = COMMON_ERROR_INVALID_ARGUMENT;
+			}
+
+			/* Exit function. */
+			return ret;
+		}
+
 #ifdef __cplusplus
-}		// End of extern C.
-#endif
+}		/* End of extern C. */
+#endif	/* __cplusplus	*/
