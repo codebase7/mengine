@@ -18,24 +18,25 @@
     https://github.com/codebase7/mengine    
 */
 
-// Include guard.
+/* Include guard. */
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H
 #error "You must include the Dynamic_Library_Subsystem.h header file. It will include all of the other needed headers."
 #else
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_DATA_STRUCTURES_H
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_DATA_STRUCTURES_H
 
-// Define the supported API level.
+/* Define the supported API level. */
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_LEVEL 0
 
+/* Check for C++ Compiler. */
 #ifdef __cplusplus
-// Define extern C.
+/* Define extern C. */
 extern "C" {
-#endif
-		// Define Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library.
+#endif	/* __cplusplus	*/
+		/* Define Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library. */
 		struct Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library
 		{
-			bool bIsLoaded;				// Whether or not this library is loaded.
+			bool bIsLoaded;				/* Whether or not this library is loaded. */
 			bool bLastCallEncounteredAnError;	/*
 								    Whether or not this library has encountered an error in the last call.
 								    (Should reset to false when a new call is made and no error occurs.)
@@ -46,9 +47,10 @@ extern "C" {
 								    (For example, Windows defines loaded libraries with an HMODULE pointer,
 								    which is needed to unload the library or to search it.)
 								*/
-			const char * pathToLibrary;			// Path to the dynamic library file on disk.
+			const char * pathToLibrary;			/* Path to the dynamic library file on disk. */
 		};
 
+		/* Create user defined data type for Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library structure. */
 		typedef struct Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library;
 
 		/*!
@@ -79,10 +81,10 @@ extern "C" {
 		 */
 		MSYS_DLL_EXPORT void Common_Dynamic_Library_Subsystem_Destroy_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib);
 #ifdef __cplusplus
-}		// End of extern C.
-#endif
+}		/* End of extern C. */
+#endif	/* __cplusplus	*/
 
-#endif
-#endif
+#endif	/*	MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_DATA_STRUCTURES_H	*/
+#endif	/*	MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_H	*/
 
-// End of Dynamic_Library_Subsystem_Data_Structures.h
+/* End of Dynamic_Library_Subsystem_Data_Structures.h */
