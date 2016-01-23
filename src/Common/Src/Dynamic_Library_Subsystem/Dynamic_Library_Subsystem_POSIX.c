@@ -24,6 +24,7 @@
 /* Internal includes */
 #include "Dynamic_Library_Subsystem_Syscall.h"
 #include "../Error_Handler/Common_Error_Handler_Structures.h"
+#include "../Error_Handler/Common_Error_Handler_Error_Codes.h"
 
 /* External includes. */
 #include <dlfcn.h>	/* dlopen, dlclose, dlsym, dlerror. */
