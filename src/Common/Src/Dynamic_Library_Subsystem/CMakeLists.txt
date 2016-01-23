@@ -8,6 +8,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 		# Building on windows.
 		set(DYNAMIC_LIBRARY_SUBSYSTEM_INCLUDES Dynamic_Library_Subsystem_Data_Structures.c
 				Dynamic_Library_Subsystem_Data_Structures_Private_API.c
+				Dynamic_Library_Subsystem.c
 				Dynamic_Library_Subsystem_Windows.c)
 		unset(DYNAMIC_LIBRARY_SUBSYSTEM_LINK_LIBS)
 	
@@ -15,6 +16,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 				# Building on Linux.
 				set(DYNAMIC_LIBRARY_SUBSYSTEM_INCLUDES Dynamic_Library_Subsystem_Data_Structures.c
 				Dynamic_Library_Subsystem_Data_Structures_Private_API.c
+				Dynamic_Library_Subsystem.c
 				Dynamic_Library_Subsystem_POSIX.c)
 				set(DYNAMIC_LIBRARY_SUBSYSTEM_LINK_LIBS dl)
 

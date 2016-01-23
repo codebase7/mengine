@@ -305,16 +305,16 @@ extern "C" {
 			return ret;
 		}
 
-		int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char ** retVar)
+		int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char ** retVar, size_t * retVarLength)
 		{
 			/* Init vars. */
 			int ret = COMMON_ERROR_UNKNOWN_ERROR;
 
 			/* Check for valid pointers. */
-			if ((lib != NULL) && (lib->pointer != NULL) && (retVar != NULL))
+			if ((lib != NULL) && (lib->pointer != NULL) && (retVar != NULL) && (retVarLength != NULL))
 			{
 				/* Call real function. */
-				ret = Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)), retVar);
+				ret = Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(((Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private *)(lib->pointer)), retVar, retVarLength);
 				if (ret == COMMON_ERROR_INVALID_ARGUMENT)
 				{
 					/* That's an error, we didn't set up the private data structure correctly or it's been corrupted. */
