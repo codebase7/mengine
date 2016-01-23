@@ -55,12 +55,13 @@
 extern "C" {
 #endif
 		/*!
-		 * 	int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary,
+		 * 	int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const size_t pathToLibraryLength, const bool reloadLibrary,
 		 * 							    Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
 		 *
 		 * 	This function calls the system specific dynamic library handler and attempts to load the requested library.
 		 *
 		 * 	Pram: const char * pathToLibrary, a pointer to the c-string that contains the path to the library on disk.
+		 *	Pram: const size_t pathToLibraryLength, length of the pathToLibrary c-string in bytes.
 		 * 	Pram: const bool reloadLibrary, whether or not to reload the library if it is already loaded.
 		 * 	Pram: Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, A pointer to a properly constructed
 		 * 	management data structure used internally.
@@ -72,7 +73,7 @@ extern "C" {
 		 * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library pointer was NULL.
 		 *	Returns DYNLIB_ERROR_LIBRARY_ALREADY_LOADED if the library was already loaded. (Only possible if reloadLibrary is false.) (The value of lib.bLastCallEncounteredAnError will be false in this case as well.)
 		 */
-		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const bool reloadLibrary,
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Load_Library(const char * pathToLibrary, const size_t pathToLibraryLength, const bool reloadLibrary,
 																		 Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
 
 		/*!
