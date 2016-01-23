@@ -33,7 +33,7 @@ extern "C" {
 		int Common_Dynamic_Library_Subsystem_Get_API_Major_Version_Number()
 		{
 			/* Return the API Version number. */
-			return MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_LEVEL;
+			return MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_MAJOR_VER;
 		}
 
 		int Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library ** lib)

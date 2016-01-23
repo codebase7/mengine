@@ -25,8 +25,8 @@
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_DATA_STRUCTURES_H
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_DATA_STRUCTURES_H
 
-/* Define the supported API level. */
-#define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_LEVEL 0
+/* Define the supported API version numbers. */
+#define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_MAJOR_VER 0
 
 /* Internal includes. */
 #include "../../../DLL_PORT.h"
