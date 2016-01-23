@@ -102,19 +102,35 @@ extern "C" {
 		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Unload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
 
 		/*!
+		 *	int Common_Dynamic_Library_Subsystem_Reload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib)
+		 *
+		 *	This function reloads the given library.
+		 *
+		 *	(Effectively this function is a wrapper around Common_Dynamic_Library_Subsystem_Load_Library(), setting it's
+		 *	 reloadLibrary argument to true, and using the given management structure's path.)
+		 *
+		 *	Returns COMMON_ERROR_SUCCESS if the library is reloaded successfully.
+		 *
+		 *	Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer is NULL, or if the given management structure
+		 *	does not define a path. (Such as when it's first created or if it was cleared by a call to
+		 *	Common_Dynamic_Library_Subsystem_Blank_Loaded_Dynamic_Library().)
+		 *
+		 *	Otherwise returns any error given by Common_Dynamic_Library_Subsystem_Load_Library().
+		 */
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Reload_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib);
+
+		/*!
 		 * 	int Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib,
-		 * 							     const char * symbolName, void ** retSym)
+		 * 							     const char * symbolName, const size_t symbolNameLength, void ** retSym)
 		 *
 		 * 	This function calls the system specific dynamic library handler and attempts to fetch a pointer to the first byte
 		 * 	of the given symbol.
-		 *
-		 * 	Note: To check for an error result from this function, check the value of lib.bLastCallEncounteredAnError.
-		 * 	If lib.bLastCallEncounteredAnError is false, no error occured during this function. Otherwise an error occured.
 		 *
 		 * 	Pram: Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, A pointer to a properly constructed
 		 * 	management data structure used internally.
 		 * 	Pram: const char * symbolName, A pointer to a c-string that contains the name of the requested symbol to
 		 * 	search for.
+		 *	Pram: const size_t symbolNameLength, the length of symbolName in bytes.
 		 *	Pram: void ** retSym, A double pointer that will hold the address to the first byte of the requested symbol if the function succeeds.
 		 *	(retSym will NOT be modified if this function returns an error.)
 		 *
@@ -125,7 +141,7 @@ extern "C" {
 		 *	Returns COMMON_ERROR_INVALID_ARGUMENT if the given Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library, symbolName, or retSym pointer(s) was / were set to NULL.
 		 *	Returns DYNLIB_ERROR_LIBRARY_NOT_LOADED if the library was not loaded according to the given management data structure.
 		 */
-		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName, void ** retSym);
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_Symbol(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library *const lib, const char * symbolName, const size_t symbolNameLength, void ** retSym);
 #ifdef __cplusplus
 }		/* End of extern C. */
 #endif	/* __cplusplus */
