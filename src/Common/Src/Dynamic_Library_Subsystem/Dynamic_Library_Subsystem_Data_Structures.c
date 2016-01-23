@@ -30,7 +30,7 @@
 /* Define extern C. */
 extern "C" {
 #endif	/* __cplusplus	 */
-		int Common_Dynamic_Library_Subsystem_Get_API_Version()
+		int Common_Dynamic_Library_Subsystem_Get_API_Major_Version_Number()
 		{
 			/* Return the API Version number. */
 			return MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_LEVEL;

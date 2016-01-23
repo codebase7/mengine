@@ -46,11 +46,11 @@ extern "C" {
 		typedef struct Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library;
 
 		/*!
-		 *	int Common_Dynamic_Library_Subsystem_Get_API_Version()
+		 *	int Common_Dynamic_Library_Subsystem_Get_API_Major_Version_Number()
 		 *
-		 *	Returns the API version for the Dynamic Library Subsystem.
+		 *	Returns the API major version number for the Dynamic Library Subsystem.
 		 */
-		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_API_Version();
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_API_Major_Version_Number();
 
 		/*!
 		 * 	int Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library ** lib)
