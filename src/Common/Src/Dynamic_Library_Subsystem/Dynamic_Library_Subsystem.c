@@ -22,6 +22,7 @@
 #include "Dynamic_Library_Subsystem.h"
 #include "Dynamic_Library_Subsystem_Syscall.h"
 #include "../Error_Handler/Common_Error_Handler_Structures.h"
+#include "../Error_Handler/Common_Error_Handler_Error_Codes.h"
 #include "../../../Core/Src/DataProcess.h"
 
 /* Check for C++ Compiler. */
