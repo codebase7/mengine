@@ -25,8 +25,10 @@
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_DATA_STRUCTURES_H
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_DATA_STRUCTURES_H
 
-/* Define the supported API level. */
-#define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_LEVEL 0
+/* Define the supported API version numbers. */
+#define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_MAJOR_VER 0
+#define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_MINOR_VER 0
+#define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_REVISION_VER 0
 
 /* Internal includes. */
 #include "../../../DLL_PORT.h"
@@ -46,11 +48,25 @@ extern "C" {
 		typedef struct Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library;
 
 		/*!
-		 *	int Common_Dynamic_Library_Subsystem_Get_API_Version()
+		 *	int Common_Dynamic_Library_Subsystem_Get_API_Major_Version_Number()
 		 *
-		 *	Returns the API version for the Dynamic Library Subsystem.
+		 *	Returns the API major version number for the Dynamic Library Subsystem.
 		 */
-		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_API_Version();
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_API_Major_Version_Number();
+
+		/*!
+		 *	int Common_Dynamic_Library_Subsystem_Get_API_Minor_Version_Number()
+		 *
+		 *	Returns the API minor version number for the Dynamic Library Subsystem.
+		 */
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_API_Minor_Version_Number();
+
+		/*!
+		 *	int Common_Dynamic_Library_Subsystem_Get_API_Revision_Version_Number()
+		 *
+		 *	Returns the API revision version number for the Dynamic Library Subsystem.
+		 */
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_API_Revision_Version_Number();
 
 		/*!
 		 * 	int Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library ** lib)

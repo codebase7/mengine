@@ -23,6 +23,8 @@
 #include "Dynamic_Library_Subsystem_Data_Structures_Private_API.h"
 #include "../../../Core/Src/DataProcess.h"
 #include "../Error_Handler/Common_Error_Handler_Error_Codes.h"
+#include "../Error_Handler/Common_Error_Handler_Internal.h"
+#include "../Error_Handler/Common_Error_Handler_Structures.h"
 
 /* Check for C++ Compiler. */
 #ifdef __cplusplus
@@ -59,6 +61,9 @@ extern "C" {
 				{
 					/* Could not init structure. */
 					ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
+					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library_Private(): Memory allocation function returned: ");
+					COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+					COMMON_LOG_DEBUG(" Could not allocate memory for management structure.");
 				}
 			}
 			else
@@ -292,6 +297,9 @@ extern "C" {
 					{
 						/* Could not allocate memory for path string. */
 						ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
+						COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library_Private(): Memory allocation function returned: ");
+						COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+						COMMON_LOG_DEBUG(" Could not allocate memory for library path.");
 					}
 				}
 
