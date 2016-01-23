@@ -36,6 +36,18 @@ extern "C" {
 			return MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_MAJOR_VER;
 		}
 
+		int Common_Dynamic_Library_Subsystem_Get_API_Minor_Version_Number()
+		{
+			/* Return the API Version number. */
+			return MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_Minor_VER;
+		}
+
+		int Common_Dynamic_Library_Subsystem_Get_API_Revision_Version_Number()
+		{
+			/* Return the API Version number. */
+			return MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_REVISION_VER;
+		}
+
 		int Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library ** lib)
 		{
 			/* Init vars. */
