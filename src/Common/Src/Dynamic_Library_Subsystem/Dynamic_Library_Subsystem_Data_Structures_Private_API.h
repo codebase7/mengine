@@ -54,6 +54,7 @@ extern "C" {
 								    which is needed to unload the library or to search it.)
 								*/
 			char * pathToLibrary;			/* Path to the dynamic library file on disk. */
+			size_t pathToLibraryLength;		/* Length of the pathToLibrary c-string in bytes. */
 		};
 
 		/* Create user defined data type for Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private structure. */
@@ -194,11 +195,11 @@ extern "C" {
 		int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library_Private(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, void * value);
 
 		/*!
-		 * 	int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const char ** retVar)
+		 * 	int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const char ** retVar, size_t * retVarLength)
 		 *
 		 * 	ACCESSOR FUNCTION.
 		 *
-		 *	Returns the pointer for the pathToLibrary member variable.
+		 *	Returns the pointer for the pathToLibrary member variable, and the value of the pathToLibraryLength member variable.
 		 *
 		 *	WARNING: This function will NOT deallocate a preexisting structure, and will overwrite the given pointer if it is
 		 *	non-NULL if this function succeeds. Therefore if you need to keep the pointer, copy it elsewhere before calling this
@@ -210,7 +211,7 @@ extern "C" {
 		 * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer is NULL.
 		 *	Otherwise returns the appropriate error code.
 		 */
-		int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const char ** retVar);
+		int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const char ** retVar, size_t * retVarLength);
 
 		/*!
 		 * 	int Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library_Private(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const char * value, const size_t valueLength)

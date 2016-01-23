@@ -203,11 +203,11 @@ extern "C" {
 		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const void * value);
 
 		/*!
-		 * 	int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char ** retVar)
+		 * 	int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char ** retVar, size_t * retVarLength)
 		 *
 		 * 	ACCESSOR FUNCTION.
 		 *
-		 *	Returns the pointer for the pathToLibrary member variable.
+		 *	Returns the pointer for the pathToLibrary member variable, and the value of the pathToLibraryLength member variable.
 		 *
 		 *	WARNING: This function will NOT deallocate a preexisting structure, and will overwrite the given pointer if it is
 		 *	non-NULL if this function succeeds. Therefore if you need to keep the pointer, copy it elsewhere before calling this
@@ -219,7 +219,7 @@ extern "C" {
 		 * 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given pointer is NULL.
 		 *	Otherwise returns the appropriate error code.
 		 */
-		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char ** retVar);
+		MSYS_DLL_EXPORT int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char ** retVar, size_t * retVarLength);
 
 		/*!
 		 * 	int Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library(Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library * lib, const char * value, const size_t valueLength)
