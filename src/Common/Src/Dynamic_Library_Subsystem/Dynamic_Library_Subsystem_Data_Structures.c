@@ -39,7 +39,7 @@ extern "C" {
 		int Common_Dynamic_Library_Subsystem_Get_API_Minor_Version_Number()
 		{
 			/* Return the API Version number. */
-			return MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_Minor_VER;
+			return MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_API_MINOR_VER;
 		}
 
 		int Common_Dynamic_Library_Subsystem_Get_API_Revision_Version_Number()
