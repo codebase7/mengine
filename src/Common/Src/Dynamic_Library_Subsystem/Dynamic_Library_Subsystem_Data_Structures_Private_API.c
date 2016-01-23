@@ -97,6 +97,7 @@ extern "C" {
 				lib->bIsLoaded = false;
 				lib->bLastCallEncounteredAnError = false;
 				lib->osSpecificPointerData = NULL;
+				lib->pathToLibraryLength = 0;
 
 				/* Check for set pathToLibrary. */
 				if (lib->pathToLibrary != NULL)
@@ -248,16 +249,19 @@ extern "C" {
 			return ret;
 		}
 
-		int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const char ** retVar)
+		int Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library_Private(const Common_Dynamic_Library_Subsystem_Loaded_Dynamic_Library_Private * lib, const char ** retVar, size_t * retVarLength)
 		{
 			/* Init vars. */
 			int ret = COMMON_ERROR_UNKNOWN_ERROR;
 
 			/* Check for valid pointer. */
-			if ((lib != NULL) && (retVar != NULL))
+			if ((lib != NULL) && (retVar != NULL) && (retVarLength != NULL))
 			{
 				/* Get the pathToLibrary pointer and copy it to retVar. */
 				(*retVar) = lib->pathToLibrary;
+
+				/* Get the length of pathToLibrary and copy it to retVarLength. */
+				(*retVarLength) = lib->pathToLibraryLength;
 
 				/* Success. */
 				ret = COMMON_ERROR_SUCCESS;
@@ -310,13 +314,20 @@ extern "C" {
 					{
 						/* Deallocate the path string. */
 						DataProcess_Deallocate_CString(&(lib->pathToLibrary));
+
+						/* Reset the path string's length. */
+						lib->pathToLibraryLength = 0;
 					}
 
-					/* Check and see if we need to copy the tempPath pointer. */
+					/* Check and see if we need to copy the tempPath pointer and length. */
 					if (tempPath != NULL)
 					{
 						/* Copy the tempPath pointer to the structure. */
 						lib->pathToLibrary = tempPath;
+					}
+					if (valueLength > 0)
+					{
+						lib->pathToLibraryLength = valueLength;
 					}
 
 					/* Success. */
