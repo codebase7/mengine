@@ -30,7 +30,7 @@
 #define COMMON_UNKNOWN_ERROR_MSG_DEF "Unknown error code."
 
 /* Error code table ABI version. */
-#define COMMON_ERROR_TABLE_ABI_VER 3	/* Increment this if you alter the table. */
+#define COMMON_ERROR_TABLE_ABI_VER 4	/* Increment this if you alter the table. */
 
 /* Enable C linkage if needed. */
 #ifdef __cplusplus

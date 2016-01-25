@@ -81,6 +81,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{COMMON_ERROR_HOST_NOT_SUPPORTED, "The host system does not support the requested function / command / feature."},
 	{COMMON_ERROR_TRUE, "The result of the previous operation returned true. (See the code documentation for what the result actually means. This is just a generic boolean response.)"},
 	{COMMON_ERROR_FALSE, "The result of the previous operation returned false. (See the code documentation for what the result actually means. This is just a generic boolean response.)"},
+	{COMMON_ERROR_ARGUMENT_CONVERSION_FAILURE, "A given argument to the previous engine call was not converted properly. (See the code documentation for what the result actually means.)"},
 	/* Rendering Subsystem error codes. */
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF, "Could not allocate memory for overlay image buffer."},
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF, "Could not allocate memory for transparency data buffer."},
