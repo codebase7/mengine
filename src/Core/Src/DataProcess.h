@@ -133,6 +133,29 @@ MSYS_DLL_EXPORT int DataProcess_Reallocate_C_String_With_NULL_Terminator(char **
 MSYS_DLL_EXPORT void DataProcess_Deallocate_CString(char ** str);
 
 /*!
+	int DataProcess_Copy_C_String(const char * source, const size_t sourceLength, char ** dest)
+
+	Internal function for coping a const string for later modification.
+	(Copied string if the function succeeds will be pointed to by dest, copied string is always
+	 the same length as it's source.)
+
+	Note: This function will overwrite dest without deallocating it. If you need whatever
+	dest points to after this function returns, copy the pointer elsewhere before calling
+	this function.
+
+	When this string is no longer needed it should be deallocated by
+	DataProcess_Deallocate_CString().
+
+	Returns COMMON_ERROR_SUCCESS if successful.
+	Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is NULL, or if sourceLength <= 0.
+	Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+
+	No alteration clause:
+		In the event of an error, this function will not modifiy the arguments given to it.
+*/
+MSYS_DLL_EXPORT int DataProcess_Copy_C_String(const char * source, const size_t sourceLength, char ** dest);
+
+/*!
  *		int DataProcess_getCStringFromSizeT(const size_t number, char ** str, size_t * strLength)
  *
  *		Takes given size_t and outputs the equivalent human-readable string as a C-String.

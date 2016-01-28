@@ -144,6 +144,59 @@ void DataProcess_Deallocate_CString(char ** str)
 	return;
 }
 
+int DataProcess_Copy_C_String(const char * source, const size_t sourceLength, char ** dest)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of other engine functions. */
+	size_t x = 0;									/* Loop counter. */
+	char * tempDest = NULL;							/* Temporary pointer used to copy the source string. */
+
+	/* Check for valid arguments. */
+	if ((source != NULL) && (sourceLength > 0) && (dest != NULL))
+	{
+		/* Allocate memory for the copy. */
+		retFromCall = DataProcess_Reallocate_C_String(&tempDest, 0, sourceLength);
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempDest != NULL))
+		{
+			/* Copy the string. */
+			for (x = 0; (x < sourceLength); x++)
+			{
+				tempDest[x] = source[x];
+			}
+
+			/* Copy the pointer. */
+			(*dest) = tempDest;
+
+			/* Done. */
+			ret = COMMON_ERROR_SUCCESS;
+		}
+		else
+		{
+			/* Could not allocate memory for tempDest. */
+			ret = COMMON_ERROR_MEMORY_ERROR;
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Check for no success. */
+	if (ret != COMMON_ERROR_SUCCESS)
+	{
+		/* Deallocate tempDest if needed. */
+		if (tempDest != NULL)
+		{
+			DataProcess_Deallocate_CString(&tempDest);
+		}
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 #ifdef __cplusplus
 }	/* End of extern "C". */
 #endif	/* __cplusplus */
