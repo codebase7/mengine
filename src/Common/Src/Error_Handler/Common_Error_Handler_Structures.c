@@ -82,6 +82,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{COMMON_ERROR_TRUE, "The result of the previous operation returned true. (See the code documentation for what the result actually means. This is just a generic boolean response.)"},
 	{COMMON_ERROR_FALSE, "The result of the previous operation returned false. (See the code documentation for what the result actually means. This is just a generic boolean response.)"},
 	{COMMON_ERROR_ARGUMENT_CONVERSION_FAILURE, "A given argument to the previous engine call was not converted properly. (See the code documentation for what the result actually means.)"},
+	{COMMON_ERROR_FALSE_SUCCESS, "A success code was returned without a valid result. (AKA. Some expected return value was not obtained, was invalid, corrupted, etc. This can happen when the engine interacts with poorly written / designed code. Including when interacting with itself.)"},
 	/* Rendering Subsystem error codes. */
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF, "Could not allocate memory for overlay image buffer."},
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF, "Could not allocate memory for transparency data buffer."},
@@ -121,6 +122,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{DYNLIB_ERROR_LIBRARY_ALREADY_LOADED, "The given library is already loaded."},
 	{DYNLIB_ERROR_LIBRARY_NOT_LOADED, "The given library is not currently loaded."},
 	{DYNLIB_ERROR_HOST_VS_LIBRARY_MISMATCH, "The given library was built for a different system. (Different OS / Arch / etc.)"},
+	{DYNLIB_ERROR_SYMBOL_NOT_FOUND, "The requested symbol was not found in the given library."},
 	/* TODO: Need to add the error codes from all common namespace functions. */
 };
 
