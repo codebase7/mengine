@@ -121,6 +121,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{DYNLIB_ERROR_LIBRARY_ALREADY_LOADED, "The given library is already loaded."},
 	{DYNLIB_ERROR_LIBRARY_NOT_LOADED, "The given library is not currently loaded."},
 	{DYNLIB_ERROR_HOST_VS_LIBRARY_MISMATCH, "The given library was built for a different system. (Different OS / Arch / etc.)"},
+	{DYNLIB_ERROR_SYMBOL_NOT_FOUND, "The requested symbol was not found in the given library."},
 	/* TODO: Need to add the error codes from all common namespace functions. */
 };
 
