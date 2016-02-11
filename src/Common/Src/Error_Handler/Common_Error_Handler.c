@@ -36,17 +36,6 @@
 extern "C" {
 #endif	/* __cplusplus */
 
-/*!
- * 	static int Common_commonLastErrorCode
- * 
- * 	Contains the last error code encountered by a Common namespace function.
- * 
- * 	Note: Calling Common_GetErrorMessage() or Common_GetErrorTableSize()
- * 	will NOT clear this variable.
- * 	Calling any other Common namespace function WILL clear this variable.
- */
-static int Common_commonLastErrorCode = COMMON_ERROR_SUCCESS;
-
 void Common_Set_Error_Log_Level(const unsigned int logLevel)
 {
 	/* Set the log level. */
