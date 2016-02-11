@@ -398,6 +398,12 @@ short Unit_Test_Rendering_Subsystem_Main()
 	// Enable debug output.
 	Common::Renderer::DebugChannel.change_log_level(ERROR_VERBOSE);
 
+	// Tell the user the Rendering Subsystem API Version.
+	std::cout << "Rendering Subsystem Version: v" << Common::Renderer::Get_Rendering_Subsystem_API_Major_Version_Number() << '.';
+	std::cout << Common::Renderer::Get_Rendering_Subsystem_API_Minor_Version_Number() << '.';
+	std::cout << Common::Renderer::Get_Rendering_Subsystem_API_Revision_Version_Number() << ".\n";
+	std::cout.flush();
+
 	// Tell the user we are currently testing the Renderer_Text_Console class.
 	std::cout << "Performing tests on the Renderer_Text_Console class.\n";
 	std::cout << "Please wait.\n";
