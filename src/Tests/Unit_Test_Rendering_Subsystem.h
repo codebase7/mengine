@@ -22,6 +22,9 @@
 #ifndef RENDER_SUBSYS_UNIT_TESTS
 #define RENDER_SUBSYS_UNIT_TESTS
 
+/* Only continue if the compiler is a C++ compiler. */
+#ifdef __cplusplus
+
 // Include base header from Rendering Subsystem.
 #include "../Common/Src/Rendering_Subsystem/Renderer.h"
 
@@ -145,6 +148,8 @@ bool Renderer_Text_Console_Basic_No_Overlay_Test();
  */
 short Unit_Test_Rendering_Subsystem_Main();
 
-#endif
+#endif	/* __cplusplus */
+
+#endif	/* RENDER_SUBSYS_UNIT_TESTS */
 
 // End of Unit_Test_Rendering_Subsystem.h

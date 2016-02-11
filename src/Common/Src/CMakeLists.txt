@@ -49,6 +49,14 @@ if (BUILD_THREADING_SUBSYSTEM)
 endif (BUILD_THREADING_SUBSYSTEM)
 
 
+# Create the Rendering Subsystem.
+if (BUILD_RENDERING_SUBSYSTEM)
+	add_subdirectory(Rendering_Subsystem)
+	set (COMMON_BUILT_SHARED_LIBRARY_LIST ${COMMON_BUILT_SHARED_LIBRARY_LIST} Rendering_Subsystem_Multiverse_Engine)
+	set (COMMON_BUILT_STATIC_LIBRARY_LIST ${COMMON_BUILT_STATIC_LIBRARY_LIST} Rendering_Subsystem_Multiverse_Engine_Static)
+endif (BUILD_RENDERING_SUBSYSTEM)
+
+
 # Add static library.
 add_library(Common_Multiverse_Engine_Static STATIC Generic_Wrapper.cpp)
 target_link_libraries(Common_Multiverse_Engine_Static Core_Multiverse_Engine_Static

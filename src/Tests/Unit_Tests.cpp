@@ -28,6 +28,7 @@ int main()
 	short error_code_data_object = 0;
 	short error_code_fileutills = 0;
 	short error_code_thread_utils = 0;
+	short error_code_rendering_subsys = 0;
 	int error_code_byte_order = 0;
 
     // Starting Unit tests.
@@ -56,6 +57,14 @@ int main()
 #else
 	std::cout << "Thread_Utils was disabled at build time. Skipping Thread_Utils tests.\n";
 #endif	/* MSYS_HAVE_THREAD_UTILS */
+
+/* Only call Rendering_Subsystem tests if Rendering_Subsystem was built. */
+#ifdef MSYS_HAVE_RENDERING_SUBSYS
+	std::cout << "Starting Rendering_Subsystem Tests.\n";
+	error_code_rendering_subsys = Unit_Test_Rendering_Subsystem_Main();
+#else
+	std::cout << "Rendering_Subsystem was disabled at build time. Skipping Rendering_Subsystem tests.\n";
+#endif	/* MSYS_HAVE_RENDERING_SUBSYS */
 
 	// Output overall test results.
 	std::cout << "Overall Test Results:\n\n";
@@ -98,6 +107,19 @@ int main()
 		std::cout << "PASS\n";
 	}
 #endif	/* MSYS_HAVE_THREAD_UTILS */
+
+#ifdef MSYS_HAVE_RENDERING_SUBSYS
+	std::cout << "Rendering_Subsystem Tests: ";
+	if (error_code_rendering_subsys != 0)
+	{
+		std::cout << "FAIL\n";
+		std::cout << "Returned error code was: " << error_code_rendering_subsys << ".\n";
+	}
+	else
+	{
+		std::cout << "PASS\n";
+	}
+#endif	/* MSYS_HAVE_RENDERING_SUBSYS */
 
 	/* Exit test program. */
 	return 0;

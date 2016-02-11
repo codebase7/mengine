@@ -33,6 +33,10 @@
 #include "Unit_Tests_Thread_Utils.h"
 #endif	/* MSYS_HAVE_THREAD_UTILS */
 
+#ifdef MSYS_HAVE_RENDERING_SUBSYS
+#include "Unit_Test_Rendering_Subsystem.h"
+#endif	/* MSYS_HAVE_RENDERING_SUBSYS */
+
 #ifdef MSYS_HAVE_COMMON_ERROR_HANDLER
 #include "Unit_Tests_Common_Error_Handler.h"
 #endif	/* MSYS_HAVE_COMMON_ERROR_HANDLER */

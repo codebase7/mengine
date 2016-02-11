@@ -29,6 +29,7 @@ option (BUILD_INTERNAL_MUTEX_THREAD_SUBSYS_WRAPPER "Whether or not the Threading
 option (BUILD_INTERNAL_MUTEX_THREAD_SUBSYS_WRAPPER_PLUGIN "Whether or not to build the Threading Subsystem plugin for Internal Mutex Support. (Defaults to yes, but is disabled currently due to changes to Thread_Utils that have not been commited yet.)" OFF)
 option (BUILD_FILE_MANAGEMENT_SUBSYSTEM "Whether or not to build the file management subsystem. FileUtills. (Defaults to yes.)" ON)
 option (BUILD_THREADING_SUBSYSTEM "Whether or not to build the threading subsystem. Thread_Utils. (Defaults to yes.)" ON)
+option (BUILD_RENDERING_SUBSYSTEM "Whether or not to build the rendering subsystem. (Defaults to yes.)" ON)
 option (ENABLE_THREADING_SUBSYSTEM_PLUGIN_SUPPORT "Whether or not to enable the threading subsystem's plugin support. (Defaults to yes.)" ON)
 option (BUILD_THREAD_SUBSYS_PTHREADS_PLUGIN "Whether or not to build the threading subsystem's pthreads plugin. (Defaults to yes.)" ON)
 option (BUILD_UNIT_TESTS "Whether or not to build the unit_test program. (Defaults to yes.)" ON)

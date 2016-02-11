@@ -21,6 +21,11 @@
 /* Internal includes. */
 #include "Unit_Tests.h"
 
+/* Use C linkage. */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
+
 /*!
  *		Unit_Tests_DataProcess_TRNG()
  *
@@ -1065,3 +1070,7 @@ int Unit_Tests_DataProcess_Main()
 	/* Return ret. */
 	return ret;
 }
+
+#ifdef __cplusplus
+}	/* extern "C" */
+#endif	/* __cplusplus */

@@ -29,6 +29,11 @@ if (BUILD_THREADING_SUBSYSTEM)
 		set (UNIT_TESTS_DEFINES ${UNIT_TESTS_DEFINES} MSYS_HAVE_THREAD_UTILS)
 endif (BUILD_THREADING_SUBSYSTEM)
 
+if (BUILD_RENDERING_SUBSYSTEM)
+		set (UNIT_TESTS_INCLUDES ${UNIT_TESTS_INCLUDES} Unit_Test_Rendering_Subsystem.cpp)
+		set (UNIT_TESTS_DEFINES ${UNIT_TESTS_DEFINES} MSYS_HAVE_RENDERING_SUBSYS)
+endif (BUILD_RENDERING_SUBSYSTEM)
+
 # Add shared library executable.
 add_executable(Unit_Tests ${UNIT_TESTS_INCLUDES})
 target_link_libraries(Unit_Tests Common_Multiverse_Engine Core_Multiverse_Engine)
