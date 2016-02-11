@@ -878,7 +878,7 @@ bool Common::Renderer::Renderer_Text_Console::Duplicate_Overlay(const size_t & s
 const char * Common::Renderer::Renderer_Text_Console::Get_Last_Error_From_Overlay(const size_t & overlayNumber) const
 {
 	// Init result.
-	const char * result = Common::commonErrorTable[2].error;	// Holds the pointer to the error message string. (Default is to return the invalid argument message. (If the overlay is valid it will set unknown error.))
+	const char * result = NULL;	// Holds the pointer to the error message string. (Default is to return the invalid argument message. (If the overlay is valid it will set unknown error.))
 
 	// Check and see if the given overlay exists.
 	if ((this->bOverlaysEnabled) && ((overlayNumber >= 0) && (overlayNumber < this->overlayStack.size())))
@@ -894,7 +894,7 @@ const char * Common::Renderer::Renderer_Text_Console::Get_Last_Error_From_Overla
 short Common::Renderer::Renderer_Text_Console::Get_Last_Error_Code_From_Overlay(const size_t & overlayNumber) const
 {
 	// Init result.
-	short result = COMMON_INVALID_ARGUMENT;		// Holds the error code from the overlay. (Default is to return invalid argument.)
+	short result = COMMON_ERROR_INVALID_ARGUMENT;		// Holds the error code from the overlay. (Default is to return invalid argument.)
 
 	// Check and see if the given overlay exists.
 	if ((this->bOverlaysEnabled) && ((overlayNumber >= 0) && (overlayNumber < this->overlayStack.size())))

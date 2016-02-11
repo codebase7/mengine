@@ -78,7 +78,7 @@ namespace Common
 				{
 					created = false;
 					transparencyBufferEnabled = true;
-					lastError = COMMON_SUCCESS;
+					lastError = COMMON_ERROR_SUCCESS;
 					debugLevel = ERROR_CRITICAL;
 					masterXAxisOffset = 0;
 					masterYAxisOffset = 0;
@@ -118,7 +118,7 @@ namespace Common
 					this->calcTrans = funct;
 
 					// Reset lastError.
-					this->lastError = COMMON_SUCCESS;
+					this->lastError = COMMON_ERROR_SUCCESS;
 
 					// Exit function.
 					return;
@@ -247,26 +247,18 @@ namespace Common
 				const char * Get_Last_Error() const
 				{
 					// Init result.
-					const char * result = Common::commonErrorTable[1].error;	// Default is unknown error.
+					const char * result = NULL;	// Default is unknown error.
 
 					// Guard against no error.
 					if (this->lastError != 0)
 					{
-						// Start lookup loop.
-						for (size_t x = 0; ((x < Common::Get_Error_Table_Size()) && (result == Common::commonErrorTable[1].error)); x++)
-						{
-							// Check for matching error code.
-							if (this->lastError == Common::commonErrorTable[x].errorCode)
-							{
-								// Set the error message.
-								result = Common::commonErrorTable[x].error;
-							}
-						}
+						/* Call error lookup function call. */
+						result = Common_Get_Error_Message(this->lastError);
 					}
 					else
 					{
 						// Result is no error.
-						result = Common::commonErrorTable[0].error;
+						result = Common_Get_Error_Message(COMMON_ERROR_SUCCESS);
 					}
 
 					// Return the result.
@@ -292,7 +284,7 @@ namespace Common
 				void Clear_Last_Error()
 				{
 					// Reset lastError.
-					this->lastError = COMMON_SUCCESS;
+					this->lastError = COMMON_ERROR_SUCCESS;
 
 					// Exit function.
 					return;
@@ -349,7 +341,7 @@ namespace Common
 					bool result = false;					// The result of this function.
 
 					// Reset this->lastError.
-					this->lastError = COMMON_SUCCESS;
+					this->lastError = COMMON_ERROR_SUCCESS;
 
 					// Check for invalid resolutions.
 					if ((xResolution > 0) && (yResolution > 0))
@@ -432,7 +424,7 @@ namespace Common
 										}
 
 										// Could not allocate memory for overlay transparency data buffer.
-										this->lastError = RENDERER_UNABLE_TO_ALLOC_TD_BUF;
+										this->lastError = RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF;
 									}
 								}
 								else
@@ -447,13 +439,13 @@ namespace Common
 							else
 							{
 								// Could not allocate memory for overlay image buffer.
-								this->lastError = RENDERER_UNABLE_TO_ALLOC_OI_BUF;
+								this->lastError = RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF;
 							}
 						}
 						catch(...)
 						{
 							// An exception was thrown while attempting to create the overlay.
-							this->lastError = RENDERER_MEM_BUF_ALLOC_EXCEPTION;
+							this->lastError = RENDERER_ERROR_MEM_BUF_ALLOC_EXCEPTION;
 
 							// Check to see the overlay data image buffer was allocated.
 							if (this->overlayData != NULL)
@@ -856,7 +848,7 @@ namespace Common
 #endif
 
 					// Reset this->lastError.
-					this->lastError = COMMON_SUCCESS;
+					this->lastError = COMMON_ERROR_SUCCESS;
 
 					// Exit function.
 					return;
@@ -1285,7 +1277,7 @@ namespace Common
 					}
 #endif
 					// Reset this->lastError.
-					this->lastError = COMMON_SUCCESS;
+					this->lastError = COMMON_ERROR_SUCCESS;
 
 					// Exit function.
 					return;
@@ -1334,7 +1326,7 @@ namespace Common
 					}
 
 					// Reset this->lastError.
-					this->lastError = COMMON_SUCCESS;
+					this->lastError = COMMON_ERROR_SUCCESS;
 
 					// Exit function.
 					return;
@@ -1367,7 +1359,7 @@ namespace Common
 					// Reset the remaining variables.
 					this->transparencyBufferEnabled = false;
 					this->calcTrans = NULL;
-					this->lastError = COMMON_SUCCESS;
+					this->lastError = COMMON_ERROR_SUCCESS;
 					this->debugLevel = 0;
 					Common::Renderer::DebugChannel.change_log_level(this->debugLevel);
 					this->masterXAxisOffset = 0;
@@ -1393,7 +1385,7 @@ namespace Common
 					bool result = false;		// The result of this function.
 
 					// Reset this->lastError.
-					this->lastError = COMMON_SUCCESS;
+					this->lastError = COMMON_ERROR_SUCCESS;
 
 					// Check and see if Create_Overlay() has been run at least once.
 					if (this->created)
@@ -1466,7 +1458,7 @@ namespace Common
 										}
 
 										// Could not allocate memory for the transparencyData buffer.
-										this->lastError = RENDERER_UNABLE_TO_ALLOC_TD_BUF;
+										this->lastError = RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF;
 									}
 								}
 								else
@@ -1478,13 +1470,13 @@ namespace Common
 							else
 							{
 								// Could not allocate memory for overlay image buffer.
-								this->lastError = RENDERER_UNABLE_TO_ALLOC_OI_BUF;
+								this->lastError = RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF;
 							}
 						}
 						catch(...)
 						{
 							// An exception was thrown while attempting to create the overlay.
-							this->lastError = RENDERER_MEM_BUF_ALLOC_EXCEPTION;
+							this->lastError = RENDERER_ERROR_MEM_BUF_ALLOC_EXCEPTION;
 
 							// Check to see the overlay data image buffer was allocated.
 							if (this->overlayData != NULL)
@@ -1540,7 +1532,7 @@ namespace Common
 					if (this != &src)
 					{
 						// Reset this->lastError.
-						this->lastError = COMMON_SUCCESS;
+						this->lastError = COMMON_ERROR_SUCCESS;
 
 						// Swap the created flags.
 						temp_bool = this->created;
@@ -1606,7 +1598,7 @@ namespace Common
 					else
 					{
 						// We are the given overlay, cannot do self assignment.
-						this->lastError = RENDERER_INVAL_OVERLAY_SELF_OVERWRITE;
+						this->lastError = RENDERER_ERROR_INVAL_OVERLAY_SELF_OVERWRITE;
 					}
 
 					// Return the result.
@@ -1638,7 +1630,7 @@ namespace Common
 					if (this != &src)
 					{
 						// Reset this->lastError.
-						this->lastError = COMMON_SUCCESS;
+						this->lastError = COMMON_ERROR_SUCCESS;
 
 						// Copy the created flag of the source overlay.
 						this->created = src.created;
@@ -1695,7 +1687,7 @@ namespace Common
 								catch(...)
 								{
 									// Exception thrown.
-									this->lastError = RENDERER_MEM_BUF_ALLOC_EXCEPTION;
+									this->lastError = RENDERER_ERROR_MEM_BUF_ALLOC_EXCEPTION;
 								}
 
 								// Make sure that the overlayData buffer was allocated.
@@ -1736,14 +1728,14 @@ namespace Common
 											}
 
 											// Could not allocate memory for transparencyData buffer.
-											this->lastError = RENDERER_UNABLE_TO_ALLOC_TD_BUF;
+											this->lastError = RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF;
 										}
 									}
 								}
 								else
 								{
 									// Could not allocate memory for overlay image buffer.
-									this->lastError = RENDERER_UNABLE_TO_ALLOC_OI_BUF;
+									this->lastError = RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF;
 								}
 							}
 						}
@@ -1785,7 +1777,7 @@ namespace Common
 					else
 					{
 						// We cannot duplicate ourselves.
-						this->lastError = RENDERER_INVAL_OVERLAY_SELF_OVERWRITE;
+						this->lastError = RENDERER_ERROR_INVAL_OVERLAY_SELF_OVERWRITE;
 					}
 
 					// Exit function.
