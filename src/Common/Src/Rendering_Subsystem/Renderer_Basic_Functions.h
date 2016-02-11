@@ -26,11 +26,35 @@
 #ifndef COMMON_RENDER_BASIC_FUNCTIONS_H
 #define COMMON_RENDER_BASIC_FUNCTIONS_H
 
+/* Include DLL_PORT.h */
+#include "../../../DLL_PORT.h"
+
 // Declare namespaces.
 namespace Common
 {
 	namespace Renderer
 	{
+		/*!
+		 *	int Common::Renderer::Get_Rendering_Subsystem_API_Major_Version_Number()
+		 *
+		 *	Returns the major version number of the Rendering Subsystem.
+		 */
+		MSYS_DLL_EXPORT int Get_Rendering_Subsystem_API_Major_Version_Number();
+
+		/*!
+		 *	int Common::Renderer::Get_Rendering_Subsystem_API_Minor_Version_Number()
+		 *
+		 *	Returns the minor version number of the Rendering Subsystem.
+		 */
+		MSYS_DLL_EXPORT int Get_Rendering_Subsystem_API_Minor_Version_Number();
+
+		/*!
+		 *	int Common::Renderer::Get_Rendering_Subsystem_API_Revision_Version_Number()
+		 *
+		 *	Returns the revision version number of the Rendering Subsystem.
+		 */
+		MSYS_DLL_EXPORT int Get_Rendering_Subsystem_API_Revision_Version_Number();
+
 		/*!
 		 * 	bool Common::Renderer::Calculate_Offsets_From_Coordnates(const long & destXCoordOffset, const long & destYCoordOffset, const size_t & destXAxisResolution, const size_t & destYAxisResolution,
 		 * 								 const size_t & sourceXAxisResolution, const size_t & sourceYAxisResolution, size_t & currentSourceXCoordOffset, size_t & currentDestXCoordOffset, size_t & currentDestOffset,

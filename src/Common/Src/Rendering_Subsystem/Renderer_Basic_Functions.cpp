@@ -20,6 +20,21 @@
 
 #include "Renderer.h"
 
+int Common::Renderer::Get_Rendering_Subsystem_API_Major_Version_Number()
+{
+	return MSYS_RENDERING_SUBSYS_API_MAJOR_VER;
+}
+
+int Common::Renderer::Get_Rendering_Subsystem_API_Minor_Version_Number()
+{
+	return MSYS_RENDERING_SUBSYS_API_MINOR_VER;
+}
+
+int Common::Renderer::Get_Rendering_Subsystem_API_Revision_Version_Number()
+{
+	return MSYS_RENDERING_SUBSYS_API_REVISION_VER;
+}
+
 bool Common::Renderer::Calculate_Offsets_From_Coordnates(const long & destXCoordOffset, const long & destYCoordOffset, const size_t & destXAxisResolution, const size_t & destYAxisResolution,
 							 const size_t & sourceXAxisResolution, const size_t & sourceYAxisResolution, size_t & currentSourceXCoordOffset, size_t & currentDestXCoordOffset, size_t & currentDestOffset,
 							 size_t & currentSourceOffset, size_t & nextDestEndOfLineOffset, size_t & nextSourceEndOfLineOffset)

@@ -42,6 +42,11 @@
 #include "Renderer_Management_Functions.h"			// Static renderer functions. (Create_Renderer(), Choose_Renderer(), etc.)
 #include "Renderer_Text_Console.h"				// Text Console Renderer.
 
+/* Define API Version. */
+#define MSYS_RENDERING_SUBSYS_API_MAJOR_VER 0
+#define MSYS_RENDERING_SUBSYS_API_MINOR_VER 0
+#define MSYS_RENDERING_SUBSYS_API_REVISION_VER 1
+
 #endif
 
 // End of Renderer.h
