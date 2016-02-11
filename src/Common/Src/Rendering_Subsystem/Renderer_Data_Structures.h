@@ -36,7 +36,7 @@ namespace Common
 		 *
 		 * 	A class used to allow error / debug logging by various portions of the Rendering Subsystem.
 		 */
-		static Panic::ERROR DebugChannel;
+		static Panic::Panic_ERROR DebugChannel;
 
 		// Declare 2D renderer base class.
 		class Renderer2D
