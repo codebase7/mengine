@@ -36,6 +36,36 @@
 extern "C" {
 #endif	/* __cplusplus */
 
+/*
+ * 	struct CommonErrorLogData
+ *
+ * 	Private data struct to contain the registered error
+ * 	log callback pointer and current log level for the
+ * 	Common namespace functions.
+ *
+ * 	Note: We declare this here as the structure
+ * 	and it's definition is supposed to be private
+ * 	to the engine. DO NOT USE THIS STRUCTURE DIRECTLY!
+ * 	This structure is NOT a part of the public API, and
+ * 	is subject to change at anytime.
+ */
+struct CommonErrorLogData {
+	unsigned int errorLogLevel;	// Current log level.
+	void (*loggingFunct)(const unsigned int logLevel, const char * errorMsg); // Pointer to current callback function.
+};
+
+/*
+ * 	static struct CommonErrorLogData commonErrorLoggingData
+ *
+ * 	The actual data structure that contains the error
+ * 	logging data for the Common namespace functions.
+ *
+ * 	Once again, DO NOT USE THIS STRUCTURE DIRECTLY!
+ * 	This structure is NOT a part of the public API, and
+ * 	is subject to change at anytime.
+ */
+static struct CommonErrorLogData commonErrorLoggingData = {ERROR_DISABLE, NULL};
+
 void Common_Set_Error_Log_Level(const unsigned int logLevel)
 {
 	/* Set the log level. */
