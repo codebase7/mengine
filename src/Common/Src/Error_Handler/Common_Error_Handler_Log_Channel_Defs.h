@@ -46,6 +46,11 @@
 #define MSYS_ERROR_LOG_CHANNEL_THREADUTILS_NAME "Threading Subsystem"
 #define MSYS_ERROR_LOG_CHANNEL_RENDERING_SUBSYS_NAME "Rendering Subsystem"
 
+/* Check for a C++ Compiler. */
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
+
 /*!
 	int Common_Error_Get_Logging_Channel_ID_Number_By_Name(int * channelID, const char * name, const size_t nameLength)
 
@@ -110,6 +115,10 @@ MSYS_DLL_EXPORT int Common_Error_Get_Logging_Channel_Status_By_ID_Number(const i
 	Returns COMMON_ERROR_INVALID_ARGUMENT if the given channel ID is invalid / not recognized.
  */
 MSYS_DLL_EXPORT int Common_Error_Set_Logging_Channel_Status_By_ID_Number(const int channelID, const short enabled);
+
+#ifdef __cplusplus
+}	/* extern "C" */
+#endif	/* __cplusplus */
 
 #endif	/* COMMON_ERROR_HANDLER_LOG_CHANNEL_DEFS_H */
 
