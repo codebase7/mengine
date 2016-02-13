@@ -52,8 +52,14 @@ extern "C" {
 #include "Posix_Error_Translation_Table.h"		/* Defines the POSIX errno to Common namespace error translation table and functions. */
 #endif /* _WIN32 */
 
+#include "Common_Error_Handler_Log_Channel_Defs.h"	/* Defines the error log channels and their related functions. */
 #include "Common_Error_Handler_Error_Codes.h"		/* Defines error codes. */
 #include "Common_Error_Handler_Structures.h"		/* Defines the error codes, error lookup table error lookup table version number, and Common::commonLastErrorCode. */
+
+/* Define the supported API version numbers. */
+#define MSYS_COMMON_ERROR_HANDLER_API_MAJOR_VER 1
+#define MSYS_COMMON_ERROR_HANDLER_API_MINOR_VER 0
+#define MSYS_COMMON_ERROR_HANDLER_API_REVISION_VER 0
 
 /* Enable C linkage if needed. */
 #ifdef __cplusplus
@@ -61,6 +67,27 @@ extern "C" {
 #endif	/* __cplusplus */
 
 /* Define the C bindings for the error handler. */
+
+/*!
+	int Common_Error_Handler_Get_API_Major_Version_Number()
+
+	Returns the API major version number for the Common Error Handler.
+ */
+MSYS_DLL_EXPORT int Common_Error_Handler_Get_API_Major_Version_Number();
+
+/*!
+	int Common_Error_Handler_Get_API_Minor_Version_Number()
+
+	Returns the API minor version number for the Common Error Handler.
+ */
+MSYS_DLL_EXPORT int Common_Error_Handler_Get_API_Minor_Version_Number();
+
+/*!
+	int Common_Error_Handler_Get_API_Revision_Version_Number()
+
+	Returns the API revision version number for the Common Error Handler.
+ */
+MSYS_DLL_EXPORT int Common_Error_Handler_Get_API_Revision_Version_Number();
 
 /*!
  * 	void Common_Set_Error_Log_Level(const unsigned int & logLevel)
@@ -83,7 +110,7 @@ MSYS_DLL_EXPORT void Common_Set_Error_Log_Level(const unsigned int logLevel);
 MSYS_DLL_EXPORT unsigned int Common_Get_Error_Log_Level();
 
 /*!
- * 	void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
+ * 	void Common_Register_Error_Log_Callback(void (*loggingFunction)(const int channelID, const unsigned int logLevel, const char * errorMsg))
  *
  * 	WARNING: The callback function MUST return control back to
  * 	the caller, as the caller will be blocked until the callback
@@ -99,7 +126,7 @@ MSYS_DLL_EXPORT unsigned int Common_Get_Error_Log_Level();
  * 	disable calling another function when an error is generated.
  * 	In addition the logging level will be reset to ERROR_DISABLE.
  */
-MSYS_DLL_EXPORT void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg));
+MSYS_DLL_EXPORT void Common_Register_Error_Log_Callback(void (*loggingFunction)(const int channelID, const unsigned int logLevel, const char * errorMsg));
 #ifdef MSYS_BUILD_FATAL_ERROR_SUPPORT
 
 /*!
@@ -206,7 +233,7 @@ namespace Common
 	MSYS_DLL_EXPORT unsigned int Get_Error_Log_Level();
 
 	/*!
-	 * 	void Common::Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
+	 * 	void Common::Register_Error_Log_Callback(void (*loggingFunction)(const int channelID, const unsigned int logLevel, const char * errorMsg))
 	 *
 	 * 	(C++ Binding)
 	 *
@@ -224,7 +251,7 @@ namespace Common
 	 * 	disable calling another function when an error is generated.
 	 * 	In addition the logging level will be reset to ERROR_DISABLE.
 	 */
-	MSYS_DLL_EXPORT void Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg) = NULL);
+	MSYS_DLL_EXPORT void Register_Error_Log_Callback(void (*loggingFunction)(const int channelID, const unsigned int logLevel, const char * errorMsg) = NULL);
 
 #ifdef MSYS_BUILD_FATAL_ERROR_SUPPORT
 	/*!

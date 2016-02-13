@@ -23,6 +23,9 @@
 #include "FileUtills_Private_API.h"
 #include "../../../Core/Src/DataProcess.h"	/* For DataProcess Allocators. (DataProcess_Deallocate_C_String(), DataProcess_Reallocate_CString().) */
 
+/* Define the MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID macro. */
+#define MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID MSYS_ERROR_LOG_CHANNEL_FILEUTILLS
+
 int FileUtills_Create_dirList_PRIV_Object(MSYS_FileUtills_dirList_PRIV_T ** obj)
 {
 	/* Init vars. */
@@ -119,7 +122,7 @@ int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPr
 				/* Log error. */
 				if (ret != COMMON_ERROR_MEMORY_ERROR)
 				{
-					COMMON_LOG_VERBOSE("FileUtills_dirList_PRIV_Add_Entry(): Could not create a copy of the entry data.");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_dirList_PRIV_Add_Entry(): Could not create a copy of the entry data.");
 				}
 			}
 		}
@@ -132,7 +135,7 @@ int FileUtills_dirList_PRIV_Add_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPr
 			/* Log error. */
 			if (ret != COMMON_ERROR_MEMORY_ERROR)
 			{
-				COMMON_LOG_VERBOSE("FileUtills_dirList_PRIV_Add_Entry(): Could not allocate memory for the linked list object.");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_dirList_PRIV_Add_Entry(): Could not allocate memory for the linked list object.");
 			}
 		}
 	}
@@ -203,7 +206,7 @@ int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPr
 				{
 					/* Unable to get object's data contents. */
 					ret = COMMON_ERROR_INTERNAL_ERROR;
-					COMMON_LOG_VERBOSE("FileUtills_dirList_PRIV_Get_Entry(): Unable to get object's data contents.");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_dirList_PRIV_Get_Entry(): Unable to get object's data contents.");
 				}
 			}
 			else
@@ -216,7 +219,7 @@ int FileUtills_dirList_PRIV_Get_Entry(MSYS_FileUtills_dirList_PRIV_T * dirListPr
 		{
 			/* Could not get initial iterator pointer. */
 			ret = COMMON_ERROR_INTERNAL_ERROR;
-			COMMON_LOG_VERBOSE("FileUtills_dirList_PRIV_Get_Entry(): Could not get initial iterator pointer.");
+			COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_dirList_PRIV_Get_Entry(): Could not get initial iterator pointer.");
 		}
 	}
 	else
@@ -272,7 +275,7 @@ int FileUtills_dirList_PRIV_Remove_Entry(MSYS_FileUtills_dirList_PRIV_T * dirLis
 		{
 			/* Could not get initial iterator pointer. */
 			ret = COMMON_ERROR_INTERNAL_ERROR;
-			COMMON_LOG_VERBOSE("FileUtills_dirList_PRIV_Remove_Entry(): Could not get initial iterator pointer.");
+			COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_dirList_PRIV_Remove_Entry(): Could not get initial iterator pointer.");
 		}
 	}
 	else
@@ -342,9 +345,9 @@ int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pa
 					ret = COMMON_ERROR_MEMORY_ERROR;
 
 					/* Log error. */
-					COMMON_LOG_VERBOSE("FileUtills_IsAbsolutePathReference(): ");
-					COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
-					COMMON_LOG_VERBOSE(" Unable to allocate memory for absRef buffer.");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsAbsolutePathReference(): ");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Unable to allocate memory for absRef buffer.");
 				}
 			}
 		}
@@ -381,9 +384,9 @@ int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pa
 						ret = COMMON_ERROR_MEMORY_ERROR;
 
 						/* Log error. */
-						COMMON_LOG_VERBOSE("FileUtills_IsAbsolutePathReference(): ");
-						COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
-						COMMON_LOG_VERBOSE(" Unable to allocate memory for absRef buffer.");
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsAbsolutePathReference(): ");
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Unable to allocate memory for absRef buffer.");
 					}
 				}
 			}
@@ -398,8 +401,8 @@ int FileUtills_IsAbsolutePathReference_absRef(const char * path, const size_t pa
 	{
 		/* Invalid pointer. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_VERBOSE("FileUtills_IsAbsolutePathReference(): ");
-		COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsAbsolutePathReference(): ");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 	}
 
 	/* Return the result. */
@@ -522,7 +525,7 @@ int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
 					{
 						/* Unable to get user profile directory. */
 						ret = COMMON_ERROR_INTERNAL_ERROR;
-						COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Unable to get needed user profile directory path, aborting.\n");
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): Unable to get needed user profile directory path, aborting.\n");
 
 						/* Deallocate output. */
 						DataProcess_Deallocate_CString(&output);
@@ -588,7 +591,7 @@ int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
 												{
 													/* FileUtills_RemoveLastPathSegment() failed. */
 													ret = COMMON_ERROR_INTERNAL_ERROR;
-													COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Call to FileUtills_RemoveLastPathSegment() failed, unable to get needed parent directory. Aborting.\n");
+													COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): Call to FileUtills_RemoveLastPathSegment() failed, unable to get needed parent directory. Aborting.\n");
 
 													/* Deallocate output. */
 													DataProcess_Deallocate_CString(&output);
@@ -626,7 +629,7 @@ int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
 						{
 							/* Could not get current working directory. */
 							ret = COMMON_ERROR_INTERNAL_ERROR;
-							COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Unable to get needed current working directory path, aborting.\n");
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): Unable to get needed current working directory path, aborting.\n");
 
 							/* Deallocate output. */
 							DataProcess_Deallocate_CString(&output);
@@ -642,7 +645,7 @@ int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
 							ret = COMMON_ERROR_INTERNAL_ERROR;
 
 							/* Log the error. */
-							COMMON_LOG_DEBUG("FileUtills_ResolvePath(): Could not determing if the given path was an absolute path reference, aborting.\n");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): Could not determing if the given path was an absolute path reference, aborting.\n");
 
 							/* Deallocate output. */
 							DataProcess_Deallocate_CString(&output);
@@ -722,7 +725,7 @@ int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
 												{
 													/* FileUtills_RemoveLastPathSegment() failed. */
 													ret = COMMON_ERROR_INTERNAL_ERROR;
-													COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Call to FileUtills_RemoveLastPathSegment() failed. Unable to remove current path segment. Aborting.\n");
+													COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): Call to FileUtills_RemoveLastPathSegment() failed. Unable to remove current path segment. Aborting.\n");
 
 													/* Deallocate output. */
 													DataProcess_Deallocate_CString(&output);
@@ -835,11 +838,11 @@ int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
 				(*retStrSize) = outputLength;
 
 				/* Log result. */
-				COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): Path ( ");
-				COMMON_LOG_VERBOSE((*retStr));
-				COMMON_LOG_VERBOSE(" ) resolved to ( ");
-				COMMON_LOG_VERBOSE(output);
-				COMMON_LOG_VERBOSE(").\n");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): Path ( ");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, (*retStr));
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) resolved to ( ");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, output);
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, ").\n");
 			}
 			else
 			{
@@ -851,18 +854,18 @@ int FileUtills_ResolvePath_Helper(char ** retStr, size_t * retStrSize)
 		{
 			/* Could not get pointer for given path. */
 			ret = COMMON_ERROR_INTERNAL_ERROR;
-			COMMON_LOG_WARNING("FileUtills_ResolvePath(): ");
-			COMMON_LOG_WARNING(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-			COMMON_LOG_WARNING(" Unable to get pointer to given path argument.\n");
+			COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+			COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+			COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Unable to get pointer to given path argument.\n");
 		}
 	}
 	else
 	{
 		/* Invalid arguments. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_VERBOSE("FileUtills_ResolvePath(): ");
-		COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-		COMMON_LOG_VERBOSE(" No path given.\n");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " No path given.\n");
 	}
 
 	/* Check for allocated strings, and deallocate them if needed. */
@@ -952,8 +955,8 @@ int FileUtills_RemoveLastPathSegmentAtPosition(char ** path, size_t * pathSize, 
 							}
 
 							/* Log the error. */
-							COMMON_LOG_DEBUG("FileUtills_RemoveLastPathSegmentAtPosition(): Call to DataProcess_Reallocate_C_String() failed with error code: ");
-							COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_RemoveLastPathSegmentAtPosition(): Call to DataProcess_Reallocate_C_String() failed with error code: ");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 						}
 					}
 				}
@@ -968,27 +971,27 @@ int FileUtills_RemoveLastPathSegmentAtPosition(char ** path, size_t * pathSize, 
 			{
 				/* currentPathPos is beyond the end of the path buffer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegmentAtPosition(): ");
-				COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-				COMMON_LOG_VERBOSE(" current path position is beyond the end of the path buffer. (Nice try.)");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_RemoveLastPathSegmentAtPosition(): ");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " current path position is beyond the end of the path buffer. (Nice try.)");
 			}
 		}
 		else
 		{
 			/* Invalid currentPathPos. */
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
-			COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegmentAtPosition(): ");
-			COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-			COMMON_LOG_VERBOSE(" current path position is invalid.");
+			COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_RemoveLastPathSegmentAtPosition(): ");
+			COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+			COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " current path position is invalid.");
 		}
 	}
 	else
 	{
 		/* No path given. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_VERBOSE("FileUtills_RemoveLastPathSegmentAtPosition(): ");
-		COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-		COMMON_LOG_VERBOSE(" No valid path given.");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_RemoveLastPathSegmentAtPosition(): ");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " No valid path given.");
 	}
 
 	/* Check for success. */
@@ -1033,7 +1036,7 @@ int FileUtills_IsFileOrDirectory_Helper(const char * absPath, const size_t absPa
 			break;
 		default:	/* Called function returned an invalid error code. */
 			ret = COMMON_ERROR_UNKNOWN_ERROR;
-			COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectoryHelper(): Called FileUtills_IsFileOrDirectory_Syscall() function returned an invalid error code, and needs to be rewritten to conform to the error code definitions. Please report this bug.");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsFileOrDirectoryHelper(): Called FileUtills_IsFileOrDirectory_Syscall() function returned an invalid error code, and needs to be rewritten to conform to the error code definitions. Please report this bug.");
 			break;
 	};
 

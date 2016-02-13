@@ -25,6 +25,10 @@
 #include "../Error_Handler/Common_Error_Handler_Error_Codes.h"
 #include "../Error_Handler/Common_Error_Handler_Internal.h"
 #include "../Error_Handler/Common_Error_Handler_Structures.h"
+#include "../Error_Handler/Common_Error_Handler_Log_Channel_Defs.h"
+
+/* Define the MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID macro. */
+#define MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID MSYS_ERROR_LOG_CHANNEL_DYNLIB
 
 /* Check for C++ Compiler. */
 #ifdef __cplusplus
@@ -75,17 +79,17 @@ extern "C" {
 				{
 					/* Could not init structure. */
 					ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
-					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(): Memory allocation function returned: ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-					COMMON_LOG_DEBUG(" Could not allocate memory for management structure.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(): Memory allocation function returned: ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Could not allocate memory for management structure.");
 				}
 			}
 			else
 			{
 				/* Invalid lib pointer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Create_Loaded_Dynamic_Library(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 			}
 
 			/* Return result. */
@@ -138,17 +142,17 @@ extern "C" {
 				if (ret == COMMON_ERROR_INVALID_ARGUMENT)
 				{
 					/* That's an error, we didn't set up the private data structure correctly or it's been corrupted. */
-					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Get_IsLoaded_Loaded_Dynamic_Library(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-					COMMON_LOG_DEBUG(" Private API data structure pointer is invalid.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_IsLoaded_Loaded_Dynamic_Library(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Private API data structure pointer is invalid.");
 				}
 			}
 			else
 			{
 				/* Invalid lib pointer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Get_IsLoaded_Loaded_Dynamic_Library(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_IsLoaded_Loaded_Dynamic_Library(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 			}
 
 			/* Exit function. */
@@ -168,17 +172,17 @@ extern "C" {
 				if (ret == COMMON_ERROR_INVALID_ARGUMENT)
 				{
 					/* That's an error, we didn't set up the private data structure correctly or it's been corrupted. */
-					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Set_IsLoaded_Loaded_Dynamic_Library(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-					COMMON_LOG_DEBUG(" Private API data structure pointer is invalid.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Set_IsLoaded_Loaded_Dynamic_Library(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Private API data structure pointer is invalid.");
 				}
 			}
 			else
 			{
 				/* Invalid lib pointer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Set_IsLoaded_Loaded_Dynamic_Library(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Set_IsLoaded_Loaded_Dynamic_Library(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 			}
 
 			/* Exit function. */
@@ -198,17 +202,17 @@ extern "C" {
 				if (ret == COMMON_ERROR_INVALID_ARGUMENT)
 				{
 					/* That's an error, we didn't set up the private data structure correctly or it's been corrupted. */
-					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Get_LastCallEncounteredError_Loaded_Dynamic_Library(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-					COMMON_LOG_DEBUG(" Private API data structure pointer is invalid.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_LastCallEncounteredError_Loaded_Dynamic_Library(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Private API data structure pointer is invalid.");
 				}
 			}
 			else
 			{
 				/* Invalid lib pointer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Get_LastCallEncounteredError_Loaded_Dynamic_Library(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_LastCallEncounteredError_Loaded_Dynamic_Library(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 			}
 
 			/* Exit function. */
@@ -228,17 +232,17 @@ extern "C" {
 				if (ret == COMMON_ERROR_INVALID_ARGUMENT)
 				{
 					/* That's an error, we didn't set up the private data structure correctly or it's been corrupted. */
-					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-					COMMON_LOG_DEBUG(" Private API data structure pointer is invalid.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Private API data structure pointer is invalid.");
 				}
 			}
 			else
 			{
 				/* Invalid lib pointer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 			}
 
 			/* Exit function. */
@@ -258,17 +262,17 @@ extern "C" {
 				if (ret == COMMON_ERROR_INVALID_ARGUMENT)
 				{
 					/* That's an error, we didn't set up the private data structure correctly or it's been corrupted. */
-					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Get_OsSpecificPointerData_Loaded_Dynamic_Library(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-					COMMON_LOG_DEBUG(" Private API data structure pointer is invalid.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_OsSpecificPointerData_Loaded_Dynamic_Library(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Private API data structure pointer is invalid.");
 				}
 			}
 			else
 			{
 				/* Invalid lib pointer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Get_OsSpecificPointerData_Loaded_Dynamic_Library(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_OsSpecificPointerData_Loaded_Dynamic_Library(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 			}
 
 			/* Exit function. */
@@ -288,17 +292,17 @@ extern "C" {
 				if (ret == COMMON_ERROR_INVALID_ARGUMENT)
 				{
 					/* That's an error, we didn't set up the private data structure correctly or it's been corrupted. */
-					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-					COMMON_LOG_DEBUG(" Private API data structure pointer is invalid.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Private API data structure pointer is invalid.");
 				}
 			}
 			else
 			{
 				/* Invalid lib pointer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Set_OsSpecificPointerData_Loaded_Dynamic_Library(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 			}
 
 			/* Exit function. */
@@ -318,17 +322,17 @@ extern "C" {
 				if (ret == COMMON_ERROR_INVALID_ARGUMENT)
 				{
 					/* That's an error, we didn't set up the private data structure correctly or it's been corrupted. */
-					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-					COMMON_LOG_DEBUG(" Private API data structure pointer is invalid.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Private API data structure pointer is invalid.");
 				}
 			}
 			else
 			{
 				/* Invalid lib pointer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 			}
 
 			/* Exit function. */
@@ -350,17 +354,17 @@ extern "C" {
 				if (ret == COMMON_ERROR_INVALID_ARGUMENT)
 				{
 					/* That's an error, we didn't set up the private data structure correctly or it's been corrupted. */
-					COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-					COMMON_LOG_DEBUG(" Private API data structure pointer is invalid.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Private API data structure pointer is invalid.");
 				}
 			}
 			else
 			{
 				/* Invalid lib pointer. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
-				COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Set_PathToLibrary_Loaded_Dynamic_Library(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 			}
 
 			/* Exit function. */

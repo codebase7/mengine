@@ -23,7 +23,11 @@
 #include "Dynamic_Library_Subsystem_Syscall.h"
 #include "../Error_Handler/Common_Error_Handler_Structures.h"
 #include "../Error_Handler/Common_Error_Handler_Error_Codes.h"
+#include "../Error_Handler/Common_Error_Handler_Log_Channel_Defs.h"
 #include "../../../Core/Src/DataProcess.h"
+
+/* Define the MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID macro. */
+#define MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID MSYS_ERROR_LOG_CHANNEL_DYNLIB
 
 /* Check for C++ Compiler. */
 #ifdef __cplusplus
@@ -76,8 +80,8 @@ extern "C" {
 								{
 									/* Could not allocate memory for tempPath. */
 									ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
-									COMMON_LOG_DEBUG("Common_Dynamic_Library_Subsystem_Load_Library(): Memory allocation function returned: ");
-									COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+									COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Load_Library(): Memory allocation function returned: ");
+									COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 								}
 
 								/* Reset tempPath and tempPathLength. */
@@ -93,14 +97,14 @@ extern "C" {
 							/* Could not get the pathToLibrary pointer from the data structure. */
 							ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
 							retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-							COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Unable to get the pathToLibrary pointer from the data structure.");
-							COMMON_LOG_VERBOSE("Engine call returned: ");
-							COMMON_LOG_VERBOSE(Common_Get_Error_Message(ret));
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Load_Library(): Unable to get the pathToLibrary pointer from the data structure.");
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Engine call returned: ");
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(ret));
 							if (retFromCall != COMMON_ERROR_SUCCESS)
 							{
 								/* Log additional error. */
-								COMMON_LOG_VERBOSE(" Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
-								COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 							}
 						}
 					}
@@ -138,9 +142,9 @@ extern "C" {
 										{
 											/* Success. */
 											ret = COMMON_ERROR_SUCCESS;
-											COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): <");
-											COMMON_LOG_VERBOSE(tempPath);
-											COMMON_LOG_VERBOSE("> loaded.");
+											COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Load_Library(): <");
+											COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, tempPath);
+											COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "> loaded.");
 										}
 										else
 										{
@@ -159,15 +163,15 @@ extern "C" {
 									/* Could not get osSpecificPointerData. Syscall failed. Set bLastCallEncounteredAnError flag in management structure. */
 									ret = retFromCall;
 									retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library_Syscall(): Could not load <");
-									COMMON_LOG_VERBOSE(pathToLibrary);
-									COMMON_LOG_VERBOSE("> Host function returned: ");
-									COMMON_LOG_VERBOSE(Common_Get_Error_Message(ret));
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Load_Library_Syscall(): Could not load <");
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, pathToLibrary);
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "> Host function returned: ");
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(ret));
 									if (retFromCall != COMMON_ERROR_SUCCESS)
 									{
 										/* Log additional error. */
-										COMMON_LOG_VERBOSE(" Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
-										COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 									}
 								}
 							}
@@ -188,12 +192,12 @@ extern "C" {
 						/* Encountered an error during the unload. */
 						ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
 						retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Unable to reload library.");
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Load_Library(): Unable to reload library.");
 						if (retFromCall != COMMON_ERROR_SUCCESS)
 						{
 							/* Log additional error. */
-							COMMON_LOG_VERBOSE(" Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
-							COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 						}
 					}
 				}
@@ -209,8 +213,8 @@ extern "C" {
 					{
 						/* An error occured. */
 						ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
-						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): Could not get loaded library flag from management structure. Engine call returned: ");
-						COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Load_Library(): Could not get loaded library flag from management structure. Engine call returned: ");
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 					}
 				}
 			}
@@ -219,12 +223,12 @@ extern "C" {
 				/* pathToLibrary is NULL. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
 				retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-				COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): No path to the library was given. Unable to load a library without the path to it.");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Load_Library(): No path to the library was given. Unable to load a library without the path to it.");
 				if (retFromCall != COMMON_ERROR_SUCCESS)
 				{
 					/* Log additional error. */
-					COMMON_LOG_VERBOSE(" Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
-					COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 				}
 			}
 		}
@@ -232,7 +236,7 @@ extern "C" {
 		{
 			/* Management structure is invalid. */
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
-			COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Load_Library(): The engine's library structure for the given library is invalid. Unable to load a library without a valid library structure.");
+			COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Load_Library(): The engine's library structure for the given library is invalid. Unable to load a library without a valid library structure.");
 		}
 
 		/* Check for an allocated copiedPathFromStruct and deallocate it if needed. */
@@ -283,33 +287,33 @@ extern "C" {
 								{
 									/* Success. */
 									ret = COMMON_ERROR_SUCCESS;
-									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): <");
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Unload_Library(): <");
 
 									/* Attempt to get the library path for the error log. */
 									if ((Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(lib, &pSym, &pSymLength) == COMMON_ERROR_SUCCESS) &&
 										(pSym != NULL))
 									{
-										COMMON_LOG_VERBOSE(pSym);
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, pSym);
 									}
 									else
 									{
-										COMMON_LOG_VERBOSE("[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
 									}
 									pSym = NULL;	/* Clear abused pSym. */
 
-									COMMON_LOG_VERBOSE("> unloaded.");
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "> unloaded.");
 								}
 								else
 								{
 									/* Could not clear os specific pointer data in management structure. */
 									ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
 									retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): Could not clear os specific pointer data in management structure. Call returned: ");
-									COMMON_LOG_VERBOSE(Common_Get_Error_Message(ret));
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Unload_Library(): Could not clear os specific pointer data in management structure. Call returned: ");
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(ret));
 									if (retFromCall != COMMON_ERROR_SUCCESS)
 									{
-										COMMON_LOG_VERBOSE(" Additionally, could not set the error flag in the management structure. Call returned: ");
-										COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, could not set the error flag in the management structure. Call returned: ");
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 									}
 								}
 							}
@@ -318,12 +322,12 @@ extern "C" {
 								/* Could not clear is loaded flag in management structure. */
 								ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
 								retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): Could not clear is loaded flag in management structure. Call returned: ");
-								COMMON_LOG_VERBOSE(Common_Get_Error_Message(ret));
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Unload_Library(): Could not clear is loaded flag in management structure. Call returned: ");
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(ret));
 								if (retFromCall != COMMON_ERROR_SUCCESS)
 								{
-									COMMON_LOG_VERBOSE(" Additionally, could not set the error flag in the management structure. Call returned: ");
-									COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, could not set the error flag in the management structure. Call returned: ");
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 								}
 							}
 						}
@@ -332,26 +336,26 @@ extern "C" {
 							/* Could not unload the library. */
 							ret = retFromCall;
 							retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-							COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): Could not unload <");
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Unload_Library(): Could not unload <");
 
 							/* Attempt to get the library path for the error log. */
 							if ((Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(lib, &pSym, &pSymLength) == COMMON_ERROR_SUCCESS) &&
 								(pSym != NULL))
 							{
-								COMMON_LOG_VERBOSE(pSym);
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, pSym);
 							}
 							else
 							{
-								COMMON_LOG_VERBOSE("[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
 							}
 							pSym = NULL;	/* Clear abused pSym. */
 
-							COMMON_LOG_VERBOSE("> Host function returned: ");
-							COMMON_LOG_VERBOSE(Common_Get_Error_Message(ret));
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "> Host function returned: ");
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(ret));
 							if (retFromCall != COMMON_ERROR_SUCCESS)
 							{
-								COMMON_LOG_VERBOSE(" Additionally, could not set the error flag in the management structure. Call returned: ");
-								COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, could not set the error flag in the management structure. Call returned: ");
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 							}
 						}
 					}
@@ -359,16 +363,16 @@ extern "C" {
 					{
 						/* Could not get osSpecificPointerData from management structure. */
 						ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
-						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): Could not get os specific data pointer from management structure. Call returned: ");
-						COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Unload_Library(): Could not get os specific data pointer from management structure. Call returned: ");
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 					}
 				}
 				else
 				{
 					/* Could not reset last call incountered an error flag. */
 					ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
-					COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): Could not reset management structure's error flag. Call returned: ");
-					COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Unload_Library(): Could not reset management structure's error flag. Call returned: ");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 				}
 			}
 			else
@@ -376,25 +380,25 @@ extern "C" {
 				/* Library is not loaded. */
 				ret = DYNLIB_ERROR_LIBRARY_NOT_LOADED;
 				retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-				COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): The given library <");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Unload_Library(): The given library <");
 
 				/* Attempt to get the library path for the error log. */
 				if ((Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(lib, &pSym, &pSymLength) == COMMON_ERROR_SUCCESS) &&
 					(pSym != NULL))
 				{
-					COMMON_LOG_VERBOSE(pSym);
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, pSym);
 				}
 				else
 				{
-					COMMON_LOG_VERBOSE("[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
 				}
 				pSym = NULL;	/* Clear abused pSym. */
 
-				COMMON_LOG_VERBOSE("> is not loaded.");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "> is not loaded.");
 				if (retFromCall != COMMON_ERROR_SUCCESS)
 				{
-					COMMON_LOG_VERBOSE(" Additionally, could not set the error flag in the management structure. Call returned: ");
-					COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, could not set the error flag in the management structure. Call returned: ");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 				}
 			}
 		}
@@ -402,7 +406,7 @@ extern "C" {
 		{
 			/* Management structure is invalid. */
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
-			COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Unload_Library(): The engine's library structure for the given library is invalid. Unable to unload a library without a valid library structure.");
+			COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Unload_Library(): The engine's library structure for the given library is invalid. Unable to unload a library without a valid library structure.");
 		}
 
 		/* Return result. */
@@ -434,7 +438,7 @@ extern "C" {
 				{
 					/* The given library structure does not define a path. */
 					ret = COMMON_ERROR_INVALID_ARGUMENT;
-					COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Reload_Library(): The given library structure does not define a path.");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Reload_Library(): The given library structure does not define a path.");
 				}
 			}
 			else
@@ -442,14 +446,14 @@ extern "C" {
 				/* Could not get the pathToLibrary pointer from the data structure. */
 				ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
 				retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-				COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Reload_Library(): Unable to get the pathToLibrary pointer from the data structure.");
-				COMMON_LOG_VERBOSE("Engine call returned: ");
-				COMMON_LOG_VERBOSE(Common_Get_Error_Message(ret));
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Reload_Library(): Unable to get the pathToLibrary pointer from the data structure.");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Engine call returned: ");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(ret));
 				if (retFromCall != COMMON_ERROR_SUCCESS)
 				{
 					/* Log additional error. */
-					COMMON_LOG_VERBOSE(" Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
-					COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, we could not set the error flag for the internal library structure. Engine Call returned: ");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 				}
 			}
 		}
@@ -457,7 +461,7 @@ extern "C" {
 		{
 			/* Library structure is invalid. */
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
-			COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Reload_Library(): The engine's library structure for the given library is invalid.");
+			COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Reload_Library(): The engine's library structure for the given library is invalid.");
 		}
 
 		/* Exit function. */
@@ -509,26 +513,26 @@ extern "C" {
 									/* An error occured fetching the symbol. */
 									ret = retFromCall;
 									retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-									COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): Could not fetch symbol in <");
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_Symbol(): Could not fetch symbol in <");
 
 									/* Attempt to get the library path for the error log. */
 									if ((Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(lib, (char**)&pSym, &pSymLength) == COMMON_ERROR_SUCCESS) &&
 										(pSym != NULL))
 									{
-										COMMON_LOG_VERBOSE((char*)pSym);
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, (char*)pSym);
 									}
 									else
 									{
-										COMMON_LOG_VERBOSE("[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
 									}
 									pSym = NULL;	/* Clear abused pSym. */
 
-									COMMON_LOG_VERBOSE("> Host function returned: ");
-									COMMON_LOG_VERBOSE(Common_Get_Error_Message(ret));
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "> Host function returned: ");
+									COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(ret));
 									if (retFromCall != COMMON_ERROR_SUCCESS)
 									{
-										COMMON_LOG_VERBOSE(" Additionally, could not set the error flag in the management structure. Call returned: ");
-										COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, could not set the error flag in the management structure. Call returned: ");
+										COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 									}
 								}
 							}
@@ -536,16 +540,16 @@ extern "C" {
 							{
 								/* Could not get osSpecificPointerData from management structure. */
 								ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
-								COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): Could not get os specific data pointer from management structure. Call returned: ");
-								COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_Symbol(): Could not get os specific data pointer from management structure. Call returned: ");
+								COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 							}
 						}
 						else
 						{
 							/* Could not reset last call incountered an error flag. */
 							ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
-							COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): Could not reset management structure's error flag. Call returned: ");
-							COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_Symbol(): Could not reset management structure's error flag. Call returned: ");
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 						}
 					}
 					else
@@ -553,25 +557,25 @@ extern "C" {
 						/* Library is not loaded. */
 						ret = DYNLIB_ERROR_LIBRARY_NOT_LOADED;
 						retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-						COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The given library <");
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_Symbol(): The given library <");
 
 						/* Attempt to get the library path for the error log. */
 						if ((Common_Dynamic_Library_Subsystem_Get_PathToLibrary_Loaded_Dynamic_Library(lib, (char**)&pSym, &pSymLength) == COMMON_ERROR_SUCCESS) &&
 							(pSym != NULL))
 						{
-							COMMON_LOG_VERBOSE((char*)pSym);
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, (char*)pSym);
 						}
 						else
 						{
-							COMMON_LOG_VERBOSE("[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "[ERROR: COULD NOT FETCH PATH TO LIBRARY FROM MANAGEMENT STRUCTURE.]");
 						}
 						pSym = NULL;	/* Clear abused pSym. */
 
-						COMMON_LOG_VERBOSE("> is not loaded.");
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "> is not loaded.");
 						if (retFromCall != COMMON_ERROR_SUCCESS)
 						{
-							COMMON_LOG_VERBOSE(" Additionally, could not set the error flag in the management structure. Call returned: ");
-							COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, could not set the error flag in the management structure. Call returned: ");
+							COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 						}
 					}
 				}
@@ -580,11 +584,11 @@ extern "C" {
 					/* symbolName is NULL. */
 					ret = COMMON_ERROR_INVALID_ARGUMENT;
 					retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-					COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): No symbol name was given, cannot load a symbol without a name to identifiy it.");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_Symbol(): No symbol name was given, cannot load a symbol without a name to identifiy it.");
 					if (retFromCall != COMMON_ERROR_SUCCESS)
 					{
-						COMMON_LOG_VERBOSE(" Additionally, could not set the error flag in the management structure. Call returned: ");
-						COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, could not set the error flag in the management structure. Call returned: ");
+						COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 					}
 				}
 			}
@@ -593,12 +597,12 @@ extern "C" {
 				/* retSym is NULL. */
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
 				retFromCall = Common_Dynamic_Library_Subsystem_Set_LastCallEncounteredError_Loaded_Dynamic_Library(lib, true);
-				COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): ");
-				COMMON_LOG_VERBOSE(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_Symbol(): ");
+				COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 				if (retFromCall != COMMON_ERROR_SUCCESS)
 				{
-					COMMON_LOG_VERBOSE(" Additionally, could not set the error flag in the management structure. Call returned: ");
-					COMMON_LOG_VERBOSE(Common_Get_Error_Message(retFromCall));
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Additionally, could not set the error flag in the management structure. Call returned: ");
+					COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 				}
 			}
 		}
@@ -606,7 +610,7 @@ extern "C" {
 		{
 			/* Library structure is invalid. */
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
-			COMMON_LOG_VERBOSE("Common_Dynamic_Library_Subsystem_Get_Symbol(): The engine's library structure for the given library is invalid. Unable to lookup function without a valid library structure.");
+			COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common_Dynamic_Library_Subsystem_Get_Symbol(): The engine's library structure for the given library is invalid. Unable to lookup function without a valid library structure.");
 		}
 
 		/* Return result. */

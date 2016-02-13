@@ -28,6 +28,9 @@
 // External includes.
 #include <exception>
 
+/* Define the MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID macro. */
+#define MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID MSYS_ERROR_LOG_CHANNEL_ERROR_HANDLER
+
 void Common::Set_Error_Log_Level(const unsigned int & logLevel)
 {
 	Common_Set_Error_Log_Level(logLevel);
@@ -38,7 +41,7 @@ unsigned int Common::Get_Error_Log_Level()
 	return Common_Get_Error_Log_Level();
 }
 
-void Common::Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
+void Common::Register_Error_Log_Callback(void (*loggingFunction)(const int channelID, const unsigned int logLevel, const char * errorMsg))
 {
 	Common_Register_Error_Log_Callback(loggingFunction);
 }
@@ -108,7 +111,7 @@ void Common::Fatal_Error_Notify()
 	catch (...)
 	{
 		// Well, not much to do here, we are terminating anyway.
-		COMMON_LOG_CRITICAL("Common::Fatal_Error_Notify(): Exception occured while notifying engine subsystems / application that a fatal error occured.");
+		COMMON_LOG_CRITICAL(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "Common::Fatal_Error_Notify(): Exception occured while notifying engine subsystems / application that a fatal error occured.");
 	}
 }
 
