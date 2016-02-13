@@ -55,12 +55,38 @@ extern "C" {
 #include "Common_Error_Handler_Error_Codes.h"		/* Defines error codes. */
 #include "Common_Error_Handler_Structures.h"		/* Defines the error codes, error lookup table error lookup table version number, and Common::commonLastErrorCode. */
 
+/* Define the supported API version numbers. */
+#define MSYS_COMMON_ERROR_HANDLER_API_MAJOR_VER 0
+#define MSYS_COMMON_ERROR_HANDLER_API_MINOR_VER 0
+#define MSYS_COMMON_ERROR_HANDLER_API_REVISION_VER 0
+
 /* Enable C linkage if needed. */
 #ifdef __cplusplus
 extern "C" {
 #endif	/* __cplusplus */
 
 /* Define the C bindings for the error handler. */
+
+/*!
+	int Common_Error_Handler_Get_API_Major_Version_Number()
+
+	Returns the API major version number for the Common Error Handler.
+ */
+MSYS_DLL_EXPORT int Common_Error_Handler_Get_API_Major_Version_Number();
+
+/*!
+	int Common_Error_Handler_Get_API_Minor_Version_Number()
+
+	Returns the API minor version number for the Common Error Handler.
+ */
+MSYS_DLL_EXPORT int Common_Error_Handler_Get_API_Minor_Version_Number();
+
+/*!
+	int Common_Error_Handler_Get_API_Revision_Version_Number()
+
+	Returns the API revision version number for the Common Error Handler.
+ */
+MSYS_DLL_EXPORT int Common_Error_Handler_Get_API_Revision_Version_Number();
 
 /*!
  * 	void Common_Set_Error_Log_Level(const unsigned int & logLevel)

@@ -66,6 +66,24 @@ struct CommonErrorLogData {
  */
 static struct CommonErrorLogData commonErrorLoggingData = {ERROR_DISABLE, NULL};
 
+int Common_Error_Handler_Get_API_Major_Version_Number()
+{
+	/* Return the API Version number. */
+	return MSYS_COMMON_ERROR_HANDLER_API_MAJOR_VER;
+}
+
+int Common_Error_Handler_Get_API_Minor_Version_Number()
+{
+	/* Return the API Version number. */
+	return MSYS_COMMON_ERROR_HANDLER_API_MINOR_VER;
+}
+
+int Common_Error_Handler_Get_API_Revision_Version_Number()
+{
+	/* Return the API Version number. */
+	return MSYS_COMMON_ERROR_HANDLER_API_REVISION_VER;
+}
+
 void Common_Set_Error_Log_Level(const unsigned int logLevel)
 {
 	/* Set the log level. */
