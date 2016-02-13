@@ -26,12 +26,12 @@
 #include "../Common/Src/Error_Handler/Common_Error_Handler.h"
 
 /*!
- * 	void Common_Error_Log_Callback(const unsigned int logLevel, const char * errorMsg)
+ * 	void Common_Error_Log_Callback(const int channelID, const unsigned int logLevel, const char * errorMsg)
  * 
  * 	Callback function for Common::Register_Error_Log_Callback().
  * 	Displays given error message on standard output.
  */
-void Common_Error_Log_Callback(const unsigned int logLevel, const char * errorMsg);
+void Common_Error_Log_Callback(const int channelID, const unsigned int logLevel, const char * errorMsg);
 
 #endif	/* UNIT_TESTS_COMMON_ERROR_HANDLER_H */
 
