@@ -24,12 +24,26 @@
 /* External includes. */
 #include <iostream>
 
-void Common_Error_Log_Callback(const unsigned int logLevel, const char * errorMsg)
+void Common_Error_Log_Callback(const int channelID, const unsigned int logLevel, const char * errorMsg)
 {
+	/* Init vars. */
+	size_t nameLength = 0;
+	const char * name = NULL;
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
 	// Print to std::cout.
 	if (errorMsg != NULL)
 	{
-		std::cout << errorMsg;
+		/* Attempt to get the Channel Name. */
+		retFromCall = Common_Error_Get_Logging_Channel_Name_By_ID_Number(channelID, &name, &nameLength);
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (name != NULL) && (nameLength > 0))
+		{
+			std::cout << name << ": " << errorMsg;
+		}
+		else
+		{
+			std::cout << errorMsg;
+		}
 		std::cout.flush();
 	}
 
