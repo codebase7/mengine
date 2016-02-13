@@ -22,6 +22,9 @@
 #include "FileUtills.h"
 #include "FileUtills_Private_API.h"
 
+/* Define the MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID macro. */
+#define MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID MSYS_ERROR_LOG_CHANNEL_FILEUTILLS
+
 /*!
  *		int FileUtills_RemoveTrailingSlash(char ** retStr, size_t * retStrSize)
  *
@@ -370,14 +373,14 @@ int FileUtills_Get_File_Length_By_Filename(const char * filename, const size_t f
 								{
 									/* Could not set size in structure. */
 									ret = COMMON_ERROR_INTERNAL_ERROR;
-									COMMON_LOG_DEBUG("FileUtills_Get_File_Length_By_Filename(): Could not set size in structure.");
+									COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_Get_File_Length_By_Filename(): Could not set size in structure.");
 								}
 							}
 							else
 							{
 								/* Could not get size from structure. */
 								ret = COMMON_ERROR_INTERNAL_ERROR;
-								COMMON_LOG_DEBUG("FileUtills_Get_File_Length_By_Filename(): Could not get size from structure.");
+								COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_Get_File_Length_By_Filename(): Could not get size from structure.");
 							}
 						}
 						else
@@ -530,7 +533,7 @@ int FileUtills_Get_File_Length(FILE * fp, MSYS_FILESIZE_T * fileLength)
 						{
 							/* Internal engine error. */
 							ret = COMMON_ERROR_INTERNAL_ERROR;
-							COMMON_LOG_DEBUG("FileUtills_Get_File_Length(): Could not copy file length to management structure.");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_Get_File_Length(): Could not copy file length to management structure.");
 						}
 					}
 					else
@@ -626,7 +629,7 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 				ret = COMMON_ERROR_END_OF_DATA;
 
 				/* Log error. */
-				COMMON_LOG_DEBUG("DEBUG: FileUtills_Read_Bytes_From_File(): Reached end of file before reading the given amount of data.");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Read_Bytes_From_File(): Reached end of file before reading the given amount of data.");
 			}
 			else
 			{
@@ -634,7 +637,7 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 				ret = COMMON_ERROR_IO_ERROR;
 
 				/* Log error. */
-				COMMON_LOG_DEBUG("DEBUG: FileUtills_Read_Bytes_From_File(): Input file handle has failed.");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Read_Bytes_From_File(): Input file handle has failed.");
 			}
 		}
 	}
@@ -644,8 +647,8 @@ int FileUtills_Read_Bytes_From_File(FILE * IN, const size_t dataLength, char * d
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 		/* Log error. */
-		COMMON_LOG_DEBUG("DEBUG: FileUtills_Read_Bytes_From_File(): ");
-		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Read_Bytes_From_File(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 	}
 
 	/* Exit function. */
@@ -759,7 +762,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 														ret = COMMON_ERROR_IO_ERROR;
 
 														/* Log error. */
-														COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not flush output buffer data to output file.\n");
+														COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not flush output buffer data to output file.\n");
 													}
 												}
 												else
@@ -768,7 +771,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 													ret = COMMON_ERROR_IO_ERROR;
 
 													/* Log error. */
-													COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not write data to output file.\n");
+													COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not write data to output file.\n");
 												}
 											}
 											else
@@ -777,7 +780,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 												ret = COMMON_ERROR_IO_ERROR;
 
 												/* Log error. */
-												COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not read data from input file.\n");
+												COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not read data from input file.\n");
 											}
 										}
 
@@ -800,7 +803,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 											if (ret == COMMON_ERROR_IO_ERROR)
 											{
 												/* Log error. */
-												COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): File I/O Error.\n");
+												COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): File I/O Error.\n");
 											}
 										}
 									}
@@ -810,7 +813,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 										ret = COMMON_ERROR_MEMORY_ERROR;
 
 										/* Log error. */
-										COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for input buffer.\n");
+										COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for input buffer.\n");
 									}
 								}
 								else
@@ -819,7 +822,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 									ret = COMMON_ERROR_IO_ERROR;
 
 									/* Log error. */
-									COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not seek to starting offset.\n");
+									COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not seek to starting offset.\n");
 								}
 							}
 							else
@@ -828,7 +831,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 								ret = COMMON_ERROR_IO_ERROR;
 
 								/* Log error. */
-								COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not get input file length or input file is empty.\n");
+								COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not get input file length or input file is empty.\n");
 							}
 
 							/* Close the input file. */
@@ -839,9 +842,9 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 								ret = COMMON_ERROR_IO_ERROR;
 
 								/* Log error. */
-								COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not close input file ( ");
-								COMMON_LOG_DEBUG(filename);
-								COMMON_LOG_DEBUG(" ).\n");
+								COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not close input file ( ");
+								COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, filename);
+								COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ).\n");
 							}
 						}
 						else
@@ -855,7 +858,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 							else
 							{
 								ret = COMMON_ERROR_INTERNAL_ERROR;
-								COMMON_LOG_DEBUG("FileUtills_Write_Data_To_File_From_File(): Could not get length of file. FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT() returned success without result.");
+								COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_Write_Data_To_File_From_File(): Could not get length of file. FileUtills_Get_Length_From_MSYS_FILESIZE_Structure_LLINT() returned success without result.");
 							}
 						}
 					}
@@ -865,9 +868,9 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 						ret = COMMON_ERROR_IO_ERROR;
 
 						/* Log error. */
-						COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not open input file ( ");
-						COMMON_LOG_DEBUG(filename);
-						COMMON_LOG_DEBUG(" ).\n");
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not open input file ( ");
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, filename);
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ).\n");
 					}
 
 					/* Deallocate inFileLength. */
@@ -879,14 +882,14 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 					ret = COMMON_ERROR_MEMORY_ERROR;
 
 					/* Log error. */
-					COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for MSYS_FILESIZE structure.\n");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Could not allocate memory for MSYS_FILESIZE structure.\n");
 				}
 			}
 			else
 			{
 				/* Either we have an invalid file starting offset or we could not get it from the file. */
 				ret = ((retFromCall != COMMON_ERROR_SUCCESS) ? (COMMON_ERROR_INTERNAL_ERROR) : (COMMON_ERROR_INVALID_ARGUMENT));
-				COMMON_LOG_DEBUG(((retFromCall != COMMON_ERROR_SUCCESS) ?
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, ((retFromCall != COMMON_ERROR_SUCCESS) ?
 									("FileUtills_Write_Data_To_File_From_File(): Could not get starting offset from management structure.") :
 									("FileUtills_Write_Data_To_File_From_File(): Invalid file starting offset.")));
 			}
@@ -897,7 +900,7 @@ int FileUtills_Write_Data_To_File_From_File(FILE * OUT, const char * filename, c
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 			/* Log error. */
-			COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_File(): Invalid argument.\n");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_File(): Invalid argument.\n");
 		}
 
 		/* Exit function. */
@@ -943,7 +946,7 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
 							ret = COMMON_ERROR_IO_ERROR;
 
 							/* Log error. */
-							COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_Memory(): Could not flush remaining output file data to disk.\n");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_Memory(): Could not flush remaining output file data to disk.\n");
 						}
 				}
 				else
@@ -952,7 +955,7 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
 					ret = COMMON_ERROR_IO_ERROR;
 
 					/* Log error. */
-					COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_Memory(): Could not write data to file.\n");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_Memory(): Could not write data to file.\n");
 				}
 		}
 		else
@@ -961,7 +964,7 @@ int FileUtills_Write_Data_To_File_From_Memory(FILE * OUT, const char * data, con
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 			/* Log error. */
-			COMMON_LOG_DEBUG("DEBUG: FileUtills_Write_Data_To_File_From_Memory(): Invalid argument.\n");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "DEBUG: FileUtills_Write_Data_To_File_From_Memory(): Invalid argument.\n");
 		}
 
 		/* Exit function. */
@@ -1194,7 +1197,7 @@ int FileUtills_GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize)
 		{
 			/* Could not allocate memory for output string. */
 			ret = COMMON_ERROR_MEMORY_ERROR;
-			COMMON_LOG_DEBUG("FileUtills_GetUserProfileDirectoryPath(): Could not allocate memory for output string.");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetUserProfileDirectoryPath(): Could not allocate memory for output string.");
 		}
 	}
 	else
@@ -1206,14 +1209,14 @@ int FileUtills_GetUserProfileDirectoryPath(char ** retStr, size_t * retStrSize)
 		if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
 		{
 			/* Log this error. */
-			COMMON_LOG_WARNING("FileUtills_GetUserProfileDirectoryPath(): Syscall returned an invalid argument error. Please report this bug.\n");
+			COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetUserProfileDirectoryPath(): Syscall returned an invalid argument error. Please report this bug.\n");
 		}
 		else
 		{
 			/* Log the error. */
-			COMMON_LOG_DEBUG("FileUtills_GetUserProfileDirectoryPath(): ");
-			COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-			COMMON_LOG_DEBUG("\n");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetUserProfileDirectoryPath(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "\n");
 		}
 	}
 
@@ -1264,7 +1267,7 @@ int FileUtills_GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSiz
 		{
 			/* Could not allocate memory for output string. */
 			ret = COMMON_ERROR_MEMORY_ERROR;
-			COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath(): Could not allocate memory for output string.");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetCurrentWorkingDirectoryPath(): Could not allocate memory for output string.");
 		}
 	}
 	else
@@ -1276,14 +1279,14 @@ int FileUtills_GetCurrentWorkingDirectoryPath(char ** retStr, size_t * retStrSiz
 		if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
 		{
 			/* Log this error. */
-			COMMON_LOG_WARNING("FileUtills_GetCurrentWorkingDirectoryPath(): Syscall returned an invalid argument error. Please report this bug.\n");
+			COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetCurrentWorkingDirectoryPath(): Syscall returned an invalid argument error. Please report this bug.\n");
 		}
 		else
 		{
 			/* Log the error. */
-			COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath(): ");
-			COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-			COMMON_LOG_DEBUG("\n");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetCurrentWorkingDirectoryPath(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "\n");
 		}
 	}
 
@@ -1334,7 +1337,7 @@ int FileUtills_GetExecDirectory(char ** retStr, size_t * retStrSize)
 		{
 			/* Could not allocate memory for output string. */
 			ret = COMMON_ERROR_MEMORY_ERROR;
-			COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): Could not allocate memory for output string.");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): Could not allocate memory for output string.");
 		}
 	}
 	else
@@ -1346,14 +1349,14 @@ int FileUtills_GetExecDirectory(char ** retStr, size_t * retStrSize)
 		if (retFromCall == COMMON_ERROR_INVALID_ARGUMENT)
 		{
 			/* Log this error. */
-			COMMON_LOG_WARNING("FileUtills_GetExecDirectory(): Syscall returned an invalid argument error. Please report this bug.\n");
+			COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): Syscall returned an invalid argument error. Please report this bug.\n");
 		}
 		else
 		{
 			/* Log the error. */
-			COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
-			COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-			COMMON_LOG_DEBUG("\n");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "\n");
 		}
 	}
 
@@ -1400,9 +1403,9 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 					{
 						/* Invalid path string. (NULL should be at the end of the buffer.) */
 						ret = COMMON_ERROR_INVALID_ARGUMENT;
-						COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-						COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-						COMMON_LOG_DEBUG(" given path argument has a NULL character before the end of the buffer.");
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " given path argument has a NULL character before the end of the buffer.");
 					}
 					else
 					{
@@ -1475,9 +1478,9 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 																{
 																	/* Alright, the tempLinkBuf should NOT have a NULL character in the middle of the buffer. */
 																	ret = COMMON_ERROR_INTERNAL_ERROR;
-																	COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-																	COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-																	COMMON_LOG_DEBUG(" invalid NULL character found in the middle of a resolved symbolic link's buffer.");
+																	COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+																	COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+																	COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " invalid NULL character found in the middle of a resolved symbolic link's buffer.");
 																}
 																else
 																{
@@ -1493,17 +1496,17 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 															{
 																/* Unable to allocate memory for buffer reallocation. */
 																ret = COMMON_ERROR_MEMORY_ERROR;
-																COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-																COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
-																COMMON_LOG_DEBUG(" out of usable memory. Cannot reallocate buffer for addition of relative path.");
+																COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+																COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+																COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " out of usable memory. Cannot reallocate buffer for addition of relative path.");
 															}
 															else
 															{
 																/* All other errors. */
 																ret = COMMON_ERROR_INTERNAL_ERROR;
-																COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-																COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-																COMMON_LOG_DEBUG(" unable to reallocate output buffer for addition of relative path. Please report this bug.");
+																COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+																COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+																COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " unable to reallocate output buffer for addition of relative path. Please report this bug.");
 															}
 														}
 													}
@@ -1511,9 +1514,9 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 													{
 														/* Unable to remove the last path segment. */
 														ret = COMMON_ERROR_INTERNAL_ERROR;
-														COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-														COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-														COMMON_LOG_DEBUG(" Call to path segment removal function failed. Please report this bug.");
+														COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+														COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+														COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Call to path segment removal function failed. Please report this bug.");
 													}
 												}
 												else
@@ -1535,20 +1538,20 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 														{
 															/* Could not reallocate memory for outputStr. */
 															ret = COMMON_ERROR_MEMORY_ERROR;
-															COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-															COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-															COMMON_LOG_DEBUG(" Call to DataProcess_Reallocate_C_String() failed while attempting to copy resolved absolute path system symbolic link.");
+															COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+															COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+															COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Call to DataProcess_Reallocate_C_String() failed while attempting to copy resolved absolute path system symbolic link.");
 														}
 													}
 													else
 													{
 														/* This is any other error. */
 														ret = COMMON_ERROR_INTERNAL_ERROR;
-														COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-														COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-														COMMON_LOG_DEBUG(" Unable to resolve the given path ( ");
-														COMMON_LOG_DEBUG(path);
-														COMMON_LOG_DEBUG(" ) Unable to determine the type of the symbolic link.");
+														COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+														COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+														COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Unable to resolve the given path ( ");
+														COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, path);
+														COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) Unable to determine the type of the symbolic link.");
 													}
 												}
 											}
@@ -1559,19 +1562,19 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 												{
 													/* This is an internal engine error. */
 													ret = COMMON_ERROR_INTERNAL_ERROR;
-													COMMON_LOG_WARNING("FileUtills_ResolvePath(): ");
-													COMMON_LOG_WARNING(Common_Get_Error_Message(retFromCall));
-													COMMON_LOG_WARNING(" Call to system symbolic link resolution function failed with the given path ( ");
-													COMMON_LOG_WARNING(outputStr);
-													COMMON_LOG_WARNING(" ) Please report this bug.");
+													COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+													COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+													COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Call to system symbolic link resolution function failed with the given path ( ");
+													COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, outputStr);
+													COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) Please report this bug.");
 												}
 												else
 												{
 													/* This is any other error. */
 													ret = COMMON_ERROR_INTERNAL_ERROR;
-													COMMON_LOG_DEBUG("FileUtills_ResolvePath(): Unable to resolve the given path ( ");
-													COMMON_LOG_DEBUG(outputStr);
-													COMMON_LOG_DEBUG(" ) Unable to resolve system defined symbolic link.");
+													COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): Unable to resolve the given path ( ");
+													COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, outputStr);
+													COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) Unable to resolve system defined symbolic link.");
 												}
 											}
 
@@ -1589,19 +1592,19 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 										{
 											/* This is an internal engine error. */
 											ret = COMMON_ERROR_INTERNAL_ERROR;
-											COMMON_LOG_WARNING("FileUtills_ResolvePath(): ");
-											COMMON_LOG_WARNING(Common_Get_Error_Message(retFromCall));
-											COMMON_LOG_WARNING(" Call to FileUtills_IsFileOrDirectory() failed with the given path ( ");
-											COMMON_LOG_WARNING(path);
-											COMMON_LOG_WARNING(" ) Please report this bug.\n");
+											COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+											COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+											COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Call to FileUtills_IsFileOrDirectory() failed with the given path ( ");
+											COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, path);
+											COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) Please report this bug.\n");
 										}
 										else
 										{
 											/* This is any other error. */
 											ret = COMMON_ERROR_INTERNAL_ERROR;
-											COMMON_LOG_DEBUG("FileUtills_ResolvePath(): Unable to resolve the given path ( ");
-											COMMON_LOG_DEBUG(path);
-											COMMON_LOG_DEBUG(" ) Unable to determine final path type.\n");
+											COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): Unable to resolve the given path ( ");
+											COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, path);
+											COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) Unable to determine final path type.\n");
 										}
 										break;
 								};
@@ -1612,9 +1615,9 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 								ret = COMMON_ERROR_INTERNAL_ERROR;
 
 								/* Log the error. */
-								COMMON_LOG_WARNING("FileUtills_ResolvePath(): ");
-								COMMON_LOG_WARNING(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-								COMMON_LOG_WARNING(" Call to helper function indicated success but did not give a result. Please report this bug.\n");
+								COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+								COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+								COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Call to helper function indicated success but did not give a result. Please report this bug.\n");
 							}
 						}
 					}
@@ -1626,11 +1629,11 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 						ret = FILEUTILLS_ERROR_SYMLINK_CHAIN_TOO_DEEP;
 
 						/* Log the error. */
-						COMMON_LOG_INFO("FileUtills_ResolvePath(): Unable to resolve the given path ( ");
-						COMMON_LOG_INFO(path);
-						COMMON_LOG_INFO(" ) ");
-						COMMON_LOG_INFO(Common_Get_Error_Message(FILEUTILLS_ERROR_SYMLINK_CHAIN_TOO_DEEP));
-						COMMON_LOG_INFO("\n");
+						COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): Unable to resolve the given path ( ");
+						COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, path);
+						COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) ");
+						COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(FILEUTILLS_ERROR_SYMLINK_CHAIN_TOO_DEEP));
+						COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "\n");
 					}
 					else
 					{
@@ -1651,9 +1654,9 @@ int FileUtills_ResolvePath(const char * path, const size_t pathSize, char ** ret
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 		/* Log the error. */
-		COMMON_LOG_DEBUG("FileUtills_ResolvePath(): ");
-		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-		COMMON_LOG_DEBUG(" Given path is invalid.\n");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolvePath(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given path is invalid.\n");
 	}
 
 	/* If we do not have success, we need to deallocate the outputStr buffer. */
