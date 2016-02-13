@@ -36,16 +36,53 @@
 extern "C" {
 #endif	/* __cplusplus */
 
-/*!
- * 	static int Common_commonLastErrorCode
- * 
- * 	Contains the last error code encountered by a Common namespace function.
- * 
- * 	Note: Calling Common_GetErrorMessage() or Common_GetErrorTableSize()
- * 	will NOT clear this variable.
- * 	Calling any other Common namespace function WILL clear this variable.
+/*
+ * 	struct CommonErrorLogData
+ *
+ * 	Private data struct to contain the registered error
+ * 	log callback pointer and current log level for the
+ * 	Common namespace functions.
+ *
+ * 	Note: We declare this here as the structure
+ * 	and it's definition is supposed to be private
+ * 	to the engine. DO NOT USE THIS STRUCTURE DIRECTLY!
+ * 	This structure is NOT a part of the public API, and
+ * 	is subject to change at anytime.
  */
-static int Common_commonLastErrorCode = COMMON_ERROR_SUCCESS;
+struct CommonErrorLogData {
+	unsigned int errorLogLevel;	// Current log level.
+	void (*loggingFunct)(const int channelID, const unsigned int logLevel, const char * errorMsg); // Pointer to current callback function.
+};
+
+/*
+ * 	static struct CommonErrorLogData commonErrorLoggingData
+ *
+ * 	The actual data structure that contains the error
+ * 	logging data for the Common namespace functions.
+ *
+ * 	Once again, DO NOT USE THIS STRUCTURE DIRECTLY!
+ * 	This structure is NOT a part of the public API, and
+ * 	is subject to change at anytime.
+ */
+static struct CommonErrorLogData commonErrorLoggingData = {ERROR_DISABLE, NULL};
+
+int Common_Error_Handler_Get_API_Major_Version_Number()
+{
+	/* Return the API Version number. */
+	return MSYS_COMMON_ERROR_HANDLER_API_MAJOR_VER;
+}
+
+int Common_Error_Handler_Get_API_Minor_Version_Number()
+{
+	/* Return the API Version number. */
+	return MSYS_COMMON_ERROR_HANDLER_API_MINOR_VER;
+}
+
+int Common_Error_Handler_Get_API_Revision_Version_Number()
+{
+	/* Return the API Version number. */
+	return MSYS_COMMON_ERROR_HANDLER_API_REVISION_VER;
+}
 
 void Common_Set_Error_Log_Level(const unsigned int logLevel)
 {
@@ -62,7 +99,7 @@ unsigned int Common_Get_Error_Log_Level()
 	return commonErrorLoggingData.errorLogLevel;
 }
 
-void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
+void Common_Register_Error_Log_Callback(void (*loggingFunction)(const int channelID, const unsigned int logLevel, const char * errorMsg))
 {
 	/* Check and see if the pointer is NULL. */
 	if (loggingFunction == NULL)
@@ -317,7 +354,7 @@ void Common_Fatal_Error_Notify()
 
 #endif	/* MSYS_BUILD_FATAL_ERROR_SUPPORT */
 
-void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg)
+void COMMON_LOG_ERROR(const int channelID, const unsigned int loggingLevel, const char * errorMsg)
 {
 	/*
 	 * 	Only do something if the log is enabled,
@@ -328,43 +365,44 @@ void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg)
 	 */
 	if ((commonErrorLoggingData.errorLogLevel != ERROR_DISABLE) &&
 	    (commonErrorLoggingData.loggingFunct != NULL) &&
-	    (loggingLevel <= commonErrorLoggingData.errorLogLevel))
+	    (loggingLevel <= commonErrorLoggingData.errorLogLevel) &&
+		(Common_Error_Get_Logging_Channel_Status_By_ID_Number(channelID) == COMMON_ERROR_TRUE))
 	{
 		/* Call the callback. (Hope it returns....) */
-		commonErrorLoggingData.loggingFunct(loggingLevel, errorMsg);
+		commonErrorLoggingData.loggingFunct(channelID, loggingLevel, errorMsg);
 	}
 
 	/* Exit function. */
 	return;
 }
 
-void COMMON_LOG_CRITICAL(const char * errorMsg)
+void COMMON_LOG_CRITICAL(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_CRITICAL, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_CRITICAL, errorMsg);
 	return;
 }
 
-void COMMON_LOG_WARNING(const char * errorMsg)
+void COMMON_LOG_WARNING(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_WARNING, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_WARNING, errorMsg);
 	return;
 }
 
-void COMMON_LOG_INFO(const char * errorMsg)
+void COMMON_LOG_INFO(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_INFO, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_INFO, errorMsg);
 	return;
 }
 
-void COMMON_LOG_DEBUG(const char * errorMsg)
+void COMMON_LOG_DEBUG(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_DEBUG, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_DEBUG, errorMsg);
 	return;
 }
 
-void COMMON_LOG_VERBOSE(const char * errorMsg)
+void COMMON_LOG_VERBOSE(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_VERBOSE, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_VERBOSE, errorMsg);
 	return;
 }
 
