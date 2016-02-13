@@ -23,6 +23,9 @@
 #include "FileUtills_Private_API.h"
 #include "FileUtills_Private_API_Windows_Syscall.h"
 
+/* Define the MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID macro. */
+#define MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID MSYS_ERROR_LOG_CHANNEL_FILEUTILLS
+
 size_t FileUtills_Get_Max_Symlink_Depth_Syscall()
 {
 	/* Windows supports a maximum of 31 reparse points (and therefore symbolic links).
@@ -104,16 +107,16 @@ int FileUtills_Windows_Syscall_Copy_C_String(const char * source, const size_t s
 		{
 			/* Could not allocate memory for tempDest. */
 			ret = COMMON_ERROR_MEMORY_ERROR;
-			COMMON_LOG_DEBUG("FileUtills_Windows_Syscall_Copy_C_String(): ");
-			COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_Windows_Syscall_Copy_C_String(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
 		}
 	}
 	else
 	{
 		/* Invalid arguments. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_DEBUG("FileUtills_Windows_Syscall_Copy_C_String(): ");
-		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_Windows_Syscall_Copy_C_String(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 	}
 
 	/* Check for no success. */
@@ -194,16 +197,16 @@ int FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(char ** path, size_t *
 		{
 			/* Could not allocate memory for tempPath. */
 			ret = COMMON_ERROR_MEMORY_ERROR;
-			COMMON_LOG_DEBUG("FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(): ");
-			COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
 		}
 	}
 	else
 	{
 		/* Invalid argument. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_DEBUG("FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(): ");
-		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_Windows_Syscall_Add_Extended_Length_Prefix(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 	}
 
 	/* Check for no success. */
@@ -236,9 +239,9 @@ int FileUtills_ResolveSystemSymoblicLink_Syscall(char ** path, size_t * pathSize
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 		/* Log the error. */
-		COMMON_LOG_DEBUG("FileUtills_ResolveSystemSymoblicLink(): ");
-		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-		COMMON_LOG_DEBUG(" Given path argument is invalid.");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_ResolveSystemSymoblicLink(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given path argument is invalid.");
 	}
 
 	/* Return the result. */
@@ -303,9 +306,9 @@ int FileUtills_GetCurrentWorkingDirectoryPath_Syscall(char ** path, size_t * pat
 					{
 						/* Host has changed the current directory since the last call, so abort. */
 						ret = COMMON_ERROR_RACE_CONDITION;
-						COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
-						COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_RACE_CONDITION));
-						COMMON_LOG_DEBUG(" Host has changed the current working directory while attempting to get it's path.");
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_RACE_CONDITION));
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Host has changed the current working directory while attempting to get it's path.");
 					}
 					else
 					{
@@ -319,8 +322,8 @@ int FileUtills_GetCurrentWorkingDirectoryPath_Syscall(char ** path, size_t * pat
 							ret = retFromCall;
 
 							/* Log the error. */
-							COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
-							COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 						}
 						else
 						{
@@ -337,9 +340,9 @@ int FileUtills_GetCurrentWorkingDirectoryPath_Syscall(char ** path, size_t * pat
 				{
 					/* Could not allocate memory for path string. */
 					ret = COMMON_ERROR_MEMORY_ERROR;
-					COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
-					COMMON_LOG_DEBUG(" Could not allocate memory for path string.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Could not allocate memory for path string.");
 				}
 			}
 			else
@@ -354,8 +357,8 @@ int FileUtills_GetCurrentWorkingDirectoryPath_Syscall(char ** path, size_t * pat
 					ret = retFromCall;
 
 					/* Log the error. */
-					COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 				}
 				else
 				{
@@ -374,9 +377,9 @@ int FileUtills_GetCurrentWorkingDirectoryPath_Syscall(char ** path, size_t * pat
 					{
 						/* Could not allocate memory for path string. */
 						ret = COMMON_ERROR_MEMORY_ERROR;
-						COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
-						COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
-						COMMON_LOG_DEBUG(" Could not allocate memory for path string.");
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+						COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Could not allocate memory for path string.");
 					}
 				}
 			}
@@ -385,17 +388,17 @@ int FileUtills_GetCurrentWorkingDirectoryPath_Syscall(char ** path, size_t * pat
 		{
 			/* Could not allocate memory for path string. */
 			ret = COMMON_ERROR_MEMORY_ERROR;
-			COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
-			COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
-			COMMON_LOG_DEBUG(" Could not allocate memory for path string.");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Could not allocate memory for path string.");
 		}
 	}
 	else
 	{
 		/* Invalid arguments. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_DEBUG("FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
-		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetCurrentWorkingDirectoryPath_Syscall(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 	}
 
 	/* If unsuccessful, make sure the buffer is deallocated. */
@@ -546,24 +549,24 @@ int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
 											{
 												/* Could not free the unneeded memory. */
 												ret = COMMON_ERROR_MEMORY_ERROR;
-												COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): Call to FileUtills_Reallocate_CString_Buffer() failed: ");
-												COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+												COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): Call to FileUtills_Reallocate_CString_Buffer() failed: ");
+												COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 											}
 										}
 										else
 										{
 											/* Something is screwing with us...abort. */
 											ret = COMMON_ERROR_INTERNAL_ERROR;
-											COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
-											COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+											COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): ");
+											COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
 										}
 									}
 									else
 									{
 										/* Something is screwing with us...abort. */
 										ret = COMMON_ERROR_INTERNAL_ERROR;
-										COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
-										COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+										COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): ");
+										COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
 									}
 								}
 								else
@@ -571,8 +574,8 @@ int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
 									/* Error. */
 									errcpy = GetLastError();
 									ret = Common_Error_Handler_Translate_Windows_Error_Code(errcpy);
-									COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): GetModuleFileName() system call returned: ");
-									COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
+									COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): GetModuleFileName() system call returned: ");
+									COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(ret));
 								}
 							}
 							else
@@ -595,8 +598,8 @@ int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
 							/* Error. */
 							errcpy = GetLastError();
 							ret = Common_Error_Handler_Translate_Windows_Error_Code(errcpy);
-							COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): GetModuleFileName() system call returned: ");
-							COMMON_LOG_DEBUG(Common_Get_Error_Message(ret));
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): GetModuleFileName() system call returned: ");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(ret));
 						}
 					}
 				}
@@ -604,18 +607,18 @@ int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
 				{
 					/* Could not allocate memory for check buffer. */
 					ret = COMMON_ERROR_MEMORY_ERROR;
-					COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
-					COMMON_LOG_DEBUG(" Could not allocate memory for check buffer.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Could not allocate memory for check buffer.");
 				}
 			}
 			else
 			{
 				/* Could not allocate memory for path buffer. */
 				ret = COMMON_ERROR_MEMORY_ERROR;
-				COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
-				COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
-				COMMON_LOG_DEBUG(" Could not allocate memory for path buffer.");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_MEMORY_ERROR));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Could not allocate memory for path buffer.");
 			}
 		}
 
@@ -634,9 +637,9 @@ int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
 			 *  FILEUTILLS_PATH_LENGTH_INVALID.)
 			 */
 			ret = COMMON_ERROR_INTERNAL_ERROR;
-			COMMON_LOG_INFO("FileUtills_GetExecDirectory(): ");
-			COMMON_LOG_INFO(Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
-			COMMON_LOG_INFO(" Unable to resolve the symbolic link due to engine limitation. (Length of the resolved path is too long.)");
+			COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): ");
+			COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INTERNAL_ERROR));
+			COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Unable to resolve the symbolic link due to engine limitation. (Length of the resolved path is too long.)");
 		}
 
 		/* If unsuccessful, make sure both buffers are deallocated. */
@@ -658,8 +661,8 @@ int FileUtills_GetExecDirectory_Syscall(char ** retStr, size_t * retStrSize)
 	{
 		/* Invalid arguments. */
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
-		COMMON_LOG_DEBUG("FileUtills_GetExecDirectory(): ");
-		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_GetExecDirectory(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
 	}
 
 	/* Return result. */
@@ -708,14 +711,14 @@ FileUtills::dirlist * FileUtills::getDirectory_Syscall(const std::string & absPa
 					}
 
 					// Log the error.
-					COMMON_LOG_INFO("FileUtills::getDirectory(): Unable to get directory contents for ( ");
-					COMMON_LOG_INFO(absPath.c_str());
-					COMMON_LOG_INFO(" ) The system returned ");
-					COMMON_LOG_INFO(Common::Get_Error_Message(errcpy));
-					COMMON_LOG_INFO("\n");
+					COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::getDirectory(): Unable to get directory contents for ( ");
+					COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, absPath.c_str());
+					COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) The system returned ");
+					COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(errcpy));
+					COMMON_LOG_INFO(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "\n");
 
 					// Copy the translated error code to Common::commonLastErrorCode.
-					Common::commonLastErrorCode = errcpy;
+					ret = errcpy;
 				}
 
 				// Start filesystem fetch loop.
@@ -746,15 +749,15 @@ FileUtills::dirlist * FileUtills::getDirectory_Syscall(const std::string & absPa
 				ret->numOfEntries = ret->list.size();
 
 				// Set Common::commonLastErrorCode.
-				Common::commonLastErrorCode = COMMON_ERROR_SUCCESS;
+				ret = COMMON_ERROR_SUCCESS;
 			}
 			else
 			{
 				// Could not allocate memory.
-				Common::commonLastErrorCode = COMMON_ERROR_MEMORY_ERROR;
+				ret = COMMON_ERROR_MEMORY_ERROR;
 			}
 		}
-		catch(exception &ex)
+		catch(std::exception &ex)
 		{
 			// Free memory if needed.
 			if (ret != NULL)
@@ -764,26 +767,26 @@ FileUtills::dirlist * FileUtills::getDirectory_Syscall(const std::string & absPa
 			}
 
 			// Could not allocate struct.
-			Common::commonLastErrorCode = COMMON_ERROR_EXCEPTION_THROWN;
+			ret = COMMON_ERROR_EXCEPTION_THROWN;
 
 			// Log the error.
-			COMMON_LOG_DEBUG("FileUtills::getDirectory(): ");
-			COMMON_LOG_DEBUG(Common::Get_Error_Message(COMMON_ERROR_EXCEPTION_THROWN));
-			COMMON_LOG_DEBUG(" ");
-			COMMON_LOG_DEBUG(ex.what());
-			COMMON_LOG_DEBUG("\n");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::getDirectory(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(COMMON_ERROR_EXCEPTION_THROWN));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, ex.what());
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "\n");
 		}
 #endif
 	}
 	else
 	{
 		// Invalid path.
-		Common::commonLastErrorCode = COMMON_ERROR_INVALID_ARGUMENT;
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 		// Log the error.
-		COMMON_LOG_DEBUG("FileUtills::getDirectory(): ");
-		COMMON_LOG_DEBUG(Common::Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-		COMMON_LOG_DEBUG(" Given path is invalid.\n");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::getDirectory(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given path is invalid.\n");
 	}
 
 	// Return the result.
@@ -817,9 +820,9 @@ int FileUtills::CreateDirectory_Syscall(const char * absPath)
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 		// Log the error.
-		COMMON_LOG_DEBUG("FileUtills::CreateDirectory(): ");
-		COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-		COMMON_LOG_DEBUG(" Given path is invalid.\n");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::CreateDirectory(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(ret));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given path is invalid.\n");
 	}
 
 	// Return the result.
@@ -845,9 +848,9 @@ int FileUtills::CheckPermissions_Syscall(const std::string & absPath, const bool
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 			// Log the error.
-			COMMON_LOG_DEBUG("FileUtills::CheckPermissions(): ");
-			COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-			COMMON_LOG_DEBUG(" No check to perform, aborting.\n");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::CheckPermissions(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(ret));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " No check to perform, aborting.\n");
 		}
 	}
 	else
@@ -856,9 +859,9 @@ int FileUtills::CheckPermissions_Syscall(const std::string & absPath, const bool
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 		// Log the error.
-		COMMON_LOG_DEBUG("FileUtills::CheckPermissions(): ");
-		COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-		COMMON_LOG_DEBUG(" Given path is invalid.\n");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::CheckPermissions(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(ret));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given path is invalid.\n");
 	}
 
 	// Default return.
@@ -899,9 +902,9 @@ int FileUtills::DoesExist_Syscall(const std::string & absPath)
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 		// Log the error.
-		COMMON_LOG_DEBUG("FileUtills::DoesExist(): ");
-		COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-		COMMON_LOG_DEBUG(" Given path is invalid.\n");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::DoesExist(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(ret));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given path is invalid.\n");
 	}
 
 	// Return the result.
@@ -988,8 +991,8 @@ int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absP
 							ret = retFromCall;
 
 							/* Log the error. */
-							COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
-							COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 						}
 					}
 				}
@@ -1003,8 +1006,8 @@ int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absP
 					ret = retFromCall;
 
 					/* Log the error. */
-					COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
-					COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsFileOrDirectory_Syscall(): Host function returned: ");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
 				}
 			}
 			else
@@ -1018,7 +1021,7 @@ int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absP
 				{
 					/* Could not prepend the extended length prefix to the given path. */
 					ret = COMMON_ERROR_INTERNAL_ERROR;
-					COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Could not prepend extended length prefix to path.");
+					COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsFileOrDirectory_Syscall(): Could not prepend extended length prefix to path.");
 				}
 			}
 		}
@@ -1026,9 +1029,9 @@ int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absP
 		{
 			/* Could not copy path string to temp buffer. */
 			ret = COMMON_ERROR_MEMORY_ERROR;
-			COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): ");
-			COMMON_LOG_DEBUG(Common_Get_Error_Message(retFromCall));
-			COMMON_LOG_DEBUG(" Could not copy path string to temp buffer.");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsFileOrDirectory_Syscall(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(retFromCall));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Could not copy path string to temp buffer.");
 		}
 	}
 	else
@@ -1037,9 +1040,9 @@ int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absP
 		ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 		/* Log the error. */
-		COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): ");
-		COMMON_LOG_DEBUG(Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
-		COMMON_LOG_DEBUG(" Given path is invalid.");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsFileOrDirectory_Syscall(): ");
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common_Get_Error_Message(COMMON_ERROR_INVALID_ARGUMENT));
+		COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given path is invalid.");
 	}
 
 	/* Check for open handle and close it if needed. */
@@ -1052,7 +1055,7 @@ int FileUtills_IsFileOrDirectory_Syscall(const char * absPath, const size_t absP
 		else
 		{
 			/* Could not release LPWIN32_FIND_DATA structure. */
-			COMMON_LOG_DEBUG("FileUtills_IsFileOrDirectory_Syscall(): Could not release LPWIN32_FIND_DATA structure.");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills_IsFileOrDirectory_Syscall(): Could not release LPWIN32_FIND_DATA structure.");
 		}
 	}
 
@@ -1096,22 +1099,22 @@ int FileUtills::DeletePath_Syscall(const std::string & absPath)
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 			// Log the error.
-			COMMON_LOG_DEBUG("FileUtills::DeletePath(): ");
-			COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-			COMMON_LOG_DEBUG(" Given path is invalid.\n");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::DeletePath(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(ret));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given path is invalid.\n");
 		}
 	}
-	catch (exception &ex)
+	catch (std::exception &ex)
 	{
 		// Exception thrown.
 		ret = COMMON_ERROR_EXCEPTION_THROWN;
 
 		// Log the error.
-		COMMON_LOG_VERBOSE("FileUtills::DeletePath(): ");
-		COMMON_LOG_VERBOSE(Common::Get_Error_Message(ret));
-		COMMON_LOG_VERBOSE(" ");
-		COMMON_LOG_VERBOSE(ex.what());
-		COMMON_LOG_VERBOSE("\n");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::DeletePath(): ");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(ret));
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, ex.what());
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "\n");
 	}
   
 	// Return the result.
@@ -1157,9 +1160,9 @@ int FileUtills::RenamePath_Syscall(const std::string & absPathSrc, const std::st
 							ret = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
 
 							// Log the error.
-							COMMON_LOG_DEBUG("FileUtills::RenamePath(): Unable to dereference symlink on the source path ( ");
-							COMMON_LOG_DEBUG(absPathSrc.c_str());
-							COMMON_LOG_DEBUG(").\n");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::RenamePath(): Unable to dereference symlink on the source path ( ");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, absPathSrc.c_str());
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, ").\n");
 
 							// Deallocate the srcLinkedPath if needed.
 							if (srcLinkedPath != NULL)
@@ -1187,9 +1190,9 @@ int FileUtills::RenamePath_Syscall(const std::string & absPathSrc, const std::st
 							ret = Common::Translate_Posix_Errno_To_Common_Error_Code(errcpy);
 
 							// Log the error.
-							COMMON_LOG_DEBUG("FileUtills::RenamePath(): Unable to dereference symlink on the destionation path ( ");
-							COMMON_LOG_DEBUG(absPathDest.c_str());
-							COMMON_LOG_DEBUG(").\n");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::RenamePath(): Unable to dereference symlink on the destionation path ( ");
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, absPathDest.c_str());
+							COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, ").\n");
 
 							// Deallocate the destLinkedPath if needed.
 							if (destLinkedPath != NULL)
@@ -1219,9 +1222,9 @@ int FileUtills::RenamePath_Syscall(const std::string & absPathSrc, const std::st
 							ret = COMMON_ERROR_INTERNAL_ERROR;
 
 							// Log the error.
-							COMMON_LOG_WARNING("FileUtills::RenamePath(): Resolved symlink buffer for the destionation path ( ");
-							COMMON_LOG_WARNING(absPathDest.c_str());
-							COMMON_LOG_WARNING(" ) is invalid, but it should be valid. Please report this bug.\n");
+							COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::RenamePath(): Resolved symlink buffer for the destionation path ( ");
+							COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, absPathDest.c_str());
+							COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) is invalid, but it should be valid. Please report this bug.\n");
 						}
 					}
 					else
@@ -1230,9 +1233,9 @@ int FileUtills::RenamePath_Syscall(const std::string & absPathSrc, const std::st
 						ret = COMMON_ERROR_INTERNAL_ERROR;
 
 						// Log the error.
-						COMMON_LOG_WARNING("FileUtills::RenamePath(): Resolved symlink buffer for the source path ( ");
-						COMMON_LOG_WARNING(absPathSrc.c_str());
-						COMMON_LOG_WARNING(" ) is invalid, but it should be valid. Please report this bug.\n");
+						COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::RenamePath(): Resolved symlink buffer for the source path ( ");
+						COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, absPathSrc.c_str());
+						COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) is invalid, but it should be valid. Please report this bug.\n");
 					}
 				}
 				else
@@ -1251,9 +1254,9 @@ int FileUtills::RenamePath_Syscall(const std::string & absPathSrc, const std::st
 							ret = COMMON_ERROR_INTERNAL_ERROR;
 
 							// Log the error.
-							COMMON_LOG_WARNING("FileUtills::RenamePath(): Resolved symlink buffer for the source path ( ");
-							COMMON_LOG_WARNING(absPathSrc.c_str());
-							COMMON_LOG_WARNING(" ) is invalid, but it should be valid. Please report this bug.\n");
+							COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::RenamePath(): Resolved symlink buffer for the source path ( ");
+							COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, absPathSrc.c_str());
+							COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) is invalid, but it should be valid. Please report this bug.\n");
 						}
 					}
 					else
@@ -1272,9 +1275,9 @@ int FileUtills::RenamePath_Syscall(const std::string & absPathSrc, const std::st
 								ret = COMMON_ERROR_INTERNAL_ERROR;
 
 								// Log the error.
-								COMMON_LOG_WARNING("FileUtills::RenamePath(): Resolved symlink buffer for the destionation path ( ");
-								COMMON_LOG_WARNING(absPathDest.c_str());
-								COMMON_LOG_WARNING(" ) is invalid, but it should be valid. Please report this bug.\n");
+								COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::RenamePath(): Resolved symlink buffer for the destionation path ( ");
+								COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, absPathDest.c_str());
+								COMMON_LOG_WARNING(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ) is invalid, but it should be valid. Please report this bug.\n");
 							}
 						}
 						else
@@ -1319,9 +1322,9 @@ int FileUtills::RenamePath_Syscall(const std::string & absPathSrc, const std::st
 				ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 				// Log the error.
-				COMMON_LOG_DEBUG("FileUtills::RenamePath(): ");
-				COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-				COMMON_LOG_DEBUG(" Given destionation path is invalid.\n");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::RenamePath(): ");
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(ret));
+				COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given destionation path is invalid.\n");
 			}
 		}
 		else
@@ -1330,9 +1333,9 @@ int FileUtills::RenamePath_Syscall(const std::string & absPathSrc, const std::st
 			ret = COMMON_ERROR_INVALID_ARGUMENT;
 
 			// Log the error.
-			COMMON_LOG_DEBUG("FileUtills::RenamePath(): ");
-			COMMON_LOG_DEBUG(Common::Get_Error_Message(ret));
-			COMMON_LOG_DEBUG(" Given source path is invalid.\n");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::RenamePath(): ");
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(ret));
+			COMMON_LOG_DEBUG(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " Given source path is invalid.\n");
 		}
 
 		// Deallocate srcLinkedPath and destLinkedPath if needed.
@@ -1347,21 +1350,18 @@ int FileUtills::RenamePath_Syscall(const std::string & absPathSrc, const std::st
 			destLinkedPath = NULL;
 		}
 	}
-	catch (exception &ex)
+	catch (std::exception &ex)
 	{
 		// Exception thrown.
 		ret = COMMON_ERROR_EXCEPTION_THROWN;
 
 		// Log the error.
-		COMMON_LOG_VERBOSE("FileUtills::RenamePath(): ");
-		COMMON_LOG_VERBOSE(Common::Get_Error_Message(ret));
-		COMMON_LOG_VERBOSE(" ");
-		COMMON_LOG_VERBOSE(ex.what());
-		COMMON_LOG_VERBOSE("\n");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "FileUtills::RenamePath(): ");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, Common::Get_Error_Message(ret));
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, " ");
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, ex.what());
+		COMMON_LOG_VERBOSE(MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID, "\n");
 	}
-
-	// Copy ret to Common::commonLastErrorCode.
-	Common::commonLastErrorCode = ret;
 
 	// Return the result.
 	return ret;
