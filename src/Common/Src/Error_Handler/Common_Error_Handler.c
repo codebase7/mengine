@@ -51,7 +51,7 @@ extern "C" {
  */
 struct CommonErrorLogData {
 	unsigned int errorLogLevel;	// Current log level.
-	void (*loggingFunct)(const unsigned int logLevel, const char * errorMsg); // Pointer to current callback function.
+	void (*loggingFunct)(const int channelID, const unsigned int logLevel, const char * errorMsg); // Pointer to current callback function.
 };
 
 /*
@@ -99,7 +99,7 @@ unsigned int Common_Get_Error_Log_Level()
 	return commonErrorLoggingData.errorLogLevel;
 }
 
-void Common_Register_Error_Log_Callback(void (*loggingFunction)(const unsigned int logLevel, const char * errorMsg))
+void Common_Register_Error_Log_Callback(void (*loggingFunction)(const int channelID, const unsigned int logLevel, const char * errorMsg))
 {
 	/* Check and see if the pointer is NULL. */
 	if (loggingFunction == NULL)
@@ -354,7 +354,7 @@ void Common_Fatal_Error_Notify()
 
 #endif	/* MSYS_BUILD_FATAL_ERROR_SUPPORT */
 
-void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg)
+void COMMON_LOG_ERROR(const int channelID, const unsigned int loggingLevel, const char * errorMsg)
 {
 	/*
 	 * 	Only do something if the log is enabled,
@@ -365,43 +365,44 @@ void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg)
 	 */
 	if ((commonErrorLoggingData.errorLogLevel != ERROR_DISABLE) &&
 	    (commonErrorLoggingData.loggingFunct != NULL) &&
-	    (loggingLevel <= commonErrorLoggingData.errorLogLevel))
+	    (loggingLevel <= commonErrorLoggingData.errorLogLevel) &&
+		(Common_Error_Get_Logging_Channel_Status_By_ID_Number(channelID) == COMMON_ERROR_TRUE))
 	{
 		/* Call the callback. (Hope it returns....) */
-		commonErrorLoggingData.loggingFunct(loggingLevel, errorMsg);
+		commonErrorLoggingData.loggingFunct(channelID, loggingLevel, errorMsg);
 	}
 
 	/* Exit function. */
 	return;
 }
 
-void COMMON_LOG_CRITICAL(const char * errorMsg)
+void COMMON_LOG_CRITICAL(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_CRITICAL, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_CRITICAL, errorMsg);
 	return;
 }
 
-void COMMON_LOG_WARNING(const char * errorMsg)
+void COMMON_LOG_WARNING(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_WARNING, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_WARNING, errorMsg);
 	return;
 }
 
-void COMMON_LOG_INFO(const char * errorMsg)
+void COMMON_LOG_INFO(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_INFO, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_INFO, errorMsg);
 	return;
 }
 
-void COMMON_LOG_DEBUG(const char * errorMsg)
+void COMMON_LOG_DEBUG(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_DEBUG, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_DEBUG, errorMsg);
 	return;
 }
 
-void COMMON_LOG_VERBOSE(const char * errorMsg)
+void COMMON_LOG_VERBOSE(const int channelID, const char * errorMsg)
 {
-	COMMON_LOG_ERROR(ERROR_VERBOSE, errorMsg);
+	COMMON_LOG_ERROR(channelID, ERROR_VERBOSE, errorMsg);
 	return;
 }
 

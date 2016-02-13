@@ -40,7 +40,7 @@ extern "C" {
 #endif	/* __cplusplus */
 
 /*
- * 	void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg)
+ * 	void COMMON_LOG_ERROR(const int channelID, const unsigned int loggingLevel, const char * errorMsg)
  * 
  * 	This is the actual function that calls the current
  * 	error logging callback function for the Common
@@ -50,10 +50,10 @@ extern "C" {
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-MSYS_DLL_EXPORT void COMMON_LOG_ERROR(const unsigned int loggingLevel, const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_ERROR(const int channelID, const unsigned int loggingLevel, const char * errorMsg);
 
 /*
- * 	COMMON_LOG_CRITICAL(const char * errorMsg)
+ * 	COMMON_LOG_CRITICAL(const int channelID, const char * errorMsg)
  * 
  * 	Internal API for calling the current callback error
  * 	logging function with a log level of ERROR_CRITICAL.
@@ -62,10 +62,10 @@ MSYS_DLL_EXPORT void COMMON_LOG_ERROR(const unsigned int loggingLevel, const cha
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-MSYS_DLL_EXPORT void COMMON_LOG_CRITICAL(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_CRITICAL(const int channelID, const char * errorMsg);
 
 /*
- * 	COMMON_LOG_WARNING(const char * errorMsg)
+ * 	COMMON_LOG_WARNING(const int channelID, const char * errorMsg)
  * 
  * 	Internal API for calling the current callback error
  * 	logging function with a log level of ERROR_WARNING.
@@ -74,10 +74,10 @@ MSYS_DLL_EXPORT void COMMON_LOG_CRITICAL(const char * errorMsg);
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-MSYS_DLL_EXPORT void COMMON_LOG_WARNING(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_WARNING(const int channelID, const char * errorMsg);
 
 /*
- * 	COMMON_LOG_INFO(const char * errorMsg)
+ * 	COMMON_LOG_INFO(const int channelID, const char * errorMsg)
  * 
  * 	Internal API for calling the current callback error
  * 	logging function with a log level of ERROR_INFO.
@@ -86,10 +86,10 @@ MSYS_DLL_EXPORT void COMMON_LOG_WARNING(const char * errorMsg);
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-MSYS_DLL_EXPORT void COMMON_LOG_INFO(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_INFO(const int channelID, const char * errorMsg);
 
 /*
- * 	COMMON_LOG_DEBUG(const char * errorMsg)
+ * 	COMMON_LOG_DEBUG(const int channelID, const char * errorMsg)
  * 
  * 	Internal API for calling the current callback error
  * 	logging function with a log level of ERROR_DEBUG.
@@ -98,10 +98,10 @@ MSYS_DLL_EXPORT void COMMON_LOG_INFO(const char * errorMsg);
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-MSYS_DLL_EXPORT void COMMON_LOG_DEBUG(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_DEBUG(const int channelID, const char * errorMsg);
 
 /*
- * 	COMMON_LOG_VERBOSE(const char * errorMsg)
+ * 	COMMON_LOG_VERBOSE(const int channelID, const char * errorMsg)
  * 
  * 	Internal API for calling the current callback error
  * 	logging function with a log level of ERROR_VERBOSE.
@@ -110,7 +110,7 @@ MSYS_DLL_EXPORT void COMMON_LOG_DEBUG(const char * errorMsg);
  * 	This function is NOT a part of the public API, and
  * 	is subject to change at anytime.
  */
-MSYS_DLL_EXPORT void COMMON_LOG_VERBOSE(const char * errorMsg);
+MSYS_DLL_EXPORT void COMMON_LOG_VERBOSE(const int channelID, const char * errorMsg);
 
 /* End C Linkage if needed. */
 #ifdef __cplusplus

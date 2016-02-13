@@ -18,11 +18,12 @@ if (BUILD_FATAL_ERROR_NOTIFY_SUPPORT)
 endif (BUILD_FATAL_ERROR_NOTIFY_SUPPORT)
 
 # Create the error handler. (Nasty hack to avoid a warning from GCC about invalid -std:gnu99 flag below....)
-set (COMMON_ERROR_HANDLER_C_INCLUDES_BASE Common_Error_Handler.c 
+set (COMMON_ERROR_HANDLER_C_INCLUDES_BASE Common_Error_Handler.c
+		Common_Error_Handler_Log_Channel_Defs.c
 		Common_Error_Handler_Structures.c)
 set (COMMON_ERROR_HANDLER_CXX_INCLUDES_BASE Common_Error_Handler_Structures_CPP_Bindings.cpp
 		Common_Error_Handler_CPP_Bindings.cpp)
-	
+
 # Build the posix error translation table if we are running under posix.
 if (${CMAKE_SYSTEM_NAME} EQUAL "Linux")
 	set (COMMON_ERROR_HANDLER_C_INCLUDES ${COMMON_ERROR_HANDLER_C_INCLUDES_BASE} 
