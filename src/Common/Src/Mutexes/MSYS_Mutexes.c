@@ -167,7 +167,7 @@ MSYS_Mutex * MSYS_Lock_Mutex(MSYS_Mutex * mu)
 	if ((mu != NULL) && (mu->lock != NULL))
 	{
 		/* Begin loop. */
-		while (retFromLOCK != MSYS_MU_SUCCESS)
+		while ((retFromLOCK != MSYS_MU_SUCCESS) || (retFromLOCK != MSYS_MU_ALREADY_OWNED))
 		{
 			/* Attempt to lock the mutex. */
 			retFromLOCK = MSYS_Try_Lock_Mutex(mu);
@@ -243,15 +243,44 @@ short MSYS_Try_Lock_Mutex(MSYS_Mutex * mu)
 		}
 		else
 		{
-			/* Lock is already active. */
-			ret = MSYS_MU_ALREADY_LOCKED;
+			/* Check and see if we own the lock. */
+			if (((MSYS_Mutex_Private *)mu->lock)->tidLock == tid)
+			{
+				/* Lock is already held by us. */
+				ret = MSYS_MU_ALREADY_OWNED;
+			}
+			else
+			{
+				/* Lock is owned by someone else. */
+				ret = MSYS_MU_ALREADY_LOCKED;
+			}
 		}
 
 		/* Release the lock. */
 		MSYS_Compare_And_Swap((&((MSYS_Mutex_Private *)mu->lock)->lock), TRUE, FALSE);
 #else
 		/* Attempt to lock the mutex. */
-		ret = MSYS_Compare_And_Swap_Long((&((MSYS_Mutex_Private *)mu->lock)->tidLock), MSYS_INVALID_TID, tid);
+		retFromCAS = MSYS_Compare_And_Swap_Long((&((MSYS_Mutex_Private *)mu->lock)->tidLock), MSYS_INVALID_TID, tid);
+		if (retFromCAS == TRUE)
+		{
+			/* Set ret. */
+			ret = MSYS_MU_SUCCESS;
+		}
+		else
+		{
+			/* Check and see if we own the lock. */
+			retFromCAS = MSYS_Compare_And_Swap_Long((&((MSYS_Mutex_Private *)mu->lock)->tidLock), tid, tid);
+			if (retFromCAS)
+			{
+				/* Lock is already held by us. */
+				ret = MSYS_MU_ALREADY_OWNED;
+			}
+			else
+			{
+				/* Lock is owned by someone else. */
+				ret = MSYS_MU_ALREADY_LOCKED;
+			}
+		}
 #endif	/* MSYS_INSUFFIENCT_BITS_LONG_LOCK */
 	}
 
