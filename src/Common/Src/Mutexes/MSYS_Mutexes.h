@@ -32,7 +32,9 @@ extern "C" {
 
 /* Define error codes. */
 #define MSYS_MU_SUCCESS 0
-#define MSYS_MU_ALREADY_LOCKED 1
+#define MSYS_MU_ALREADY_UNLOCKED 3	/* Locked by no-one. */
+#define MSYS_MU_ALREADY_OWNED 2		/* Locked by the current thread. */
+#define MSYS_MU_ALREADY_LOCKED 1	/* Locked by another thread. */
 #define MSYS_MU_INVALID -1
 #define MSYS_MU_UNKNOWN_ERROR -2
 
@@ -107,13 +109,14 @@ MSYS_Mutex * MSYS_Lock_Mutex(MSYS_Mutex * mu);
  * 	Takes the given MSYS_Mutex struct pointer and blocks the
  * 	caller until a lock attempt is made.
  *
- * 	Returns 0 if the lock is aquired and now owned by the
+ * 	Returns MSYS_MU_SUCCESS if the lock is aquired and now owned by the
  * 	calling thread.
  *
- * 	Returns 1 if the lock is already owned by another thread,
- * 	or owned by the calling thread.
+ * 	Returns MSYS_MU_ALREADY_LOCKED if the lock is already owned by another thread.
  *
- * 	Returns -1 if the given mutex pointer is invalid.
+ * 	Returns MSYS_MU_ALREADY_OWNED if owned by the calling thread.
+ *
+ * 	Returns MSYS_MU_INVALID if the given mutex pointer is invalid.
  */
 short MSYS_Try_Lock_Mutex(MSYS_Mutex * mu);
 
@@ -123,12 +126,13 @@ short MSYS_Try_Lock_Mutex(MSYS_Mutex * mu);
  * 	Takes the given MSYS_Mutex struct pointer and attempts
  * 	to release the mutex lock.
  *
- * 	Returns 0 if successful.
+ * 	Returns MSYS_MU_SUCCESS if successful.
  *
- * 	Returns 1 if the lock is unowned, or if
- * 	the calling thread does not own the lock.
+ * 	Returns MSYS_MU_ALREADY_UNLOCKED if the lock is free.
  *
- * 	Returns -1 if the given mutex pointer is invalid.
+ * 	Returns MSYS_MU_ALREADY_LOCKED the calling thread does not own the lock.
+ *
+ * 	Returns MSYS_MU_INVALID if the given mutex pointer is invalid.
  */
 short MSYS_Unlock_Mutex(MSYS_Mutex * mu);
 
