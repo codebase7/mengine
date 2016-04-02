@@ -32,6 +32,7 @@ extern "C" {
 
 /* Define error codes. */
 #define MSYS_MU_SUCCESS 0
+#define MSYS_MU_ALREADY_UNLOCKED 3	/* Locked by no-one. */
 #define MSYS_MU_ALREADY_OWNED 2		/* Locked by the current thread. */
 #define MSYS_MU_ALREADY_LOCKED 1	/* Locked by another thread. */
 #define MSYS_MU_INVALID -1
@@ -127,8 +128,9 @@ short MSYS_Try_Lock_Mutex(MSYS_Mutex * mu);
  *
  * 	Returns MSYS_MU_SUCCESS if successful.
  *
- * 	Returns MSYS_MU_ALREADY_LOCKED if the lock is unowned, or if
- * 	the calling thread does not own the lock.
+ * 	Returns MSYS_MU_ALREADY_UNLOCKED if the lock is free.
+ *
+ * 	Returns MSYS_MU_ALREADY_LOCKED the calling thread does not own the lock.
  *
  * 	Returns MSYS_MU_INVALID if the given mutex pointer is invalid.
  */

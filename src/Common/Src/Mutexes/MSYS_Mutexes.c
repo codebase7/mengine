@@ -355,8 +355,17 @@ short MSYS_Unlock_Mutex(MSYS_Mutex * mu)
 		}
 		else
 		{
-			/* Lock is owned by another thread, or is unowned. */
-			ret = MSYS_MU_ALREADY_LOCKED;
+			/* Check whether lock is owned by another thread, or is unowned. */
+			if (((MSYS_Mutex_Private *)mu->lock)->tidLock == MSYS_INVALID_TID)
+			{
+				/* The mutex is not owned by anyone. */
+				ret = MSYS_MU_ALREADY_UNLOCKED;
+			}
+			else
+			{
+				/* The mutex is locked by another thread. */
+				ret = MSYS_MU_ALREADY_LOCKED;
+			}
 		}
 
 		/* Release the lock. */
@@ -370,8 +379,18 @@ short MSYS_Unlock_Mutex(MSYS_Mutex * mu)
 		}
 		else
 		{
-			/* Lock is owned by another thread, or is unowned. */
-			ret = MSYS_MU_ALREADY_LOCKED;
+			/* Check whether lock is owned by another thread, or is unowned. */
+			retFromCAS = MSYS_Compare_And_Swap_Long((&((MSYS_Mutex_Private *)mu->lock)->tidLock), MSYS_INVALID_TID, MSYS_INVALID_TID);
+			if (retFromCAS == TRUE)
+			{
+				/* The mutex is not owned by anyone. */
+				ret = MSYS_MU_ALREADY_UNLOCKED;
+			}
+			else
+			{
+				/* The mutex is locked by another thread. */
+				ret = MSYS_MU_ALREADY_LOCKED;
+			}
 		}
 #endif	/* MSYS_INSUFFIENCT_BITS_LONG_LOCK */
 	}
