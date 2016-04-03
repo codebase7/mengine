@@ -83,6 +83,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{COMMON_ERROR_FALSE, "The result of the previous operation returned false. (See the code documentation for what the result actually means. This is just a generic boolean response.)"},
 	{COMMON_ERROR_ARGUMENT_CONVERSION_FAILURE, "A given argument to the previous engine call was not converted properly. (See the code documentation for what the result actually means.)"},
 	{COMMON_ERROR_FALSE_SUCCESS, "A success code was returned without a valid result. (AKA. Some expected return value was not obtained, was invalid, corrupted, etc. This can happen when the engine interacts with poorly written / designed code. Including when interacting with itself.)"},
+	{COMMON_ERROR_PEBKAC_OPERATION_ALREADY_COMPLETED, "Caller is attempting to redo an operation that only needs to be done once per program execution / object, unless it is undone. (Currently the operation has already been performed, so the call was not needed.)"},
 	/* Rendering Subsystem error codes. */
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF, "Could not allocate memory for overlay image buffer."},
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF, "Could not allocate memory for transparency data buffer."},
