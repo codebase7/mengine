@@ -86,6 +86,7 @@ const Common_Error_Object Common_commonErrorTable[] = {
 	{COMMON_ERROR_PEBKAC_OPERATION_ALREADY_COMPLETED, "Caller is attempting to redo an operation that only needs to be done once per program execution / object, unless it is undone. (Currently the operation has already been performed, so the call was not needed.)"},
 	{COMMON_ERROR_NO_DATA, "There was no data to process."},
 	{COMMON_ERROR_DATA_CORRUPTION, "The given data / structure was in an inconsistant state."},
+	{COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED, "A limit defined by the system is being surpassed. (Normally this is something like a variable being incremented beyond it's MAX value. Note: This code means the error was caught before it happened.)"},
 	/* Rendering Subsystem error codes. */
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_OI_BUF, "Could not allocate memory for overlay image buffer."},
 	{RENDERER_ERROR_UNABLE_TO_ALLOC_TD_BUF, "Could not allocate memory for transparency data buffer."},
