@@ -1,5 +1,5 @@
 # Ignore the build and doc directories.
-build/
+build*/
 doc/doxygen_doc/*
 
 # Ignore any object or archive file anywhere in the tree.
