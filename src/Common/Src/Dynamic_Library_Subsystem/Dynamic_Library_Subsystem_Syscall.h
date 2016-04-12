@@ -22,6 +22,9 @@
 #ifndef MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_SYSCALL_H
 #define MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_SYSCALL_H
 
+/* External includes. */
+#include <stddef.h>
+
 /*!
 	int Common_Dynamic_Library_Subsystem_Load_Library_Syscall(	const char * pathToLibrary,
 																const size_t pathToLibraryLength,
@@ -116,6 +119,6 @@ int Common_Dynamic_Library_Subsystem_Unload_Library_Syscall(void * osData);
  */
 int Common_Dynamic_Library_Subsystem_Get_Symbol_Syscall(void * osData, const char * symbolName, const size_t symbolNameLength, void ** retSym);
 
-#endif MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_SYSCALL_H
+#endif /* MSYS_DYNAMIC_LIBRARY_SUBSYSTEM_SYSCALL_H */
 
 /* End of Dynamic_Library_Subsystem_Syscall.h. */
