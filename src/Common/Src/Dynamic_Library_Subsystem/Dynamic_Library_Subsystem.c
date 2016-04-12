@@ -26,6 +26,10 @@
 #include "../Error_Handler/Common_Error_Handler_Log_Channel_Defs.h"
 #include "../../../Core/Src/DataProcess.h"
 
+/* External includes. */
+#include <stddef.h>
+#include <string.h>
+
 /* Define the MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID macro. */
 #define MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID MSYS_ERROR_LOG_CHANNEL_DYNLIB
 
@@ -40,7 +44,7 @@ extern "C" {
 		/* Init vars. */
 		int ret = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of this function. */
 		int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;	/* The result of calls to other engine functions. */
-		char * tempPath = NULL;							/* Used to verifiy that the path was stored in the management structure. */
+		const char * tempPath = NULL;							/* Used to verifiy that the path was stored in the management structure. */
 		size_t tempPathLength = 0;						/* Used to store the length of the tempPath string in bytes. */
 		char * copiedPathFromStruct = NULL;				/* Used to copy the path from the management structure during a reload. */
 		size_t copiedPathLengthFromStruct = 0;			/* Used to store the length of the tempPath string in bytes. */
