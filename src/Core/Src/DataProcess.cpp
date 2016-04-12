@@ -23,6 +23,12 @@
 #include "FileStreams.h"
 #include "../../Common/Src/Error_Handler/Common_Error_Handler_Error_Codes.h"
 
+/* External includes. */
+#include <iostream>
+#include <sstream>
+#include <string.h>
+#include <vector>
+
 int DataProcess::CopyCStringToStdString(const char * source, const size_t & sourceLength, std::string & dest)
 {
 	/* Init result. */
@@ -1444,615 +1450,470 @@ short DataProcess::getnumberFromString(char input)
 
 const char * DataProcess::Data_Object::get_Pointer() const
 {
-        return this->data;
+	/* Init vars. */
+	const char * ptr = NULL;
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+	/* Check for valid C library object. */
+	if (this->obj != NULL)
+	{
+		/* Call C library. */
+		retFromCall = MSYS_DataObject_Get_Pointer(this->obj, &ptr);
+	}
+
+	/* Exit function. */
+    return ptr;
 }
 
 char * DataProcess::Data_Object::get_Copy() const
 {
-        // Dumb check.
-        if (this->data == NULL)
-        {
-                return NULL;
-        }
-        if (this->length <= 0)
-        {
-                return NULL;
-        }
+	/* Init vars. */
+	char * ptr = NULL;
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Init vars.
-        char * result = NULL;
+	/* Check for valid C library object. */
+	if (this->obj != NULL)
+	{
+		/* Begin try block. */
+		try {
+			/* Call C library. */
+			retFromCall = MSYS_DataObject_Get_Copy(this->obj, &ptr);
+			if ((retFromCall != COMMON_ERROR_SUCCESS) && (ptr != NULL))
+			{
+				DataProcess_Deallocate_CString(&ptr);
+			}
+		}
+		catch (...)
+		{
+			if (ptr != NULL)
+			{
+				DataProcess_Deallocate_CString(&ptr);
+			}
+		}
+	}
 
-        try{
-                result = (char*)malloc(this->length);
-                memset(result, '\0', this->length);
-                for(size_t x = 0; x < this->length; x++)
-                {
-                        result[x] = this->data[x];
-                }
-                return result;
-        }
-        catch(...)
-        {
-                if (result != NULL)
-                {
-                        free(result);
-                        return NULL;
-                }
-        }
-
-        // Default return.
-        return NULL;
+    /* Exit function. */
+    return ptr;
 }
 
 DataProcess::Data_Object::Data_Object(const DataProcess::Data_Object & source)
 {
-        // Set variables to known safe values.
-        this->length = 0;
-        this->capacity = 0;
-        this->data = NULL;
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Now deep copy data if it is allocated.
-        if ((source.capacity > 0) && (source.data != NULL))
-        {
-                try {
-                        this->data = (char*)malloc(source.capacity);
-                        memset(this->data, '\0', source.capacity);
+    // Set variables to known safe values.
+    this->obj = NULL;
 
-                        // Init loop.
-                        for (size_t x = 0; x < source.capacity; x++)
-                        {
-                                this->data[x] = source.data[x];
-                        }
-
-                        // Set final vars.
-                        this->length = source.length;
-                        this->capacity = source.capacity;
-                }
-                catch(...)
-                {
-                        // Error.
-                        this->clear();
-                }
+    // Now deep copy data if it is allocated.
+    if (source.obj != NULL)
+    {
+        try {
+			/* Call C Library. */
+			retFromCall = MSYS_DataObject_Create_From_Existing_DataObject(source.obj, (&(this->obj)));
+			if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+			{
+				MSYS_Destroy_DataObject(&(this->obj));
+			}
         }
+        catch(...)
+        {
+            // Error.
+            this->clear();
+        }
+    }
 }
 
 DataProcess::Data_Object::Data_Object(const std::string & source)
 {
-        // Set variables to known safe values.
-        this->length = 0;
-        this->capacity = 0;
-        this->data = NULL;
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Now deep copy data if it is allocated.
-        if (source.size() > 0)
-        {
-                try{
-                        this->data = (char*)malloc(source.size());
-                        memset(this->data, '\0', (source.size()));
+    // Set variables to known safe values.
+    this->obj = NULL;
 
-                        for(size_t x = 0; x < source.size(); x++)
-                        {
-                                this->data[x] = source[x];
-                        }
-
-                        // Put the variable update here after we have actually set everything up.
-                        this->length = source.size();
-                        this->capacity = this->length;
-                }
-                catch(...)
-                {
-                        // Some error.
-                        this->clear();
-                }
+    // Now deep copy data if it is allocated.
+    if (source.size() > 0)
+    {
+        try{
+			/* Create the object. */
+			retFromCall = MSYS_Create_DataObject(&(this->obj));
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+			{
+				/* Copy the data. */
+				retFromCall = MSYS_DataObject_Set_Data_From_CString(this->obj, source.c_str(), source.size());
+				if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+				{
+					MSYS_Destroy_DataObject(&(this->obj));
+				}
+			}
+			else
+			{
+				if (this->obj != NULL)
+				{
+					MSYS_Destroy_DataObject(&(this->obj));
+				}
+			}
         }
+        catch(...)
+        {
+            // Some error.
+            this->clear();
+        }
+    }
 }
 
 DataProcess::Data_Object::Data_Object(const char * source, size_t str_length)
 {
-        // Set variables to known safe values.
-        this->length = 0;
-        this->capacity = 0;
-        this->data = NULL;
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Now deep copy data if it is allocated.
-        if ((source != NULL) && (str_length > 0))
-        {
-                try{
-                        this->data = (char*)malloc(str_length);
-                        memset(this->data, '\0', str_length);
+    // Set variables to known safe values.
+    this->obj = NULL;
 
-                        for(size_t x = 0; x < str_length; x++)
-                        {
-                                this->data[x] = source[x];
-                        }
-
-                        // Put the variable update here after we have actually set everything up.
-                        this->length = str_length;
-                        this->capacity = str_length;
-                }
-                catch(...)
-                {
-                        // Some error.
-                        this->clear();
-                }
+    // Now deep copy data if it is allocated.
+    if ((source != NULL) && (str_length > 0))
+    {
+        try{
+			/* Create the object. */
+			retFromCall = MSYS_Create_DataObject(&(this->obj));
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+			{
+				/* Copy the data. */
+				retFromCall = MSYS_DataObject_Set_Data_From_CString(this->obj, source, str_length);
+				if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+				{
+					MSYS_Destroy_DataObject(&(this->obj));
+				}
+			}
+			else
+			{
+				if (this->obj != NULL)
+				{
+					MSYS_Destroy_DataObject(&(this->obj));
+				}
+			}
         }
+        catch(...)
+        {
+            // Some error.
+            this->clear();
+        }
+    }
 }
 
 DataProcess::Data_Object::Data_Object(const char & source)
 {
-        // Set variables to known safe values.
-        this->length = 0;
-        this->capacity = 0;
-        this->data = NULL;
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Now deep copy data if it is allocated.
-        try{
-                // Allocate memory.
-                this->data = (char*)malloc(1);
-                memset(this->data, '\0', 1);
+    // Set variables to known safe values.
+    this->obj = NULL;
 
-                // Set the source value.
-                this->data[0] = source;
-
-                // Put the variable update here after we have actually set everything up.
-                this->length = 1;
-                this->capacity = 1;
-        }
-        catch(...)
-        {
-                // Some error.
-                this->clear();
-        }
+    // Now deep copy data if it is allocated.
+    try{
+		/* Create the object. */
+		retFromCall = MSYS_Create_DataObject(&(this->obj));
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+		{
+			/* Copy the data. */
+			retFromCall = MSYS_DataObject_Set_Data_From_Char(this->obj, source);
+			if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+			{
+				MSYS_Destroy_DataObject(&(this->obj));
+			}
+		}
+		else
+		{
+			if (this->obj != NULL)
+			{
+				MSYS_Destroy_DataObject(&(this->obj));
+			}
+		}
+    }
+    catch(...)
+    {
+        // Some error.
+        this->clear();
+    }
 }
 
 DataProcess::Data_Object & DataProcess::Data_Object::operator= (const DataProcess::Data_Object & source)
 {
-        // Prevent self assignment.
-        if (this != &source)
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+    // Prevent self assignment.
+    if (this != &source)
+    {
+		/* Check for allocated buffer. */
+		if (this->obj == NULL)
+		{
+			/* Allocate the data object. */
+			retFromCall = MSYS_Create_DataObject(&(this->obj));
+			if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+			{
+				MSYS_Destroy_DataObject(&(this->obj));
+			}
+		}
+
+        // Now deep copy data if it is allocated.
+        if ((source.obj != NULL) && (this->obj != NULL))
         {
-                // Set variables to known safe values.
-                this->length = 0;
-                this->capacity = 0;
-                this->data = NULL;
-
-                // Now deep copy data if it is allocated.
-                if ((source.capacity > 0) && (source.data != NULL))
-                {
-                        try {
-                                this->data = (char*)malloc(source.capacity);
-                                memset(this->data, '\0', source.capacity);
-
-                                // Init loop.
-                                for (size_t x = 0; x < source.capacity; x++)
-                                {
-                                        this->data[x] = source.data[x];
-                                }
-
-                                // Set final vars.
-                                this->length = source.length;
-                                this->capacity = source.capacity;
-                        }
-                        catch(...)
-                        {
-                                // Error.
-                                this->clear();
-                        }
-                }
+            try {
+                retFromCall = MSYS_Deep_Copy_DataObject(source.obj, this->obj);
+            }
+            catch(...)
+            {
+                // Error.
+                this->clear();
+            }
         }
+    }
 
-        // Exit function.
-        return *this;
+    // Exit function.
+    return *this;
 }
 
 DataProcess::Data_Object & DataProcess::Data_Object::operator= (const std::string & source)
 {
-        // Set varaiables to known safe values.
-        this->length = 0;
-        this->capacity = 0;
-        this->data = NULL;
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // If the source is empty then we've already finished (the clear command above is enough).
-        if (source.size() <= 0)
-        {
-                return *this;
-        }
+    /* Check for allocated buffer. */
+	if (this->obj == NULL)
+	{
+		/* Allocate the data object. */
+		retFromCall = MSYS_Create_DataObject(&(this->obj));
+		if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+		{
+			MSYS_Destroy_DataObject(&(this->obj));
+		}
+	}
 
-        try{
-                this->data = (char*)malloc(source.size());
-                memset(this->data, '\0', (source.size()));
+    // Now copy data if it is allocated.
+    if (this->obj != NULL)
+    {
+		// If the source is empty then we've already finished (the clear command above is enough).
+		if (source.size() > 0)
+		{
+			try{
+				retFromCall = MSYS_DataObject_Set_Data_From_CString(this->obj, source.c_str(), source.size());
+			}
+			catch(...)
+			{
+				// Some error.
+				this->clear();
+			}
+		}
+	}
 
-                for(size_t x = 0; x < source.size(); x++)
-                {
-                        this->data[x] = source[x];
-                }
-
-                // Put the variable update here after we have actually set everything up.
-                this->length = source.size();
-                this->capacity = this->length;
-        }
-        catch(...)
-        {
-                // Some error.
-                this->clear();
-        }
-
-        // Exit function.
-        return *this;
+    // Exit function.
+    return *this;
 }
 
 DataProcess::Data_Object & DataProcess::Data_Object::operator= (const char & source)
 {
-        // Set varaiables to known safe values.
-        this->length = 0;
-        this->capacity = 0;
-        this->data = NULL;
+    /* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        try{
-                // Allocate memory.
-                this->data = (char*)malloc(1);
-                memset(this->data, '\0', 1);
+    /* Check for allocated buffer. */
+	if (this->obj == NULL)
+	{
+		/* Allocate the data object. */
+		retFromCall = MSYS_Create_DataObject(&(this->obj));
+		if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+		{
+			MSYS_Destroy_DataObject(&(this->obj));
+		}
+	}
 
-                // Set the source value.
-                this->data[0] = source;
+	// Now copy data if the object is allocated.
+    if (this->obj != NULL)
+    {
+		try{
+			retFromCall = MSYS_DataObject_Set_Data_From_Char(this->obj, source);
+		}
+		catch(...)
+		{
+			// Some error.
+			this->clear();
+		}
+	}
 
-                // Put the variable update here after we have actually set everything up.
-                this->length = 1;
-                this->capacity = 1;
-        }
-        catch(...)
-        {
-                // Some error.
-                this->clear();
-        }
-
-        // Exit function.
-        return *this;
+    // Exit function.
+    return *this;
 }
 
 DataProcess::Data_Object & DataProcess::Data_Object::operator+= (const char & source)
 {
-        // Init vars.
-        char * result = NULL;
+    /* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Check and see if we need to reallocate memory.
-        try{
-                if ((this->length + 1) <= this->capacity)
-                {
-                        this->data[(this->length)] = source;
-                        this->length++;
-                }
-                else
-                {
-                        result = (char*)malloc((this->capacity + 1));
-                        memset(result, '\0', (this->capacity + 1));
-                        if (this->length > 0)
-                        {
-                                for(size_t x = 0; x < (this->length); x++)
-                                {
-                                        result[x] = this->data[x];
-                                }
-                        }
-                        result[(this->length)] = source;
-                        free(this->data);
-                        this->data = result;
-                        this->length++;
-                        this->capacity++;
-                        result = NULL;
-                }
-        }
-        catch(...)
-        {
-                if (result != NULL)
-                {
-                        free(result);
-                        result = NULL;
-                }
-                this->clear();
-        }
+    /* Check for allocated buffer. */
+	if (this->obj == NULL)
+	{
+		/* Allocate the data object. */
+		retFromCall = MSYS_Create_DataObject(&(this->obj));
+		if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+		{
+			MSYS_Destroy_DataObject(&(this->obj));
+		}
+	}
 
-        // Exit function.
-        return *this;
+	// Now copy data if the object is allocated.
+    if (this->obj != NULL)
+    {
+		try{
+			retFromCall = MSYS_DataObject_Append_Char(this->obj, source);
+		}
+		catch(...)
+		{
+
+		}
+	}
+
+    // Exit function.
+    return *this;
 }
 
-DataProcess::Data_Object & DataProcess::Data_Object::operator+= (const std::string source)
+DataProcess::Data_Object & DataProcess::Data_Object::operator+= (const std::string & source)
 {
-        // Check for blank string.
-        if (source.size() <= 0)
-        {
-                return *this;
-        }
+    /* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Init var.
-        char * result = NULL;
-        size_t old_size = this->length;
+    /* Check for allocated buffer. */
+	if (this->obj == NULL)
+	{
+		/* Allocate the data object. */
+		retFromCall = MSYS_Create_DataObject(&(this->obj));
+		if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+		{
+			MSYS_Destroy_DataObject(&(this->obj));
+		}
+	}
 
-        // Check and see if we need to reallocate memory.
-        try{
-                if ((this->length + source.size()) <= this->capacity)
-                {
-                        // Copy the data into the buffer.
-                        for (size_t x = 0; x < source.size(); x++)
-                        {
-                                this->data[((old_size) + x)] = source[x];
-                        }
-                        this->length = ((old_size) + source.size());
-                }
-                else
-                {
-                        // Allocate the new buffer.
-                        result = (char*)malloc((this->length + source.size()));
-                        memset(result, '\0', (this->length + source.size()));
+	// Now copy data if the object is allocated.
+    if ((this->obj != NULL) && (source.size() > 0))
+    {
+		try{
+			retFromCall = MSYS_DataObject_Append_CString(this->obj, source.c_str(), source.size());
+		}
+		catch(...)
+		{
 
-                        if (this->data != NULL)
-                        {
-                                // Copy data to new buffer then free the old one.
-                                for(size_t x = 0; x < this->length; x++)
-                                {
-                                        result[x] = this->data[x];
-                                }
-                                this->clear();
-                        }
-                        for (size_t x = 0; x < (source.size()); x++)
-                        {
-                                // Copy the new data into the new buffer.
-                                result[((old_size) + x)] = source[x];
-                        }
+		}
+	}
 
-                        // Set the new buffer, and update the length and capacity.
-                        this->data = result;
-                        this->length = (old_size + source.size());
-                        this->capacity = this->length;
-                }
-        }
-        catch(...)
-        {
-                if (result != NULL)
-                {
-                        free(result);
-                        result = NULL;
-                }
-                this->clear();
-        }
-
-        // Exit function.
-        return *this;
+    // Exit function.
+    return *this;
 }
 
 DataProcess::Data_Object & DataProcess::Data_Object::operator+= (const DataProcess::Data_Object & source)
 {
-        // Check for empty source.
-        if (source.size() <= 0)
-        {
-                // Nothing to do.
-                return *this;
-        }
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Init vars.
-        char * result = NULL;
-        size_t old_size = this->length;
+	/* Check for allocated buffer. */
+	if (this->obj == NULL)
+	{
+		/* Allocate the data object. */
+		retFromCall = MSYS_Create_DataObject(&(this->obj));
+		if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+		{
+			MSYS_Destroy_DataObject(&(this->obj));
+		}
+	}
 
-        // Check and see if we need to reallocate memory.
-        try{
-                if ((this->length + source.size()) <= this->capacity)
-                {
-                        // Copy the data into the buffer.
-                        for (size_t x = 0; x < source.size(); x++)
-                        {
-                                this->data[((old_size) + x)] = source.data[x];
-                        }
-                        this->length = ((old_size) + source.size());
-                }
-                else
-                {
-                        // Allocate new buffer.
-                        result = (char*)malloc((this->length + source.size()));
-                        memset(result, '\0', (this->length + source.size()));
+	// Now copy data if the object is allocated.
+    if ((this->obj != NULL) && (source.obj != NULL))
+    {
+		try{
+			retFromCall = MSYS_DataObject_Append_DataObject(this->obj, source.obj);
+		}
+		catch(...)
+		{
 
-                        // Copy old data into the new buffer.
-                        if (this->data != NULL)
-                        {
-                                for(size_t x = 0; x < this->length; x++)
-                                {
-                                        result[x] = this->data[x];
-                                }
+		}
+	}
 
-                                // Clear the old data.
-                                this->clear();
-                        }
-
-                        // Copy in new data.
-                        for (size_t x = 0; x < (source.size()); x++)
-                        {
-                                result[((old_size)+x)] = source.data[x];
-                        }
-
-                        // Update the data pointer, and the length and capacity.
-                        this->data = result;
-                        this->length = (old_size + source.size());
-                        this->capacity = this->length;
-                }
-        }
-        catch (...)
-        {
-                if (result != NULL)
-                {
-                        free(result);
-                        result = NULL;
-                }
-                this->clear();
-        }
-
-        // Exit function.
-        return *this;
+    // Exit function.
+    return *this;
 }
 
 char * DataProcess::Data_Object::substr(size_t offset, size_t endpoint) const
 {
-        // Dumb check.
-        if ((this->data == NULL) || (this->length <= 0))
-        {
-                // Nothing to do.
-                return NULL;
-        }
-        if ((offset > this->length) || (offset < 0) || (offset >= endpoint))
-        {
-                // Invalid offset.
-                return NULL;
-        }
-        if ((endpoint > this->length) || (endpoint < 0) || (endpoint <= offset))
-        {
-                // Invalid endpoint.
-                return NULL;
-        }
+ 	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+	char * ret = NULL;
 
-        // Init vars.
-        char * result = NULL;
-        size_t result_size = 0;
+	// Check vars.
+    if (this->obj != NULL)
+    {
+		try{
+			retFromCall = MSYS_DataObject_Substr(this->obj, offset, endpoint, &ret);
+			if ((retFromCall != COMMON_ERROR_SUCCESS) && (ret != NULL))
+			{
+				DataProcess_Deallocate_CString(&ret);
+			}
+		}
+		catch(...)
+		{
+			if (ret != NULL)
+			{
+				DataProcess_Deallocate_CString(&ret);
+			}
+		}
+	}
 
-        // Compute diffrence between endpoint and offset.
-        result_size = (endpoint - offset);
-        if (result_size <= 0)
-        {
-                // Bad args.
-                return NULL;
-        }
-        try{
-                result = (char*)malloc(result_size);
-                memset(result, '\0', result_size);
-                for (size_t x = 0; x < result_size; x++)
-                {
-                        result[x] = this->data[(offset+x)];
-                }
-                return result;
-        }
-        catch(...)
-        {
-                if (result != NULL)
-                {
-                        free(result);
-                        result = NULL;
-                }
-                return NULL;
-        }
-
-        if (result != NULL)
-        {
-                free(result);
-                result = NULL;
-        }
-        // Default return.
-        return result;
+    // Exit function.
+    return ret;
 }
 
 int DataProcess::Data_Object::Buffer_Copy(const DataProcess::Data_Object & source, size_t copy_offset, size_t copy_length)
 {
-        // Reset our buffers.
-        this->reset();
+ 	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Dumb check.
-        if ((source.length <= 0) || (source.length < copy_offset))
-        {
-                // Can not copy non existant data.
-                return -5;
-        }
-        if ((copy_offset == 0) && (copy_length == 0))
-        {
-                // Copy all data from source.
-                copy_length = source.length;
-        }
-        if ((copy_offset != 0) && (copy_length == 0))
-        {
-                // Bad range.
-                return -5;
-        }
-        if ((source.length < copy_length) || (source.length < (copy_offset + copy_length)))
-        {
-                // Bad range.
-                return -5;
-        }
-        try{
-                // Copy data.
-                for (size_t x = 0; x < this->capacity; x++)
-                {
-                        // Get data.
-                        this->data[x] = source.data[(copy_offset + x)];
+	// Check vars.
+	if ((this->obj != NULL) && (source.obj != NULL))
+    {
+		try{
+			ret = MSYS_DataObject_Buffer_Copy(this->obj, source.obj, copy_offset, copy_length);
+		}
+		catch(...)
+		{
+			ret = COMMON_ERROR_EXCEPTION_THROWN;
+		}
+	}
+	else
+	{
+		/* Invalid object. */
+		ret = COMMON_ERROR_SUBSYSTEM_OBJECT_NOT_INITED;
+	}
 
-                        // Increment length.
-                        this->length++;
-
-                        // Check for end of data.
-                        if ((x + 1) == copy_length)
-                        {
-                                // Data copied.
-                                return 0;
-                        }
-
-                        // Check for end of buffer.
-                        if ((x + 1) == this->capacity)
-                        {
-                                // End of buffer, due to the fact that we ran out of space in the buffer, return -1.
-                                return -1;
-                        }
-
-                        // Boundry check.
-                        if ((x < 0) || (x >= this->capacity) || (x > copy_length))
-                        {
-                                // Out of bounds.
-                                this->reset();
-                                return -9;
-                        }
-                }
-        }
-        catch(...)
-        {
-                // Some error.
-                this->reset();
-                return -9;
-        }
-
-        // Default return.
-        this->reset();
-        return -3;
+    // Exit function.
+    return ret;
 }
 
 bool DataProcess::Data_Object::Compare(const DataProcess::Data_Object &source) const
 {
-        // Init var.
-        const char * test = NULL;
-        test = source.get_Pointer();
+ 	/* Init vars. */
+	bool ret = false;
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        if (source.get_length() != this->length)
-        {
-                return false;
-        }
+	/* Begin try block. */
+	try{
+		/* Call C library. (Note: It can handle invalid objects.) */
+		retFromCall = MSYS_DataObject_Compare(this->obj, source.obj);
+		ret = ((retFromCall == COMMON_ERROR_COMPARISON_PASSED) ? (true) : (false));
+	}
+	catch(...)
+	{
+		ret = false;
+	}
 
-        if (source.get_Capacity() != this->capacity)
-        {
-                return false;
-        }
-
-        if ((this->data == NULL) && (test != NULL))
-        {
-                return false;
-        }
-
-        if ((this->data != NULL) && (test == NULL))
-        {
-                return false;
-        }
-
-        if ((test != NULL) && (this->data != NULL))
-        {
-                for (size_t x = 0; x < this->length; x++)
-                {
-                        if (this->data[x] != test[x])
-                        {
-                                return false;
-                        }
-                }
-        }
-
-        return true;
+    // Exit function.
+    return ret;
 }
 
 bool DataProcess::Data_Object::NCompare(const DataProcess::Data_Object &source) const
@@ -2062,37 +1923,23 @@ bool DataProcess::Data_Object::NCompare(const DataProcess::Data_Object &source) 
 
 bool DataProcess::Data_Object::Data_Compare(const DataProcess::Data_Object & source) const
 {
-        // Check length.
-        if (source.length != this->length)
-        {
-                return false;
-        }
+ 	/* Init vars. */
+	bool ret = false;
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Check pointers.
-        if ((this->data == NULL) && (source.data != NULL))
-        {
-                return false;
-        }
+	/* Begin try block. */
+	try{
+		/* Call C library. (Note: It can handle invalid objects.) */
+		retFromCall = MSYS_DataObject_Data_Compare(this->obj, source.obj);
+		ret = ((retFromCall == COMMON_ERROR_COMPARISON_PASSED) ? (true) : (false));
+	}
+	catch(...)
+	{
+		ret = false;
+	}
 
-        if ((this->data != NULL) && (source.data == NULL))
-        {
-                return false;
-        }
-
-        // Check data.
-        if ((source.data != NULL) && (this->data != NULL))
-        {
-                for (size_t x = 0; x < this->length; x++)
-                {
-                        if (this->data[x] != source.data[x])
-                        {
-                                return false;
-                        }
-                }
-        }
-
-        // Data is equal.
-        return true;
+    // Exit function.
+    return ret;
 }
 
 bool DataProcess::Data_Object::Data_NCompare(const DataProcess::Data_Object & source) const
@@ -2102,487 +1949,213 @@ bool DataProcess::Data_Object::Data_NCompare(const DataProcess::Data_Object & so
 
 void DataProcess::Data_Object::clear()
 {
-        if (this->data != NULL)
-        {
-                free(this->data);
-                this->data = NULL;
-        }
-        this->length = 0;
-        this->capacity = 0;
-        return;
+	/* Check for valid object. */
+	if (this->obj != NULL)
+	{
+		MSYS_Clear_DataObject(this->obj);
+	}
+
+	/* Exit function. */
+	return;
 }
 
 size_t DataProcess::Data_Object::get_length() const
 {
-		return this->length;
+	/* Init vars. */
+	size_t ret = 0;
+
+	/* Check for valid object. */
+	if (this->obj != NULL)
+	{
+		try {
+			MSYS_DataObject_Get_Length(this->obj, &ret);
+		}
+		catch(...)
+		{
+			/* Bad result... (Need to fix this function.) */
+			ret = 0;
+		}
+	}
+
+	/* Exit function. */
+	return ret;
 }
 
 size_t DataProcess::Data_Object::get_Capacity() const
 {
-		return this->capacity;
+	/* Init vars. */
+	size_t ret = 0;
+
+	/* Check for valid object. */
+	if (this->obj != NULL)
+	{
+		try {
+			MSYS_DataObject_Get_Capacity(this->obj, &ret);
+		}
+		catch(...)
+		{
+			/* Bad result... (Need to fix this function.) */
+			ret = 0;
+		}
+	}
+
+	/* Exit function. */
+	return ret;
 }
 
 size_t DataProcess::Data_Object::size() const
 {
-		return this->length;
+	/* Init vars. */
+	size_t ret = 0;
+
+	/* Check for valid object. */
+	if (this->obj != NULL)
+	{
+		try {
+			MSYS_DataObject_Get_Length(this->obj, &ret);
+		}
+		catch(...)
+		{
+			/* Bad result... (Need to fix this function.) */
+			ret = 0;
+		}
+	}
+
+	/* Exit function. */
+	return ret;
 }
 
 void DataProcess::Data_Object::set(const char * source, const size_t & source_length)
 {
-        // Clear the old data.
-        this->clear();
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Dumb check.
-        if (source == NULL)
-        {
-                // Nothing to do.
-                return;
-        }
-        if (source_length <= 0)
-        {
-                // Nothing to do.
-                return;
-        }
-
-        // Try and set the vars.
+	// Check vars.
+    if ((source != NULL) && (source_length > 0))
+    {
         try{
-                // Allocate the new buffer.
-                this->data = (char*)malloc(source_length);
-                memset(this->data, '\0', source_length);
+			/* Create the object. (If needed.) */
+			if (this->obj == NULL)
+			{
+				retFromCall = MSYS_Create_DataObject(&(this->obj));
+				if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+				{
+					MSYS_Destroy_DataObject(&(this->obj));
+				}
+			}
+			else
+			{
+				/* Indicate that when we checked the object it was initilized. */
+				retFromCall = COMMON_ERROR_SUCCESS;
+			}
 
-                // Copy the data into the new buffer.
-                for(size_t x = 0; x < source_length; x++)
-                {
-                        this->data[x] = source[x];
-                }
-
-                // Update capacity and length.
-                this->length = source_length;
-                this->capacity = source_length;
+			/* Copy the data. */
+			if ((this->obj != NULL) && (retFromCall == COMMON_ERROR_SUCCESS))
+			{
+				retFromCall = MSYS_DataObject_Set_Data_From_CString(this->obj, source, source_length);
+				if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+				{
+					/* The object won't be modified here, but we need to return the error code. */
+				}
+			}
+			else
+			{
+				/* Need to return an error here... */
+			}
         }
         catch(...)
         {
-                this->clear();
+			/* More error codes needed. */
         }
-
-        // Exit function.
-        return;
+    }
 }
 
 void DataProcess::Data_Object::reset()
 {
-        // Dumb check.
-        if ((this->data == NULL) || (this->capacity <= 0))
-        {
-                // Nothing to do.
-                return;
-        }
+	/* Check for valid object. */
+	if (this->obj != NULL)
+	{
+		try {
+			MSYS_Reset_DataObject(this->obj);
+		}
+		catch(...)
+		{
+			/* Ignore the error. */
+		}
+	}
 
-        // Reset the data buffer.
-        try{
-                memset(this->data, '\0', (this->capacity - 1));
-                this->length = 0;
-                return;
-        }
-        catch(...)
-        {
-                // Error.
-                return;
-        }
-
-        // Exit function.
-        return;
+	/* Exit function. */
+	return;
 }
 
 void DataProcess::Data_Object::reserve(size_t new_length)
 {
-        // Check and see if length is less than our current size.
-        if (new_length < this->length)
-        {
-                // Failsafe, we don't want to destroy data if we can help it.
-                return;
-        }
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Init vars.
-        char * temp_buffer = NULL;
-        size_t old_length = 0;
+	/* Check for valid object. */
+	if (this->obj != NULL)
+	{
+		try {
+			retFromCall = MSYS_DataObject_Reserve_Memory(this->obj, new_length);
+		}
+		catch(...)
+		{
+			/* Bad result... (Need to fix this function.) */
 
-        try{
-                // Allocate new buffer.
-                temp_buffer = (char*)malloc(new_length);
-                if (temp_buffer == NULL)
-                {
-                        // Cannot allocate memory.
-                        return;
-                }
-                memset(temp_buffer, '\0', new_length);
-        }
-        catch(...)
-        {
-                // Could not realloc memory.
-                return;
-        }
+		}
+	}
 
-        // Copy old data if nessacarry.
-        if (this->data != NULL)
-        {
-                try{
-                        // Set old length.
-                        old_length = this->length;
-
-                        // Reset length.
-                        this->length = 0;
-
-                        // Copy the contents of the original data.
-                        for (size_t x = 0; x < old_length; x++)
-                        {
-                                temp_buffer[x] = this->data[x];
-                                this->length++;
-                        }
-                }
-                catch(...)
-                {
-
-                }
-
-                // Free the original buffer.
-                if (this->data != NULL)
-                {
-                        free(this->data);
-                        this->data = NULL;
-                }
-
-                // Set our new buffer.
-                this->data = temp_buffer;
-
-                // Set our new capacity.
-                this->capacity = new_length;
-
-                // Exit function.
-                return;
-        }
-        else
-        {
-                // Set our new length.
-                this->length = 0;
-
-                // Set our new capacity.
-                this->capacity = new_length;
-
-                // Set our new buffer.
-                this->data = temp_buffer;
-
-                // Exit function.
-                return;
-        }
-
-        // Default return.
-        return;
+	/* Exit function. */
+	return;
 }
 
 size_t DataProcess::Data_Object::insert(size_t offset, const char source)
 {
-        // Check for bad offset.
-        if ((offset < 0) || (offset > this->length))
-        {
-                // Bad offset.
-                return 0;
-        }
+    /* Init vars. */
+    int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Init vars.
-        char current_char = '\0';
-        char next_char = '\0';
-        char * result = NULL;
+    /* Check for valid object. */
+    if (this->obj != NULL)
+    {
+        /* Call C library function. */
+        retFromCall = MSYS_DataObject_Insert_CString(this->obj, offset, &source, sizeof(char));
+    }
 
-        // Check and see if we need to reallocate memory.
-        try{
-                if ((this->length + 1) <= this->capacity)
-                {
-                        // Set the inital current char, to the source value.
-                        current_char = source;
-
-                        // At the offset read in the next char.
-                        for (size_t x = offset; x < (this->length); x++)
-                        {
-                                // Read in the next char.
-                                next_char = this->data[x];
-
-                                // Copy the current_char.
-                                this->data[x] = current_char;
-
-                                // Current char is updated.
-                                current_char = next_char;
-                        }
-
-                        // Insert the last char.
-                        this->data[(this->length)] = current_char;
-
-                        // Increment the length.
-                        this->length++;
-
-                        // Exit function.
-                        return 1;
-                }
-                else
-                {
-                        result = (char*)malloc((this->capacity + 1));
-                        memset(result, '\0', (this->capacity + 1));
-                        if (this->length > 0)
-                        {
-                                // Copy data until we reach the offset.
-                                for(size_t x = 0; x < ((this->length) + 1); x++)
-                                {
-                                        // If we have not yet reached the offset, copy data directly.
-                                        if (x < offset)
-                                        {
-                                                result[x] = this->data[x];
-                                        }
-
-                                        // If we are at the offset, copy the source value.
-                                        if (x == offset)
-                                        {
-                                                result[x] = source;
-                                        }
-
-                                        /*
-                                            If we are past the offset, copy the remaining data.
-                                            Note: This is correct as x - 1 equals the data without
-                                            the source value added.
-                                        */
-                                        if (x > offset)
-                                        {
-                                                result[x] = this->data[x - 1];
-                                        }
-
-                                }
-                        }
-                        else
-                        {
-                                // We have no data so just insert the source value.
-                                this->data[0] = source;
-                        }
-
-                        // Free the old data buffer.
-                        if (this->data != NULL)
-                        {
-                                free(this->data);
-                                this->data = NULL;
-                        }
-
-                        // Set the new buffer.
-                        this->data = result;
-
-                        // Update length and capacity.
-                        this->length++;
-                        this->capacity++;
-
-                        // Exit function.
-                        return 1;
-                }
-        }
-        catch(...)
-        {
-                if (result != NULL)
-                {
-                        free(result);
-                        result = NULL;
-                }
-                this->clear();
-        }
-
-        // Default return.
-        return 0;
+    /* Exit function. (Bad error code.) */
+    return (sizeof(char));
 }
 
 size_t DataProcess::Data_Object::insert(size_t offset, const std::string & source)
 {
-        // Check for empty source.
-        if (source.size() <= 0)
-        {
-                // Nothing to do.
-                return 0;
-        }
+    /* Init vars. */
+    int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Check for bad offset.
-        if ((offset < 0) || (offset > this->length))
-        {
-                // Bad offset.
-                return 0;
-        }
+    /* Check for valid object. */
+    if ((this->obj != NULL) && (source.size() > 0))
+    {
+        /* Call C library function. */
+        retFromCall = MSYS_DataObject_Insert_CString(this->obj, offset, source.c_str(), source.size());
+    }
 
-        // Init vars.
-        size_t old_size = this->length;
-        char * result = NULL;
-
-        try{
-                if ((this->length + source.size()) <= this->capacity)
-                {
-                        for (size_t x = 0; x < source.size(); x++)
-                        {
-                                if (this->insert((offset + x), source[x]) != 1)
-                                {
-                                        // Error Could not copy all data.
-                                        return x;
-                                }
-                        }
-
-                        // Exit the function.
-                        return source.size();
-                }
-                else
-                {
-                        // Allocate new buffer.
-                        result = (char*)malloc((this->length + source.size()));
-                        memset(result, '\0', (this->length + source.size()));
-
-                        // Copy old data into the new buffer until we reach the offset.
-                        if (this->data != NULL)
-                        {
-                                for (size_t x = 0; x < offset; x++)
-                                {
-                                        result[x] = this->data[x];
-                                }
-                        }
-
-                        // Copy in new data.
-                        for (size_t x = 0; x < (source.size()); x++)
-                        {
-                                result[(offset + x)] = source[x];
-                        }
-
-                        // Copy remaining data from the old buffer.
-                        if (this->data != NULL)
-                        {
-                                for(size_t x = offset; x < old_size; x++)
-                                {
-                                        result[(offset + (source.size()) + x)] = this->data[(offset + x)];
-                                }
-                        }
-
-                        // Release the old memory.
-                        if (this->data != NULL)
-                        {
-                                free(this->data);
-                                this->data = NULL;
-                        }
-
-                        // Update the data pointer, and the length and capacity.
-                        this->data = result;
-                        this->length = (old_size + source.size());
-                        this->capacity = this->length;
-
-                        // Exit function.
-                        return source.size();
-                }
-        }
-        catch (...)
-        {
-                if (result != NULL)
-                {
-                        free(result);
-                        result = NULL;
-                }
-                this->clear();
-        }
-
-        // Default return.
-        return 0;
+    /* Exit function. (Bad error code.) */
+    return (source.size());
 }
 
 size_t DataProcess::Data_Object::insert(size_t offset, const DataProcess::Data_Object & source)
 {
-        // Check for empty source.
-        if (source.size() <= 0)
-        {
-                // Nothing to do.
-                return 0;
-        }
+    /* Init vars. */
+    int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
 
-        // Check for bad offset.
-        if ((offset < 0) || (offset > this->length))
-        {
-                // Bad offset.
-                return 0;
-        }
+    /* Check for valid object. */
+    if ((this->obj != NULL) && (source.obj != NULL))
+    {
+        /* Call C library function. */
+        retFromCall = MSYS_DataObject_Insert_From_DataObject(this->obj, offset, source.obj);
+    }
 
-        // Init vars.
-        size_t old_size = this->length;
-        char * result = NULL;
-
-        try{
-                if ((this->length + source.size()) <= this->capacity)
-                {
-                        // This is a single char insert, but short of creating a second buffer, This is the best way to do it.
-                        for (size_t x = 0; x < source.size(); x++)
-                        {
-                                if (this->insert((offset + x), source.data[x]) != 1)
-                                {
-                                        // Error Could not copy all data.
-                                        return x;
-                                }
-                        }
-
-                        // Exit function.
-                        return source.size();
-                }
-                else
-                {
-                        // Allocate new buffer.
-                        result = (char*)malloc((this->length + source.size()));
-                        memset(result, '\0', (this->length + source.size()));
-
-                        // Copy old data into the new buffer until we reach the offset.
-                        if (this->data != NULL)
-                        {
-                                for (size_t x = 0; x < offset; x++)
-                                {
-                                        result[x] = this->data[x];
-                                }
-                        }
-
-                        // Copy in new data.
-                        for (size_t x = 0; x < (source.size()); x++)
-                        {
-                                result[(offset + x)] = source.data[x];
-                        }
-
-                        // Copy remaining data from the old buffer.
-                        if (this->data != NULL)
-                        {
-                                for(size_t x = offset; x < old_size; x++)
-                                {
-                                        result[(offset + (source.size()) + x)] = this->data[(offset + x)];
-                                }
-                        }
-
-                        // Release the old memory.
-                        if (this->data != NULL)
-                        {
-                                free(this->data);
-                                this->data = NULL;
-                        }
-
-                        // Update the data pointer, and the length and capacity.
-                        this->data = result;
-                        this->length = (old_size + source.size());
-                        this->capacity = this->length;
-
-                        // Exit function.
-                        return source.size();
-                }
-        }
-        catch (...)
-        {
-                if (result != NULL)
-                {
-                        free(result);
-                        result = NULL;
-                }
-                this->clear();
-        }
-
-        // Default return.
-        return 0;
+    /* Exit function. (Bad error code.) */
+    return 1;
 }
 
 short DataProcess::RegularExpressionParser(const std::string & expression, const std::string & input, Panic::Panic_ERROR * error)

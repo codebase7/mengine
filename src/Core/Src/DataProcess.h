@@ -37,14 +37,14 @@
 extern "C" {
 #endif	/* __cplusplus */
 
-/* Include DLL_PORT.h */
-#include "../../DLL_PORT.h"
-
 /* External includes. */
 #include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+
+/* Include data object C header. */
+#include "Data_Object/Data_Object.h"
+
+/* Include DLL_PORT.h */
+#include "../../DLL_PORT.h"
 
 /* We need to include stdint.h for SIZE_MAX. (MSVC includes it automaticly with the above headers.) */
 #ifdef __GNUC__
@@ -304,9 +304,6 @@ MSYS_DLL_EXPORT int DataProcess_Get_SubString_Using_Offset(const char * src, con
 #include "DataProcess_Endianness_Check.h"
 
 /* External includes. */
-#include <iostream>
-#include <sstream>
-#include <string.h>
 #include <vector>
 
 /* Define DataProcess namespace. */
@@ -314,26 +311,19 @@ namespace DataProcess{
 
 class Data_Object{
     private:
-        char * data;        // Pointer to data.
-        size_t length;      // Length of data.
-        size_t capacity;    // Length of data we can store.
+        MSYS_DataObject_T * obj;	/* The actual C object. */
 
     public:
         MSYS_DLL_EXPORT Data_Object()
         {
-                data = NULL;
-                length = 0;
-                capacity = 0;
+                obj = NULL;
         }
         MSYS_DLL_EXPORT ~Data_Object()
         {
-                if (data != NULL)
-                {
-                        free(data);
-                        data = NULL;
-                }
-                length = 0;
-                capacity = 0;
+            if (obj != NULL)
+            {
+				MSYS_Destroy_DataObject(&(this->obj));
+            }
         }
         MSYS_DLL_EXPORT Data_Object(const Data_Object & source);
         MSYS_DLL_EXPORT Data_Object(const std::string & source);
@@ -343,7 +333,7 @@ class Data_Object{
         MSYS_DLL_EXPORT Data_Object & operator= (const std::string &source);
         MSYS_DLL_EXPORT Data_Object & operator= (const char &source);
         MSYS_DLL_EXPORT Data_Object & operator+= (const char &source);
-        MSYS_DLL_EXPORT Data_Object & operator+= (const std::string source);
+        MSYS_DLL_EXPORT Data_Object & operator+= (const std::string & source);
         MSYS_DLL_EXPORT Data_Object & operator+= (const Data_Object & source);
         MSYS_DLL_EXPORT char * substr(size_t offset, size_t endpoint) const;
 
