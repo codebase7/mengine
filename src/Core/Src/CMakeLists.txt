@@ -15,6 +15,9 @@ add_library(Basic_Linked_List_Multiverse_Engine_Static STATIC Basic_Linked_List.
 target_link_libraries(Basic_Linked_List_Multiverse_Engine DataProcess_Memory_Management_Multiverse_Engine)
 target_link_libraries(Basic_Linked_List_Multiverse_Engine_Static DataProcess_Memory_Management_Multiverse_Engine_Static)
 
+# Include the Data_Object code.
+add_subdirectory(Data_Object)
+
 add_library(Core_Multiverse_Engine SHARED DataProcess.cpp
 DataProcess.c
 DataProcess_Endianness_Check.cpp
