@@ -27,6 +27,10 @@
 #include "../Error_Handler/Common_Error_Handler_Structures.h"
 #include "../Error_Handler/Common_Error_Handler_Log_Channel_Defs.h"
 
+/* External includes. */
+#include <stddef.h>
+#include <string.h>
+
 /* Define the MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID macro. */
 #define MSYS_SUBSYS_DEFAULT_ERROR_CHANNEL_ID MSYS_ERROR_LOG_CHANNEL_DYNLIB
 
