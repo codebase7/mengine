@@ -43,7 +43,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	# Create the Pthreads Plugin.
 	set(PTHREADS_PLUGIN_INCLUDES ../Generic_Wrapper.cpp 
 	    Thread_Utils_Base.cpp 
-	    Thread_Utils_pthread.cpp
+	    Posix_Threads/Thread_Utils_pthread.cpp
 	    Posix_Threads/Thread_Utils_pthread_Plugin.cpp)
 	
 	ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -57,7 +57,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	    # Create the Pthreads Plugin.
 	    set(PTHREADS_PLUGIN_INCLUDES ../Generic_Wrapper.cpp 
 		Thread_Utils_Base.cpp 
-		Thread_Utils_pthread.cpp
+		Posix_Threads/Thread_Utils_pthread.cpp
 		Posix_Threads/Thread_Utils_pthread_Plugin.cpp)
 
 	ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
