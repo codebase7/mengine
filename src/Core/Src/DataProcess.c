@@ -23,12 +23,22 @@
 extern "C" {
 #endif	/* __cplusplus */
 
+/* Disable shitty M$ deprecations of the C standard. */
+#ifdef _MSC_FULL_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif	/* _MSC_FULL_VER */
+
 /* Internal includes. */
 #include "DataProcess.h"
 #include "../../Common/Src/Error_Handler/Common_Error_Handler_Error_Codes.h"	/* Defines Common Error Codes. */
 
 /* External includes. */
 #include <time.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 
 size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand)
 {
@@ -40,7 +50,7 @@ size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const
 	/* Init vars. */
 	static bool rand_set;			/* Whether or not the random seed has been set or not. */
 	static size_t modifier;			/* Used to ensure that the random seed is unique if the function is called more than once within the timeframe of a second. */
-	time_t tt;						/* The current system time as a time_t. */
+	time_t tt;				/* The current system time as a time_t. */
 	struct tm * timeM = NULL;		/* The current system time as a tm structure. */
 
 	/* Check if we need to set the RNG. */
