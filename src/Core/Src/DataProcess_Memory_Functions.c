@@ -27,6 +27,12 @@ extern "C" {
 #include "DataProcess.h"
 #include "../../Common/Src/Error_Handler/Common_Error_Handler_Error_Codes.h"	/* Defines Common Error Codes. */
 
+/* External includes. */
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 int DataProcess_Reallocate_C_String(char ** str, const size_t strLength, const size_t newLength)
 {
 	/* Init vars. */
