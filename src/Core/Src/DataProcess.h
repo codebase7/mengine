@@ -314,10 +314,8 @@ class Data_Object{
         MSYS_DataObject_T * obj;	/* The actual C object. */
 
     public:
-        MSYS_DLL_EXPORT Data_Object()
-        {
-                obj = NULL;
-        }
+        MSYS_DLL_EXPORT Data_Object();
+
         MSYS_DLL_EXPORT ~Data_Object()
         {
             if (obj != NULL)

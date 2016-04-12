@@ -1496,6 +1496,30 @@ char * DataProcess::Data_Object::get_Copy() const
     return ptr;
 }
 
+DataProcess::Data_Object::Data_Object()
+{
+	/* Init vars. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+	// Set variables to known safe values.
+    this->obj = NULL;
+
+	/* Attempt to allocate the C library object. */
+	try {
+		/* Call C Library. */
+		retFromCall = MSYS_Create_DataObject((&(this->obj)));
+		if ((retFromCall != COMMON_ERROR_SUCCESS) && (this->obj != NULL))
+		{
+			MSYS_Destroy_DataObject(&(this->obj));
+		}
+	}
+	catch(...)
+	{
+		// Error.
+        this->clear();
+	}
+}
+
 DataProcess::Data_Object::Data_Object(const DataProcess::Data_Object & source)
 {
 	/* Init vars. */
