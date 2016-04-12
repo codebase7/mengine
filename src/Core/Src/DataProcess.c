@@ -39,7 +39,6 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 
-
 size_t DataProcess_Trivial_Random_Number_Generator(const size_t min_value, const size_t max_value, const bool reset_rand)
 {
 	/* Define MAX_MODIFIER */
