@@ -43,6 +43,15 @@ extern "C" {
 #else
 /* Use the compiler's version of stdbool.h. */
 #include <stdbool.h>
+
+/* We need to include aliases for TRUE and FALSE. */
+#ifndef TRUE
+#define TRUE true
+#endif /* TRUE */
+
+#ifndef FALSE
+#define FALSE false
+#endif /* FALSE */
 #endif  /* __STDC_VERSION__ < 199901L */
 
 /* Define the invalid thread ID to use. */
