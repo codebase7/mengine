@@ -25,6 +25,9 @@
 /* Internal includes. */
 #include "../../../DLL_PORT.h"
 
+/* External includes. */
+#include <stddef.h>
+
 /* Define error log channels. */
 #define MSYS_ERROR_LOG_CHANNEL_LIST_VER 0	/* Version ID of the channel list. If you change the channel IDs below change the version ID. */
 #define MSYS_ERROR_LOG_CHANNEL_UNDEFINED 0
