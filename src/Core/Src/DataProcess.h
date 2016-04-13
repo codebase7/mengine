@@ -397,6 +397,21 @@ class Data_Object{
         MSYS_DLL_EXPORT size_t size() const;
 
 		/*!
+				int DataProcess::Data_Object::Shallow_Copy(const DataProcess::Data_Object & source)
+
+				Makes the object that this function is called on a shallow copy of the given DataProcess::Data_Object.
+				(Variable only copy.)
+
+				Note: If this function succeeds, then ANY changes made to either the source object or the object
+				that this function is called on will desync the other object. Care should be taken to not
+				cause a desync between a shallow copied object and it's source object. Failure to prevent
+				a desync, will result in UNDEFINED BEHAVIOR.
+
+				Returns COMMON_ERROR_SUCCESS if the shallow copy is successful.
+		 */
+		MSYS_DLL_EXPORT int Shallow_Copy(const DataProcess::Data_Object & source);
+
+		/*!
 			void DataProcess::Data_Object::set(const char * source, const size_t & source_length)
 
 			This function clears the Data_Object's buffer, and then copies

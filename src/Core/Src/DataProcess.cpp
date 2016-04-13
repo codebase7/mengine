@@ -2049,6 +2049,31 @@ size_t DataProcess::Data_Object::size() const
 	return ret;
 }
 
+int DataProcess::Data_Object::Shallow_Copy(const DataProcess::Data_Object & source)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+	/* Check for valid object. */
+	if ((this->obj != NULL) && (source.obj != NULL))
+	{
+		/* Call C Library function. */
+		retFromCall = MSYS_Shallow_Copy_DataObject(source.obj, this->obj);
+
+		/* Set result. */
+		ret = ((retFromCall != COMMON_ERROR_INVALID_ARGUMENT) ? (retFromCall) : (COMMON_ERROR_SUBSYSTEM_OBJECT_NOT_INITED));
+	}
+	else
+	{
+		/* Invalid object. */
+		ret = COMMON_ERROR_SUBSYSTEM_OBJECT_NOT_INITED;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 void DataProcess::Data_Object::set(const char * source, const size_t & source_length)
 {
 	/* Init vars. */
