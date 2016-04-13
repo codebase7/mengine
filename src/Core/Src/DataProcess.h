@@ -369,7 +369,7 @@ class Data_Object{
                 This function creates a copy of the data in the Data_Object and then returns a non-const pointer to that copy.
 
                 Note: The copy that is created will not be freed after the Data_Object goes out of scope. (I.e is destroyed.)
-                The caller must free the copy's memory on their own.
+                The caller must free the copy's memory using DataProcess_Deallocate_CString().
 
                 If this function fails to allocate memory, it will return NULL.
         */
