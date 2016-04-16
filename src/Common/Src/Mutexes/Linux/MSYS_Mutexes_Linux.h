@@ -37,7 +37,6 @@ extern "C" {
 
 /* Check which C standard is supported by the compiler. */
 #if __STDC_VERSION__ < 199901L
-#error "BAD BOOL!"
 /* We need to include our fake stdbool.h header file. */
 #include "../../../../stdbool.h"
 #else
