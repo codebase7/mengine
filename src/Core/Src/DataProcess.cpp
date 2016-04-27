@@ -1496,6 +1496,15 @@ char * DataProcess::Data_Object::get_Data_Copy() const
     return ptr;
 }
 
+void DataProcess::Data_Object::destroy_Data_Copy(char ** obj) const
+{
+	/* Call C Library. */
+	MSYS_Destroy_DataObject_Data_Copy(obj);
+
+	/* Exit function. */
+	return;
+}
+
 DataProcess::Data_Object::Data_Object()
 {
 	/* Init vars. */

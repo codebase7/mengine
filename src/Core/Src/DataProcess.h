@@ -369,11 +369,29 @@ class Data_Object{
                 This function creates a copy of the data in the Data_Object and then returns a non-const pointer to that copy.
 
                 Note: The copy that is created will not be freed after the Data_Object goes out of scope. (I.e is destroyed.)
-                The caller must free the copy's memory using DataProcess_Deallocate_CString().
+                The caller must free the copy's memory using DataProcess::Data_Object::destroy_Data_Copy().
+
+				Note: The resulting copy (if the function succeeds) will have a memory buffer length identical to the value
+				returned by Data_Object::size() at the time this function was called.
 
                 If this function fails to allocate memory, it will return NULL.
         */
         MSYS_DLL_EXPORT char * get_Data_Copy() const;
+
+		/*!
+				void DataProcess::Data_Object::destroy_Data_Copy(char ** obj) const
+
+				Destroys (Deallocates) the copied object data, created by
+				DataProcess::Data_Object::get_Data_Copy().
+
+				WARNING: DO NOT ATTEMPT to deallocate DataProcess::Data_Object objects with this function.
+				Use ~DataProcess::Data_Object() instead. Failure to do so, will result in
+				UNDEFINED BEHAVIOR.
+
+				This function has no return.
+		 */
+		MSYS_DLL_EXPORT void destroy_Data_Copy(char ** obj) const;
+
         MSYS_DLL_EXPORT size_t get_length() const;
 
         /*!
