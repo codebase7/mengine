@@ -193,6 +193,29 @@ int MSYS_Check_DataObject_Consistency_Private(const MSYS_DataObject_T_Private * 
 	return ret;
 }
 
+/*!
+		void MSYS_Destroy_DataObject_Private(MSYS_DataObject_T_Private ** buffer)
+
+		Deallocates the given MSYS_DataObject_T_Private object.
+
+		This function has no return.
+ */
+void MSYS_Destroy_DataObject_Private(MSYS_DataObject_T_Private ** buffer)
+{
+	/* Check for valid pointer. */
+	if ((buffer != NULL) && (*(buffer) != NULL))
+	{
+		/* Clear the structure. */
+		MSYS_Clear_DataObject_Private(*buffer);
+
+		/* Deallocate the private structure. */
+		DataProcess_Deallocate_CString((char**)(buffer));
+	}
+
+	/* Exit function. */
+	return;
+}
+
 /*
  *
  *		Public functions are defined below.
@@ -206,6 +229,7 @@ int MSYS_Create_DataObject(MSYS_DataObject_T ** buffer)
 	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of the call to another engine function. */
 	MSYS_DataObject_T * tempPtr = NULL;					/* Used to create the MSYS_DataObject_T object. */
 	MSYS_DataObject_T_Private * realStrPtr = NULL;		/* Used to create the MSYS_DataObject_T_Private object. */
+	char * newPtP = NULL;								/* Used to allocate pointer to pointer for the public object. */
 
 	/* Check vars. */
 	if (buffer != NULL)
@@ -215,27 +239,46 @@ int MSYS_Create_DataObject(MSYS_DataObject_T ** buffer)
 		if ((retFromCall == COMMON_ERROR_SUCCESS) && (tempPtr != NULL))
 		{
 			/* Set the internal pointer to NULL. */
-			tempPtr->object = NULL;
+			tempPtr->ppObject = NULL;
 
-			/* Allocate memory for the private object. */
-			retFromCall = DataProcess_Reallocate_C_String(((char**)(&realStrPtr)), 0, sizeof(MSYS_DataObject_T_Private));
-			if ((retFromCall == COMMON_ERROR_SUCCESS) && (realStrPtr != NULL))
+			/* Create new pointer to pointer for the public object's ppObject variable. */
+			retFromCall = DataProcess_Reallocate_C_String(&newPtP, 0, sizeof(char**));
+			if ((retFromCall == COMMON_ERROR_SUCCESS) && (newPtP != NULL))
 			{
-				/* Blank the private structure. */
-				MSYS_Blank_DataObject_Private(realStrPtr);
+				/* Allocate memory for the private object. */
+				retFromCall = DataProcess_Reallocate_C_String(((char**)(&realStrPtr)), 0, sizeof(MSYS_DataObject_T_Private));
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (realStrPtr != NULL))
+				{
+					/* Blank the private structure. */
+					MSYS_Blank_DataObject_Private(realStrPtr);
 
-				/* Copy the pointer for the private structure into the public structure. */
-				tempPtr->object = ((void*)realStrPtr);
+					/* Copy the pointer for the private structure into the pointer to pointer variable. */
+					newPtP = ((char*)(realStrPtr));
 
-				/* Copy the pointer. */
-				(*buffer) = tempPtr;
+					/* Copy the pointer to pointer into the public structure. */
+					*(tempPtr->ppObject) = newPtP;
 
-				/* Done. */
-				ret = COMMON_ERROR_SUCCESS;
+					/* Copy the pointer to the public structure into the buffer argument. */
+					(*buffer) = tempPtr;
+
+					/* Done. */
+					ret = COMMON_ERROR_SUCCESS;
+				}
+				else
+				{
+					/* Could not allocate memory for the private object. */
+					ret = COMMON_ERROR_MEMORY_ERROR;
+
+					/* Deallocate memory for the pointer to pointer variable. */
+					DataProcess_Deallocate_CString(((char**)(&newPtP)));
+
+					/* Deallocate memory for the public structure. */
+					DataProcess_Deallocate_CString(((char**)(&tempPtr)));
+				}
 			}
 			else
 			{
-				/* Could not allocate memory for the private object. */
+				/* Could not allocate memory for the public object's ppObject variable. */
 				ret = COMMON_ERROR_MEMORY_ERROR;
 
 				/* Deallocate memory for the public structure. */
@@ -260,20 +303,14 @@ int MSYS_Create_DataObject(MSYS_DataObject_T ** buffer)
 
 void MSYS_Destroy_DataObject(MSYS_DataObject_T ** buffer)
 {
-	/* Init vars. */
-	MSYS_DataObject_T_Private * realPtr = NULL;		/* A pointer to the internal private data structure. */
-
 	/* Check for valid pointer. */
-	if ((buffer != NULL) && ((*buffer) != NULL) && (((*buffer)->object) != NULL))
+	if ((buffer != NULL) && ((*buffer) != NULL) && (((*buffer)->ppObject) != NULL) && (*((*buffer)->ppObject)) != NULL)
 	{
-		/* Get back the private structure pointer. */
-		realPtr = ((MSYS_DataObject_T_Private *)((*buffer)->object));
-
-		/* Clear the structure. */
-		MSYS_Clear_DataObject_Private(realPtr);
-
 		/* Deallocate the private structure. */
-		DataProcess_Deallocate_CString(((char**)(&((*buffer)->object))));
+		MSYS_Destroy_DataObject_Private(((MSYS_DataObject_T_Private **)((*buffer)->ppObject)));
+
+		/* Deallocate the pointer to pointer object. (ppObject itself.) */
+		DataProcess_Deallocate_CString((char**)(&((*buffer)->ppObject)));
 
 		/* Deallocate the public structure. */
 		DataProcess_Deallocate_CString(((char**)(buffer)));
@@ -290,10 +327,10 @@ int MSYS_Check_DataObject_Consistency(const MSYS_DataObject_T * obj)
 	const MSYS_DataObject_T_Private * realPtr = NULL;
 
 	/* Check args. */
-	if ((obj != NULL) && ((obj->object) != NULL))
+	if ((obj != NULL) && ((obj->ppObject) != NULL) && (*(obj->ppObject) != NULL))
 	{
 		/* Get back the real pointer. */
-		realPtr = (const MSYS_DataObject_T_Private *)(obj->object);
+		realPtr = (const MSYS_DataObject_T_Private *)(*(obj->ppObject));
 
 		/* Call the real function. */
 		ret = (MSYS_Check_DataObject_Consistency_Private(realPtr));
@@ -315,10 +352,10 @@ int MSYS_DataObject_Get_Capacity(const MSYS_DataObject_T * obj, size_t * retPtr)
 	const MSYS_DataObject_T_Private * realPtr = NULL;
 
 	/* Check args. */
-	if ((obj != NULL) && ((obj->object) != NULL) && (retPtr != NULL))
+	if ((obj != NULL) && ((obj->ppObject) != NULL) && (*(obj->ppObject) != NULL) && (retPtr != NULL))
 	{
 		/* Get back the real pointer. */
-		realPtr = (const MSYS_DataObject_T_Private *)(obj->object);
+		realPtr = (const MSYS_DataObject_T_Private *)(*(obj->ppObject));
 
 		/* Copy the capacity. */
 		(*retPtr) = realPtr->capacity;
@@ -343,10 +380,10 @@ int MSYS_DataObject_Get_Length(const MSYS_DataObject_T * obj, size_t * retPtr)
 	const MSYS_DataObject_T_Private * realPtr = NULL;
 
 	/* Check args. */
-	if ((obj != NULL) && ((obj->object) != NULL) && (retPtr != NULL))
+	if ((obj != NULL) && ((obj->ppObject) != NULL) && (*(obj->ppObject) != NULL) && (retPtr != NULL))
 	{
 		/* Get back the real pointer. */
-		realPtr = (const MSYS_DataObject_T_Private *)(obj->object);
+		realPtr = (const MSYS_DataObject_T_Private *)(*(obj->ppObject));
 
 		/* Copy the length. */
 		(*retPtr) = realPtr->length;
@@ -371,10 +408,10 @@ int MSYS_DataObject_Get_Pointer(const MSYS_DataObject_T * buffer, const char ** 
 	const MSYS_DataObject_T_Private * realPtr = NULL;
 
 	/* Check args. */
-	if ((buffer != NULL) && ((buffer->object) != NULL) && (retPtr != NULL))
+	if ((buffer != NULL) && ((buffer->ppObject) != NULL) && (*(buffer->ppObject) != NULL) && (retPtr != NULL))
 	{
 		/* Get back the real pointer. */
-		realPtr = (const MSYS_DataObject_T_Private *)(buffer->object);
+		realPtr = (const MSYS_DataObject_T_Private *)(*(buffer->ppObject));
 
 		/* Return the internal data pointer. */
 		(*retPtr) = realPtr->data;
@@ -401,10 +438,10 @@ int MSYS_DataObject_Get_Copy(const MSYS_DataObject_T * buffer, char ** retPtr)
 	char * tempCopy = NULL;
 
 	/* Check args. */
-	if ((buffer != NULL) && ((buffer->object) != NULL) && (retPtr != NULL))
+	if ((buffer != NULL) && ((buffer->ppObject) != NULL) && (*(buffer->ppObject) != NULL) && (retPtr != NULL))
 	{
 		/* Get back the real pointer. */
-		realPtr = (const MSYS_DataObject_T_Private *)(buffer->object);
+		realPtr = (const MSYS_DataObject_T_Private *)(*(buffer->ppObject));
 
 		/* Check for a valid pointer. */
 		if ((realPtr->data != NULL) && (realPtr->length > 0) && (realPtr->capacity > 0))
@@ -447,10 +484,10 @@ void MSYS_Clear_DataObject(MSYS_DataObject_T * obj)
 	MSYS_DataObject_T_Private * realPtr = NULL;
 
 	/* Check args. */
-	if ((obj != NULL) && ((obj->object) != NULL))
+	if ((obj != NULL) && ((obj->ppObject) != NULL) && (*(obj->ppObject) != NULL))
 	{
 		/* Get back the real pointer. */
-		realPtr = (MSYS_DataObject_T_Private *)(obj->object);
+		realPtr = (MSYS_DataObject_T_Private *)(*(obj->ppObject));
 
 		/* Call the private function. */
 		MSYS_Clear_DataObject_Private(realPtr);
@@ -466,10 +503,10 @@ void MSYS_Reset_DataObject(MSYS_DataObject_T * obj)
 	MSYS_DataObject_T_Private * realPtr = NULL;
 
 	/* Check args. */
-	if ((obj != NULL) && ((obj->object) != NULL))
+	if ((obj != NULL) && ((obj->ppObject) != NULL) && (*(obj->ppObject) != NULL))
 	{
 		/* Get back the real pointer. */
-		realPtr = (MSYS_DataObject_T_Private *)(obj->object);
+		realPtr = (MSYS_DataObject_T_Private *)(*(obj->ppObject));
 
 		/* Call the private function. */
 		MSYS_Reset_DataObject_Private(realPtr);
@@ -490,11 +527,13 @@ int MSYS_DataObject_Create_From_Existing_DataObject(const MSYS_DataObject_T * so
 	/* Yes, we are explictly checking that retObj does not hold the same memory address as source,
 		or the source pointer.
 	*/
-	if ((source != NULL) && (retObj != NULL) && (((void *)retObj) != ((void *)(source))) && (((void*)(retObj)) != source->object))
+	if ((source != NULL) && (retObj != NULL) && (((void *)retObj) != ((void *)(source))) &&
+		(source->ppObject != NULL) && (*(source->ppObject) != NULL) &&
+		(((void*)(retObj)) != *(source->ppObject)))
 	{
 		/* Create the new object. */
 		retFromCall = MSYS_Create_DataObject(&newObj);
-		if ((retFromCall == COMMON_ERROR_SUCCESS) && (newObj != NULL) && (newObj->object != NULL))
+		if ((retFromCall == COMMON_ERROR_SUCCESS) && (newObj != NULL) && (newObj->ppObject != NULL) && (*(newObj->ppObject) != NULL))
 		{
 			/* Deep copy the source structure. */
 			retFromCall = MSYS_Deep_Copy_DataObject(source, newObj);
@@ -536,23 +575,19 @@ int MSYS_Shallow_Copy_DataObject(const MSYS_DataObject_T * source, MSYS_DataObje
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;					/* The result of this function. */
-	const MSYS_DataObject_T_Private * srcPrivStr = NULL;	/* The internal structure of the source data object. */
-	MSYS_DataObject_T_Private * destPrivStr = NULL;			/* The internal structure of the dest data object. */
 
 	/* Check args. */
-	if ((source != NULL) && (dest != NULL) && (source != dest) && (source->object != NULL) && (dest->object != NULL) && (source->object != dest->object))
+	if ((source != NULL) && (dest != NULL) && (source != dest) && (source->ppObject != NULL) && (*(source->ppObject) != NULL) &&
+		(dest->ppObject != NULL) && (source->ppObject != dest->ppObject) && (*(source->ppObject) != *(dest->ppObject)))
 	{
-		/* Get the internal pointers. */
-		srcPrivStr = ((const MSYS_DataObject_T_Private *)(source->object));
-		destPrivStr = ((MSYS_DataObject_T_Private *)(dest->object));
+		/* Deallocate the dest private structure if needed. */
+		if (*(dest->ppObject) != NULL)
+		{
+			MSYS_Destroy_DataObject_Private(((MSYS_DataObject_T_Private **)(dest->ppObject)));
+		}
 
-		/* Clear the internal structure for the dest object. */
-		MSYS_Clear_DataObject_Private(destPrivStr);
-
-		/* Shallow copy the values from the source object to the dest object. */
-		destPrivStr->data = srcPrivStr->data;
-		destPrivStr->capacity = srcPrivStr->capacity;
-		destPrivStr->length = srcPrivStr->length;
+		/* Copy the source pointer to the dest pointer. */
+		*(dest->ppObject) = *(source->ppObject);
 
 		/* Done. */
 		ret = COMMON_ERROR_SUCCESS;
@@ -577,11 +612,12 @@ int MSYS_Deep_Copy_DataObject(const MSYS_DataObject_T * source, MSYS_DataObject_
 	MSYS_DataObject_T_Private * destPrivStr = NULL;			/* The internal structure of the dest data object. */
 
 	/* Check args. */
-	if ((source != NULL) && (dest != NULL) && (source != dest) && (source->object != NULL) && (dest->object != NULL) && (source->object != dest->object))
+	if ((source != NULL) && (dest != NULL) && (source != dest) && (source->ppObject != NULL) && (*(source->ppObject) != NULL) &&
+		(dest->ppObject != NULL) && (*(dest->ppObject) != NULL) && (*(source->ppObject) != *(dest->ppObject)))
 	{
 		/* Get the internal pointers. */
-		srcPrivStr = ((const MSYS_DataObject_T_Private *)(source->object));
-		destPrivStr = ((MSYS_DataObject_T_Private *)(dest->object));
+		srcPrivStr = (const MSYS_DataObject_T_Private *)(*(source->ppObject));
+		destPrivStr = (MSYS_DataObject_T_Private *)(*(dest->ppObject));
 
 		/* Check for valid data pointer in the source object. */
 		if (srcPrivStr->data != NULL)
@@ -655,10 +691,11 @@ int MSYS_DataObject_Set_Data_From_CString(MSYS_DataObject_T * obj, const char * 
 	char * copyStr = NULL;								/* Pointer to the copied data. */
 
 	/* Check args. */
-	if ((obj != NULL) && (obj->object != NULL) && (data != NULL) && (dataLength > 0))
+	if ((obj != NULL) && (obj->ppObject != NULL) && (*(obj->ppObject) != NULL) &&
+		(data != NULL) && (dataLength > 0))
 	{
 		/* Get back the real pointer. */
-		realPtr = (MSYS_DataObject_T_Private *)(obj->object);
+		realPtr = (MSYS_DataObject_T_Private *)(*(obj->ppObject));
 
 		/* Copy the string data. */
 		retFromCall = DataProcess_Copy_C_String(data, dataLength, &copyStr);
@@ -727,10 +764,11 @@ int MSYS_DataObject_Substr(const MSYS_DataObject_T * obj, const size_t offset, c
 	size_t newSubstrLength = 0;								/* Length of the new substring. */
 
 	/* Check args. */
-	if ((obj != NULL) && (obj->object != NULL) && (offset >= 0) && (offset < endpoint) && (substr != NULL))
+	if ((obj != NULL) && (obj->ppObject != NULL) && (*(obj->ppObject) != NULL) &&
+		(offset >= 0) && (offset < endpoint) && (substr != NULL))
 	{
 		/* Get the internal pointers. */
-		srcPrivStr = ((const MSYS_DataObject_T_Private *)(obj->object));
+		srcPrivStr = (const MSYS_DataObject_T_Private *)(*(obj->ppObject));
 
 		/* Check for valid data pointer in the source object. */
 		if (srcPrivStr->data != NULL)
@@ -818,12 +856,13 @@ int MSYS_DataObject_Buffer_Copy(MSYS_DataObject_T * dest, const MSYS_DataObject_
 	MSYS_DataObject_T_Private * destPrivStr = NULL;			/* The internal structure of the dest data object. */
 
 	/* Check args. */
-	if ((source != NULL) && (dest != NULL) && (source != dest) && (source->object != NULL) && (dest->object != NULL) && (source->object != dest->object) &&
+	if ((source != NULL) && (dest != NULL) && (source != dest) && (source->ppObject != NULL) && (*(source->ppObject) != NULL) &&
+		(dest->ppObject != NULL) && (*(dest->ppObject) != NULL) && (*(source->ppObject) != *(dest->ppObject)) &&
 		(copy_offset >= 0) && (copy_length > 0))
 	{
 		/* Get the internal pointers. */
-		srcPrivStr = ((const MSYS_DataObject_T_Private *)(source->object));
-		destPrivStr = ((MSYS_DataObject_T_Private *)(dest->object));
+		srcPrivStr = (const MSYS_DataObject_T_Private *)(*(source->ppObject));
+		destPrivStr = (MSYS_DataObject_T_Private *)(*(dest->ppObject));
 
 		/* Check for valid data pointer in the source object. */
 		retFromCall = MSYS_Check_DataObject_Consistency_Private(srcPrivStr);
@@ -850,6 +889,9 @@ int MSYS_DataObject_Buffer_Copy(MSYS_DataObject_T * dest, const MSYS_DataObject_
 
 								/* Copy the data. */
 								memcpy(destPrivStr->data, (srcPrivStr->data + copy_offset), copy_length);
+
+								/* Set the length of the dest object. */
+								destPrivStr->length = copy_length;
 
 								/* Done. */
 								ret = COMMON_ERROR_SUCCESS;
@@ -913,55 +955,84 @@ int MSYS_DataObject_Compare(const MSYS_DataObject_T * obj1, const MSYS_DataObjec
 		/* Check and see if we got a NULL.... */
 		if ((obj1 != NULL) && (obj2 != NULL))
 		{
-			/* Check internal pointers. */
-			if (obj1->object != obj2->object)
+			/* Check internal pointer to pointers. */
+			if (obj1->ppObject != obj2->ppObject)
 			{
-				/* Check for more NULL objects. */
-				if ((obj1->object != NULL) && (obj2->object != NULL))
+				/* Check for a NULL pointer to pointer object. */
+				if ((obj1->ppObject != NULL) && (obj2->ppObject != NULL))
 				{
-					/* Get the internal pointers. */
-					obj1PrivStr = ((const MSYS_DataObject_T_Private *)(obj1->object));
-					obj2PrivStr = ((const MSYS_DataObject_T_Private *)(obj2->object));
-
-					/* Check the capacity. */
-					if (obj1PrivStr->capacity == obj2PrivStr->capacity)
+					/* Check the private object pointers. */
+					if (*(obj1->ppObject) != *(obj2->ppObject))
 					{
-						/* Check the length. */
-						if (obj1PrivStr->length == obj2PrivStr->length)
+						/* Check and see if a private object is NULL. */
+						if ((*(obj1->ppObject) != NULL) && (*(obj2->ppObject) != NULL))
 						{
-							/* Check the buffer memory addresses. */
-							if (obj1PrivStr->data == obj2PrivStr->data)
+							/* Get the internal pointers. */
+							obj1PrivStr = ((const MSYS_DataObject_T_Private *)(*(obj1->ppObject)));
+							obj2PrivStr = ((const MSYS_DataObject_T_Private *)(*(obj2->ppObject)));
+
+							/* Check the capacity. */
+							if (obj1PrivStr->capacity == obj2PrivStr->capacity)
 							{
-								/* Objects are identical. */
-								ret = COMMON_ERROR_COMPARISON_PASSED;
+								/* Check the length. */
+								if (obj1PrivStr->length == obj2PrivStr->length)
+								{
+									/* Check the buffer memory addresses. */
+									if (obj1PrivStr->data == obj2PrivStr->data)
+									{
+										/* Objects are identical. */
+										ret = COMMON_ERROR_COMPARISON_PASSED;
+									}
+									else
+									{
+										/* Objects have different buffers. */
+										ret = COMMON_ERROR_COMPARISON_FAILED;
+									}
+								}
+								else
+								{
+									/* Objects have different lengths. */
+									ret = COMMON_ERROR_COMPARISON_FAILED;
+								}
 							}
 							else
 							{
-								/* Objects have different buffers. */
+								/* Objects have different capacities. */
 								ret = COMMON_ERROR_COMPARISON_FAILED;
 							}
 						}
 						else
 						{
-							/* Objects have different lengths. */
+							/* Comparing a valid private object against a NULL object. */
 							ret = COMMON_ERROR_COMPARISON_FAILED;
 						}
 					}
 					else
 					{
-						/* Objects have different capacities. */
-						ret = COMMON_ERROR_COMPARISON_FAILED;
+						/* Objects have the same private object memory address. */
+						ret = COMMON_ERROR_COMPARISON_PASSED;
 					}
 				}
 				else
 				{
-					/* Comparing a valid private object against a NULL object. */
+					/* Comparing a valid pointer to pointer object against a NULL object.
+					
+						This is the result of user manipulation of the public structures,
+						the library will only free the public structure's pointer to pointer
+						variable when that public structure itself is deallocated.
+					 */
 					ret = COMMON_ERROR_COMPARISON_FAILED;
 				}
 			}
 			else
 			{
-				/* Objects have the same private object memory address. */
+				/* Objects have the same pointer to pointer memory address.
+
+					This is the result of user manipulation of the public structures,
+					the library will never create two different objects with the
+					same pointer to pointer variable. (As it would break
+					the Shallow Copy support and cause a double free.)
+				 */
 				ret = COMMON_ERROR_COMPARISON_PASSED;
 			}
 		}
@@ -1000,64 +1071,93 @@ int MSYS_DataObject_Data_Compare(const MSYS_DataObject_T * obj1, const MSYS_Data
 		/* Check and see if we got a NULL.... */
 		if ((obj1 != NULL) && (obj2 != NULL))
 		{
-			/* Check internal pointers. */
-			if (obj1->object != obj2->object)
+			/* Check internal pointer to pointers. */
+			if (obj1->ppObject != obj2->ppObject)
 			{
-				/* Check for more NULL objects. */
-				if ((obj1->object != NULL) && (obj2->object != NULL))
+				/* Check for a NULL pointer to pointer object. */
+				if ((obj1->ppObject != NULL) && (obj2->ppObject != NULL))
 				{
-					/* Get the internal pointers. */
-					obj1PrivStr = ((const MSYS_DataObject_T_Private *)(obj1->object));
-					obj2PrivStr = ((const MSYS_DataObject_T_Private *)(obj2->object));
-
-					/* Check the length. */
-					if (obj1PrivStr->length == obj2PrivStr->length)
+					/* Check the private object pointers. */
+					if (*(obj1->ppObject) != *(obj2->ppObject))
 					{
-						/* Check the buffer memory addresses. */
-						if (obj1PrivStr->data != obj2PrivStr->data)
+						/* Check and see if a private object is NULL. */
+						if ((*(obj1->ppObject) != NULL) && (*(obj2->ppObject) != NULL))
 						{
-							/* Check for NULL data buffers. */
-							if ((obj1PrivStr->data != NULL) && (obj2PrivStr->data != NULL))
+							/* Get the internal pointers. */
+							obj1PrivStr = ((const MSYS_DataObject_T_Private *)(*(obj1->ppObject)));
+							obj2PrivStr = ((const MSYS_DataObject_T_Private *)(*(obj2->ppObject)));
+
+							/* Check the length. */
+							if (obj1PrivStr->length == obj2PrivStr->length)
 							{
-								/* Check the data. */
-								if (memcmp(obj1PrivStr->data, obj2PrivStr->data, obj1PrivStr->length) == 0)
+								/* Check the buffer memory addresses. */
+								if (obj1PrivStr->data != obj2PrivStr->data)
 								{
-									/* Objects have the same data. */
-									ret = COMMON_ERROR_COMPARISON_PASSED;
+									/* Check for NULL data buffers. */
+									if ((obj1PrivStr->data != NULL) && (obj2PrivStr->data != NULL))
+									{
+										/* Check the data. */
+										if (memcmp(obj1PrivStr->data, obj2PrivStr->data, obj1PrivStr->length) == 0)
+										{
+											/* Objects have the same data. */
+											ret = COMMON_ERROR_COMPARISON_PASSED;
+										}
+										else
+										{
+											/* Objects have different data. */
+											ret = COMMON_ERROR_COMPARISON_FAILED;
+										}
+									}
+									else
+									{
+										/* Comparing a valid private buffer against a NULL buffer. */
+										ret = COMMON_ERROR_COMPARISON_FAILED;
+									}
 								}
 								else
 								{
-									/* Objects have different data. */
-									ret = COMMON_ERROR_COMPARISON_FAILED;
+									/* Objects are identical. */
+									ret = COMMON_ERROR_COMPARISON_PASSED;
 								}
 							}
 							else
 							{
-								/* Comparing a valid private buffer against a NULL buffer. */
+								/* Objects have different lengths. */
 								ret = COMMON_ERROR_COMPARISON_FAILED;
 							}
 						}
 						else
 						{
-							/* Objects are identical. */
-							ret = COMMON_ERROR_COMPARISON_PASSED;
+							/* Comparing a valid private object against a NULL object. */
+							ret = COMMON_ERROR_COMPARISON_FAILED;
 						}
 					}
 					else
 					{
-						/* Objects have different lengths. */
-						ret = COMMON_ERROR_COMPARISON_FAILED;
+						/* Objects have the same private object memory address. */
+						ret = COMMON_ERROR_COMPARISON_PASSED;
 					}
 				}
 				else
 				{
-					/* Comparing a valid private object against a NULL object. */
+					/* Comparing a valid pointer to pointer object against a NULL object.
+					
+						This is the result of user manipulation of the public structures,
+						the library will only free the public structure's pointer to pointer
+						variable when that public structure itself is deallocated.
+					 */
 					ret = COMMON_ERROR_COMPARISON_FAILED;
 				}
 			}
 			else
 			{
-				/* Objects have the same private object memory address. */
+				/* Objects have the same pointer to pointer memory address.
+
+					This is the result of user manipulation of the public structures,
+					the library will never create two different objects with the
+					same pointer to pointer variable. (As it would break
+					the Shallow Copy support and cause a double free.)
+				 */
 				ret = COMMON_ERROR_COMPARISON_PASSED;
 			}
 		}
@@ -1071,7 +1171,7 @@ int MSYS_DataObject_Data_Compare(const MSYS_DataObject_T * obj1, const MSYS_Data
 	{
 		/* Objects have the same memory address. */
 		ret = COMMON_ERROR_COMPARISON_PASSED;
-	}
+	}			
 
 	/* Exit function. */
 	return ret;
@@ -1092,10 +1192,10 @@ int MSYS_DataObject_Reserve_Memory(MSYS_DataObject_T * obj, const size_t memoryL
 	char * expandedBuffer = NULL;						/* Pointer to the expanded buffer. */
 
 	/* Check args. */
-	if ((obj != NULL) && (obj->object != NULL))
+	if ((obj != NULL) && (obj->ppObject != NULL) && (*(obj->ppObject) != NULL))
 	{
 		/* Get back the real pointer. */
-		realPtr = (MSYS_DataObject_T_Private *)(obj->object);
+		realPtr = (MSYS_DataObject_T_Private *)(*(obj->ppObject));
 
 		/* Check the private data structure. */
 		retFromCall = MSYS_Check_DataObject_Consistency_Private(realPtr);
@@ -1166,10 +1266,10 @@ int MSYS_DataObject_Insert_CString(MSYS_DataObject_T * obj, const size_t offset,
 	size_t realOffset = 0;								/* The offset used in the memcpy() calls. */
 
 	/* Check args. */
-	if ((obj != NULL) && (obj->object != NULL) && (data != NULL) && (dataLength > 0))
+	if ((obj != NULL) && (obj->ppObject != NULL) && (*(obj->ppObject) != NULL) && (data != NULL) && (dataLength > 0))
 	{
 		/* Get back the real pointer. */
-		realPtr = (MSYS_DataObject_T_Private *)(obj->object);
+		realPtr = (MSYS_DataObject_T_Private *)(*(obj->ppObject));
 
 		/* Check for data object consistancy. */
 		retFromCall = MSYS_Check_DataObject_Consistency_Private(realPtr);
@@ -1285,10 +1385,11 @@ int MSYS_DataObject_Insert_From_DataObject(MSYS_DataObject_T * obj, const size_t
 	const MSYS_DataObject_T_Private * srcPrivStr = NULL;	/* The internal structure of the source data object. */
 
 	/* Check args. */
-	if ((obj != NULL) && (src != NULL) && (obj != src) && (obj->object != NULL) && (src->object != NULL) && (obj->object != src->object))
+	if ((src != NULL) && (obj != NULL) && (src != obj) && (src->ppObject != NULL) && (*(src->ppObject) != NULL) &&
+		(obj->ppObject != NULL) && (*(obj->ppObject) != NULL) && (*(src->ppObject) != *(obj->ppObject)))
 	{
-		/* Get the internal pointers. */
-		srcPrivStr = ((const MSYS_DataObject_T_Private *)(src->object));
+		/* Get the internal pointer for the source object. */
+		srcPrivStr = (const MSYS_DataObject_T_Private *)(*(src->ppObject));
 
 		/* Check for valid source object. */
 		retFromCall = MSYS_Check_DataObject_Consistency_Private(srcPrivStr);

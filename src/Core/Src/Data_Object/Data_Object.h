@@ -31,7 +31,7 @@ extern "C" {
 #include "../../../DLL_PORT.h"
 
 MSYS_DLL_EXPORT typedef struct MSYS_DataObject {
-	void * object;			/* The object itself. */
+	void ** ppObject;			/* The object itself. */
 } MSYS_DataObject_T;
 
 /*!
