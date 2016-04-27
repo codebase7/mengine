@@ -429,7 +429,7 @@ int MSYS_DataObject_Get_Pointer(const MSYS_DataObject_T * buffer, const char ** 
 	return ret;
 }
 
-int MSYS_DataObject_Get_Copy(const MSYS_DataObject_T * buffer, char ** retPtr)
+int MSYS_DataObject_Get_Data_Copy(const MSYS_DataObject_T * buffer, char ** retPtr)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;
@@ -478,7 +478,7 @@ int MSYS_DataObject_Get_Copy(const MSYS_DataObject_T * buffer, char ** retPtr)
 	return ret;
 }
 
-void MSYS_Destroy_DataObject_Copy(char ** obj)
+void MSYS_Destroy_DataObject_Data_Copy(char ** obj)
 {
 	/* Check for valid pointer. */
 	if (obj != NULL)
