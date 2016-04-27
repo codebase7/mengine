@@ -364,7 +364,7 @@ class Data_Object{
         MSYS_DLL_EXPORT const char * get_Pointer() const;
 
         /*!
-                char * DataProcess::Data_Object::get_Copy() const
+                char * DataProcess::Data_Object::get_Data_Copy() const
 
                 This function creates a copy of the data in the Data_Object and then returns a non-const pointer to that copy.
 
@@ -373,7 +373,7 @@ class Data_Object{
 
                 If this function fails to allocate memory, it will return NULL.
         */
-        MSYS_DLL_EXPORT char * get_Copy() const;
+        MSYS_DLL_EXPORT char * get_Data_Copy() const;
         MSYS_DLL_EXPORT size_t get_length() const;
 
         /*!

@@ -1465,7 +1465,7 @@ const char * DataProcess::Data_Object::get_Pointer() const
     return ptr;
 }
 
-char * DataProcess::Data_Object::get_Copy() const
+char * DataProcess::Data_Object::get_Data_Copy() const
 {
 	/* Init vars. */
 	char * ptr = NULL;
@@ -1477,7 +1477,7 @@ char * DataProcess::Data_Object::get_Copy() const
 		/* Begin try block. */
 		try {
 			/* Call C library. */
-			retFromCall = MSYS_DataObject_Get_Copy(this->obj, &ptr);
+			retFromCall = MSYS_DataObject_Get_Data_Copy(this->obj, &ptr);
 			if ((retFromCall != COMMON_ERROR_SUCCESS) && (ptr != NULL))
 			{
 				DataProcess_Deallocate_CString(&ptr);
