@@ -116,9 +116,10 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Get_Pointer(const MSYS_DataObject_T * buffer
 /*!
 		int MSYS_DataObject_Get_Copy(const MSYS_DataObject_T * buffer, char ** retPtr)
 
-		Copies the object's data to a C-String, and copies the resulting pointer to retPtr.
+		Copies the given object's data to a C-String, and copies the resulting pointer to retPtr.
 
-		The returned pointer should be deallocated with DataProcess_Deallocate_CString().
+		The returned pointer should be deallocated with MSYS_Destroy_DataObject_Copy() when it is
+		no longer needed.
 
 		Returns COMMON_ERROR_SUCCESS if successful.
 		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is invalid.
@@ -126,6 +127,20 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Get_Pointer(const MSYS_DataObject_T * buffer
 		Returns COMMON_ERROR_NO_DATA if the given MSYS_DataObject_T has no data in it. (I.e. Length is zero.)
  */
 MSYS_DLL_EXPORT int MSYS_DataObject_Get_Copy(const MSYS_DataObject_T * buffer, char ** retPtr);
+
+/*!
+		void MSYS_Destroy_DataObject_Copy(char ** obj)
+
+		Destroys (Deallocates) the copied object data, created by
+		MSYS_DataObject_Get_Copy().
+
+		WARNING: DO NOT ATTEMPT to deallocate MSYS_DataObject_T object with this function.
+		Use MSYS_Destroy_DataObject() instead. Failure to do so, will result in
+		UNDEFINED BEHAVIOR.
+
+		This function has no return.
+ */
+MSYS_DLL_EXPORT void MSYS_Destroy_DataObject_Copy(char ** obj);
 
 /*!
 		void MSYS_Clear_DataObject(MSYS_DataObject_T * obj)

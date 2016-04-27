@@ -478,6 +478,19 @@ int MSYS_DataObject_Get_Copy(const MSYS_DataObject_T * buffer, char ** retPtr)
 	return ret;
 }
 
+void MSYS_Destroy_DataObject_Copy(char ** obj)
+{
+	/* Check for valid pointer. */
+	if (obj != NULL)
+	{
+		/* Deallocate the copy. */
+		DataProcess_Deallocate_CString(obj);
+	}
+
+	/* Exit function. */
+	return;
+}
+
 void MSYS_Clear_DataObject(MSYS_DataObject_T * obj)
 {
 	/* Init vars.  */
