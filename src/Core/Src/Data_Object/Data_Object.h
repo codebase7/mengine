@@ -134,7 +134,7 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Get_Data_Copy(const MSYS_DataObject_T * buff
 		Destroys (Deallocates) the copied object data, created by
 		MSYS_DataObject_Get_Data_Copy().
 
-		WARNING: DO NOT ATTEMPT to deallocate MSYS_DataObject_T object with this function.
+		WARNING: DO NOT ATTEMPT to deallocate MSYS_DataObject_T objects with this function.
 		Use MSYS_Destroy_DataObject() instead. Failure to do so, will result in
 		UNDEFINED BEHAVIOR.
 
