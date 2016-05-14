@@ -437,6 +437,59 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Data_NCompare(const MSYS_DataObject_T * obj1
 MSYS_DLL_EXPORT int MSYS_DataObject_Reserve_Memory(MSYS_DataObject_T * obj, const size_t memoryLength);
 
 /*!
+		int MSYS_DataObject_Insert_CString_No_Allocaton(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength)
+
+		Inserts the given C-Style string to the given data object's buffer at the given offset. (No memory allocation version.)
+
+		Note: If the given data object's remaining capacity is not big enough to hold the pre-existing data and the given string,
+		then an error will be returned, and the data object will not be modified. (Use MSYS_DataObject_Insert_CString() if you want memory to be
+		reallocated automatically. This function is intended to be used when memory is preallocated for the data.)
+
+		If this function is given an offset greater than the length of the given object's pre-existing content, (as returned by MSYS_DataObject_Get_Length()),
+		then this function will append the given data to the end of the given object's pre-existing content. (Pre-allocated capacity is ignored when considering
+		the position of the offset.)
+
+		I.E.
+			Pre-existing content: "Cat" (Length: 3)
+				--> Actual buffer: "Cat     " (Total Capacity: 8)
+			Given Data: " Stop" (Length: 5)
+			Given offset: 5.
+			Result: "Cat Stop" (Length: 8)
+				--> Actual buffer: "Cat Stop" (Total Capacity: 8)
+
+		Returns COMMON_ERROR_SUCCESS if successful.
+		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is invalid, or the given dataLength is less than or equal to zero.
+		Returns COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL if the given data object lacks a big enough buffer to store the given data and it's original data.
+		Returns COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED if the resulting calculations on offset / length / capacity would be bigger than the SIZE_MAX
+		that the system supports.
+		Returns COMMON_ERROR_DATA_CORRUPTION if the given data object is inconsistant. (E.x. No allocated buffer, but size or capacity > 0.)
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Insert_CString_No_Allocaton(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength);
+
+/*!
+		int MSYS_DataObject_Insert_Char_No_Allocaton(MSYS_DataObject_T * obj, const size_t offset, const char data)
+
+		Inserts the given char into the given data object, at the given offset. (No memory allocation version.)
+
+		Note: This function is just a wrapper for MSYS_DataObject_Insert_CString_No_Allocaton(), and is the equivalent to calling
+		MSYS_DataObject_Insert_CString_No_Allocaton(obj, offset, data, sizeof(char)).
+
+		See MSYS_DataObject_Insert_CString_No_Allocaton() for the list of possible return codes / expected behavior.
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Insert_Char_No_Allocaton(MSYS_DataObject_T * obj, const size_t offset, const char data);
+
+/*!
+		int MSYS_DataObject_Insert_From_DataObject_No_Allocaton(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src)
+
+		Inserts the given source (src) data object's content, into the given dest data object (obj), at the given offset. (No memory allocation version.)
+
+		Note: This function is just a wrapper for MSYS_DataObject_Insert_CString_No_Allocaton().
+
+		See MSYS_DataObject_Insert_CString_No_Allocaton() for the list of possible return codes / expected behavior.
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Insert_From_DataObject_No_Allocaton(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src);
+
+/*!
 		int MSYS_DataObject_Insert_CString(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength)
 
 		Inserts the given C-Style string to the given data object's buffer at the given offset.

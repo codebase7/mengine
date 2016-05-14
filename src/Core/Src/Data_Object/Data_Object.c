@@ -1395,6 +1395,143 @@ int MSYS_DataObject_Reserve_Memory(MSYS_DataObject_T * obj, const size_t memoryL
 	return ret;
 }
 
+int MSYS_DataObject_Insert_CString_No_Allocaton(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;				/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of calls to other engine functions. */
+	MSYS_DataObject_T_Private * realPtr = NULL;			/* Pointer to private data structure. */
+	size_t newLength = 0;								/* The length of the new buffer. */
+	size_t realOffset = 0;								/* The offset used in the memcpy() calls. */
+
+	/* Check args. */
+	if ((obj != NULL) && (obj->ppObject != NULL) && (*(obj->ppObject) != NULL) && (data != NULL) && (dataLength > 0))
+	{
+		/* Get back the real pointer. */
+		realPtr = (MSYS_DataObject_T_Private *)(*(obj->ppObject));
+
+		/* Check for data object consistancy. */
+		retFromCall = MSYS_Check_DataObject_Consistency_Private(realPtr);
+		if (retFromCall == COMMON_ERROR_COMPARISON_PASSED)
+		{
+			/* If the given offset is bigger than the content length of the buffer, use the end of the buffer for the offset. */
+			realOffset = ((offset < realPtr->length) ? (offset) : (realPtr->length));
+
+			/* Check for UINT Overflow.
+				This function keeps the original data, and simply inserts the given data at the given offset.
+
+				So the total amount of data we will wind up with is: (realPtr->length + dataLength).
+			*/
+			if (((SIZE_MAX - realOffset) >= dataLength) && ((SIZE_MAX - realPtr->length) >= dataLength))
+			{
+				/* Copy the length. */
+				newLength = realPtr->length;
+
+				/* Call MSYS_DataObject_Insert_CString_No_Allocation_Private(). (Will fail if the buffer is not big enough.) */
+				retFromCall = MSYS_DataObject_Insert_CString_No_Allocation_Private(realPtr->data,
+																					&newLength,
+																					(realPtr->length + dataLength),
+																					data,
+																					dataLength,
+																					realOffset);
+				if ((retFromCall == COMMON_ERROR_SUCCESS) && (newLength == (realPtr->length + dataLength)))
+				{
+					/* Update length. */
+					realPtr->length = (realPtr->length + dataLength);
+
+					/* Done. */
+					ret = COMMON_ERROR_SUCCESS;
+				}
+				else
+				{
+					/* Set error code. */
+					ret = retFromCall;
+				}
+			}
+			else
+			{
+				/* Cannot add the given data, total data size would be bigger than SIZE_MAX. */
+				ret = COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED;
+			}
+		}
+		else
+		{
+			/* Given data object is inconsistant. */
+			ret = COMMON_ERROR_DATA_CORRUPTION;
+		}
+	}
+	else
+	{
+		/* Invalid args. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+int MSYS_DataObject_Insert_Char_No_Allocaton(MSYS_DataObject_T * obj, const size_t offset, const char data)
+{
+	/* Call real function. */
+	return (MSYS_DataObject_Insert_CString_No_Allocaton(obj, offset, &data, sizeof(char)));
+}
+
+int MSYS_DataObject_Insert_From_DataObject_No_Allocaton(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;					/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of calls to other engine functions. */
+	const MSYS_DataObject_T_Private * srcPrivStr = NULL;	/* The internal structure of the source data object. */
+
+	/* Check args. */
+	if ((src != NULL) && (obj != NULL) && (src != obj) && (src->ppObject != NULL) && (*(src->ppObject) != NULL) &&
+		(obj->ppObject != NULL) && (*(obj->ppObject) != NULL) && (*(src->ppObject) != *(obj->ppObject)))
+	{
+		/* Get the internal pointer for the source object. */
+		srcPrivStr = (const MSYS_DataObject_T_Private *)(*(src->ppObject));
+
+		/* Check for valid source object. */
+		retFromCall = MSYS_Check_DataObject_Consistency_Private(srcPrivStr);
+		if (retFromCall == COMMON_ERROR_COMPARISON_PASSED)
+		{
+			/* Check for valid data buffer and length. */
+			if ((srcPrivStr->data != NULL) && (srcPrivStr->length > 0))
+			{
+				/* Call the insert C-String function. */
+				retFromCall = MSYS_DataObject_Insert_CString_No_Allocaton(obj, offset, srcPrivStr->data, srcPrivStr->length);
+				if (retFromCall == COMMON_ERROR_SUCCESS)
+				{
+					/* Done. */
+					ret = COMMON_ERROR_SUCCESS;
+				}
+				else
+				{
+					/* Check error code. */
+					ret = ((retFromCall != COMMON_ERROR_INVALID_ARGUMENT) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
+				}
+			}
+			else
+			{
+				/* OK, the source object is empty. */
+				ret = COMMON_ERROR_NO_DATA;
+			}
+		}
+		else
+		{
+			/* OK, the source object is invalid. */
+			ret = COMMON_ERROR_DATA_CORRUPTION;
+		}
+	}
+	else
+	{
+		/* Invalid args. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 int MSYS_DataObject_Insert_CString(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength)
 {
 	/* Init vars. */
