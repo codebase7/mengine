@@ -30,6 +30,20 @@ extern "C" {
 /* Internal include for library symbol export. */
 #include "../../../DLL_PORT.h"
 
+/*!
+		 typedef struct MSYS_DataObject {} MSYS_DataObject_T
+
+		 This structure is a basic RAW data storage structure.
+
+		 It supports preallocating memory in addition to reallocating
+		 memory when needed to store data. It also supports Shallow Copies
+		 by using reference counts, and Deep Copies where needed.
+
+		 It is NOT synchronized, and therefore NOT thread safe. If it is to be
+		 used in a threaded environment, care should be taken to ensure that no
+		 data race conditions occur, either by wraping it in another thread-safe
+		 container (best option), or by ensuring it is NOT shared between threads.
+ */
 MSYS_DLL_EXPORT typedef struct MSYS_DataObject {
 	void ** ppObject;			/* The object itself. */
 } MSYS_DataObject_T;
@@ -184,20 +198,25 @@ MSYS_DLL_EXPORT void MSYS_Reset_DataObject(MSYS_DataObject_T * obj);
 MSYS_DLL_EXPORT int MSYS_DataObject_Create_From_Existing_DataObject(const MSYS_DataObject_T * source, MSYS_DataObject_T ** retObj);
 
 /*!
-		int MSYS_Shallow_Copy_DataObject(const MSYS_DataObject_T * source, MSYS_DataObject_T * dest)
+		int MSYS_Shallow_Copy_DataObject(MSYS_DataObject_T * source, MSYS_DataObject_T * dest)
 
-		Copies the data values from the source MSYS_DataObject_T object to the dest MSYS_DataObject_T object.
+		Copies the data values from the source MSYS_DataObject_T object to the dest MSYS_DataObject_T object, without
+		performing memory allocations. The source object has it's reference count incremented upon success.
 
-		WARNING: Only the values are copied, the actual data is not. If either the source object or the
-		dest object get deallocated / modified, the data for the other object will be as well. However,
-		the other object will be unaware of the changes to the data. DO NOT ATTEMPT to alter an object
-		that has been through this function without updating the other object as well, failure to
-		do so may result in UNDEFINED BEHAVIOR.
+		Note: Only the values are copied, the actual data is not. If either the source object or the dest object gets
+		modified, the data for the other object will be as well. If either the source object or the dest object
+		gets deallocated, the data will only be deallocated if the object being deallocated is the last reference
+		to it.
+
+		The maximum number of references to an object are defined by the system's SIZE_MAX. An object cannot have
+		more references than that amount. Attempts to create more than the maximum allowed references, will result in
+		an error.
 
 		Returns COMMON_ERROR_SUCCESS if successful.
 		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is invalid.
+		Returns COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED if there are too many pre-existing references to the given object.
  */
-MSYS_DLL_EXPORT int MSYS_Shallow_Copy_DataObject(const MSYS_DataObject_T * source, MSYS_DataObject_T * dest);
+MSYS_DLL_EXPORT int MSYS_Shallow_Copy_DataObject(MSYS_DataObject_T * source, MSYS_DataObject_T * dest);
 
 /*!
 		int MSYS_Deep_Copy_DataObject(const MSYS_DataObject_T * source, MSYS_DataObject_T * dest)
@@ -472,6 +491,56 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Insert_Char(MSYS_DataObject_T * obj, const s
 		See MSYS_DataObject_Insert_CString() for the list of possible return codes / expected behavior.
  */
 MSYS_DLL_EXPORT int MSYS_DataObject_Insert_From_DataObject(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src);
+
+/*!
+		int MSYS_DataObject_Replace_With_CString(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength)
+
+		Takes the given C-Style string and replaces the given data object's buffer at the given offset with it, and updates the data object's
+		length if needed.
+
+		Note: This function does NOT perform memory (re)allocations. In cases where a memory (re)allocation is required, an error will be returned,
+		and the given data object will NOT be altered.
+
+		Note 2: This function is only for replacing existing data. The given offset must be within the given data object's length, (A special case
+		is permitted for when length is zero. See note 3.) and the given data must fit within the remaining space in memory buffer, or an error
+		will be returned.
+
+		Note 3: In the event the given data object's length is zero, then the given offset must be zero. (Pre-allocated capacity is ignored when
+		considering the position of the offset.) The given data must still fit within the capacity of the existing memory buffer.
+
+		Returns COMMON_ERROR_SUCCESS if successful.
+		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is invalid, or the given dataLength is less than or equal to zero.
+		Returns COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED if the resulting calculations on offset / length / capacity would be bigger than the SIZE_MAX
+		that the system supports.
+		Returns COMMON_ERROR_DATA_CORRUPTION if the given data object is inconsistant. (E.x. No allocated buffer, but size or capacity > 0.)
+		Returns COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL if the given offset and / or dataLength would require a memory reallocation to fit within the
+		given data object's memory buffer.
+		Returns COMMON_ERROR_RANGE_ERROR if the given offset is beyond the current length of the buffer. (As returned by MSYS_DataObject_Get_Length().)
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Replace_With_CString(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength);
+
+/*!
+		int MSYS_DataObject_Replace_With_Char(MSYS_DataObject_T * obj, const size_t offset, const char data)
+
+		Replaces the given data object's data, at the given offset, with the given char.
+
+		Note: This function is just a wrapper for MSYS_DataObject_Replace_With_CString(), and is the equivalent to calling
+		MSYS_DataObject_Replace_With_CString(obj, offset, data, sizeof(char)).
+
+		See MSYS_DataObject_Replace_With_CString() for the list of possible return codes / expected behavior.
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Replace_With_Char(MSYS_DataObject_T * obj, const size_t offset, const char data);
+
+/*!
+		int MSYS_DataObject_Replace_With_DataObject(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src)
+
+		Replaces the given dest data object (obj)'s content, with the given source (src) data object's content, at the given offset.
+
+		Note: This function is just a wrapper for MSYS_DataObject_Replace_With_CString().
+
+		See MSYS_DataObject_Replace_With_CString() for the list of possible return codes / expected behavior.
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Replace_With_DataObject(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src);
 
 /* Check for C++ compiler. */
 #ifdef __cplusplus

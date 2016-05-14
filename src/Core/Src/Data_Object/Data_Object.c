@@ -39,6 +39,7 @@ typedef struct MSYS_DataObject_Private {
 	char * data;        /* Pointer to data. */
     size_t length;      /* Length of data. */
     size_t capacity;    /* Length of data we can store. */
+	size_t refcount;	/* Number of references (Shadow Copies) that point to the object. */
 } MSYS_DataObject_T_Private;
 
 /*!
@@ -58,6 +59,7 @@ void MSYS_Blank_DataObject_Private(MSYS_DataObject_T_Private * buffer)
 		buffer->data = NULL;
 		buffer->length = 0;
 		buffer->capacity = 0;
+		buffer->refcount = 0;
 	}
 
 	/* Exit function. */
@@ -148,10 +150,10 @@ int MSYS_Check_DataObject_Consistency_Private(const MSYS_DataObject_T_Private * 
 		if (obj->data != NULL)
 		{
 			/* Check for valid capacity. */
-			if (obj->capacity > 0)
+			if (obj->capacity >= 0)
 			{
 				/* Check for valid length. */
-				if (obj->length <= obj->capacity)
+				if (obj->length <= obj->capacity)	/* Make sure that obj->length is less than or equal to obj->capacity. */
 				{
 					/* Valid object. */
 					ret = COMMON_ERROR_COMPARISON_PASSED;
@@ -205,15 +207,112 @@ void MSYS_Destroy_DataObject_Private(MSYS_DataObject_T_Private ** buffer)
 	/* Check for valid pointer. */
 	if ((buffer != NULL) && (*(buffer) != NULL))
 	{
-		/* Clear the structure. */
-		MSYS_Clear_DataObject_Private(*buffer);
-
-		/* Deallocate the private structure. */
-		DataProcess_Deallocate_CString((char**)(buffer));
+		/* Check the reference count to see if it's greater than zero. */
+		if ((*buffer)->refcount > 0)
+		{
+			/* Decrease the reference count. */
+			(*buffer)->refcount--;
+		}
+		else
+		{
+			/* The last reference has been deallocated. Clear and deallocate the private structure. */
+			MSYS_Clear_DataObject_Private(*buffer);
+			DataProcess_Deallocate_CString((char**)(buffer));
+		}
 	}
 
 	/* Exit function. */
 	return;
+}
+
+/*!
+		int MSYS_DataObject_Insert_CString_No_Allocation_Private(char * buffer, size_t * bufferLength, const size_t bufferCapacity,
+																	const char * data, const size_t dataLength, const size_t offset)
+
+		Inserts the given data into the given buffer at the given offset.
+
+		Note 1: This function, as the name implies, does NOT allocate memory. The given buffer must be big enough to
+		store the data given to it. If the buffer is not big enough to store the given data in addition to the
+		original data, then an error will be returned and the buffer will not be modified.
+
+		Note 2: Any data that exists after the given offset will be "moved" to after the given data in the buffer.
+		(I.e. Data after the given offset will be moved to the following offset: (offset + dataLength).)
+
+		Note 3: bufferLength will be updated with the current (content) length of the buffer if the function succeeds.
+		(Otherwise it will not be updated, as the buffer itself will not be modified.)
+
+		Note 4: This function like all other Data_Object functions, is limited by the compiler's defined SIZE_MAX. If
+		the given size values would cause an overflow of SIZE_MAX, this function will return an error.
+
+		Note 5: The given bufferLength must be less than or equal to the given bufferCapacity or an error will be returned.
+
+		Note 6: This function, like all private functions, should not be called directly. Use the public functions instead, as
+		this function and it's prototype are subject to change without warning.
+
+		Returns COMMON_ERROR_SUCCESS if successful.
+		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is invalid, dataLength is zero, or the given bufferLength is greater
+		than the given bufferCapacity.
+		Returns COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED if the given size values would cause an overflow of SIZE_MAX.
+		Returns COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL if the given memory buffer is not big enough to store the given data.
+ */
+int MSYS_DataObject_Insert_CString_No_Allocation_Private(char * buffer, size_t * bufferLength, const size_t bufferCapacity,
+															const char * data, const size_t dataLength, const size_t offset)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;				/* The result of this function. */
+	size_t realOffset = 0;								/* The offset used in the memcpy() calls. */
+
+	/* Check args. */
+	if ((buffer != NULL) && (bufferLength != NULL) && ((*bufferLength) <= bufferCapacity) && (data != NULL) && (dataLength > 0))
+	{
+		/* If the given offset is bigger than the content length of the buffer, use the end of the buffer for the offset. */
+		realOffset = ((offset < (*bufferLength)) ? (offset) : (*bufferLength));
+
+		/* Check for UINT Overflow.
+			This function keeps the original data, and simply inserts the given data at the given offset.
+
+			So the total amount of data we will wind up with is: ((*bufferLength) + dataLength).
+		 */
+		if (((SIZE_MAX - realOffset) >= dataLength) && ((SIZE_MAX - (*bufferLength)) >= dataLength))
+		{
+			/* Determine if we need to reallocate memory. */
+			if ((bufferCapacity - (*bufferLength)) >= dataLength)
+			{
+				/* Allocated buffer has enough avaiable memory, so copy the existing data after the offset passed the new data. (If needed.) */
+				if (realOffset < (*bufferLength))
+				{
+					memcpy((buffer + realOffset + dataLength), (buffer + realOffset), ((*bufferLength) - realOffset));
+				}
+
+				/* Copy the new data. */
+				memcpy((buffer + realOffset), data, dataLength);
+
+				/* Update length. */
+				(*bufferLength) = ((*bufferLength) + dataLength);
+
+				/* Done. */
+				ret = COMMON_ERROR_SUCCESS;
+			}
+			else
+			{
+				/* The given data will not fit in the existing buffer. */
+				ret = COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL;
+			}
+		}
+		else
+		{
+			/* Cannot add the given data, total data size would be bigger than SIZE_MAX. */
+			ret = COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED;
+		}
+	}
+	else
+	{
+		/* Invalid args. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
 }
 
 /*
@@ -229,7 +328,7 @@ int MSYS_Create_DataObject(MSYS_DataObject_T ** buffer)
 	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of the call to another engine function. */
 	MSYS_DataObject_T * tempPtr = NULL;					/* Used to create the MSYS_DataObject_T object. */
 	MSYS_DataObject_T_Private * realStrPtr = NULL;		/* Used to create the MSYS_DataObject_T_Private object. */
-	char * newPtP = NULL;								/* Used to allocate pointer to pointer for the public object. */
+	char ** newPtP = NULL;								/* Used to allocate pointer to pointer for the public object. */
 
 	/* Check vars. */
 	if (buffer != NULL)
@@ -242,7 +341,7 @@ int MSYS_Create_DataObject(MSYS_DataObject_T ** buffer)
 			tempPtr->ppObject = NULL;
 
 			/* Create new pointer to pointer for the public object's ppObject variable. */
-			retFromCall = DataProcess_Reallocate_C_String(&newPtP, 0, sizeof(char**));
+			retFromCall = DataProcess_Reallocate_C_String(((char**)(&newPtP)), 0, sizeof(char*));
 			if ((retFromCall == COMMON_ERROR_SUCCESS) && (newPtP != NULL))
 			{
 				/* Allocate memory for the private object. */
@@ -252,11 +351,20 @@ int MSYS_Create_DataObject(MSYS_DataObject_T ** buffer)
 					/* Blank the private structure. */
 					MSYS_Blank_DataObject_Private(realStrPtr);
 
-					/* Copy the pointer for the private structure into the pointer to pointer variable. */
-					newPtP = ((char*)(realStrPtr));
+					/* Copy the pointer for the private structure into the pointer to pointer variable.
 
-					/* Copy the pointer to pointer into the public structure. */
-					*(tempPtr->ppObject) = newPtP;
+						Note: We are doing the memcpy here to copy the address of realStrPtr
+						into the value of newPtP. (I.e. (*newPtP) should equal the address of
+						realStrPtr. Not (newPtP).
+					 */
+					*newPtP = (char*)realStrPtr;
+
+					/* Copy the pointer to pointer into the public structure.
+
+						The newPtP pointer is a double pointer at this point.
+						[newPtP @ 0x<whatever>: 0x<realStrPtr's address>].
+					 */
+					tempPtr->ppObject = (void **)newPtP;
 
 					/* Copy the pointer to the public structure into the buffer argument. */
 					(*buffer) = tempPtr;
@@ -304,13 +412,17 @@ int MSYS_Create_DataObject(MSYS_DataObject_T ** buffer)
 void MSYS_Destroy_DataObject(MSYS_DataObject_T ** buffer)
 {
 	/* Check for valid pointer. */
-	if ((buffer != NULL) && ((*buffer) != NULL) && (((*buffer)->ppObject) != NULL) && (*((*buffer)->ppObject)) != NULL)
+	if ((buffer != NULL) && ((*buffer) != NULL) && (((*buffer)->ppObject) != NULL))
 	{
-		/* Deallocate the private structure. */
-		MSYS_Destroy_DataObject_Private(((MSYS_DataObject_T_Private **)((*buffer)->ppObject)));
+		/* Check for private structure. */
+		if ((*((*buffer)->ppObject)) != NULL)
+		{
+			/* Deallocate the private structure. */
+			MSYS_Destroy_DataObject_Private(((MSYS_DataObject_T_Private **)((*buffer)->ppObject)));
+		}
 
 		/* Deallocate the pointer to pointer object. (ppObject itself.) */
-		DataProcess_Deallocate_CString((char**)(&((*buffer)->ppObject)));
+		DataProcess_Deallocate_CString(((char**)(&((*buffer)->ppObject))));
 
 		/* Deallocate the public structure. */
 		DataProcess_Deallocate_CString(((char**)(buffer)));
@@ -584,26 +696,42 @@ int MSYS_DataObject_Create_From_Existing_DataObject(const MSYS_DataObject_T * so
 	return ret;
 }
 
-int MSYS_Shallow_Copy_DataObject(const MSYS_DataObject_T * source, MSYS_DataObject_T * dest)
+int MSYS_Shallow_Copy_DataObject(MSYS_DataObject_T * source, MSYS_DataObject_T * dest)
 {
 	/* Init vars. */
 	int ret = COMMON_ERROR_UNKNOWN_ERROR;					/* The result of this function. */
+	MSYS_DataObject_T_Private * realPtr = NULL;
 
 	/* Check args. */
 	if ((source != NULL) && (dest != NULL) && (source != dest) && (source->ppObject != NULL) && (*(source->ppObject) != NULL) &&
 		(dest->ppObject != NULL) && (source->ppObject != dest->ppObject) && (*(source->ppObject) != *(dest->ppObject)))
 	{
-		/* Deallocate the dest private structure if needed. */
-		if (*(dest->ppObject) != NULL)
+		/* Get back the real pointer. */
+		realPtr = (MSYS_DataObject_T_Private *)(*(source->ppObject));
+
+		/* Check for max refcount. */
+		if ((SIZE_MAX - realPtr->refcount) > 0)
 		{
-			MSYS_Destroy_DataObject_Private(((MSYS_DataObject_T_Private **)(dest->ppObject)));
+			/* Deallocate the dest private structure if needed. */
+			if (*(dest->ppObject) != NULL)
+			{
+				MSYS_Destroy_DataObject_Private(((MSYS_DataObject_T_Private **)(dest->ppObject)));
+			}
+
+			/* Copy the source pointer to the dest pointer. */
+			*(dest->ppObject) = *(source->ppObject);
+
+			/* Increment the refcount. */
+			realPtr->refcount++;
+
+			/* Done. */
+			ret = COMMON_ERROR_SUCCESS;
 		}
-
-		/* Copy the source pointer to the dest pointer. */
-		*(dest->ppObject) = *(source->ppObject);
-
-		/* Done. */
-		ret = COMMON_ERROR_SUCCESS;
+		else
+		{
+			/* There are too many references to this object. Cannot create any more. */
+			ret = COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED;
+		}
 	}
 	else
 	{
@@ -1029,7 +1157,7 @@ int MSYS_DataObject_Compare(const MSYS_DataObject_T * obj1, const MSYS_DataObjec
 				else
 				{
 					/* Comparing a valid pointer to pointer object against a NULL object.
-					
+
 						This is the result of user manipulation of the public structures,
 						the library will only free the public structure's pointer to pointer
 						variable when that public structure itself is deallocated.
@@ -1154,7 +1282,7 @@ int MSYS_DataObject_Data_Compare(const MSYS_DataObject_T * obj1, const MSYS_Data
 				else
 				{
 					/* Comparing a valid pointer to pointer object against a NULL object.
-					
+
 						This is the result of user manipulation of the public structures,
 						the library will only free the public structure's pointer to pointer
 						variable when that public structure itself is deallocated.
@@ -1184,7 +1312,7 @@ int MSYS_DataObject_Data_Compare(const MSYS_DataObject_T * obj1, const MSYS_Data
 	{
 		/* Objects have the same memory address. */
 		ret = COMMON_ERROR_COMPARISON_PASSED;
-	}			
+	}
 
 	/* Exit function. */
 	return ret;
@@ -1274,8 +1402,7 @@ int MSYS_DataObject_Insert_CString(MSYS_DataObject_T * obj, const size_t offset,
 	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of calls to other engine functions. */
 	MSYS_DataObject_T_Private * realPtr = NULL;			/* Pointer to private data structure. */
 	char * expandedBuffer = NULL;						/* Pointer to the expanded buffer. */
-	size_t newCapacity = 0;								/* The resulting capacity. */
-	size_t newLength = 0;								/* The resulting length. */
+	size_t newLength = 0;								/* The length of the new buffer. */
 	size_t realOffset = 0;								/* The offset used in the memcpy() calls. */
 
 	/* Check args. */
@@ -1291,80 +1418,89 @@ int MSYS_DataObject_Insert_CString(MSYS_DataObject_T * obj, const size_t offset,
 			/* If the given offset is bigger than the content length of the buffer, use the end of the buffer for the offset. */
 			realOffset = ((offset < realPtr->length) ? (offset) : (realPtr->length));
 
-			/* Check for valid offset. (I.e. Check for an UINT underflow attempt.) */
-			if ((SIZE_MAX - (SIZE_MAX - realPtr->length)) >= realOffset)
-			{
-				/* Check and see if the given data will fit in the remaining capacity of the buffer. */
-				if (dataLength > (realPtr->capacity - realPtr->length))
-				{
-					/* Buffer is not big enough. Check and see if the given dataLength will result in a UINT overflow. */
-					if ((SIZE_MAX - realPtr->capacity) >= (dataLength))
-					{
-						/* Recalculate the needed capacity. */
-						newCapacity = (realPtr->capacity + (dataLength - (realPtr->capacity - realPtr->length)));
-						newLength = newCapacity;
+			/* Check for UINT Overflow.
+				This function keeps the original data, and simply inserts the given data at the given offset.
 
-						/* We must reallocate the buffer with enough space to store the data. */
-						retFromCall = DataProcess_Reallocate_C_String(&expandedBuffer, 0, newCapacity);
-						if ((retFromCall == COMMON_ERROR_SUCCESS) && (expandedBuffer != NULL))
-						{
-							/* Copy the data. */
-							memcpy(expandedBuffer, realPtr->data, realPtr->capacity);
-						}
-						else
-						{
-							/* Could not copy the buffer. */
-							ret = COMMON_ERROR_MEMORY_ERROR;
-						}
+				So the total amount of data we will wind up with is: (realPtr->length + dataLength).
+			*/
+			if (((SIZE_MAX - realOffset) >= dataLength) && ((SIZE_MAX - realPtr->length) >= dataLength))
+			{
+				/* Determine if we need to reallocate memory.
+
+					Note: If MSYS_Check_DataObject_Consistency_Private() passed, the capacity value will be at least
+					as big as the length value. So this subtraction is safe. (As long as the realOffset check above runs.)
+				 */
+				if ((realPtr->capacity - realPtr->length) < dataLength)
+				{
+					/* Memory allocation required, Recalculate the needed capacity.
+
+							New allocated memory length is (realPtr->length + dataLength).
+					 */
+					retFromCall = DataProcess_Reallocate_C_String(&expandedBuffer, 0, (realPtr->length + dataLength));
+					if ((retFromCall == COMMON_ERROR_SUCCESS) && (expandedBuffer != NULL))
+					{
+						/* Copy the data. */
+						memcpy(expandedBuffer, realPtr->data, realPtr->length);
 					}
 					else
 					{
-						/* OK, the resulting data length is too big to be represented by a size_t variable on this system. */
-						ret = COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED;
+						/* Could not copy the buffer. */
+						ret = COMMON_ERROR_MEMORY_ERROR;
 					}
 				}
-				else
+
+				/* Check if safe to continue.
+					(If the memory allocation succeeds or no memory allocation was required, ret will be set to COMMON_ERROR_UNKNOWN_ERROR.)
+				 */
+				if (ret == COMMON_ERROR_UNKNOWN_ERROR)
 				{
-					/* Reuse the existing buffer. */
-					expandedBuffer = realPtr->data;
-					newCapacity = realPtr->capacity;
-					newLength = (realPtr->length + dataLength);
-				}
+					/* Copy the length. */
+					newLength = realPtr->length;
 
-				/* Check that we are ok to continue. */
-				if (expandedBuffer != NULL)
-				{
-					/* Check for data after the offset. */
-					if (realOffset < realPtr->length)
+					/* Call MSYS_DataObject_Insert_CString_No_Allocation_Private(). */
+					retFromCall = MSYS_DataObject_Insert_CString_No_Allocation_Private(((expandedBuffer != NULL) ? (expandedBuffer) : (realPtr->data)),
+																						&newLength,
+																						(realPtr->length + dataLength),
+																						data,
+																						dataLength,
+																						realOffset);
+					if ((retFromCall == COMMON_ERROR_SUCCESS) && (newLength == (realPtr->length + dataLength)))
 					{
-						/* Copy the data at the end of the buffer up to the end of the given data. */
-						memcpy((expandedBuffer + realOffset + dataLength), (expandedBuffer + realOffset), (realPtr->length - realOffset));
+						/* Check and see if we allocated a new buffer. */
+						if (expandedBuffer != NULL)
+						{
+							/* Deallocate the original buffer. */
+							DataProcess_Deallocate_CString((&(realPtr->data)));
+
+							/* Copy in the new pointer. */
+							realPtr->data = expandedBuffer;
+
+							/* Update capacity. */
+							realPtr->capacity = (realPtr->length + dataLength);
+						}
+
+						/* Update length. */
+						realPtr->length = (realPtr->length + dataLength);
+
+						/* Done. */
+						ret = COMMON_ERROR_SUCCESS;
 					}
-
-					/* Copy the given data into the buffer at the given offset. */
-					memcpy((expandedBuffer + realOffset), data, dataLength);
-
-					/* Update the private structure's length and capacity. */
-					realPtr->capacity = newCapacity;
-					realPtr->length = newLength;
-
-					/* Check and see if we need to deallocate the original buffer. */
-					if (realPtr->data != expandedBuffer)
+					else
 					{
-						/* Deallocate the original buffer. */
-						DataProcess_Deallocate_CString((&(realPtr->data)));
+						/* Check for buffer too small error code. (If that code gets sent back we are being messed with.) */
+						ret = ((retFromCall != COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
 
-						/* Copy in the new pointer. */
-						realPtr->data = expandedBuffer;
+						/* Deallocate the expandedBuffer. (If needed.) */
+						if (expandedBuffer != NULL)
+						{
+							DataProcess_Deallocate_CString(&expandedBuffer);
+						}
 					}
-
-					/* Done. */
-					ret = COMMON_ERROR_SUCCESS;
-				}
+				}/* End of "Check if safe to continue." No else statement needed. */
 			}
 			else
 			{
-				/* OK, the resulting offset is too big to be represented by a size_t variable on this system. */
+				/* Cannot add the given data, total data size would be bigger than SIZE_MAX. */
 				ret = COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED;
 			}
 		}
@@ -1413,6 +1549,146 @@ int MSYS_DataObject_Insert_From_DataObject(MSYS_DataObject_T * obj, const size_t
 			{
 				/* Call the insert C-String function. */
 				retFromCall = MSYS_DataObject_Insert_CString(obj, offset, srcPrivStr->data, srcPrivStr->length);
+				if (retFromCall == COMMON_ERROR_SUCCESS)
+				{
+					/* Done. */
+					ret = COMMON_ERROR_SUCCESS;
+				}
+				else
+				{
+					/* Check error code. */
+					ret = ((retFromCall != COMMON_ERROR_INVALID_ARGUMENT) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
+				}
+			}
+			else
+			{
+				/* OK, the source object is empty. */
+				ret = COMMON_ERROR_NO_DATA;
+			}
+		}
+		else
+		{
+			/* OK, the source object is invalid. */
+			ret = COMMON_ERROR_DATA_CORRUPTION;
+		}
+	}
+	else
+	{
+		/* Invalid args. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+int MSYS_DataObject_Replace_With_CString(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;				/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of calls to other engine functions. */
+	MSYS_DataObject_T_Private * realPtr = NULL;			/* Pointer to private data structure. */
+
+	/* Check args. */
+	if ((obj != NULL) && (obj->ppObject != NULL) && (*(obj->ppObject) != NULL) && (data != NULL) && (dataLength > 0))
+	{
+		/* Get back the real pointer. */
+		realPtr = (MSYS_DataObject_T_Private *)(*(obj->ppObject));
+
+		/* Check for data object consistancy. */
+		retFromCall = MSYS_Check_DataObject_Consistency_Private(realPtr);
+		if (retFromCall == COMMON_ERROR_COMPARISON_PASSED)
+		{
+			/* Check and see if the offset is within the existing buffer. */
+			if ((offset == 0) || (offset < realPtr->length))
+			{
+				/* UINT Overflow check. */
+				if ((SIZE_MAX - offset) >= dataLength)
+				{
+					/* Check and see if the given data will fit in the remaining capacity of the buffer.
+
+						If MSYS_Check_DataObject_Consistency_Private() passed, the capacity of the buffer will be
+						at least it's length, so subtracting offset from it is safe. (Assuming the check against length
+						passed above.)
+					 */
+					if (dataLength <= (realPtr->capacity - offset))
+					{
+						/* Copy the given data into the buffer at the given offset. */
+						memcpy((realPtr->data + offset), data, dataLength);
+
+						/* Update the private structure's length. (If needed.) */
+						realPtr->length = (offset + dataLength);
+
+						/* Done. */
+						ret = COMMON_ERROR_SUCCESS;
+					}
+					else
+					{
+						/* The given data will not fit in the existing buffer. */
+						ret = COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL;
+					}
+				}
+				else
+				{
+					/* OK, adding the given offset to the given dataLength would result in a value bigger than SIZE_MAX.
+						How did this happen if capacity is at least that size?
+
+						In anycase, throw back the system limit exceeded error.
+					 */
+					ret = COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED;
+				}
+			}
+			else
+			{
+				/* The offset is outside of the buffer. */
+				ret = COMMON_ERROR_RANGE_ERROR;
+			}
+		}
+		else
+		{
+			/* Given data object is inconsistant. */
+			ret = COMMON_ERROR_DATA_CORRUPTION;
+		}
+	}
+	else
+	{
+		/* Invalid args. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+int MSYS_DataObject_Replace_With_Char(MSYS_DataObject_T * obj, const size_t offset, const char data)
+{
+	/* Call real function. */
+	return (MSYS_DataObject_Replace_With_CString(obj, offset, &data, sizeof(char)));
+}
+
+int MSYS_DataObject_Replace_With_DataObject(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;					/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of calls to other engine functions. */
+	const MSYS_DataObject_T_Private * srcPrivStr = NULL;	/* The internal structure of the source data object. */
+
+	/* Check args. */
+	if ((src != NULL) && (obj != NULL) && (src != obj) && (src->ppObject != NULL) && (*(src->ppObject) != NULL) &&
+		(obj->ppObject != NULL) && (*(obj->ppObject) != NULL) && (*(src->ppObject) != *(obj->ppObject)))
+	{
+		/* Get the internal pointer for the source object. */
+		srcPrivStr = (const MSYS_DataObject_T_Private *)(*(src->ppObject));
+
+		/* Check for valid source object. */
+		retFromCall = MSYS_Check_DataObject_Consistency_Private(srcPrivStr);
+		if (retFromCall == COMMON_ERROR_COMPARISON_PASSED)
+		{
+			/* Check for valid data buffer and length. */
+			if ((srcPrivStr->data != NULL) && (srcPrivStr->length > 0))
+			{
+				/* Call the replace with C-String function. */
+				retFromCall = MSYS_DataObject_Replace_With_CString(obj, offset, srcPrivStr->data, srcPrivStr->length);
 				if (retFromCall == COMMON_ERROR_SUCCESS)
 				{
 					/* Done. */
