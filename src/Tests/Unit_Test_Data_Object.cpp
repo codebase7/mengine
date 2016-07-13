@@ -1397,18 +1397,8 @@ int Unit_Test_Data_Object()
                 return -1006;
         }
 
-        // Tell User we are starting the insert test for (char).
-        std::cout << "DataProcess::Data_Object::insert() (char):        ";
-		ret_Insert_Char = Unit_Test_Data_Object_Insert_char();
-        if (ret_Insert_Char == 0)
-        {
-                std::cout << "PASS\n";
-        }
-        else
-        {
-                std::cout << "FAIL Error Code: " << ret_Insert_Char << '\n';
-                return -1;
-        }
+        /* Run the tests for Insert, Insert No Allocation, Replace, and Overwrite functions. */
+		ret_Insert_Char = Unit_Test_Data_Object_Insert_Replace_Overwrite_Char();
 
         // Default return.
         return 0;

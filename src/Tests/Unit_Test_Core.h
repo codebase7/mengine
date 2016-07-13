@@ -37,6 +37,7 @@ int Unit_Tests_DataProcess_Main();
 
 int Unit_Test_Data_Object();
 int Unit_Test_Data_Object_Insert_char();
+int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char();
 
 #endif
 

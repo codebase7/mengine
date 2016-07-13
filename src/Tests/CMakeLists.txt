@@ -9,8 +9,9 @@ set (UNIT_TESTS_INCLUDES_BASE Unit_Tests.cpp)
 set (UNIT_TESTS_INCLUDES ${UNIT_TESTS_INCLUDES_BASE} 
 Test_Base_Header.cpp
 Unit_Test_DataProcess.c
-Unit_Test_Data_Object.cpp 
+Unit_Test_Data_Object.cpp
 Unit_Test_Data_Object_Insert_Char.cpp
+Unit_Test_Data_Object_Insert_Replace_Overwrite.cpp
 Unit_Test_Byte_Order.cpp)
 
 # Only build the tests for the subsystems that are enabled.
