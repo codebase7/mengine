@@ -1429,8 +1429,8 @@ int MSYS_DataObject_Insert_CString_No_Allocaton(MSYS_DataObject_T * obj, const s
 
 				/* Call MSYS_DataObject_Insert_CString_No_Allocation_Private(). (Will fail if the buffer is not big enough.) */
 				retFromCall = MSYS_DataObject_Insert_CString_No_Allocation_Private(realPtr->data,
-																					&newLength,
-																					(realPtr->length + dataLength),
+																					&newLength,		/* This is altered by this function call. */
+																					realPtr->capacity,
 																					data,
 																					dataLength,
 																					realOffset);
@@ -1747,14 +1747,20 @@ int MSYS_DataObject_Replace_With_CString(MSYS_DataObject_T * obj, const size_t o
 						If MSYS_Check_DataObject_Consistency_Private() passed, the capacity of the buffer will be
 						at least it's length, so subtracting offset from it is safe. (Assuming the check against length
 						passed above.)
+
+						Replace "eats" the first byte of the dataLength. So we must subtract 1 from it here.
 					 */
-					if (dataLength <= (realPtr->capacity - offset))
+					if ((dataLength - 1) <= (realPtr->capacity - offset))
 					{
 						/* Copy the given data into the buffer at the given offset. */
 						memcpy((realPtr->data + offset), data, dataLength);
 
 						/* Update the private structure's length. (If needed.) */
-						realPtr->length = (offset + dataLength);
+						if ((offset + (dataLength - 1)) > realPtr->length)
+						{
+							/* Replace "eats" the first byte of the dataLength. So we must subtract 1 from it here. */
+							realPtr->length = (offset + (dataLength - 1));
+						}
 
 						/* Done. */
 						ret = COMMON_ERROR_SUCCESS;
@@ -1826,6 +1832,194 @@ int MSYS_DataObject_Replace_With_DataObject(MSYS_DataObject_T * obj, const size_
 			{
 				/* Call the replace with C-String function. */
 				retFromCall = MSYS_DataObject_Replace_With_CString(obj, offset, srcPrivStr->data, srcPrivStr->length);
+				if (retFromCall == COMMON_ERROR_SUCCESS)
+				{
+					/* Done. */
+					ret = COMMON_ERROR_SUCCESS;
+				}
+				else
+				{
+					/* Check error code. */
+					ret = ((retFromCall != COMMON_ERROR_INVALID_ARGUMENT) ? (retFromCall) : (COMMON_ERROR_INTERNAL_ERROR));
+				}
+			}
+			else
+			{
+				/* OK, the source object is empty. */
+				ret = COMMON_ERROR_NO_DATA;
+			}
+		}
+		else
+		{
+			/* OK, the source object is invalid. */
+			ret = COMMON_ERROR_DATA_CORRUPTION;
+		}
+	}
+	else
+	{
+		/* Invalid args. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+int MSYS_DataObject_Overwrite_With_CString(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;				/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;		/* The result of calls to other engine functions. */
+	MSYS_DataObject_T_Private * realPtr = NULL;			/* Pointer to private data structure. */
+	char * newData = NULL;								/* Pointer to the reallocation buffer. */
+	size_t newDataLength = 0;							/* Length of the newData buffer. */
+
+	/* Check args. */
+	if ((obj != NULL) && (obj->ppObject != NULL) && (*(obj->ppObject) != NULL) && (data != NULL) && (dataLength > 0))
+	{
+		/* Get back the real pointer. */
+		realPtr = (MSYS_DataObject_T_Private *)(*(obj->ppObject));
+
+		/* Check for data object consistancy. */
+		retFromCall = MSYS_Check_DataObject_Consistency_Private(realPtr);
+		if (retFromCall == COMMON_ERROR_COMPARISON_PASSED)
+		{
+			/* Check and see if the offset is within the existing buffer. */
+			if ((offset == 0) || (offset < realPtr->length))
+			{
+				/* UINT Overflow check. */
+				if ((SIZE_MAX - offset) >= dataLength)
+				{
+					/* Check and see if the given data will fit in the remaining capacity of the buffer.
+
+						If MSYS_Check_DataObject_Consistency_Private() passed, the capacity of the buffer will be
+						at least it's length, so subtracting offset from it is safe. (Assuming the check against length
+						passed above.)
+
+						Overwrite "eats" the first byte of the dataLength. So we must subtract 1 from it here.
+					 */
+					if ((dataLength - 1) <= (realPtr->capacity - offset))
+					{
+						/* Copy the given data into the buffer at the given offset. */
+						memcpy((realPtr->data + offset), data, dataLength);
+
+						/* Update the private structure's length. (If needed.) */
+						if ((offset + (dataLength - 1)) > realPtr->length)
+						{
+							/* Overwrite "eats" the first byte of the dataLength. So we must subtract 1 from it here. */
+							realPtr->length = (offset + (dataLength - 1));
+						}
+
+						/* Done. */
+						ret = COMMON_ERROR_SUCCESS;
+					}
+					else
+					{
+						/* SIZE_T overflow check. */
+						if ((SIZE_MAX - (realPtr->capacity - offset)) >= dataLength)
+						{
+							/* The given data will not fit in the existing buffer, so we need to calculate the size of the needed buffer.
+								Overwrite "eats" the first byte of the dataLength. So we must subtract 1 from it here.
+							*/
+							newDataLength = ((realPtr->capacity - offset) + (dataLength - 1));
+
+							/* Allocate the new buffer. */
+							retFromCall = DataProcess_Reallocate_C_String(&newData, 0, newDataLength);
+							if (retFromCall == COMMON_ERROR_SUCCESS)
+							{
+								/* Copy the original data up to the offset. */
+								memcpy(newData, (realPtr->data), offset);
+
+								/* Copy the given data into the buffer at the given offset. */
+								memcpy((newData + offset), data, dataLength);
+
+								/* Deallocate the old string. */
+								DataProcess_Deallocate_CString(&(realPtr->data));
+
+								/* Copy the new pointer into the private structure. */
+								realPtr->data = newData;
+
+								/* Update the private structure's length and capacity. */
+								realPtr->length = newDataLength;
+								realPtr->capacity = newDataLength;
+
+								/* Done. */
+								ret = COMMON_ERROR_SUCCESS;
+							}
+							else
+							{
+								/* Could not allocate memory for new buffer. */
+								ret = COMMON_ERROR_MEMORY_ERROR;
+							}
+						}
+						else
+						{
+							/* The length of the data to add with the given offset is too big for a size_t to represent. */
+							ret = COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED;
+						}
+					}
+				}
+				else
+				{
+					/* OK, adding the given offset to the given dataLength would result in a value bigger than SIZE_MAX.
+						How did this happen if capacity is at least that size?
+
+						In anycase, throw back the system limit exceeded error.
+					 */
+					ret = COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED;
+				}
+			}
+			else
+			{
+				/* The offset is outside of the buffer. */
+				ret = COMMON_ERROR_RANGE_ERROR;
+			}
+		}
+		else
+		{
+			/* Given data object is inconsistant. */
+			ret = COMMON_ERROR_DATA_CORRUPTION;
+		}
+	}
+	else
+	{
+		/* Invalid args. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
+int MSYS_DataObject_Overwrite_With_Char(MSYS_DataObject_T * obj, const size_t offset, const char data)
+{
+	/* Call real function. */
+	return (MSYS_DataObject_Overwrite_With_CString(obj, offset, &data, sizeof(char)));
+}
+
+int MSYS_DataObject_Overwrite_With_DataObject(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;					/* The result of this function. */
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;			/* The result of calls to other engine functions. */
+	const MSYS_DataObject_T_Private * srcPrivStr = NULL;	/* The internal structure of the source data object. */
+
+	/* Check args. */
+	if ((src != NULL) && (obj != NULL) && (src != obj) && (src->ppObject != NULL) && (*(src->ppObject) != NULL) &&
+		(obj->ppObject != NULL) && (*(obj->ppObject) != NULL) && (*(src->ppObject) != *(obj->ppObject)))
+	{
+		/* Get the internal pointer for the source object. */
+		srcPrivStr = (const MSYS_DataObject_T_Private *)(*(src->ppObject));
+
+		/* Check for valid source object. */
+		retFromCall = MSYS_Check_DataObject_Consistency_Private(srcPrivStr);
+		if (retFromCall == COMMON_ERROR_COMPARISON_PASSED)
+		{
+			/* Check for valid data buffer and length. */
+			if ((srcPrivStr->data != NULL) && (srcPrivStr->length > 0))
+			{
+				/* Call the overwrite with C-String function. */
+				retFromCall = MSYS_DataObject_Overwrite_With_CString(obj, offset, srcPrivStr->data, srcPrivStr->length);
 				if (retFromCall == COMMON_ERROR_SUCCESS)
 				{
 					/* Done. */

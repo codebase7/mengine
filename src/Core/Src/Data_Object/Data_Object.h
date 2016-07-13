@@ -494,7 +494,10 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Insert_From_DataObject_No_Allocaton(MSYS_Dat
 
 		Inserts the given C-Style string to the given data object's buffer at the given offset.
 
-		Note: If the given data object's remaining capacity is not big enough to hold the pre-existing data and the given string,
+		Note: This function performs memory (re)allocations. If you DO NOT want the buffer to be reallocated automatically,
+		(due to memory constraints / design considerations / etc.) call MSYS_DataObject_Insert_CString_No_Allocaton() instead.
+
+		Note 2: If the given data object's remaining capacity is not big enough to hold the pre-existing data and the given string,
 		then the object's buffer will be reallocated to be big enough to contain both. The resulting buffer will be
 		have a length and capacity that are equal to the length of the pre-existing data and the given string.
 		I.E.
@@ -505,13 +508,21 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Insert_From_DataObject_No_Allocaton(MSYS_Dat
 		then this function will append the given data to the end of the given object's pre-existing content. (Pre-allocated capacity is ignored when considering
 		the position of the offset.)
 
-		I.E.
+		Example without remaining data:
 			Pre-existing content: "Dog" (Length: 3)
 				--> Actual buffer: "Dog     " (Total Capacity: 8)
 			Given Data: " Eats." (Length: 6)
 			Given offset: 5.
 			Result: "Dog Eats." (Length: 9)
 				--> Actual buffer: "Dog Eats." (Total Capacity: 9)
+
+		Example with remaining data:
+		Pre-existing content: "Suzie walked to the park." (Length: 25)
+				--> Actual buffer: "Suzie walked to the park. " (Total Capacity: 26)
+			Given Data: "ran" (Length: 3)
+			Given offset: 6.
+			Result: "Suzie ranwalked to the park. " (Length: 29)
+				--> Actual buffer: "Suzie ranwalked to the park. " (Total Capacity: 29)
 
 		Returns COMMON_ERROR_SUCCESS if successful.
 		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is invalid, or the given dataLength is less than or equal to zero.
@@ -551,14 +562,25 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Insert_From_DataObject(MSYS_DataObject_T * o
 		Takes the given C-Style string and replaces the given data object's buffer at the given offset with it, and updates the data object's
 		length if needed.
 
-		Note: This function does NOT perform memory (re)allocations. In cases where a memory (re)allocation is required, an error will be returned,
-		and the given data object will NOT be altered.
+		Note: If any data past the given offset is not replaced it will be retained.
 
-		Note 2: This function is only for replacing existing data. The given offset must be within the given data object's length, (A special case
-		is permitted for when length is zero. See note 3.) and the given data must fit within the remaining space in memory buffer, or an error
+		Example with remaining data:
+		Pre-existing content: "Suzie walked to the park." (Length: 25)
+				--> Actual buffer: "Suzie walked to the park. " (Total Capacity: 26)
+			Given Data: "ran" (Length: 3)
+			Given offset: 6.
+			Result: "Suzie ranked to the park. " (Length: 26)
+				--> Actual buffer: "Suzie ranked to the park. " (Total Capacity: 26)
+
+		Note 2: This function does NOT perform memory (re)allocations. In cases where a memory (re)allocation is required, an error will be returned,
+		and the given data object will NOT be altered. If you want the buffer to be reallocated automatically, call
+		MSYS_DataObject_Overwrite_With_CString() instead.
+
+		Note 3: This function is only for replacing existing data. The given offset must be within the given data object's length, (A special case
+		is permitted for when length is zero. See note 4.) and the given data must fit within the remaining space in memory buffer, or an error
 		will be returned.
 
-		Note 3: In the event the given data object's length is zero, then the given offset must be zero. (Pre-allocated capacity is ignored when
+		Note 4: In the event the given data object's length is zero, then the given offset must be zero. (Pre-allocated capacity is ignored when
 		considering the position of the offset.) The given data must still fit within the capacity of the existing memory buffer.
 
 		Returns COMMON_ERROR_SUCCESS if successful.
@@ -594,6 +616,78 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Replace_With_Char(MSYS_DataObject_T * obj, c
 		See MSYS_DataObject_Replace_With_CString() for the list of possible return codes / expected behavior.
  */
 MSYS_DLL_EXPORT int MSYS_DataObject_Replace_With_DataObject(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src);
+
+/*!
+		int MSYS_DataObject_Overwrite_With_CString(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength)
+
+		Takes the given C-Style string and overwrites the given data object's buffer at the given offset with it, and updates the data object's
+		length if needed.
+
+		If the buffer is not big enough to contain the entireity of the given data after the given offset, the buffer will be automaticly reallocated
+		to be able to contain the data.
+			I.e.
+				newCapacity = (offset + dataLength)
+				newLength = newCapacity
+
+		Note: If any data past the given offset is not overwritten it will be retained.
+
+		Example without remaining data:
+		Pre-existing content: "Dog bark" (Length: 8)
+				--> Actual buffer: "Dog bark " (Total Capacity: 9)
+			Given Data: "ug Eats." (Length: 8)
+			Given offset: 2.
+			Result: "Doug Eats." (Length: 10)
+				--> Actual buffer: "Doug Eats." (Total Capacity: 10)
+
+		Example with remaining data:
+		Pre-existing content: "Suzie walked to the park." (Length: 25)
+				--> Actual buffer: "Suzie walked to the park. " (Total Capacity: 26)
+			Given Data: "ran" (Length: 3)
+			Given offset: 6.
+			Result: "Suzie ranked to the park. " (Length: 26)
+				--> Actual buffer: "Suzie ranked to the park. " (Total Capacity: 26)
+
+		Note 2: This function performs memory (re)allocations. If you DO NOT want the buffer to be reallocated automatically,
+		(due to memory constraints / design considerations / etc.) call MSYS_DataObject_Replace_With_CString() instead.
+
+		Note 3: This function is only for overwriting existing data. The given offset must be within the given data object's length, (A special case
+		is permitted for when length is zero. See note 4.)
+
+		Note 4: In the event the given data object's length is zero, then the given offset must be zero. (Pre-allocated capacity is ignored when
+		considering the position of the offset.)
+
+		Returns COMMON_ERROR_SUCCESS if successful.
+		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is invalid, or the given dataLength is less than or equal to zero.
+		Returns COMMON_ERROR_SYSTEM_LIMIT_EXCEEDED if the resulting calculations on offset / length / capacity would be bigger than the SIZE_MAX
+		that the system supports.
+		Returns COMMON_ERROR_MEMORY_ERROR if a memory allocation attempt fails.
+		Returns COMMON_ERROR_DATA_CORRUPTION if the given data object is inconsistant. (E.x. No allocated buffer, but size or capacity > 0.)
+		Returns COMMON_ERROR_RANGE_ERROR if the given offset is beyond the current length of the buffer. (As returned by MSYS_DataObject_Get_Length().)
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Overwrite_With_CString(MSYS_DataObject_T * obj, const size_t offset, const char * data, const size_t dataLength);
+
+/*!
+		int MSYS_DataObject_Overwrite_With_Char(MSYS_DataObject_T * obj, const size_t offset, const char data)
+
+		Overwrites the given data object's data, at the given offset, with the given char.
+
+		Note: This function is just a wrapper for MSYS_DataObject_Overwrite_With_CString(), and is the equivalent to calling
+		MSYS_DataObject_Overwrite_With_CString(obj, offset, data, sizeof(char)).
+
+		See MSYS_DataObject_Overwrite_With_CString() for the list of possible return codes / expected behavior.
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Overwrite_With_Char(MSYS_DataObject_T * obj, const size_t offset, const char data);
+
+/*!
+		int MSYS_DataObject_Overwrite_With_DataObject(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src)
+
+		Overwrites the given dest data object (obj)'s content, with the given source (src) data object's content, at the given offset.
+
+		Note: This function is just a wrapper for MSYS_DataObject_Overwrite_With_CString().
+
+		See MSYS_DataObject_Overwrite_With_CString() for the list of possible return codes / expected behavior.
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Overwrite_With_DataObject(MSYS_DataObject_T * obj, const size_t offset, const MSYS_DataObject_T * src);
 
 /* Check for C++ compiler. */
 #ifdef __cplusplus
