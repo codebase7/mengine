@@ -1448,6 +1448,38 @@ short DataProcess::getnumberFromString(char input)
             return 0;
 }
 
+int DataProcess::Data_Object::get_C_Struct(MSYS_DataObject ** retPtr)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;
+
+	/* Check for valid pointers. */
+	if (retPtr != NULL)
+	{
+		if (this->obj != NULL)
+		{
+			/* Copy pointer. */
+			(*retPtr) = this->obj;
+
+			/* Done. */
+			ret = COMMON_ERROR_SUCCESS;
+		}
+		else
+		{
+			/* Invalid internal pointer. */
+			ret = COMMON_ERROR_MEMORY_ERROR;
+		}
+	}
+	else
+	{
+		/* Invalid retPtr. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 const char * DataProcess::Data_Object::get_Pointer() const
 {
 	/* Init vars. */
@@ -2214,6 +2246,102 @@ size_t DataProcess::Data_Object::insert(size_t offset, const DataProcess::Data_O
 
     /* Exit function. (Bad error code.) */
     return 1;
+}
+
+int DataProcess::Data_Object::Replace(const size_t offset, const char source)
+{
+    /* Init vars. */
+    int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+    /* Check for valid object. */
+    if (this->obj != NULL)
+    {
+        /* Call C library function. */
+        retFromCall = MSYS_DataObject_Replace_With_CString(this->obj, offset, &source, sizeof(char));
+    }
+
+    /* Exit function. */
+    return retFromCall;
+}
+
+int DataProcess::Data_Object::Replace(const size_t offset, const std::string & source)
+{
+	/* Init vars. */
+    int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+    /* Check for valid object. */
+    if ((this->obj != NULL) && (source.size() > 0))
+    {
+		/* Call C library function. */
+        retFromCall = MSYS_DataObject_Replace_With_CString(this->obj, offset, source.c_str(), source.size());
+    }
+
+    /* Exit function. */
+    return retFromCall;
+}
+
+int DataProcess::Data_Object::Replace(const size_t offset, const DataProcess::Data_Object & source)
+{
+    /* Init vars. */
+    int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+    /* Check for valid object. */
+    if ((this->obj != NULL) && (source.obj != NULL))
+    {
+        /* Call C library function. */
+        retFromCall = MSYS_DataObject_Replace_With_DataObject(this->obj, offset, source.obj);
+    }
+
+    /* Exit function. */
+    return retFromCall;
+}
+
+int DataProcess::Data_Object::Overwrite(const size_t offset, const char source)
+{
+    /* Init vars. */
+    int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+    /* Check for valid object. */
+    if (this->obj != NULL)
+    {
+        /* Call C library function. */
+        retFromCall = MSYS_DataObject_Overwrite_With_CString(this->obj, offset, &source, sizeof(char));
+    }
+
+    /* Exit function. */
+    return retFromCall;
+}
+
+int DataProcess::Data_Object::Overwrite(const size_t offset, const std::string & source)
+{
+	/* Init vars. */
+    int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+    /* Check for valid object. */
+    if ((this->obj != NULL) && (source.size() > 0))
+    {
+		/* Call C library function. */
+        retFromCall = MSYS_DataObject_Overwrite_With_CString(this->obj, offset, source.c_str(), source.size());
+    }
+
+    /* Exit function. */
+    return retFromCall;
+}
+
+int DataProcess::Data_Object::Overwrite(const size_t offset, const DataProcess::Data_Object & source)
+{
+    /* Init vars. */
+    int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+
+    /* Check for valid object. */
+    if ((this->obj != NULL) && (source.obj != NULL))
+    {
+        /* Call C library function. */
+        retFromCall = MSYS_DataObject_Overwrite_With_DataObject(this->obj, offset, source.obj);
+    }
+
+    /* Exit function. */
+    return retFromCall;
 }
 
 short DataProcess::RegularExpressionParser(const std::string & expression, const std::string & input, Panic::Panic_ERROR * error)

@@ -354,6 +354,25 @@ class Data_Object{
         */
         MSYS_DLL_EXPORT int Buffer_Copy(const DataProcess::Data_Object & source, size_t copy_offset = 0, size_t copy_length = 0);
 
+		/*!
+				int DataProcess::Data_Object::get_C_Struct(MSYS_DataObject ** retPtr)
+
+				This function returns a pointer to the internal MSYS_DataObject C object, which can be used
+				by the MSYS_DataObject C functions.
+
+				WARNING: The pointer returned by this function will become invalid if the DataProcess::Data_Object that it
+				originated from gets deallocated. DO NOT attempt to use the returned pointer if it's parent DataProcess::Data_Object
+				has been deallocated. Attempting to do so will result in undefined behavior.
+
+				Note: This function will overwrite the contents of retPtr if it's successful, otherwise the contents of
+				retPtr will not be altered.
+
+				Returns COMMON_ERROR_SUCCESS if successful, retPtr will contain pointer to MSYS_DataObject in this instance.
+				Returns COMMON_ERROR_INVALID_ARGUMENT if the given retPtr is invalid.
+				Returns	COMMON_ERROR_MEMORY_ERROR if a memory error occurs.
+		 */
+		MSYS_DLL_EXPORT int get_C_Struct(MSYS_DataObject ** retPtr);
+
         /*!
                 const char * DataProcess::Data_Object::get_Pointer() const
 
@@ -549,6 +568,82 @@ class Data_Object{
                 Returns zero (0) if an error occurs or if no data was copied.
         */
         MSYS_DLL_EXPORT size_t insert(size_t offset, const Data_Object & source);
+
+		/*!
+				int DataProcess::Data_Object::Replace(const size_t offset, const char source)
+
+                This function replaces a single char in the Data_Object at the given offset.
+
+                This function is a wrapper for MSYS_DataObject_Replace_With_CString(). See
+				MSYS_DataObject_Replace_With_CString() for expected behavior and error codes.
+		 */
+		MSYS_DLL_EXPORT int Replace(const size_t offset, const char source);
+
+		/*!
+				int DataProcess::Data_Object::Replace(const size_t offset, const std::string & source)
+
+                This function replaces the contents of the Data_Object at the given offset with the contents
+				the given string.
+
+				Note: This function does not allocate memory if needed. If automatic reallocation of
+				memory is desired, call DataProcess::Data_Object::Overwrite() instead.
+
+                This function is a wrapper for MSYS_DataObject_Replace_With_CString(). See
+				MSYS_DataObject_Replace_With_CString() for expected behavior and error codes.
+		 */
+		MSYS_DLL_EXPORT int Replace(const size_t offset, const std::string & source);
+
+		/*!
+				int DataProcess::Data_Object::Replace(const size_t offset, const DataProcess::Data_Object & source)
+
+                This function replaces the contents of the Data_Object at the given offset with the contents
+				the given source Data Object.
+
+				Note: This function does not allocate memory if needed. If automatic reallocation of
+				memory is desired, call DataProcess::Data_Object::Overwrite() instead.
+
+                This function is a wrapper for MSYS_DataObject_Replace_With_CString(). See
+				MSYS_DataObject_Replace_With_CString() for expected behavior and error codes.
+		 */
+		MSYS_DLL_EXPORT int Replace(const size_t offset, const DataProcess::Data_Object & source);
+
+		/*!
+				int DataProcess::Data_Object::Overwrite(const size_t offset, const char source)
+
+                This function overwrites a single char in the Data_Object at the given offset.
+
+                This function is a wrapper for MSYS_DataObject_Overwrite_With_CString(). See
+				MSYS_DataObject_Overwrite_With_CString() for expected behavior and error codes.
+		 */
+		MSYS_DLL_EXPORT int Overwrite(const size_t offset, const char source);
+
+		/*!
+				int DataProcess::Data_Object::Overwrite(const size_t offset, const std::string & source)
+
+                This function overwrites the contents of the Data_Object at the given offset with the contents
+				the given string.
+
+				Note: This function allocates memory if needed. If automatic reallocation of
+				memory is NOT desired, call DataProcess::Data_Object::Replace() instead.
+
+                This function is a wrapper for MSYS_DataObject_Overwrite_With_CString(). See
+				MSYS_DataObject_Overwrite_With_CString() for expected behavior and error codes.
+		 */
+		MSYS_DLL_EXPORT int Overwrite(const size_t offset, const std::string & source);
+
+		/*!
+				int DataProcess::Data_Object::Overwrite(const size_t offset, const DataProcess::Data_Object & source)
+
+                This function overwrites the contents of the Data_Object at the given offset with the contents
+				the given source Data Object.
+
+				Note: This function allocates memory if needed. If automatic reallocation of
+				memory is NOT desired, call DataProcess::Data_Object::Replace() instead.
+
+                This function is a wrapper for MSYS_DataObject_Overwrite_With_CString(). See
+				MSYS_DataObject_Overwrite_With_CString() for expected behavior and error codes.
+		 */
+		MSYS_DLL_EXPORT int Overwrite(const size_t offset, const DataProcess::Data_Object & source);
 };
 
 /*!
