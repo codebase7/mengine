@@ -64,5 +64,5 @@ ${COMMON_BUILT_STATIC_LIBRARY_LIST})
 
 # Add shared library.
 add_library(Common_Multiverse_Engine SHARED Generic_Wrapper.cpp)
-target_link_libraries(Common_Multiverse_Engine Core_Multiverse_Engine_Static
+target_link_libraries(Common_Multiverse_Engine Core_Multiverse_Engine
 ${COMMON_BUILT_SHARED_LIBRARY_LIST})
