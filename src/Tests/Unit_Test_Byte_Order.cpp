@@ -21,6 +21,11 @@
 /* Internal includes. */
 #include "Unit_Tests.h"
 
+/* Check for GCC. */
+#ifdef __GNUC__ 
+#include <limits.h>	/* Defines CHAR_MIN and UCHAR_MAX. */
+#endif /* End of __GNUC__ */
+
 void Print_Random_Bits(const char bits)
 {
 	/* Init vars. */
