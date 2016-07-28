@@ -18,7 +18,11 @@
     https://github.com/codebase7/mengine
 */
 
+/* Internal includes. */
 #include "Unit_Tests.h"
+
+/* Special include for manually creating invalid MSYS_DataObject structures. (DON'T DO THIS AT HOME KIDS. Use the factories and public functions instead!)*/
+#include "../Core/Src/Data_Object/Data_Object_Private_Structure.c"
 
 typedef struct Unit_Test_Data_Object_Char_Funct_Test {
 	int (*fp)(MSYS_DataObject_T * obj, const size_t offset, const char data);	/* Function pointer to char function to test. */
@@ -45,6 +49,17 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 		DataProcess::Data_Object test_object_2;
 		MSYS_DataObject * test_object_1_c_ptr = NULL;
 		MSYS_DataObject * test_object_2_c_ptr = NULL;
+		void * pbadPrivPtr = NULL;	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		MSYS_DataObject badPrivPtr = { &pbadPrivPtr };	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		MSYS_DataObject_Private badDataPriv = { NULL, 1, 1, 0};	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		MSYS_DataObject_Private badLengthPriv = { "Bad_STR", SIZE_MAX, 7, 0};	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		MSYS_DataObject_Private badCapacityPriv = { "Bad_STR", 7, 3, 0};	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		void * pbadData = &badDataPriv;	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		void * pbadLength = &badLengthPriv;	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		void * pbadCapacity = &badCapacityPriv;	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		MSYS_DataObject badData = { &pbadData };	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		MSYS_DataObject badLength = { &pbadLength };	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
+		MSYS_DataObject badCapacity = { &pbadCapacity };	/* <---- DON'T DO THIS AT HOME KIDS. This is for testing purposes only. */
 
         /* Hard coded test vars. */
         const std::string s1 = "Junk_Data";
@@ -54,7 +69,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 
         const char * p1 = NULL;
         const char * p2 = NULL;
-		int y = 2;
+		int y = 0;
 
 		/* Get the pointers for the C objects. */
 		retFromCall = test_object_1.get_C_Struct(&test_object_1_c_ptr);
@@ -152,7 +167,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 					}
 			}
 
-			/* Attempt to replace data. */
+			/* Run test function. */
 			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 0, c1) !=
 				((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
 					/* Insert No Allocation function should return buffer too small here. All other functions should return success. */
@@ -312,7 +327,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 					}
 			}
 
-			/* Attempt to replace data. */
+			/* Run test function. */
 			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 4, c1) !=
 				((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
 				/* Insert No Allocation function should return buffer too small here. All other functions should return success. */
@@ -499,10 +514,10 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 					}
 			}
 
-			/* Attempt to replace data. */
+			/* Run test function. */
 			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 0, c1) != COMMON_ERROR_SUCCESS)
 			{
-					/* DataProcess::Data_Object::Replace() Could not replace data. */
+					/* Test function failed. */
 					return -1020;
 			}
 
@@ -661,10 +676,10 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 					}
 			}
 
-			/* Attempt to replace data. */
+			/* Run test function. */
 			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 3, c1) != COMMON_ERROR_SUCCESS)
 			{
-					/* DataProcess::Data_Object::Replace() Could not replace data. */
+					/* Test function failed. */
 					return -1020;
 			}
 
@@ -744,6 +759,49 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 			{
 					/* DataProcess::Data_Object::clear() Invalid capacity after clear(). */
 					return -1006;
+			}
+
+			/*
+				Invalid Data_Object pointer check.
+
+				Should return COMMON_ERROR_INVALID_ARGUMENT.
+			 */
+			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(NULL, 3, c1) != COMMON_ERROR_INVALID_ARGUMENT)
+			{
+					/* Test function failure. Should have returned COMMON_ERROR_INVALID_ARGUMENT. */
+					return -1020;
+			}
+
+			/*
+				Invalid private object pointer check.
+
+				Should return COMMON_ERROR_INVALID_ARGUMENT.
+			 */
+			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(&badPrivPtr, 3, c1) != COMMON_ERROR_INVALID_ARGUMENT)
+			{
+					/* Test function failure. Should have returned COMMON_ERROR_INVALID_ARGUMENT. */
+					return -1020;
+			}
+
+			/*
+				Invalid Data Object tests.
+
+				All of the following tests should return COMMON_ERROR_DATA_CORRUPTION.
+			 */
+			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(&badData, 0, c1) != COMMON_ERROR_DATA_CORRUPTION)
+			{
+					/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
+					return -1020;
+			}
+			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(&badLength, 0, c1) != COMMON_ERROR_DATA_CORRUPTION)
+			{
+					/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
+					return -1020;
+			}
+			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(&badCapacity, 0, c1) != COMMON_ERROR_DATA_CORRUPTION)
+			{
+					/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
+					return -1020;
 			}
 
 			/* Output result of tests. */
