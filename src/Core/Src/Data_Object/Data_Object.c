@@ -33,14 +33,7 @@
  *		Private data structures and functions are defined below.
  *		(Should not be used outside this source file, subject to change without warning.)
  */
-
-/* Define the real MSYS_DataObject_T object. */
-typedef struct MSYS_DataObject_Private {
-	char * data;        /* Pointer to data. */
-    size_t length;      /* Length of data. */
-    size_t capacity;    /* Length of data we can store. */
-	size_t refcount;	/* Number of references (Shadow Copies) that point to the object. */
-} MSYS_DataObject_T_Private;
+#include "Data_Object_Private_Structure.c"
 
 /*!
 		void MSYS_Blank_DataObject_Private(MSYS_DataObject_T_Private * buffer)
