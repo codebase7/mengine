@@ -24,6 +24,7 @@
 /* Special include for manually creating invalid MSYS_DataObject structures. (DON'T DO THIS AT HOME KIDS. Use the factories and public functions instead!)*/
 #include "../Core/Src/Data_Object/Data_Object_Private_Structure.c"
 
+/* Define test structure for char function variants. */
 typedef struct Unit_Test_Data_Object_Char_Funct_Test {
 	int (*fp)(MSYS_DataObject_T * obj, const size_t offset, const char data);	/* Function pointer to char function to test. */
 	char * functName;		/* Human readable name of the function to test. */
@@ -31,8 +32,8 @@ typedef struct Unit_Test_Data_Object_Char_Funct_Test {
 	bool canReallocate;		/* Whether or not the function can reallocate the given Data Object's memory buffer. */
 } Unit_Test_Data_Object_Char_Funct_Test_T;
 
-/* Define functions to test. */
-const Unit_Test_Data_Object_Char_Funct_Test_T Unit_Test_Data_Process_Char_Functions_To_Test[] = {
+/* Define functions to test for char function variants. */
+const Unit_Test_Data_Object_Char_Funct_Test_T Unit_Test_Data_Object_Char_Functions_To_Test[] = {
 	{MSYS_DataObject_Insert_Char, "MSYS_DataObject_Insert_Char", true, true},
 	{MSYS_DataObject_Insert_Char_No_Allocaton, "MSYS_DataObject_Insert_Char_No_Allocaton", true, false},
 	{MSYS_DataObject_Replace_With_Char, "MSYS_DataObject_Replace_With_Char", false, false},
@@ -90,10 +91,10 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 		std::cout.flush();
 
 		/* Begin test loop. */
-		for (y = 0; y < (sizeof(Unit_Test_Data_Process_Char_Functions_To_Test) / sizeof(Unit_Test_Data_Object_Char_Funct_Test_T)); y++)
+		for (y = 0; y < (sizeof(Unit_Test_Data_Object_Char_Functions_To_Test) / sizeof(Unit_Test_Data_Object_Char_Funct_Test_T)); y++)
 		{
 			/* Output name of function we are testing. */
-			std::cout << Unit_Test_Data_Process_Char_Functions_To_Test[y].functName << "() Tests: ";
+			std::cout << Unit_Test_Data_Object_Char_Functions_To_Test[y].functName << "() Tests: ";
 			std::cout.flush();
 
 			/*
@@ -168,10 +169,10 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 			}
 
 			/* Run test function. */
-			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 0, c1) !=
-				((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
+			if (Unit_Test_Data_Object_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 0, c1) !=
+				((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
 					/* Insert No Allocation function should return buffer too small here. All other functions should return success. */
-					((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (COMMON_ERROR_SUCCESS) : (COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL)) :
+					((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (COMMON_ERROR_SUCCESS) : (COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL)) :
 					(COMMON_ERROR_SUCCESS)))
 			{
 					/* Test function failed. */
@@ -179,15 +180,15 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 			}
 
 			/* Make sure that test_object_1's size and capacity are equal to s1.size() + 1. */
-			if (test_object_1.size() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
-				((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (s1.size() + 1) : (s1.size())) :
+			if (test_object_1.size() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
+				((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (s1.size() + 1) : (s1.size())) :
 				(s1.size())))
 			{
 					/* Invalid size after call to test function. */
 					return -1014;
 			}
-			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
-				((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (s1.size() + 1) : (s1.size())) :
+			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
+				((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (s1.size() + 1) : (s1.size())) :
 				(s1.size())))
 			{
 					/* Invalid capacity after call to test function. */
@@ -216,9 +217,9 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 					/* Check for c1 if x = 0. */
 					if (x == 0)
 					{
-							if (p1[x] != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
+							if (p1[x] != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
 									/* Only Insert No Allocation should check for the data from p2 here, all other functions should check for c1. */
-									((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (c1) : (p2[x])) :
+									((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (c1) : (p2[x])) :
 									(c1)))
 							{
 									/* DataProcess::Data_Object (Manual compare) Invalid data in the data_object. */
@@ -229,8 +230,8 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 					/* Check for s1 otherwise. */
 					else
 					{
-							if (p1[x] != p2[((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
-								((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (x - 1) : (x)) :
+							if (p1[x] != p2[((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
+								((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (x - 1) : (x)) :
 								(x))])
 							{
 									/* DataProcess::Data_Object (Manual compare) Invalid data in the data_object. */
@@ -328,10 +329,10 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 			}
 
 			/* Run test function. */
-			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 4, c1) !=
-				((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
+			if (Unit_Test_Data_Object_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 4, c1) !=
+				((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
 				/* Insert No Allocation function should return buffer too small here. All other functions should return success. */
-					((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (COMMON_ERROR_SUCCESS) : (COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL)) :
+					((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (COMMON_ERROR_SUCCESS) : (COMMON_ERROR_MEMORY_BUFFER_TOO_SMALL)) :
 					(COMMON_ERROR_SUCCESS)))
 			{
 					/* Test function failed. */
@@ -339,15 +340,15 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 			}
 
 			/* Make sure that test_object_1's size and capacity are equal to s3.size(). */
-			if (test_object_1.size() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
-				((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (s3.size() + 1) : (s3.size())) :
+			if (test_object_1.size() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
+				((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (s3.size() + 1) : (s3.size())) :
 				(s3.size())))
 			{
 					/* Invalid size after call to test function. */
 					return -1014;
 			}
-			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
-				((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (s3.size() + 1) : (s3.size())) :
+			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
+				((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (s3.size() + 1) : (s3.size())) :
 				(s3.size())))
 			{
 					/* Invalid capacity after call to test function. */
@@ -376,9 +377,9 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 					/* Check for c1 if x = 4. */
 					if (x == 4)
 					{
-							if (p1[x] != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
+							if (p1[x] != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
 								/* Only Insert No Allocation should check for the data from p2 here, all other functions should check for c1. */
-									((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (c1) : (p2[x])) :
+									((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (c1) : (p2[x])) :
 									(c1)))
 							{
 									/* DataProcess::Data_Object (Manual compare) Invalid data in the data_object. */
@@ -402,8 +403,8 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 							}
 							if (x > 4)
 							{
-									if (p1[x] != p2[((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ?
-										((Unit_Test_Data_Process_Char_Functions_To_Test[y].canReallocate) ? (x - 1) : (x)) :
+									if (p1[x] != p2[((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ?
+										((Unit_Test_Data_Object_Char_Functions_To_Test[y].canReallocate) ? (x - 1) : (x)) :
 										(x))])
 									{
 											/* DataProcess::Data_Object (Manual compare) Invalid data in the data_object. */
@@ -459,7 +460,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 			}
 
 			/* Reserve memory for s3.size(). */
-			test_object_1.reserve(((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())));
+			test_object_1.reserve(((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())));
 
 			/* Check for reserved memory. */
 			if (test_object_1.size() != 0)
@@ -467,7 +468,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 						/* DataProcess::Data_Object::reserve() Invalid size after call to reserve(). */
 						return -1008;
 			}
-			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())))
+			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())))
 			{
 					/* DataProcess::Data_Object::reserve() Invalid capacity after call to reserve(). */
 					return -1007;
@@ -482,7 +483,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 						/* DataProcess::Data_Object::reserve() Invalid size after call to operator+= std::string. */
 						return -1010;
 			}
-			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())))
+			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())))
 			{
 						/* DataProcess::Data_Object::reserve() Invalid capacity after call to operator+= std::string. */
 						return -1009;
@@ -515,19 +516,19 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 			}
 
 			/* Run test function. */
-			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 0, c1) != COMMON_ERROR_SUCCESS)
+			if (Unit_Test_Data_Object_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 0, c1) != COMMON_ERROR_SUCCESS)
 			{
 					/* Test function failed. */
 					return -1020;
 			}
 
 			/* Make sure that test_object_1's size and capacity are equal to s3.size(). */
-			if (test_object_1.size() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())))
+			if (test_object_1.size() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())))
 			{
 					/* DataProcess::Data_Object::operator= Invalid size after call to DataProcess::Data_Object::operator= std::string. */
 					return -1014;
 			}
-			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())))
+			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s3.size() + 1) : (s3.size())))
 			{
 					/* DataProcess::Data_Object::operator= Invalid capacity after call to DataProcess::Data_Object::operator= std::string. */
 					return -1015;
@@ -565,7 +566,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 					/* Check for s3 otherwise. */
 					else
 					{
-							if (p1[x] != p2[((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (x - 1) : (x))])
+							if (p1[x] != p2[((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (x - 1) : (x))])
 							{
 									/* DataProcess::Data_Object (Manual compare) Invalid data in the data_object. */
 									return -1004;
@@ -621,7 +622,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 			}
 
 			/* Reserve memory for s1.size(). */
-			test_object_1.reserve(((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())));
+			test_object_1.reserve(((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())));
 
 			/* Check for reserved memory. */
 			if (test_object_1.size() != 0)
@@ -629,7 +630,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 						/* DataProcess::Data_Object::reserve() Invalid size after call to reserve(). */
 						return -1008;
 			}
-			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())))
+			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())))
 			{
 					/* DataProcess::Data_Object::reserve() Invalid capacity after call to reserve(). */
 					return -1007;
@@ -644,7 +645,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 						/* DataProcess::Data_Object::reserve() Invalid size after call to operator+= std::string. */
 						return -1010;
 			}
-			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())))
+			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())))
 			{
 						/* DataProcess::Data_Object::reserve() Invalid capacity after call to operator+= std::string. */
 						return -1009;
@@ -677,19 +678,19 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 			}
 
 			/* Run test function. */
-			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 3, c1) != COMMON_ERROR_SUCCESS)
+			if (Unit_Test_Data_Object_Char_Functions_To_Test[y].fp(test_object_1_c_ptr, 3, c1) != COMMON_ERROR_SUCCESS)
 			{
 					/* Test function failed. */
 					return -1020;
 			}
 
 			/* Make sure that test_object_1's size and capacity are equal to s1.size(). */
-			if (test_object_1.size() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())))
+			if (test_object_1.size() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())))
 			{
 					/* DataProcess::Data_Object::operator= Invalid size after call to DataProcess::Data_Object::operator= std::string. */
 					return -1014;
 			}
-			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())))
+			if (test_object_1.get_Capacity() != ((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (s1.size() + 1) : (s1.size())))
 			{
 					/* DataProcess::Data_Object::operator= Invalid capacity after call to DataProcess::Data_Object::operator= std::string. */
 					return -1015;
@@ -737,7 +738,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 							}
 							if (x > 3)
 							{
-									if (p1[x] != p2[((Unit_Test_Data_Process_Char_Functions_To_Test[y].isInsert) ? (x - 1) : (x))])
+									if (p1[x] != p2[((Unit_Test_Data_Object_Char_Functions_To_Test[y].isInsert) ? (x - 1) : (x))])
 									{
 											/* DataProcess::Data_Object (Manual compare) Invalid data in the data_object. */
 											return -1004;
@@ -766,7 +767,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 
 				Should return COMMON_ERROR_INVALID_ARGUMENT.
 			 */
-			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(NULL, 3, c1) != COMMON_ERROR_INVALID_ARGUMENT)
+			if (Unit_Test_Data_Object_Char_Functions_To_Test[y].fp(NULL, 3, c1) != COMMON_ERROR_INVALID_ARGUMENT)
 			{
 					/* Test function failure. Should have returned COMMON_ERROR_INVALID_ARGUMENT. */
 					return -1020;
@@ -777,7 +778,7 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 
 				Should return COMMON_ERROR_INVALID_ARGUMENT.
 			 */
-			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(&badPrivPtr, 3, c1) != COMMON_ERROR_INVALID_ARGUMENT)
+			if (Unit_Test_Data_Object_Char_Functions_To_Test[y].fp(&badPrivPtr, 3, c1) != COMMON_ERROR_INVALID_ARGUMENT)
 			{
 					/* Test function failure. Should have returned COMMON_ERROR_INVALID_ARGUMENT. */
 					return -1020;
@@ -788,17 +789,17 @@ int Unit_Test_Data_Object_Insert_Replace_Overwrite_Char()
 
 				All of the following tests should return COMMON_ERROR_DATA_CORRUPTION.
 			 */
-			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(&badData, 0, c1) != COMMON_ERROR_DATA_CORRUPTION)
+			if (Unit_Test_Data_Object_Char_Functions_To_Test[y].fp(&badData, 0, c1) != COMMON_ERROR_DATA_CORRUPTION)
 			{
 					/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
 					return -1020;
 			}
-			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(&badLength, 0, c1) != COMMON_ERROR_DATA_CORRUPTION)
+			if (Unit_Test_Data_Object_Char_Functions_To_Test[y].fp(&badLength, 0, c1) != COMMON_ERROR_DATA_CORRUPTION)
 			{
 					/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
 					return -1020;
 			}
-			if (Unit_Test_Data_Process_Char_Functions_To_Test[y].fp(&badCapacity, 0, c1) != COMMON_ERROR_DATA_CORRUPTION)
+			if (Unit_Test_Data_Object_Char_Functions_To_Test[y].fp(&badCapacity, 0, c1) != COMMON_ERROR_DATA_CORRUPTION)
 			{
 					/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
 					return -1020;
