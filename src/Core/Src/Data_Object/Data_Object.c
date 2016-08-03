@@ -1891,7 +1891,7 @@ int MSYS_DataObject_Overwrite_With_CString(MSYS_DataObject_T * obj, const size_t
 
 						Overwrite "eats" the first byte of the dataLength. So we must subtract 1 from it here.
 					 */
-					if ((dataLength - 1) <= (realPtr->capacity - offset))
+					if ((dataLength - 1) < (realPtr->capacity - offset))
 					{
 						/* Copy the given data into the buffer at the given offset. */
 						memcpy((realPtr->data + offset), data, dataLength);
