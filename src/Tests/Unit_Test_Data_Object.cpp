@@ -78,6 +78,13 @@ int Unit_Test_Data_Object()
                         operator+= (char)
                         operator+= (std::string)
                         insert (char)
+						insert (DataProcess::Data_Object)
+						insert_No_Allocation (char)
+						insert_No_Allocation (DataProcess::Data_Object)
+						replace (char)
+						replace (DataProcess::Data_Object)
+						overwrite (char)
+						overwrite (DataProcess::Data_Object)
 
                     Need to be added.
                         operator+= (DataProcess::Data_Object)
@@ -87,10 +94,9 @@ int Unit_Test_Data_Object()
                         reset()
                         substr()
                         insert (std::string)
-                        insert (DataProcess::Data_Object)
-						replace (char)
+						insert_No_Allocation (std::string)
 						replace (std::string)
-						replace (DataProcess::Data_Object)
+						overwrite (std::string)
         */
 
         // Test data objects.
@@ -106,8 +112,9 @@ int Unit_Test_Data_Object()
         const char * p1 = NULL;
         const char * p2 = NULL;
 
-		/* Result from Insert_Char test. */
+		/* Result from Insert * tests. */
 		int ret_Insert_Char = 0;
+		int ret_Insert_DO = 0;
 
         // First test DataProcess::Data_Object.
 
@@ -1399,6 +1406,19 @@ int Unit_Test_Data_Object()
 
         /* Run the tests for Insert, Insert No Allocation, Replace, and Overwrite functions. */
 		ret_Insert_Char = Unit_Test_Data_Object_Insert_Replace_Overwrite_Char();
+		if (ret_Insert_Char != 0)
+		{
+			std::cout << "FAIL\n";
+			std::cout.flush();
+			return ret_Insert_Char;
+		}
+		ret_Insert_DO = Unit_Test_Data_Object_Insert_Replace_Overwrite_Data_Object();
+		if (ret_Insert_DO != 0)
+		{
+			std::cout << "FAIL\n";
+			std::cout.flush();
+			return ret_Insert_DO;
+		}
 
         // Default return.
         return 0;
