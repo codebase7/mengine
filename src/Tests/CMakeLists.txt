@@ -13,6 +13,7 @@ Unit_Test_Data_Object.cpp
 Unit_Test_Data_Object_Insert_Char.cpp
 Unit_Test_Data_Object_Insert_Replace_Overwrite_Char.cpp
 Unit_Test_Data_Object_Insert_Replace_Overwrite_Data_Object.cpp
+Unit_Test_Data_Object_Insert_Replace_Overwrite_C_Str.cpp
 Unit_Test_Byte_Order.cpp)
 
 # Only build the tests for the subsystems that are enabled.
