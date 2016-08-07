@@ -161,6 +161,32 @@ MSYS_DLL_EXPORT int MSYS_DataObject_Get_Data_Copy(const MSYS_DataObject_T * buff
 MSYS_DLL_EXPORT int MSYS_DataObject_Get_Byte(const MSYS_DataObject_T * buffer, char * retPtr, const size_t offset);
 
 /*!
+		int MSYS_DataObject_Set_Byte(MSYS_DataObject_T * buffer, const char byte, const size_t offset)
+
+		Sets the value of the byte in the given MSYS_DataObject_T's allocated memory buffer at the given offset.
+
+		Note 1: This function DOES NOT consider the current length (as returned by MSYS_DataObject_Get_Length())
+		when checking the given offset. This is because it allows accessing any value in the allocated memory
+		buffer for the object.
+
+		Note 2: This function DOES NOT allocate memory. If the given MSYS_DataObject_T lacks an allocated
+		memory buffer when this function is called, or if the given offset is outside of the allocated
+		memory buffer, an error will be returned. See below.
+
+		Note 3: This function will set the length of the given MSYS_DataObject_T to include the set byte
+		if the given offset is greater than the MSYS_DataObject_T's length at the time of the call.
+		(I.e. length = ((length < offset) ? (offset) : (length)))
+
+		Returns COMMON_ERROR_SUCCESS if successful.
+		Returns COMMON_ERROR_INVALID_ARGUMENT if a given pointer is invalid.
+		Returns COMMON_ERROR_NO_DATA if the given MSYS_DataObject_T lacks an allocated buffer. (I.e. Capacity is zero.)
+		Returns COMMON_ERROR_DATA_CORRUPTION if the source MSYS_DataObject_T object is inconsistant. (E.x. No allocated buffer, but size or capacity > 0.)
+		Returns COMMON_ERROR_RANGE_ERROR if the given offset argument is outside the given object's allocated memory buffer. (I.e. An offset that
+		would point to data from before or after the end of the given data object's allocated memory buffer.)
+ */
+MSYS_DLL_EXPORT int MSYS_DataObject_Set_Byte(MSYS_DataObject_T * buffer, const char byte, const size_t offset);
+
+/*!
 		void MSYS_Destroy_DataObject_Data_Copy(char ** obj)
 
 		Destroys (Deallocates) the copied object data, created by

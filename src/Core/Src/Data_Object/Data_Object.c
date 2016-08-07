@@ -640,6 +640,70 @@ int MSYS_DataObject_Get_Byte(const MSYS_DataObject_T * buffer, char * retPtr, co
 	return ret;
 }
 
+int MSYS_DataObject_Set_Byte(MSYS_DataObject_T * buffer, const char byte, const size_t offset)
+{
+	/* Init vars. */
+	int ret = COMMON_ERROR_UNKNOWN_ERROR;
+	int retFromCall = COMMON_ERROR_UNKNOWN_ERROR;
+	MSYS_DataObject_T_Private * realPtr = NULL;
+
+	/* Check args. */
+	if ((buffer != NULL) && ((buffer->ppObject) != NULL) && (*(buffer->ppObject) != NULL))
+	{
+		/* Get back the real pointer. */
+		realPtr = (MSYS_DataObject_T_Private *)(*(buffer->ppObject));
+
+		/* Check for data object consistancy. */
+		retFromCall = MSYS_Check_DataObject_Consistency_Private(realPtr);
+		if (retFromCall == COMMON_ERROR_COMPARISON_PASSED)
+		{
+			/* Check for data. */
+			if ((realPtr->data != NULL) && (realPtr->capacity > 0))
+			{
+				/* Check for valid offset. */
+				if (offset < realPtr->capacity)
+				{
+					/* Set the byte. */
+					realPtr->data[offset] = byte;
+
+					/* Check to see if we need to update the length. */
+					if (realPtr->length < offset)
+					{
+						/* Update the length to include the byte we just set. */
+						realPtr->length = offset;
+					}
+
+					/* Done. */
+					ret = COMMON_ERROR_SUCCESS;
+				}
+				else
+				{
+					/* Invalid offset. */
+					ret = COMMON_ERROR_RANGE_ERROR;
+				}
+			}
+			else
+			{
+				/* No data to return. */
+				ret = COMMON_ERROR_NO_DATA;
+			}
+		}
+		else
+		{
+			/* Given data object is inconsistant. */
+			ret = COMMON_ERROR_DATA_CORRUPTION;
+		}
+	}
+	else
+	{
+		/* Invalid arguments. */
+		ret = COMMON_ERROR_INVALID_ARGUMENT;
+	}
+
+	/* Exit function. */
+	return ret;
+}
+
 void MSYS_Destroy_DataObject_Data_Copy(char ** obj)
 {
 	/* Check for valid pointer. */
