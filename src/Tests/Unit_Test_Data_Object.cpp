@@ -93,6 +93,8 @@ int Unit_Test_Data_Object()
 						overwrite (char)
 						overwrite (std::string)
 						overwrite (DataProcess::Data_Object)
+						Get_Byte()
+						Set_Byte()
 
                     Need to be added.
                         operator+= (DataProcess::Data_Object)
@@ -1725,6 +1727,282 @@ int Unit_Test_Data_Object()
 		}
 		retFromCall = MSYS_DataObject_Get_Byte(&badCapacity, &byte, 0);
 		if ((retFromCall != COMMON_ERROR_DATA_CORRUPTION) || (byte != '\0'))
+		{
+			/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
+			return -1020;
+		}
+		std::cout << "PASS\n";
+		std::cout.flush();
+
+		/*
+				Set_Byte() test 1.
+
+				This test checks the result of a valid call to Set_Byte(), using s1 and offset 3.
+
+				The result should be that the given byte is stored at offset 3 in test_object_1 and the function
+				will return COMMON_ERROR_SUCCESS.
+		*/
+		std::cout << "MSYS_DataObject_Set_Byte() Tests: ";
+		std::cout.flush();
+
+		// Clear test_object_1.
+        test_object_1.clear();
+
+		// Make sure that both test_object_1 is empty.
+        if (test_object_1.size() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid size after clear().
+                return -1005;
+        }
+        if (test_object_1.get_Capacity() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid capacity after clear().
+                return -1006;
+        }
+
+		/* Set test_object_1 to s1. */
+		test_object_1 = s1;
+
+		/*
+			Make sure that test_object_1's size and capacity are equal to s1.
+		*/
+		if (test_object_1.size() != s1.size())
+		{
+			/* DataProcess::Data_Object::reserve() Invalid size after call to operator+= std::string. */
+			return -1010;
+		}
+		if (test_object_1.get_Capacity() != (s1.size()))
+		{
+			/* DataProcess::Data_Object::reserve() Invalid capacity after call to operator+= std::string. */
+			return -1009;
+		}
+
+		/* Get pointer for test_object_1. */
+		p1 = NULL;
+		if ((p1 = test_object_1.get_Pointer()) == NULL)
+		{
+			/* DataProcess::Data_Object::get_Pointer() Could not get pointer to test_object's data. */
+			return -1003;
+		}
+
+		/* Get pointer to string. */
+		p2 = NULL;
+		if ((p2 = s1.c_str()) == NULL)
+		{
+			/* Could not get pointer to string object. */
+			return -9001;
+		}
+
+		/* Make sure that test_object_1 actually contains the correct data. */
+		for (size_t x = 0; x < test_object_1.size(); x++)
+		{
+			if (p1[x] != p2[x])
+			{
+				/* DataProcess::Data_Object (Manual compare) Invalid data in the data_object. */
+				return -1004;
+			}
+		}
+
+		/* Run Set_Byte() function. */
+		retFromCall = MSYS_DataObject_Set_Byte(test_object_1_c_ptr, byte, 3);
+		if (retFromCall != COMMON_ERROR_SUCCESS)
+		{
+			/* Test function failed. */
+			return -1020;
+		}
+
+		/* Check for valid byte. */
+		if (byte != p1[3])
+		{
+			/* Test function failed to set the correct byte. */
+			return -1020;
+		}
+
+		// Clear test_object_1.
+        test_object_1.clear();
+
+		// Make sure that both test_object_1 is empty.
+        if (test_object_1.size() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid size after clear().
+                return -1005;
+        }
+        if (test_object_1.get_Capacity() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid capacity after clear().
+                return -1006;
+        }
+
+		/*
+				Set_Byte() test 2.
+
+				This test checks the result of a invalid call to Set_Byte(), using a blank object and offset 3.
+
+				The result should be that the function returns COMMON_ERROR_NO_DATA.
+		*/
+
+		/* Reset byte. */
+		byte = '\0';
+
+		// Clear test_object_1.
+        test_object_1.clear();
+
+		// Make sure that both test_object_1 is empty.
+        if (test_object_1.size() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid size after clear().
+                return -1005;
+        }
+        if (test_object_1.get_Capacity() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid capacity after clear().
+                return -1006;
+        }
+
+		/* Run Set_Byte() function. */
+		retFromCall = MSYS_DataObject_Set_Byte(test_object_1_c_ptr, byte, 3);
+		if (retFromCall != COMMON_ERROR_NO_DATA)
+		{
+			/* Test function failed. */
+			return -1020;
+		}
+
+		/*
+				Set_Byte() test 3.
+
+				This test checks the result of a invalid call to Set_Byte(), using s1 an offset beyond the end of the buffer.
+
+				The result should be that the function returns COMMON_ERROR_RANGE_ERROR.
+		*/
+
+		/* Reset byte. */
+		byte = '\0';
+
+		// Clear test_object_1.
+        test_object_1.clear();
+
+		// Make sure that both test_object_1 is empty.
+        if (test_object_1.size() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid size after clear().
+                return -1005;
+        }
+        if (test_object_1.get_Capacity() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid capacity after clear().
+                return -1006;
+        }
+
+		/* Set test_object_1 to s1. */
+		test_object_1 = s1;
+
+		/*
+			Make sure that test_object_1's size and capacity are equal to s1.
+		*/
+		if (test_object_1.size() != s1.size())
+		{
+			/* DataProcess::Data_Object::reserve() Invalid size after call to operator+= std::string. */
+			return -1010;
+		}
+		if (test_object_1.get_Capacity() != (s1.size()))
+		{
+			/* DataProcess::Data_Object::reserve() Invalid capacity after call to operator+= std::string. */
+			return -1009;
+		}
+
+		/* Get pointer for test_object_1. */
+		p1 = NULL;
+		if ((p1 = test_object_1.get_Pointer()) == NULL)
+		{
+			/* DataProcess::Data_Object::get_Pointer() Could not get pointer to test_object's data. */
+			return -1003;
+		}
+
+		/* Get pointer to string. */
+		p2 = NULL;
+		if ((p2 = s1.c_str()) == NULL)
+		{
+			/* Could not get pointer to string object. */
+			return -9001;
+		}
+
+		/* Make sure that test_object_1 actually contains the correct data. */
+		for (size_t x = 0; x < test_object_1.size(); x++)
+		{
+			if (p1[x] != p2[x])
+			{
+				/* DataProcess::Data_Object (Manual compare) Invalid data in the data_object. */
+				return -1004;
+			}
+		}
+
+		/* Run Set_Byte() function. */
+		retFromCall = MSYS_DataObject_Set_Byte(test_object_1_c_ptr, byte, SIZE_MAX);
+		if (retFromCall != COMMON_ERROR_RANGE_ERROR)
+		{
+			/* Test function failed. */
+			return -1020;
+		}
+
+		// Clear test_object_1.
+        test_object_1.clear();
+
+		// Make sure that both test_object_1 is empty.
+        if (test_object_1.size() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid size after clear().
+                return -1005;
+        }
+        if (test_object_1.get_Capacity() != 0)
+        {
+                // DataProcess::Data_Object::clear() Invalid capacity after clear().
+                return -1006;
+        }
+
+		/*
+				Set_Byte() test 4.
+
+				This test checks the result of a invalid call to Set_Byte(), using a NULL Data Object.
+
+				The result should be that the function returns COMMON_ERROR_INVALID_ARGUMENT.
+		*/
+
+		/* Reset byte. */
+		byte = '\0';
+
+		/* Run Set_Byte() function. */
+		retFromCall = MSYS_DataObject_Set_Byte(NULL, byte, 0);
+		if (retFromCall != COMMON_ERROR_INVALID_ARGUMENT)
+		{
+			/* Test function failed. */
+			return -1020;
+		}
+
+		/*
+				Set_Byte() test 5.
+
+				This test checks the result of a invalid call to Set_Byte(), using inconsistant (malformed) Data Objects.
+
+				The result should be that the function returns COMMON_ERROR_DATA_CORRUPTION.
+		*/
+		/* Reset byte. */
+		byte = '\0';
+
+		/* Call Set_Byte(). */
+		retFromCall = MSYS_DataObject_Set_Byte(&badData, byte, 0);
+		if (retFromCall != COMMON_ERROR_DATA_CORRUPTION)
+		{
+			/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
+			return -1020;
+		}
+		retFromCall = MSYS_DataObject_Set_Byte(&badLength, byte, 0);
+		if (retFromCall != COMMON_ERROR_DATA_CORRUPTION)
+		{
+			/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
+			return -1020;
+		}
+		retFromCall = MSYS_DataObject_Set_Byte(&badCapacity, byte, 0);
+		if (retFromCall != COMMON_ERROR_DATA_CORRUPTION)
 		{
 			/* Test function failure. Should have returned COMMON_ERROR_DATA_CORRUPTION. */
 			return -1020;
